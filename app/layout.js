@@ -32,8 +32,8 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="th" className={sukhumvitTadmai.variable}>
-      <body className={`${sukhumvitTadmai.variable} font-sukhumvit`}>
+    <html lang="th" className={sukhumvitTadmai.variable} suppressHydrationWarning>
+  <body className={`${sukhumvitTadmai.variable} font-sukhumvit`} suppressHydrationWarning>
         <LocaleProvider>
           <Navbartest />
           <TabMenu />
