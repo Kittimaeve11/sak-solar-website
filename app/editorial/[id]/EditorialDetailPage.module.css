@@ -1,0 +1,315 @@
+/* EditorialDetailPage.module.css */
+/* ครอบทั้งหมด กำหนด relative เพื่อให้ sidebar ลอยได้ */
+.wrapper {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+/* เนื้อหา max-width: 1200px และอยู่กึ่งกลาง */
+.contentBox {
+  max-width: 1200px;
+  width: 100%;
+}
+
+.headerportfolio {
+  padding: 1rem 0;
+}
+
+.contentWrapper {
+  flex: 1;
+}
+
+.article {
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  font-size: 32px;
+  font-weight: bold;
+  color: #0c3c78;
+  margin-top: 0;
+  margin-bottom: 0rem;
+}
+
+.date {
+  font-size: 15px;
+  color: #666;
+  margin-top: -0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.mainImage {
+  width: 100%;
+  height: auto;
+  border-radius: 0.25rem;
+  margin-bottom: 2rem;
+  background-color: #ddd;
+}
+
+/* .content {
+  font-size: 18px;
+  line-height: 1.8;
+  color: #333;
+}
+
+.content :global(h2) {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-top: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.content :global(h3) {
+  font-size: 1.125rem;
+  font-weight: bold;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  padding-left: 1rem;
+}
+
+.content :global(p) {
+  margin-bottom: 0rem;
+  padding-left: 1rem;
+} */
+
+
+.content {
+  padding-top: 0.2rem;
+  padding-left: 0rem;
+  padding-right: 0rem;
+  padding-bottom: 0.5rem;
+  line-height: 1.8;
+  font-size: 1.05rem;
+  color: #333;
+  background-color: #fff;
+}
+
+.content h1,
+.content h2,
+.content h3,
+.content h4,
+.content h5,
+.content h6 {
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  line-height: 1.4;
+  scroll-margin-top: 6rem; /* เผื่อมี sticky header */
+}
+
+.content h1 {
+  font-size: 2rem;
+  padding-bottom: 0.3rem;
+}
+
+.content h2 {
+  font-size: 20px;
+}
+
+.content h3 {
+  font-size: 1.3rem;
+  color: #333;
+}
+
+.content p {
+  margin: 1rem 0;
+  padding-left: 1rem;
+}
+
+.content ul,
+.content ol {
+  margin-left: 2rem;
+  margin-bottom: 1.5rem;
+  padding-left: 1rem;
+}
+
+.content blockquote {
+  border-left: 4px solid #ffcc00;
+  background: #fffbe6;
+  margin: 1.5rem 0;
+  padding: 1rem;
+  font-style: italic;
+  color: #555;
+}
+
+@media (max-width: 768px) {
+  .content {
+    padding: 1rem;
+    font-size: 1rem;
+  }
+
+  .content h1 {
+    font-size: 1.5rem;
+  }
+
+  .content h2 {
+    font-size: 1.3rem;
+  }
+
+  .content h3 {
+    font-size: 1.1rem;
+  }
+}
+
+
+/* Sidebar / TOC */
+/* เริ่มแบบ absolute */
+.sidebar {
+  position: absolute;
+  top: 155px; /* ปรับให้เท่ารูป */
+  left: 53%;
+  transform: translateX(600px);
+  width: 250px;
+  z-index: 10;
+  /* transition: all 0.8s ease; */
+}
+
+.sticky {
+  position: fixed !important;
+  top: 2rem !important;
+}
+
+/* Responsive: ซ่อน sidebar ในมือถือ */
+@media (max-width: 1260px) {
+  .sidebar {
+    display: none;
+  }
+}
+
+.sidebarTitle {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+/* .tocList {
+  list-style: none;
+  padding-left: 0;
+  border-left: 3px solid #ddd;
+} */
+
+/* .tocItem {
+  margin-bottom: 0.5rem;
+  padding-left: 1rem;
+  position: relative;
+} */
+
+/* .tocItem a {
+  text-decoration: none;
+  color: #ff5c00;
+  font-weight: bold;
+}
+
+.tocSubItem {
+  margin-bottom: 0.5rem;
+  padding-left: 2rem;
+  color: #666;
+}
+
+.tocSubItem a {
+  text-decoration: none;
+  color: #666;
+}
+
+.tocItem a:hover,
+.tocSubItem a:hover {
+  text-decoration: underline;
+} */
+
+
+
+.tocTitle {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+/* list container */
+.tocList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  padding-left: 1rem; /* เยื้องรายการออกจากหัวข้อ */
+}
+
+.tocItem {
+  margin-bottom: 0.5rem;
+}
+
+/* ปรับปุ่มภายใน .tocItem */
+.tocItem button {
+  color: #666;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  transition: color 0.2s ease;
+}
+
+.tocItem button:hover {
+  color: #ff5d06af;
+}
+
+.tocItem button.active {
+  color: #FF5E06;
+  font-weight: bold;
+}
+
+/* .tocLinkMain {
+  color: #ff6600;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.tocLinkSection {
+  color: #666666;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.tocLinkSub {
+  color: #666666;
+  font-weight: normal;
+  margin-left: 1.5rem;
+  text-decoration: none;
+} */
+
+
+.notFound {
+  text-align: center;
+  font-size: 1.25rem;
+  margin-top: 4rem;
+}
+
+.meta {
+    font-size: 18px;
+    color: #666;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    align-items: center;
+}
+
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  /* ให้ไอคอนกับข้อความอยู่กึ่งกลางในแนวตั้ง */
+  gap: 0.1rem;
+  /* ระยะห่างระหว่างไอคอนกับข้อความ */
+  color: #FF5E06;
+  text-decoration: none;
+  font-size: 18px;
+}
+
+.link:hover {
+  text-decoration: none;
+  /* ห้ามแสดงเส้นใต้ตอน hover */
+  color: #E55100;
+  /* ถ้าต้องการเปลี่ยนสีตอน hover */
+}

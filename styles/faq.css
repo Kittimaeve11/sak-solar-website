@@ -1,0 +1,202 @@
+/* Container ของแต่ละ FAQ */
+.faq-item {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  margin-bottom: 0rem;
+  padding-bottom: 1.2rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  transition: box-shadow 0.3s ease;
+  cursor: default;
+}
+
+.faq-item.open {
+  box-shadow: 0 4px 12px rgba(255, 136, 0, 0.08);
+}
+
+/* ปุ่มคำถาม */
+.faq-button {
+  background: transparent;
+  color: #243865;
+  width: 100%;
+  padding: 1rem 2rem 0.6rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-align: left;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  margin-bottom: 0;
+  transition: color 0.3s ease, margin-bottom 0.3s ease;
+  user-select: none;
+}
+
+.faq-item.open .faq-button {
+  color: #F25C05;
+  margin-bottom: 0;
+}
+
+/* ไอคอนลูกศร */
+.faq-icon {
+  display: flex;
+  font-size: 1.2rem;
+  color: #F25C05;
+  transition: transform 0.3s ease;
+  flex-shrink: 0;
+  margin-right: 1rem;
+  /* เพิ่มช่องว่างขวาให้ลูกศรไม่ชิดขอบ */
+}
+
+.faq-item.open .faq-icon {
+  transform: rotate(90deg);
+}
+
+/* เนื้อหาคำตอบ */
+.faq-answer {
+  color: #243865;
+  padding: 0 2rem;
+  max-height: 0;
+  overflow: hidden;
+  transition:
+    max-height 0.4s ease,
+    padding 0.3s ease;
+  word-break: break-word;
+  white-space: normal;
+
+  /* เพิ่มสำหรับกระจายข้อความภาษาไทย */
+  text-align: justify;           /* จัดย่อหน้าให้กระจายเต็มบรรทัด */
+  text-justify: distribute;      /* วิธีกระจายข้อความแบบไทย */
+  hyphens: none;                 /* ปิดการตัดคำอัตโนมัติ */
+  word-break: break-word;        /* ตัดคำตามที่จำเป็น */
+  padding-left: 2.5rem;
+  padding-right: 5.5rem;
+}
+
+.faq-answer.open {
+  /* พวก padding-top/bottom จะถูกเซ็ตผ่าน JavaScript */
+}
+
+.faq-answer p {
+  text-indent: 2rem;
+  margin: 0 1rem 1rem 1rem;
+  /* ขยับซ้ายขวาเข้า 1rem */
+  line-height: 1.8;
+  user-select: text;
+  overflow-wrap: break-word;
+}
+
+/* hover effect (ถ้าต้องการ) */
+.faq-button:hover {
+  color: #F25C05;
+
+}
+
+.faq-answer ol {
+  padding-left: 2rem;       /* ระยะเลขกับข้อความเท่ากัน */
+  margin: 0;
+  list-style-position: inside; /* เลขอยู่ชิดข้อความ */
+}
+
+.faq-answer li {
+  margin: 0;
+  padding: 0;
+  line-height: 1.5;
+}
+
+.faq-answer li p {
+  display: inline; /* ถ้ามี <p> อยู่ข้างใน li */
+  margin: 0;
+  padding: 0;
+}
+
+.faq-answer li span, 
+.faq-answer li strong {
+  display: inline; /* tag inline อื่น ๆ อยู่ในบรรทัดเดียวกับเลข */
+}
+
+/* Skeleton loading effect */
+.skeleton {
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0% { background-color: #e0e0e0; }
+  50% { background-color: #f0f0f0; }
+  100% { background-color: #e0e0e0; }
+}
+
+/* FAQ Skeleton Card */
+.faq-skeleton-card {
+  display: flex;
+  flex-direction: column;
+  border-radius: 10px;
+  overflow: hidden;
+  background-color: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  margin-bottom: 10px;
+  padding:  20px;
+}
+
+.faq-skeleton-question {
+  height: 24px;
+  width: 60%;
+  margin-bottom: 12px;
+  border-radius: 4px;
+}
+
+.faq-skeleton-answer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.banner-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3.22 / 1;
+  /* คุมอัตราส่วน */
+  min-height: 300px;
+  /* fallback กัน layout shift */
+  overflow: hidden;
+}
+
+.banner-image {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+  display: block;
+  transition: opacity 0.6s ease-in-out;
+}
+
+
+/* Banner Skeleton */
+.skeleton-banner {
+  width: 100%;
+  aspect-ratio: 3.22 / 1;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+/* Fade-in animation */
+.fade-in {
+  opacity: 0;
+  animation: fadeIn 0.8s ease-in forwards;
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+
+/* Responsive for mobile */
+@media (max-width: 768px) {
+  .skeleton-banner {
+    aspect-ratio: 1.9 / 1;
+  }
+}

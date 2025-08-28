@@ -1,0 +1,225 @@
+/* SlidePortfolio.css */
+.portfolio-gridslide {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+    /* ← เพิ่มระยะห่างระหว่างการ์ด */
+    padding: 0 12px;
+}
+
+.portfolio-wrapperslide {
+    padding: 0rem 1rem;
+    max-width: 1200px;
+    margin: auto;
+    padding-top: 1rem;
+}
+
+
+.portfolio-headerslide {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 16px;
+}
+
+
+/* การ์ด carousel */
+.portfolio-cardslide {
+    background: #fff;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    overflow: hidden;
+    margin-bottom: 10px;
+    transition: box-shadow 0.2s ease;
+    text-decoration: none;
+    /* เพิ่ม */
+    color: inherit;
+    /* เพิ่ม */
+}
+
+/* .portfolio-card:hover {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+} */
+
+.portfolioslide-image-wrapper {
+    position: relative;
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    border-radius: 0;
+}
+
+.portfolioslide-image {
+    position: absolute !important;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.portfolio-cardslide:hover .portfolioslide-image {
+    filter: brightness(0.4);
+}
+
+/* Banner logo ซ้ายบน */
+.portfolio-bannerslide {
+    position: absolute;
+    top: 1rem;
+    left: 0;
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.92);
+    padding: 4px 10px;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #243865;
+    z-index: 2;
+}
+
+.banner-logoslide {
+    width: 25px;
+    height: 25px;
+    margin-right: 6px;
+}
+
+.banner-textslide {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #264798;
+    white-space: nowrap;
+}
+
+/* เนื้อหาการ์ด */
+.portfolio-contentslide {
+    padding: 16px 20px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.project-titleslide {
+    font-size: 18px;
+    font-weight: 600;
+    color: #264798;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.project-detailsslide {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: 0.95rem;
+    color: #555;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.project-detailsslide li {
+    display: flex;
+    justify-content: space-between;
+    padding: 2px 0;
+}
+
+.project-detailsslide li strong {
+    color: #264798;
+}
+
+.project-detailsslide li.date-postslide {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    justify-content: flex-start;
+    color: #264798;
+    margin-top: 6px;
+    border: none;
+}
+
+
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .headersolarslide {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .portfolio-cardslide {
+        margin: 6px;
+    }
+
+    .portfolioslide-image-wrapper {
+        height: 160px;
+    }
+}
+
+/* Skeleton loading effect */
+.skeleton {
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0% { background-color: #e0e0e0; }
+  50% { background-color: #f0f0f0; }
+  100% { background-color: #e0e0e0; }
+}
+
+.skeleton-cardportfolio {
+  display: flex;
+  flex-direction: column;
+  border-radius: 10px;
+  overflow: hidden;
+  background-color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  padding-bottom: 16px;
+}
+
+.skeleton-imageportfolio {
+  width: 100%;
+  height: 180px;
+}
+
+.skeleton-titleportfolio {
+  height: 20px;
+  margin: 16px 16px 8px 16px;
+  width: 70%;
+}
+
+.skeleton-lineportfolio {
+  height: 16px;
+  margin: 6px 16px;
+  width: 90%;
+  display: block;
+}
+
+.fade-in {
+  opacity: 0;
+  animation: fadeIn 0.8s ease-in forwards;
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+
+/* Responsive grid for skeletons */
+.portfolio-loading-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  padding: 0 16px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .skeleton-banner {
+    aspect-ratio: 1.92 / 1;
+  }
+}

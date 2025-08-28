@@ -1,0 +1,208 @@
+.editorial-wrapperslide {
+  padding: 0rem 1rem;
+  max-width: 1200px;
+  margin: auto;
+  padding-top: 1rem;
+
+}
+
+.editorial-headerslide {
+  display: flex;
+  justify-content: flex-end;
+  /* 👉 จัดชิดขวา */
+  margin-bottom: 1rem;
+}
+
+.slide-itemeditorial {
+  padding: 0 12px;
+  box-sizing: border-box;
+}
+
+.editorial-cardslide {
+  background: #fff;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  overflow: hidden;
+  margin-bottom: 10px;
+  text-decoration: none;
+  /* เพิ่ม */
+  color: inherit;
+  /* เพิ่ม */
+}
+
+/* .editorial-card:hover {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+} */
+
+.card-imageslide {
+  border-radius: 6px 6px 0 0;
+  display: block;
+}
+
+.editorial-cardslide:hover .card-imageslide {
+  filter: brightness(0.4);
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+}
+
+.card-contentslide {
+  padding: 10px 25px 16px 25px;
+}
+
+/* หัวข้อ: จำกัด 1 บรรทัด */
+.card-titleslide {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 0rem;
+
+  display: block;
+  width: 280px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+  box-sizing: border-box;
+}
+
+/* เนื้อหา: จำกัด 2 บรรทัด */
+.card-snippetslide {
+  color: #555;
+  font-size: 15px;
+  margin-top: 0.5rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  text-decoration: none;
+  /* เพิ่ม */
+  border-bottom: none;
+  /* เพิ่ม */
+  box-shadow: none;
+  /* เพิ่ม */
+}
+
+.editorial-dateslide {
+  color: #888;
+  font-size: 14px;
+}
+
+
+
+.headersolarslide {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  font-weight: 400;
+  /* ใช้ Thin */
+  text-align: center;
+  color: #F2780C;
+}
+
+/* Skeleton Loading - Pulse effect */
+.skeleton {
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0% {
+    background-color: #e0e0e0;
+  }
+
+  50% {
+    background-color: #f0f0f0;
+  }
+
+  100% {
+    background-color: #e0e0e0;
+  }
+}
+
+/* Skeleton Card Container */
+.skeleton-cardeditorial {
+  display: flex;
+  flex-direction: column;
+  border-radius: 6px;
+  overflow: hidden;
+  background-color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  height: 100%;
+
+  padding-bottom: 40px;
+  /* เพิ่มจาก 16px เป็น 24px */
+  margin-bottom: 40px;
+  /* เพิ่ม margin ด้านล่างเผื่อช่องว่าง */
+}
+
+/* Skeleton Image Placeholder (ขนาดเท่ากับ .card-image) */
+.skeleton-imageeditorial {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 6px 6px 0 0;
+}
+
+/* เนื้อหาใน skeleton ให้ตรงกับ padding ของ .card-content */
+.skeleton-titleeditorial,
+.skeleton-lineeditorial,
+.skeleton-dataeditorial {
+  margin-left: 25px;
+  margin-right: 25px;
+  border-radius: 6px;
+  background-color: #ddd;
+  /* สีพื้นสว่างกว่าข้อความปกติเล็กน้อย */
+}
+
+/* ความสูงและความกว้างปรับให้สมดุล */
+.skeleton-titleeditorial {
+  height: 22px;
+  width: 60%;
+  margin-top: 22px;
+  margin-bottom: 20px;
+}
+
+.skeleton-dataeditorial {
+  height: 14px;
+  width: 30%;
+  margin-top: 2px;
+  margin-bottom: 22px;
+}
+
+.skeleton-lineeditorial {
+  height: 18px;
+  width: 85%;
+  margin-bottom: 15px;
+}
+
+.skeleton-lineeditorial:last-child {
+  width: 85%;
+  margin-bottom: 0;
+}
+
+/* Fade-in animation */
+.fade-in {
+  opacity: 0;
+  animation: fadeIn 0.8s ease-in forwards;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+
+.custom-dots {
+  display: none;
+}

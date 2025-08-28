@@ -1,0 +1,556 @@
+.navWrapper {
+  position: relative;
+  background: #ffffff;
+}
+
+.navbar {
+  /* width: calc(100% - 50px); ลดความกว้าง 20px (ซ้าย+ขวา = 10px+10px) */
+  /* margin: 0 auto; กึ่งกลาง */
+  /* padding: 0.5rem 5rem; เว้นขอบซ้าย-ขวาให้ห่างขึ้น */
+  /* max-width: 1200px;       กำหนดความกว้างสูงสุดของ navbar */
+  margin: 0 auto;
+  /* ทำให้อยู่กึ่งกลางจอ */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: white;
+  padding: 10px 80px 10px 200px;
+  /*     top   right  bottom  left */
+  position: relative;
+  z-index: 2;
+}
+
+.leftSection {
+  display: flex;
+  align-items: center;
+}
+
+.companyName {
+  margin-left: 15px;
+}
+
+/* .thai {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.eng {
+  font-size: 14px;
+  color: #ccc;
+}
+
+.rightSection {
+  text-align: right;
+  color: black;
+}
+
+.lang {
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+.hotline {
+  font-size: 20px;
+  font-weight: bold;
+  color: #0056b3;
+  margin: 5px 0;
+} */
+
+/* 
+.links a {
+  text-decoration: none;
+  color: black;
+  margin: 0 5px;
+}
+
+.links a:hover {
+  text-decoration: underline;
+} */
+
+/* 🔷 Yellow Triangle Section (simulate diagonal cut) */
+.navWrapper::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 420.5px;
+  /* คงที่หรือ responsive ได้ */
+  height: 100%;
+  background-color: #E88534;
+  /* background-color: #f87f0b; */
+  clip-path: polygon(100px 0, 100% 0%, 100% 100%, 0% 100%);
+  z-index: 1;
+}
+
+/* 🔶 Yellow bottom line */
+.navWrapper::before {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 9.5px;
+  width: 100%;
+  background-color: #E88534;
+  z-index: 3;
+}
+
+.leftSection {
+  display: flex;
+  align-items: center;
+  /* ✅ กึ่งกลางแนวตั้ง */
+  gap: 16px;
+}
+
+.logoContainer {
+  position: relative;
+  width: 450px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  /* ✅ กึ่งกลางแนวตั้งใน logoContainer */
+  justify-content: center;
+  /* เฉพาะถ้าคุณต้องการให้รูปภาพอยู่กลาง container */
+}
+
+.logoImage {
+  height: 100%;
+  max-height: 80px;
+  padding: 0;
+  object-fit: contain;
+  display: block;
+}
+
+/* กลุ่มปุ่มภาษา + เกี่ยวกับเรา + ติดต่อเรา */
+.localeContactGroup {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  /* กึ่งกลางแนวนอน */
+  justify-content: flex-end;
+  /* กึ่งกลางแนวตั้ง */
+  text-align: center;
+}
+
+/* ปุ่มภาษา */
+.localeButtons {
+  display: flex;
+  justify-content: flex-end;
+  /* เปลี่ยนจาก center เป็นขวา */
+  gap: 0px;
+  /* หรือ margin ตามต้องการ */
+  margin-bottom: -0.5rem;
+}
+
+.localeItem {
+  cursor: pointer;
+}
+
+.localeDivider {
+  margin: 0 5px;
+  /* เพิ่มช่องว่างซ้าย-ขวา */
+}
+
+.localeButtons>* {
+  position: relative;
+  display: inline-block;
+  color: #ffffffbb;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.localeButtons>*:hover {
+  background-image: linear-gradient(120deg, #ffffff, #243865, #ffffff);
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: shine 3s linear infinite;
+}
+
+@keyframes shine {
+  0% {
+    background-position: -200% center;
+  }
+
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.localeItem {
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  font-weight: 400 !important;
+  /* ใช้ Thin */
+}
+
+.localeItem.disabled {
+  color: #0d3973;
+  pointer-events: none;
+}
+
+.separator {
+  width: 0rem;
+}
+
+.separatorone {
+  width: 0rem;
+}
+
+/* เส้นตรงกลางปุ่มเปลี่ยนภาษา */
+/* .separator {
+  border-left: 1.8px solid #0d3973;
+  height: 16px;
+  margin: 0 8px;
+} */
+/* เส้นตรงกลาง เกี่ยวกับเรา ติดต่อเรา */
+/* .separatorone {
+  border-left: 1.8px solid #ffffff;
+  height: 16px;
+  margin: 0 8px;
+} */
+
+.contactActions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  /* 🔹 จัดกึ่งกลางแนวนอน */
+  justify-content: center;
+  /* 🔹 จัดกึ่งกลางแนวตั้ง (หาก container สูง) */
+  text-align: center;
+}
+
+.callLink {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: #243865;
+  font-weight: bold;
+  font-size: 26px;
+  justify-items: center;
+  margin-bottom: -0.5rem;
+
+}
+
+.phoneIcon {
+  margin-right: 6px;
+  margin-bottom: -0.5rem;
+  font-size: 20px;
+}
+
+.phoneNumber {
+  font-weight: bold;
+}
+
+/* ปุ่มติดต่อเรา + เกี่ยวกับเรา */
+.contact {
+  display: inline-block;
+  text-decoration: none;
+  color: white;
+  font-weight: 400;
+  font-size: 14px;
+  user-select: none;
+  cursor: pointer;
+  padding-bottom: 0px;
+  border-bottom: 2px solid transparent;
+  transition: border-bottom 0.2s ease;
+}
+
+/* .contact:hover {
+  background-image: linear-gradient(120deg, #ffffff, #243765ad, #ffffff);
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: shine 3s linear infinite;
+}
+
+@keyframes shine {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+} */
+
+.contact:hover {
+  /* background-color: #11377c;*/
+  color: #11377c;
+}
+
+
+.contact.active {
+  /* background-color: #f87f0b; */
+  color: #11377c;
+  /* border-bottom: 2px solid white; */
+}
+
+@media (max-width: 1200px) {
+  .navbar {
+    padding: 10px 80px;
+    /* ลดระยะห่างด้านข้างลง */
+  }
+
+
+  .logoContainer {
+    width: 450px;
+    /* ปรับขนาดโลโก้เล็กลงตามจอ */
+  }
+}
+
+.contactLinkGroup {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+}
+
+@media (max-width: 991px) {
+  .navbar {
+    padding: 0px 0px 47px 90px;
+    /* เพิ่ม padding-bottom ให้สูงพอ */
+    position: relative;
+    z-index: 2;
+  }
+
+  .navWrapper {
+    position: relative;
+    background: #ffffff;
+    z-index: 0;
+  }
+
+  /* 🔶 พื้นหลังสีส้มด้านล่าง ไม่เปลี่ยนแปลง */
+  .navWrapper::before {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 50px;
+    width: 100%;
+    background-color: #E88534;
+    z-index: 0;
+  }
+
+  /* 🔷 พื้นหลังสามเหลี่ยมด้านขวา */
+  .navWrapper::after {
+    width: 200px;
+    clip-path: polygon(100px 0, 100% 0%, 100% 100%, 0% 100%);
+    transition: width 0.3s ease, clip-path 0.3s ease;
+  }
+
+  .logoContainer {
+    position: relative;
+    width: 450px;
+    /* ขนาดเริ่มต้น */
+    height: 90px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    /* ชิดซ้าย */
+    padding-left: 20px;
+    /* เว้นช่องว่างซ้ายไว้ */
+    z-index: 3;
+    /* เหนือเส้น */
+    transition: width 0.3s ease, padding-left 0.3s ease;
+  }
+
+  .logoImage {
+    max-height: 80px;
+    /* ไม่เลยเส้นสีส้ม */
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    object-fit: contain;
+    display: block;
+    transition: max-height 0.3s ease, width 0.3s ease;
+  }
+
+  /* กลุ่มปุ่มและเมนู */
+  .localeContactGroup {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    z-index: 2;
+  }
+
+  .localeItem {
+    font-size: 14px;
+  }
+
+  .localeButtons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 13px;
+    margin-bottom: 2px;
+  }
+
+  .contact {
+    font-size: 14px;
+  }
+
+  .contactActions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 19px;
+    margin-top: 2px;
+  }
+
+  .phoneIcon,
+  .phoneNumber {
+    display: none;
+  }
+}
+
+/* ย่อขนาดและเลื่อนตำแหน่งตามจอเล็กลง */
+
+/* <= 800px */
+@media (max-width: 800px) {
+  .logoContainer {
+    width: clamp(250px, 60vw, 500px);
+    padding-left: clamp(0px, 3vw, 20px);
+    transition: width 0.4s ease, padding-left 0.4s ease;
+  }
+
+  .logoImage {
+    max-height: clamp(200px, 50vw, 400px);
+    transition: max-height 0.4s ease;
+  }
+
+  .navWrapper::after {
+    width: clamp(180px, 25vw, 230px);
+    clip-path: polygon(90px 0, 100% 0%, 100% 100%, 0% 100%);
+    transition: width 0.4s ease;
+  }
+
+  .navbar {
+    padding: 0px clamp(10px, 3vw, 50px) 47px clamp(10px, 4vw, 50px);
+    transition: padding 0.4s ease;
+  }
+}
+
+@media (max-width: 600px) {
+  .logoContainer {
+    width: clamp(180px, 90vw, 380px);
+    padding-left: clamp(5px, 2vw, 15px);
+  }
+
+  .navWrapper::after {
+    width: clamp(180px, 22vw, 130px);
+    clip-path: polygon(90px 0, 100% 0%, 100% 100%, 0% 100%);
+  }
+}
+
+@media (max-width: 518px) {
+  .logoContainer {
+    width: clamp(180px, 90vw, 380px);
+    padding-left: clamp(5px, 2vw, 15px);
+  }
+
+  .navWrapper::after {
+    width: clamp(150px, 22vw, 130px);
+    clip-path: polygon(90px 0, 100% 0%, 100% 100%, 0% 100%);
+  }
+}
+
+@media (max-width: 495px) {
+  .logoContainer {
+    width: clamp(160px, 85vw, 350px);
+  }
+
+  .logoImage {
+    max-height: clamp(80px, 90vw, 300px);
+  }
+
+  .navWrapper::after {
+    width: clamp(150px, 20vw, 110px);
+    clip-path: polygon(90px 0, 100% 0%, 100% 100%, 0% 100%);
+  }
+}
+
+@media (max-width: 459px) {
+  .navbar {
+    padding: 0px 0px 47px 20px;
+  }
+
+  .logoContainer {
+    width: clamp(160px, 80vw, 330px);
+  }
+
+  .navWrapper::after {
+    width: clamp(130px, 20vw, 110px);
+    clip-path: polygon(90px 0, 100% 0%, 100% 100%, 0% 100%);
+  }
+}
+
+@media (max-width: 400px) {
+  .navbar {
+    padding: 10px clamp(5px, 2vw, 20px) 47px clamp(0px, 1vw, 15px);
+    /* เพิ่ม padding-top ให้ลงมา */
+    transition: padding 0.4s ease;
+    display: flex;
+    align-items: center;
+  }
+
+  .logoContainer {
+    width: clamp(180px, 80vw, 400px);
+    max-width: 400px;
+    padding-left: clamp(5px, 2vw, 15px);
+    display: flex;
+    align-items: center;
+    /* ถ้าต้องการเลื่อนลงอีก */
+    margin-top: 10px;
+    /* ปรับเพิ่ม-ลดได้ตามชอบ */
+    transition: margin-top 0.4s ease;
+  }
+
+  .logoImage {
+    max-height: clamp(70px, 22vw, 200px);
+    width: 100%;
+    object-fit: contain;
+    display: block;
+  }
+
+  .navWrapper::after {
+    width: clamp(100px, 22vw, 130px);
+    clip-path: polygon(80px 0, 100% 0%, 100% 100%, 0% 100%);
+  }
+}
+
+@media (max-width: 319px) {
+  .navbar {
+    display: flex;
+    align-items: center;
+    padding-top: 10px;
+    /* เพิ่ม padding-top เล็กน้อย */
+  }
+
+  .logoContainer {
+    width: clamp(10px, 90vw, 350px);
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+    /* เพิ่ม margin-top */
+    transition: margin-top 0.4s ease;
+  }
+
+  .logoImage {
+    max-height: clamp(10px, 25vw, 250px);
+    display: block;
+  }
+
+  .navWrapper::after {
+    width: clamp(70px, 25vw, 90px);
+    clip-path: polygon(70px 0, 100% 0%, 100% 100%, 0% 100%);
+  }
+}

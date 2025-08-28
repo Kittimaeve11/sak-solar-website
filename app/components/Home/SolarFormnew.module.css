@@ -1,0 +1,502 @@
+/* พื้นหลังฟอร์ม */
+.containersolar {
+  background-color: #FAFBFF;
+  padding: 1rem 0;
+  width: 100%;
+}
+
+.formWrapper {
+  margin: 0 auto;
+  font-family: sans-serif;
+  border-radius: 8px;
+  width: 100%;
+}
+
+.formWrapperInitial {
+  max-width: 670px;
+}
+
+.formWrapperResult {
+  max-width: 1200px;
+}
+
+.headtitelsolar {
+  color: #264798;
+  text-align: center;
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+  font-weight: 600;
+}
+
+/* คำแนะนำ */
+.instructions {
+  margin: 1rem 0;
+  color: #264798;
+}
+
+.instructions1 {
+  margin-top: -0.5rem;
+  margin-left: 3.5rem;
+  margin-bottom: 0.5rem;
+  color: #264798;
+}
+
+.instructions2 {
+  margin-bottom: 1rem;
+  color: #F2780C;
+}
+
+/* ฟอร์มคำนวณ */
+.solar-form {
+  max-width: 700px;
+  margin: 0 auto;
+  border-radius: 10px;
+}
+
+.buttonGroup {
+  display: flex;
+  justify-content: flex-end;
+  /* ชิดขวาทั้งหมด */
+  margin-top: 1.5rem;
+}
+
+
+/* slider */
+.rangeControl {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 9px;
+  border-radius: 5px;
+  background: #ffffff;
+  outline: none;
+  border: 1px solid #ccc;
+}
+
+.rangeControl::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  background: #F2780C;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+}
+
+.rangeControl::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: #F2780C;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+}
+
+.rangeControl::-moz-range-track {
+  height: 6px;
+  background: #f2f2f2;
+  border-radius: 3px;
+}
+
+/* ช่วงเวลา */
+.usageSplit {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: #555;
+  font-weight: 400;
+  margin-bottom: 1.5rem;
+}
+
+/* อนิเมชัน */
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ผลคำนวณ */
+/* แถวบน */
+.resultGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.topGrid,
+.bottomGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.resultBox {
+  background: #fff;
+  /* border: 2px solid #ddd; */
+  border-radius: 8px;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  padding-left: 2rem;
+  padding-right: 2rem;
+  /* padding: 2rem; */
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+
+.labelRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+
+.resultBoxc {
+  display: flex;
+  align-items: center;
+  /* กึ่งกลางแนวดิ่ง */
+  padding: 1rem 2rem;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  height: auto;
+}
+
+.labelRowc {
+  display: flex;
+  justify-content: space-between;
+  /* ดัน label ชิดซ้าย, value ชิดขวา */
+  align-items: center;
+  /* กึ่งกลางแนวตั้ง */
+  width: 100%;
+}
+
+.labelheadc {
+  font-size: 36px;
+  font-weight: 800;
+  color: #E88534;
+  line-height: 1;
+}
+
+.valueLargec {
+  display: flex;
+  align-items: baseline;
+  /* ให้เลขกับหน่วยชิดกันสวย */
+}
+
+.recommendedNumberc {
+  font-size: 60px;
+  font-weight: bold;
+  color: #E88534;
+  line-height: 1;
+}
+
+.recommendedUnitc {
+  font-size: 30px;
+  font-weight: bold;
+  color: #E88534;
+  margin-left: 4px;
+  line-height: 1;
+}
+
+.labelhead {
+  font-size: 36px;
+  color: #E88534;
+  font-weight: 800;
+
+  /* margin-bottom: 0.5rem; */
+}
+
+.valueLarge {
+  display: flex;
+  align-items: flex-end;
+}
+
+.recommendedNumber {
+  font-size: 50px;
+  font-weight: bold;
+  color: #E88534;
+  line-height: 1;
+}
+
+
+
+.recommendedUnit {
+  font-size: 30px;
+  font-weight: bold;
+  color: #E88534;
+  margin-left: 4px;
+  line-height: 1;
+}
+
+.subtext {
+  font-size: 16px;
+  color: #666;
+  margin-top: 0.2rem;
+}
+
+/* แพ็กเกจที่แนะนำ */
+
+.resultBoxL {
+  background: #fff;
+  /* border: 2px solid #ddd; */
+  border-radius: 8px;
+  padding-top: -1rem;
+  padding-bottom: 1rem;
+  padding-left: 2rem;
+  padding-right: 2rem;
+  /* padding: 2rem; */
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+
+.packageTitle {
+  /* padding-top: -2rem; */
+  margin-top: 1.5rem;
+  margin-bottom: -1rem;
+  font-size: 30px;
+  text-align: center;
+  font-weight: 600;
+  color: #E88534;
+}
+
+.systemType {
+  color: #264798;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 600;
+  text-shadow: 0.02m 0 0 currentColor;
+  margin-top: 10px;
+  /* margin-bottom: 1rem; */
+}
+
+.systemType.with-lines {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #243865;
+}
+
+.systemType.with-lines::before,
+.systemType.with-lines::after {
+  content: "";
+  width: 25px;
+  /* ความยาวของเส้น */
+  height: 4px;
+  background-color: #E88534;
+  margin: 0 12px;
+  /* ระยะห่างระหว่างเส้นกับข้อความ */
+}
+
+
+/* สินค้า */
+.productListWrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.productList {
+  display: flex;
+  gap: 2rem;
+  text-align: center;
+  justify-content: center;
+}
+
+.productCard {
+  position: relative;
+  width: 300px;
+  text-align: center;
+  border: 0.5px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 3px 16px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1.8rem;
+  padding-bottom: 1rem;
+  background-color: #fff;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  /* ✅ เพิ่มบรรทัดนี้ */
+}
+
+.productCard:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+/* 🔥 overlay ปิดทับการ์ด */
+.cardOverlay {
+  position: absolute;
+  inset: 0;
+  /* top: 0; right: 0; bottom: 0; left: 0; */
+  background-color: rgba(0, 0, 0, 0.651);
+  color: #fff;
+  font-weight: 600;
+  font-size: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+/* ✨ แสดง overlay เมื่อ hover */
+.productCard:hover .cardOverlay {
+  opacity: 4;
+  pointer-events: auto;
+}
+
+
+.productImage {
+  /* border: 2px solid #ccc; */
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  object-fit: cover;
+  /* box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); */
+  max-width: 100%;
+  height: auto;
+}
+
+.productTable {
+  width: 100%;
+  padding: 0 15px;
+  border-radius: 8px;
+}
+
+.productTable .product-info {
+  text-align: left;
+}
+
+.productTable .product-info h3,
+.productTable .product-info p {
+  text-align: left;
+  margin: 0rem 0;
+  /* ปรับ margin ให้เฉพาะบน-ล่าง จะได้ไม่ดันออกด้านข้าง */
+}
+
+.productTable h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #264798;
+}
+
+.productTable .value {
+  color: #264798;
+}
+
+.product-size {
+  font-weight: 600 !important;
+  font-size: 18px;
+  color: #ff0000;
+}
+
+
+.solarTitle {
+  /* padding-top: -2rem; */
+  margin-top: 1rem;
+  margin-bottom: 0rem;
+  font-size: 30px;
+  text-align: center;
+  font-weight: 600;
+  color: #E88534;
+}
+
+.costRow {
+  padding: 8px 0;
+  border-bottom: 1px dashed #ccc;
+  display: flex;
+  justify-content: space-between;
+  /* แยกซ้าย-ขวา */
+  align-items: center;
+  margin: 0.5rem 0;
+  /* border-bottom: 1px dashed #cccccccb; */
+
+}
+
+.leftGroup {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  /* ระยะห่างระหว่างไอคอนกับข้อความซ้าย */
+}
+
+.costLabel {
+  font-size: 20px;
+  font-weight: 600;
+  color: #E88534;
+}
+
+.costValue {
+  font-size: 20px;
+  font-weight: 600;
+  color: #6A6A6A;
+}
+
+.solardeteil {
+  /* padding-top: -2rem; */
+  margin-top: 1.5rem;
+  margin-bottom: 0rem;
+  font-size: 22px;
+  /* text-align: center; */
+  font-weight: 600;
+  color: #E88534;
+}
+
+
+.costList {
+  margin-top: 1rem;
+  list-style: none;
+  padding: 0;
+  font-size: 16px;
+}
+
+.rowds {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: space-between;
+  padding: 8px 0;
+  padding-left: 3rem;
+  /* ✅ ย่อหน้าเข้าไปทั้งบรรทัด */
+  position: relative;
+  border-bottom: 1px dashed #ccc;
+
+}
+
+.bullet {
+  position: absolute;
+  left: 1.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-block;
+  width: 12px;
+  height: 2.8px;
+  background-color: #E88534;
+}
+
+.labelds {
+  color: #264798;
+  flex: 1;
+  white-space: nowrap;
+}
+
+.valueds {
+  color: #6A6A6A;
+  white-space: nowrap;
+  font-weight: 600;
+  text-align: right;
+  min-width: 150px;
+  /* ปรับขนาดได้ตามต้องการ */
+}
+
+.buttonWrapper {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+  /* เพิ่มระยะห่างด้านบนถ้าต้องการ */
+}

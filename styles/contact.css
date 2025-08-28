@@ -1,0 +1,529 @@
+/* กำหนดสไตล์ให้กับองค์ประกอบของแต่ละกล่อง */
+.contact-container {
+  display: flex;
+  /* จัดเรียงกล่องแบบแนวนอน */
+  justify-content: center;
+  /* จัดให้อยู่ตรงกลางแนวนอน */
+  gap: 30px;
+  /* ระยะห่างระหว่างกล่อง */
+  flex-wrap: wrap;
+  /* ถ้ามากเกินขอบจะขึ้นบรรทัดใหม่ */
+  text-align: center;
+  /* จัดข้อความกึ่งกลาง */
+  margin-top: 0px;
+}
+
+/* กำหนดสไตล์ให้กับแต่ละกล่องข้อมูล */
+.contact-box {
+  display: flex;
+  flex-direction: column;
+  /* แนวตั้ง (จากบนลงล่าง) */
+  align-items: center;
+  /* จัดกึ่งกลางแนวนอน */
+  max-width: 240px;
+  /* กำหนดความกว้างสูงสุด */
+  margin: 0 10px;
+  /* ระยะห่างซ้าย-ขวา */
+}
+
+/* ชื่อไเติ้ล ช่องทางสาอบถามเพิ่มเติม */
+.social-title {
+  margin-bottom: 0px;
+  /* เพิ่มระยะห่างจากไอคอนด้านล่าง  */
+}
+
+/* ไอคอนสีส้ม */
+/* ข้อความอธิบายใต้ไอคอน */
+.contact-text {
+  color: #102e50;
+  margin: 0px 0;
+  /* ลดช่องว่างด้านบนและล่าง */
+  margin-top: 0;
+  line-height: 1.5;
+  /* ลดความสูงของบรรทัด */
+}
+
+
+
+/* สไตล์ช่อง input, textarea และ select */
+
+.centeredText {
+  text-align: center;
+  color: #19489d;
+  font-weight: 400;
+  font-size: 40px;
+  margin-top: 1rem;
+  /* ระยะห่างบน */
+  margin-bottom: 1rem;
+  /* ระยะห่างล่างมาก */
+}
+
+/* กล่องฟอร์มติดต่อ */
+.contact-form {
+  max-width: 700px;
+  margin: 0 auto;
+  border-radius: 10px;
+}
+
+/* เครื่องหมายดอกจันสีแดง (สำหรับช่องบังคับกรอก) */
+.required {
+  color: red;
+}
+
+/* กล่องปุ่มทั้งหมดอยู่ตรงกลาง + จัดปุ่มเรียงแนวนอน */
+.form-submit {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  /* ระยะห่างระหว่างปุ่ม */
+  margin-top: 1.5rem;
+}
+
+/* .form-button {
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 18px;
+  font-weight: 400;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+} */
+
+/* ปุ่มสีส้ม ส่งข้อความ */
+.btn-orange {
+  background-color: #d8742d;
+  /* สีส้มเข้มกว่าเดิม */
+  min-width: max-content;
+  /* ปรับความกว้างตามเนื้อหา */
+}
+
+/* ปุ่มสีฟ้า ย้อนกลับ */
+.btn-blue {
+  background-color: #153976;
+  /* สีฟ้าเข้มกว่าเดิม */
+  min-width: max-content;
+  /* ปรับความกว้างตามเนื้อหา */
+}
+
+/* Hover ทุกปุ่ม */
+.form-button:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+/* ส่วนของ layout และรูปภาพ */
+.infoSection {
+  flex: 1 1 50%;
+  min-width: 300px;
+  max-width: 600px;
+}
+
+.imageSection {
+  flex: 1 1 40%;
+  min-width: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.companyImage {
+  width: 100%;
+  max-width: 500px;
+  height: auto;
+  border-radius: 16px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.contactWrapper {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  gap: 2rem;
+}
+
+.companyName {
+  color: #19489d;
+  font-size: 2rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  white-space: normal;
+  word-break: break-word;
+  text-align: left;
+}
+
+.sectionTitle {
+  font-size: 1.1rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.infoItem {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.icon {
+  color: #d8742d;
+  font-size: 1.4rem;
+  margin-right: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.contactContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin: 2rem 0;
+}
+
+.googleMap {
+  width: 100%;
+  max-width: 600px;
+  height: 350px;
+  border: 1px solid #d1d5db00;
+  /* ขอบสีเทาอ่อนแบบเรียบหรู (เทาโทนอ่อน) */
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  /* เงาอ่อน ๆ เบลอบางเบา */
+  background-color: #fff;
+  /* เพิ่มพื้นหลังสีขาวสะอาด */
+}
+
+.socialSection {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  justify-content: flex-start;
+}
+
+.socialLinks {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* เฟสไลน์ */
+.socialItem {
+  display: flex;
+  align-items: center;
+  font-size: 1.1rem;
+  color: #000;
+  text-decoration: none;
+  gap: 0.75rem;
+}
+
+.iconFL {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.label {
+  font-weight: 300;
+  line-height: 1.4;
+}
+
+/* ช่องทางการติดต่อ */
+.communicationName {
+  color: #19489d;
+  font-size: 1.8rem;
+  font-weight: 500;
+  margin-bottom: 0rem;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.contactGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.gridItem {
+  padding: 1rem;
+}
+
+.companyInfo,
+.googleMapWrapper {
+  grid-column: 1;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.companyImageWrapper,
+.socialSection {
+  grid-column: 2;
+}
+
+
+
+/* Skeleton effect */
+/* Keyframe: Pulse */
+/* Pulse animation */
+@keyframes pulse {
+  0% {
+    background-color: #e0e0e0;
+  }
+
+  50% {
+    background-color: #f0f0f0;
+  }
+
+  100% {
+    background-color: #e0e0e0;
+  }
+}
+
+/* Skeleton block */
+.skeleton {
+  background-color: #e0e0e0;
+  border-radius: 6px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+
+.skeleton-banner {
+  width: 100%;
+  aspect-ratio: 3.23 / 1;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  animation: pulse 1.5s infinite ease-in-out;
+  margin-bottom: 2rem;
+}
+
+
+/* Skeleton blocks แบบไม่มีพื้นหลังก้อน */
+.skeleton-card {
+  padding: 1.5rem 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  box-sizing: border-box;
+}
+
+/* title - แทนชื่อบริษัทหรือหัวข้อ */
+.skeleton-title {
+  height: 22px;
+  width: 45%;
+  background-color: #e0e0e0;
+  border-radius: 6px;
+  animation: pulse 1.5s infinite ease-in-out;
+  margin-bottom: 1rem;
+}
+
+/* line - แทนข้อความแต่ละบรรทัด */
+.skeleton-line {
+  height: 14px;
+  background-color: #e0e0e0;
+  border-radius: 6px;
+  animation: pulse 1.5s infinite ease-in-out;
+  margin: 0.35rem 0;
+}
+
+/* ความยาว line ให้สมจริง: */
+.skeleton-line.w90 {
+  width: 90%;
+}
+
+.skeleton-line.w85 {
+  width: 85%;
+}
+
+.skeleton-line.w80 {
+  width: 80%;
+}
+
+.skeleton-line.w75 {
+  width: 75%;
+}
+
+.skeleton-line.w70 {
+  width: 70%;
+}
+
+.skeleton-line.w60 {
+  width: 60%;
+}
+
+/* Image placeholders */
+.skeleton-image--medium,
+.skeleton-image--large {
+  background-color: #dcdcdc;
+  border-radius: 12px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+.skeleton-image--medium {
+  width: 100%;
+  height: 200px;
+}
+
+.skeleton-image--large {
+  width: 100%;
+  height: 300px;
+}
+
+/* Bullet-style layout */
+.skeleton-bullet-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.skeleton-bullet {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.skeleton-bullet-circle {
+  width: 10px;
+  height: 10px;
+  background-color: #cfcfcf;
+  border-radius: 50%;
+}
+
+.skeleton-bullet-line {
+  flex: 1;
+  height: 14px;
+  background-color: #e0e0e0;
+  border-radius: 5px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+/* Fade-in */
+.fade-in {
+  opacity: 0;
+  animation: fadeIn 0.3s ease-in forwards;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+
+/* --- Mobile Responsive Styles --- */
+@media (max-width: 600px) {
+
+  /* Grid เปลี่ยนเป็น 1 คอลัมน์ */
+  .contactGrid {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+    row-gap: 1.5rem;
+  }
+
+  /* ทุกส่วนให้อยู่คอลัมน์เดียว */
+  .companyInfo,
+  .companyImageWrapper,
+  .googleMapWrapper,
+  .socialSection {
+    grid-column: 1;
+  }
+
+  /* รูปบริษัทปรับขนาดเต็มความกว้าง */
+  .companyImage {
+    max-width: 100%;
+    border-radius: 12px;
+    margin: 0 auto;
+  }
+
+  /* Google Map ปรับขนาดและระยะ */
+  .googleMap {
+    width: 100%;
+    height: 250px;
+    margin-top: 1rem;
+  }
+
+  /* ฟอร์มเปลี่ยนเป็นคอลัมน์เดียว */
+  .form-grid {
+    grid-template-columns: 1fr;
+    row-gap: 0.8rem;
+  }
+
+  /* ปุ่มจัดกึ่งกลาง */
+  .form-submit {
+    align-items: center;
+  }
+
+  .form-button {
+    align-items: center;
+  }
+
+  /* Contact container เป็นแนวตั้ง */
+  .contact-container {
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  /* Contact box กว้างเต็ม */
+  .contact-box {
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  /* ตัวหนังสือหัวข้อขนาดเล็กลง */
+  .centeredText {
+    font-size: 28px;
+  }
+
+  .companyName,
+  .communicationName {
+    font-size: 1.4rem;
+    text-align: center;
+  }
+
+  /* Social item ปรับช่องว่างและจัดซ้าย */
+  .socialItem {
+    display: flex;
+    justify-content: flex-start;
+    gap: 24px;
+  }
+
+  /* ปรับ aspect ratio ของ skeleton banner สำหรับมือถือ */
+  .skeleton-banner {
+    aspect-ratio: 1.92 / 1;
+  }
+}
+
+/* แบนเนอร์ */
+.banner-container {
+  width: 100%;
+  /* height: 100vh; เพิ่ม */
+  margin: 0;
+  padding: 0;
+}
+
+
+.banner-wrapper {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.banner-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}

@@ -1,0 +1,88 @@
+.highlight-section {
+  text-align: center;
+  max-width: 900px;
+  width: 100%;
+  padding: 1rem;
+  background-color: rgba(255, 255, 255, 0.89);
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
+}
+
+.highlight-logo {
+  margin: 0 auto 0.25rem auto;
+  display: block;
+  width: 200px;
+  height: auto;
+}
+
+.highlight-section h2 {
+  margin: 0;
+  /* ลบ margin ทั้งหมด */
+  font-weight: 400;
+}
+
+.highlight-section h5 {
+  margin: 0 0 2rem 0;
+  font-weight: 400;
+  color: #19489D;
+}
+
+.highlight-text h4 {
+  margin-top: 0.5rem;
+  /* ✅ เพิ่มระยะห่างจาก h5 */
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+.imageWrapper {
+  width: 100%;
+  overflow: hidden;
+}
+
+.imageContainer {
+  position: relative;
+}
+
+.overlayLink {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  color: white;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 8px 16px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 1rem;
+  z-index: 9999;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.overlayLink:hover {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.formWrapper {
+  max-width: 670px;
+  margin: 0 auto;
+  padding: 0rem;
+  font-family: sans-serif;
+  border-radius: 8px;
+}
+
+
+
+.containersolar {
+  background-image: url('/images/solar-cellbackfrom.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  padding-bottom: 1rem;
+  width: 100%;
+}
+
+
+
+

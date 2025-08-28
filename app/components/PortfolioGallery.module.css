@@ -1,0 +1,17 @@
+.galleryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.galleryImageWrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+.custom-caption {
+  text-align: center;
+  font-size: 16px;
+  color: white;
+  margin-top: 12px;
+}

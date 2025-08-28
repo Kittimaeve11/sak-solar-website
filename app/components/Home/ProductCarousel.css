@@ -1,0 +1,238 @@
+.carouselSlide {
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  box-sizing: border-box;
+  height: 100%;
+  padding: 0 6px;
+  margin: 0;
+}
+
+.carouselWrapper {
+  max-width: 1500px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0rem;
+  position: relative;
+  border-radius: 6px;
+  box-sizing: border-box;
+  gap: 10px;
+}
+
+.carouselWrapper .slick-slide {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  padding: 0 !important;
+  /* ✅ ลบ padding ซ้ำซ้อน */
+  box-sizing: border-box;
+}
+
+.carouselInner {
+  max-width: 1450px;
+  margin: 0 auto;
+}
+
+.carouselInner .slick-track {
+  display: flex !important;
+  gap: 0px;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.carouselHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: -1.5rem;
+  padding: 0 1rem;
+}
+
+.carouselTitle {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1b2f50;
+}
+
+.carouselLink {
+  font-size: 1rem;
+  color: #0056b3;
+  text-decoration: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.carouselLink:hover {
+  color: #F25C05;
+}
+
+/* สินค้าที่มีไม่ถึง 5 */
+.carouselStaticWrapper {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 38px !important;
+  padding: 1rem 0;
+}
+
+/*  ใช้ขนาดเดียวกันกับ carouselCard */
+.carouselStaticWrapper .carouselCard {
+  width: 330px;
+}
+
+/* Responsive: Tablet (3 ใบต่อแถว) */
+@media (max-width: 1024px) {
+  .carouselStaticWrapper .carouselCard {
+    width: calc(33.33% - 24px);
+  }
+}
+
+/* Responsive: มือถือ (เต็มแถว) */
+@media (max-width: 640px) {
+  .carouselStaticWrapper .carouselCard {
+    width: 100%;
+  }
+}
+
+/* ✅ Card */
+.carouselCard {
+  background-color: #ffffff;
+  border-radius: 6px;
+  border: 1px solid #ebebeb;
+  width: 330px;
+  height: auto;
+  padding: 0;
+  padding-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+
+.carouselCard:hover {
+  transform: translateY(-6px);
+  /* box-shadow: 0 2px 10px rgba(65, 65, 65, 0.1); */
+
+}
+
+.product-info {
+  padding-right: 1rem;
+  padding-left: 1rem;
+  padding-top: 0rem;
+  padding-bottom: 1rem;
+  /* margin: 0; */
+}
+
+.product-info h3,
+.product-info h6 {
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.6; /* ปรับให้ชิดกันมากขึ้น */
+}
+
+
+.carouselCard img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+}
+
+/* .carouselCard h3 {
+  font-size: px;
+  font-weight: 600;
+  color: #2a3e5e;
+  margin: 0.75rem 1rem 0rem;
+  min-height: 2.6em;
+} */
+
+.carouselCard h3 {
+  font-size: 17px;
+  font-weight: 600;
+  color: #2a3e5e; 
+  /* margin: 0.75rem 0rem 0rem 1rem;
+  min-height: 2.0em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  max-width: calc(100% - 2rem);
+  /* ลบ margin ซ้ายขวา 1rem ออก */
+}
+
+
+.carouselCard p {
+  font-weight: 600;
+  font-size: 20px;
+  color: #000000;
+}
+
+
+
+.product-size {
+  font-weight: 600 !important;
+  font-size: 18px;
+}
+
+/* Arrows */
+.carouselArrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #004bade5;
+  color: white;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  border: none;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s ease;
+}
+
+.carouselArrow:hover {
+  background-color: #002f80e3;
+}
+
+.carouselArrow.left {
+  left: -20px;
+}
+
+.carouselArrow.right {
+  right: -20px;
+}
+
+.carouselCard,
+.carouselCard:hover,
+.carouselLink,
+.carouselLink:hover {
+  text-decoration: none !important;
+}
+
+/* สำหรับโปโมชั่น */
+.product-promo-ribbon {
+  position: absolute;
+  top: 10px;
+  right: -35px;
+  /* ปรับตามความยาวของแทป */
+  background: #ee2226;
+  color: #fff;
+  font-weight: 700;
+  padding: 5px 45px;
+  /* ความสูง x ความยาวแทป */
+  text-align: center;
+  transform: rotate(45deg);
+  /* ทำให้เฉียง */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+  font-size: 16px;
+}

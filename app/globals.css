@@ -1,0 +1,793 @@
+@font-face {
+  font-family: 'SukhumvitTadmai';
+  src: url('/fonts/SukhumvitTadmai-Text.otf') format('opentype');
+  font-weight: 400;
+  /* normal */
+}
+
+@font-face {
+  font-family: 'SukhumvitTadmai';
+  src: url('/fonts/SukhumvitTadmai-UltraLight.otf') format('opentype');
+  font-weight: 200;
+}
+
+@font-face {
+  font-family: 'SukhumvitTadmai';
+  src: url('/fonts/SukhumvitTadmai-SemiBold.otf') format('opentype');
+  font-weight: 600;
+}
+
+@font-face {
+  font-family: 'SukhumvitTadmai';
+  src: url('/fonts/SukhumvitTadmai-ExtraBold.otf') format('opentype');
+  font-weight: 800;
+}
+
+.font-300 {
+  font-family: 'SukhumvitTadmai', sans-serif;
+  font-weight: 200;
+  transform: scaleX(1.01);
+  letter-spacing: 0.3px;
+}
+
+.font-500 {
+  font-family: 'SukhumvitTadmai', sans-serif;
+  font-weight: 400;
+  text-shadow: 0 0 0 0.2px black;
+}
+
+.font-700 {
+  font-family: 'SukhumvitTadmai', sans-serif;
+  font-weight: 600;
+  text-shadow: 0.3px 0 black, -0.3px 0 black;
+}
+
+
+/* ใช้ SukhumvitTadmai แบบที่ฝังไว้ */
+* {
+  font-family: "SukhumvitTadmai", sans-serif;
+  font-weight: 400;
+  box-sizing: border-box;
+}
+
+.error-page {
+  font-family: "SukhumvitTadmai", sans-serif;
+  font-weight: 400;
+  color: #243865;
+}
+
+/* :root {
+  --nav-color: #102e50;
+  --nav-hover-color: gray;
+  --accent-color: #e78b48;
+  --nav-dropdown-background-color: #fff;
+  --nav-dropdown-color: #102e50;
+  --nav-dropdown-hover-color: gray;
+  --nav-font: Arial, sans-serif;
+  --nav-mobile-background-color: #fff;
+  --default-color: #000;
+  --contrast-color: #fff;
+} */
+
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+html {
+  margin: 0;
+  padding: 0;
+}
+
+
+/* แทปใต้ Banner */
+.headline {
+  background-color: #0D3973;
+  color: white;
+  text-align: center;
+  padding: 10px 5px;
+  margin: 0px 0;
+  line-height: 1.8;
+}
+
+h1 {
+  font-size: 30px;
+  color: #243865;
+}
+
+h2 {
+  font-size: 24px;
+  color: #243865;
+
+}
+
+h3 {
+  font-size: 20px;
+  color: #243865;
+}
+
+h4 {
+  font-size: 18px;
+  color: #243865;
+}
+
+h5 {
+  font-size: 16px;
+  color: #243865;
+
+}
+
+h6 {
+  font-size: 14px;
+  color: #243865;
+
+}
+
+.no-margin {
+  margin-top: -1rem !important;
+}
+
+.container {
+  padding: 0;
+  margin: 0;
+  width: 100vw;
+  max-width: 100vw;
+}
+
+.layout-container {
+  width: 1200px;
+  /*  ปกติจะอยู่ที่ 1200px */
+  max-width: 1500px;
+  /*  จำกัดไม่ให้เกิน 1500px ตอนซูม */
+  margin: 0 auto;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  padding: 0 16px 50px 16px;
+  
+  gap: 24px;
+  /* ช่องไฟระหว่างบล็อก */
+}
+
+.headtitle {
+  font-size: clamp(1.2rem, 5vw, 2rem);
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 0.5rem;
+  color: #243865;
+}
+
+.headtitleone {
+  font-size: clamp(1.2rem, 5vw, 2rem);
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 0.5rem;
+  color: #F2780C;
+}
+
+.buttonPrimary {
+  font-weight: 400;
+  padding: 0.6rem 1.8rem;
+  background-color: #367AF5;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  margin: 1rem 0.5rem;
+  /* ✅ เพิ่มระยะห่างซ้ายขวา */
+}
+
+.buttonPrimary:hover {
+  background: #1E61DC;
+}
+
+.buttonDelete {
+  font-weight: 400;
+  padding: 0.6rem 1.8rem;
+  background-color: #EC3B32;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  margin: 1rem 0.5rem;
+  /* ✅ เพิ่มระยะห่างซ้ายขวา */
+}
+
+.buttonDelete:hover {
+  background: #d50000;
+}
+
+.buttonSecondarybule {
+  font-weight: 400;
+  padding: 0.6rem 1.8rem;
+  background-color: white;
+  color: #367AF5;
+  border: 2px solid #367AF5;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin: 1rem 0.5rem;
+  /*  เพิ่มระยะห่างซ้ายขวา */
+
+}
+
+.buttonSecondarybule:hover {
+  background-color: #367AF5;
+  color: white;
+}
+
+.buttonSecondaryonebule {
+  font-weight: 400;
+  padding: 0.6rem 1.8rem;
+  background-color: white;
+  color: #367AF5;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin: 1rem 0.5rem;
+  /*  เพิ่มระยะห่างซ้ายขวา */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.buttonSecondaryonebule:hover {
+  background-color: #367AF5;
+  color: white;
+}
+
+.buttonSecondarydelte {
+  font-weight: 400;
+  padding: 0.6rem 1.8rem;
+  background-color: white;
+  color: #F44336;
+  border: 2px solid #F44336;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin: 1rem 0.5rem;
+  /*  เพิ่มระยะห่างซ้ายขวา */
+
+}
+
+.buttonSecondarydelte:hover {
+  background-color: #F44336;
+  color: white;
+}
+
+.buttonSecondaryonedelte {
+  font-weight: 400;
+  padding: 0.6rem 1.8rem;
+  background-color: white;
+  color: #F44336;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin: 1rem 0.5rem;
+  /*  เพิ่มระยะห่างซ้ายขวา */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.buttonSecondaryonedelte:hover {
+  background-color: #F44336;
+  color: white;
+}
+
+.buttonPrimaryorange {
+  font-weight: 400;
+  padding: 0.6rem 1.8rem;
+  background-color: #FF5E06;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  margin: 1rem 0.5rem;
+  /* ✅ เพิ่มระยะห่างซ้ายขวา */
+}
+
+.buttonPrimaryorange:hover {
+  background: #E55100;
+}
+
+.buttonSecondaryorange {
+  font-weight: 400;
+  padding: 0.6rem 1.8rem;
+  background-color: white;
+  color: #FF5E06;
+  border: 2px solid #FF5E06;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin: 1rem 0.5rem;
+  /*  เพิ่มระยะห่างซ้ายขวา */
+
+}
+
+.buttonSecondaryorange:hover {
+  background-color: #FF5E06;
+  color: white;
+}
+
+.buttonSecondaryoneorange {
+  font-weight: 400;
+  padding: 0.6rem 1.8rem;
+  background-color: white;
+  color: #FF5E06;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin: 1rem 0.5rem;
+  /*  เพิ่มระยะห่างซ้ายขวา */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.buttonSecondaryoneorange:hover {
+  background-color: #FF5E06;
+  color: white;
+}
+
+/* ฟอร์ม */
+.form-container {
+  /* background-color: #FAFBFF; */
+  width: 100%;
+  /* padding: 2rem; */
+  border-radius: 8px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+/* ====== Label ====== */
+.form-label {
+  display: block;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  color: #264798;
+}
+
+/* ====== Text Input Field ====== */
+.form-field {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 15px;
+  line-height: 1.5;
+  box-sizing: border-box;
+  color: #264798;
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.form-field:focus {
+  border-color: #367AF5;
+  outline: none;
+  box-shadow: 0 4px 12px rgba(54, 122, 245, 0.25);
+  background-color: #fff;
+  color: #264798;
+}
+
+.form-field::placeholder {
+  color: #AAAAAB;
+}
+
+/* ====== Select Dropdown ====== */
+.form-select-wrapper {
+  margin-bottom: 1rem;
+}
+
+.custom-select-container {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.form-select {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: white;
+  appearance: none;
+  font-size: 15px;
+  color: #264798;
+  line-height: 1.5;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.form-select option {
+  color: #264798;
+  font-size: 15px !important;
+}
+
+.form-select.placeholder {
+  color: #AAAAAB;
+  /* สีอ่อนสำหรับ placeholder */
+}
+
+.form-select:focus {
+  border-color: #367AF5;
+  color: #264798;
+  outline: none;
+  box-shadow: 0 4px 12px rgba(54, 122, 245, 0.25);
+  background-color: #fff;
+}
+
+.select-arrow {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #adadad;
+  font-size: 1.3rem;
+}
+
+/* ====== Checkbox ====== */
+.form-checkbox {
+  margin-right: 0.5rem;
+}
+
+.form-textarea {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 15px;
+  resize: vertical;
+  color: #264798;
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.form-textarea:focus {
+  border-color: #367AF5;
+  outline: none;
+  box-shadow: 0 4px 12px rgba(54, 122, 245, 0.25);
+  background-color: #fff;
+}
+
+/* ====== Error Message ====== */
+.error-text {
+  color: rgb(236, 3, 3);
+  font-size: 14px;
+  margin-top: 0.3rem;
+  margin-bottom: 0.5rem;
+}
+
+.required-asterisk {
+  color: rgb(236, 3, 3);
+}
+
+/* ====== Checkbox Custom Styling ====== */
+.checkbox-wrapper {
+  margin-top: 1rem;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+  padding-left: 1.5rem;
+}
+
+.checkbox-input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.custom-checkbox {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 1rem;
+  width: 1rem;
+  border: 2px solid #367AF5;
+  border-radius: 50%;
+  background-color: #fff;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.checkbox-input:checked~.custom-checkbox {
+  background-color: #367AF5;
+  box-shadow: inset 0 0 0 2.5px white;
+}
+
+/* ====== Radio Buttons ====== */
+.form-radio {
+  color: #264798;
+  display: inline-flex;
+  align-items: center;
+  margin-right: 1.5rem;
+  cursor: pointer;
+  position: relative;
+}
+
+.radio-input {
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid #367AF5;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+  cursor: pointer;
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.radio-input:checked::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0.5rem;
+  height: 0.5rem;
+  background-color: #367AF5;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: background-color 0.3s ease;
+}
+
+/* ====== Error Styling ====== */
+
+/* สำหรับกลุ่ม radio ที่มี error */
+.error-border .radio-input {
+  border-color: red !important;
+}
+
+.error-border .radio-input:checked::before {
+  background-color: red !important;
+}
+
+/* สำหรับ input, select, textarea ที่มี error */
+.error-border .radio-input {
+  border-color: red;
+}
+
+.error-border .radio-input:checked::before {
+  background-color: red;
+}
+
+.input-error {
+  border: 1px solid red !important;
+}
+
+/* กรณี input, select ที่ใช้ class error-border */
+.form-field.error-border,
+.form-select.error-border,
+.form-textarea.error-border {
+  border: 2px solid red !important;
+}
+
+/* เมาส์ชี้แล้วดุ๊กดิ๊ก */
+@keyframes wiggle {
+
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+
+  50% {
+    transform: rotate(5deg);
+  }
+}
+
+.hover-wiggle:hover {
+  animation: wiggle 0.6s ease-in-out infinite;
+}
+
+
+.circle-shadow {
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  /* ลดความฟุ้งลง */
+  display: inline-block;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.circle-shadow:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  /* เงาเวลา hover นุ่มขึ้นแต่ยังคม */
+}
+
+.banner-container {
+  width: 100%;
+}
+
+.banner-wrapper {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.banner-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100px;
+  /* 👈 ปรับสูงพอให้ spinner อยู่กลาง */
+  width: 100%;
+}
+
+.spinner {
+  width: 60px;
+  height: 60px;
+  border: 6px solid #ccc;
+  border-top: 6px solid #F25C05;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+.ellipsis {
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  font-weight: 600;
+}
+
+
+
+.page-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+
+.page-buttons button {
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: white;
+  cursor: pointer;
+  justify-content: center;
+  font-size: 14px;
+  transition: background-color 0.2s ease;
+  flex-direction: row;
+}
+
+
+.page-buttons button:hover {
+  background-color: #f0f0f0;
+}
+
+.page-buttons button.active-page {
+  background-color: #f5741f;
+  color: white;
+  font-weight: bold;
+  border-color: #f5741f;
+}
+
+.page-buttons button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Button with arrow */
+.btn-with-arrow {
+  display: inline-flex;
+  align-items: center;
+  font-size: 14px;
+  line-height: 1;
+  gap: 6px;
+  padding: 8px 12px;
+  border: none;
+  background: white;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+
+.btn-with-arrow:hover {
+  background-color: #f0f0f0;
+}
+
+
+
+.arrow-icon {
+  font-size: 14px;
+  line-height: 1;
+  vertical-align: middle;
+  color: #313131;
+}
+
+.read-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #ff6600;
+  font-size: 14px;
+  margin-top: 4px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  text-decoration: none !important;
+}
+
+.read-more * {
+  text-decoration: none !important;
+}
+
+.read-more:hover {
+  color: #264798;
+  text-decoration: none !important;
+}
+
+.read-more:hover * {
+  color: #264798;
+  text-decoration: none !important;
+}
+
+.view-all {
+  font-size: 1rem;
+  color: #0056b3;
+  text-decoration: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: color 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.1rem;
+  /* หรือ 4px */
+}
+
+.view-all:hover {
+  color: #F25C05;
+}
+
+.icon-view{
+  width: 20px;
+  height: 20px;
+}
+/* จุด slide แบบแทบส้ม */
+.custom-dots {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
+.dot-bar {
+  height: 4px;
+  width: 24px;
+  background-color: #ffe0b2;
+  border-radius: 8px;
+  margin: 0 4px;
+  cursor: pointer;
+  transition: width 0.5s ease-in-out, background-color 0.5s ease-in-out;
+  position: relative;
+  overflow: hidden;
+}
+
+.dot-bar.active {
+  width: 40px;
+  background-color: #ff6d00;
+}
+
+.slide-item {
+  padding: 0 12px;
+  box-sizing: border-box;
+}

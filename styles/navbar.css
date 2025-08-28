@@ -1,0 +1,230 @@
+.navbar {
+  width: calc(100% - 70px); /* ลดความกว้าง 20px (ซ้าย+ขวา = 10px+10px) */
+  margin: 0 auto; /* กึ่งกลาง */
+  padding: 0.5rem 5rem; /*เว้นขอบซ้าย-ขวาให้ห่างขึ้น */
+  display: flex;
+  justify-content: space-between;
+  background-color: rgb(255, 255, 255);
+  border-bottom: 2.5px solid #F2780C;
+  
+  position: relative; /* ต้องมีสำหรับ ::after */
+}
+/* .navbar::after {
+  content: '';
+  position: absolute;
+  bottom: -19px; /* ปรับค่าลงล่างมากขึ้น */
+  /* left:50%;
+  transform: translateX(-50%);
+  width: 40%;
+  height: 50px;
+  background-image: url('/images/wave-On.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  z-index: 1;
+/* } */  
+/* กลุ่มโลโก้ + ชื่อบริษัท */
+.logoTitleGroup {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.logoTitleGroup img {
+  height: 80px;
+}
+
+/* ข้อความบริษัท */
+.companyName h1 {
+  font-size: 23px;
+  margin: 0;
+  color: #11377c;
+  font-weight: 400; /*ตัวไม่หนา */
+}
+
+.companyName h3 {
+  font-size: 18px;
+  margin: 0;
+  color: #11377c;
+  font-weight: normal;
+}
+
+/* กลุ่มปุ่มภาษา + ติดต่อเรา */
+.localeContactGroup {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* กึ่งกลางแนวนอน */
+  justify-content: center; /* กึ่งกลางแนวตั้ง */
+  gap: 0.5rem;
+}
+
+/* ปุ่มภาษา */
+.localeButtons {
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  color: #cbdceb;
+  user-select: none;
+  gap: 0rem; /* เพิ่มช่องว่างระหว่างภาษา */
+  margin: 0px 8px;
+  margin-left: auto;
+}
+.localeButtons > :hover {
+  color: #f87f0b;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+.localeItem {
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  font-weight: 400 !important; /* ใช้ Thin */
+}
+
+.localeItem.disabled {
+  color: #19489d;
+  pointer-events: none;
+}
+
+.separator {
+  width: 0rem;
+}
+/* เส้นตรงกลางปุ่มเปลี่ยนภาษา */
+.separator {
+  border-left: 1.8px solid #19489d;
+  height: 18px;
+  margin: 0 8px;
+}
+
+/* ปุ่มติดต่อเรา */
+.contactButton {
+  /* background-color:; */
+  border: none;
+  border-radius: 6px;
+  padding: 9px 12px;
+  color: white;
+  font-weight: 400;
+  cursor: pointer;
+  font-size: 14px;
+  user-select: none;
+  /* transition: background-color 0.2s; */
+}
+
+.contactButton:hover {
+  /* background-color: #11377c; */
+  color: #cbdceb;
+}
+.contactActions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.contactButton.active {
+  background-color: #f87f0b;
+  color: white;
+}
+
+/*   
+  ปุ่มโทรศัพท์
+  .callLink {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: #19489D;
+    font-size: 16px;
+    font-weight: 500;
+    gap: 6px;
+    line-height: 1; 
+  }
+  
+  .phoneIcon {
+    font-size: 23px;
+    color: #19489D;
+    display: flex;
+    align-items: center; 
+  }
+    .phoneNumber {
+    color: #19489D;
+    font-size: 25px;
+    font-weight: 600; 
+
+  }
+     */
+/* ========== เดสก์ท็อปหน้าจอแคบ (ไม่ให้ h1/h3 ตกบรรทัด) ========== */
+@media (max-width: 1280px) {
+  .companyName {
+    white-space: nowrap; /* ไม่ให้ตัดบรรทัด */
+    overflow: hidden;
+    text-overflow: ellipsis; /* ถ้ายาวเกินให้ ... */
+    max-width: 400px; /* ปรับตามพื้นที่ที่เหลือ */
+  }
+
+  .companyName h1 {
+    font-size: 20px;
+  }
+
+  .companyName h3 {
+    font-size: 16px;
+  }
+
+  .logoTitleGroup img {
+    height: 70px;
+  }
+
+  .navbar {
+    padding: 0.5rem 2rem;
+  }
+}
+
+/* ========== มุมมองมือถือ ========== */
+@media (max-width: 600px) {
+  .navbar {
+    padding: 0.5rem 1rem;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .logoTitleGroup {
+    gap: 0.5rem;
+  }
+
+  .logoTitleGroup img {
+    height: 50px;
+  }
+
+  .companyName h1 {
+    font-size: 16px;
+  }
+
+  .companyName h3 {
+    font-size: 12px;
+  }
+
+  /* ซ่อนข้อความชื่อบริษัทเมื่อหน้าจอแคบมาก */
+  @media (max-width: 480px) {
+    .companyName h1,
+    .companyName h3 {
+      display: none;
+    }
+  }
+
+  .localeContactGroup {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.25rem;
+  }
+
+  .localeButtons {
+    font-size: 14px;
+  }
+
+  .contactButton {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .separator {
+    height: 16px;
+    margin: 0 4px;
+  }
+}

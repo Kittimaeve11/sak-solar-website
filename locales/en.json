@@ -1,0 +1,61 @@
+{
+  "greeting": "Welcome to Saksiame Solar!",
+  "home": "Home",
+  "serviceproduct": "Service & Product",
+  "editorial": "Editorial",
+  "faq": "FAQ",
+  "portfolio": "Portfolio",
+  "review": "review",
+  "about": "About US",
+  "solar": "Solar cells",
+  "services": "Services",
+  "contact": "Contact US",
+  "search": "Branch Search",
+  "ativities": "ativities",
+  "company": "SAKSIAM SOLAR ENERGY CO., LTD.",
+  "address": "275, Moo 3, Khung Taphao Sub-district, Mueang District, Uttaradit Province 53000",
+  "phone": "phone",
+  "fax": "fax",
+  "additional": "Additional inquiry channels",
+  "ask": "Ask for more information",
+  "selecttop": "Select a topic",
+  "pleaseselect": "Please select the topic you would like to inquire about.",
+  "inquiries1": "General inquiries",
+  "inquiries2": "General inquiries xxx",
+  "inquiries3": "General inquiries xxxx",
+  "namelast": "First name and last name",
+  "pnumber": "phone number",
+  "email": "Email (if any)",
+  "leavemassage": "Leave a message",
+  "please_fill": "Please fill in your first and last name.",
+  "onlyphone": "Only 10 digits for example",
+  "communication": "Communication Channels",
+  "backpage": "Go to Corporate Site",
+  "back": "Back",
+  "send": "Send a message",
+  "Infovalidate": {
+    "topic": "Please select the topic you wish to inquire about.",
+    "fullname": {
+      "fullnamenull": "Please enter your full name.",
+      "name": "Please enter your full name correctly."
+    },
+    "phone": {
+      "phonenull": "Please enter your phone number.",
+      "phonenumber": "Please enter a valid 10-digit phone number."
+    },
+    "email": "Please enter a valid email address, e.g., example@example.com.",
+    "message": {
+      "clean": "Please enter your inquiry message.",
+      "patternmessage": "Please enter your inquiry message clearly and correctly."
+    }
+  },
+  "contacts": {
+    "socialmedia": {
+      "facebook": "Facebook | Saksiame Solar Energy",
+      "line": "Line | @SaksiameSolar",
+      "tiktok": "TikTok | Saksiame Solar Energy",
+      "ig": "Instagram | Saksiame Solar Energy",
+      "youtube": "YouTube | Saksiame Solar Energy"
+    }
+  }
+}
