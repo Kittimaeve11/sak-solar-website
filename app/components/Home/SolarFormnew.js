@@ -7,7 +7,6 @@ import { MdOutlineElectricBolt } from 'react-icons/md';
 import html2canvas from 'html2canvas';
 import Link from 'next/link';
 
-
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 
@@ -94,7 +93,6 @@ const calculateSolarSize = (electricityCost, dayUsage, installationCost = 0) => 
 };
 
 export default function SolarCalculatorForm() {
-
   const [formValues, setFormValues] = useState({
     electricityCost: '',
     systemType: '',
@@ -105,8 +103,8 @@ export default function SolarCalculatorForm() {
   const [errors, setErrors] = useState({});
   const [results, setResults] = useState(null);
   const [productsData, setProductsData] = useState([]);
+  const [attemptedRoofInput, setAttemptedRoofInput] = useState(false);
 
-  // ดึงข้อมูลจาก API จริง
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -125,7 +123,6 @@ export default function SolarCalculatorForm() {
         console.error('เกิดข้อผิดพลาดในการดึงข้อมูลสินค้า:', err);
       }
     };
-
     fetchProducts();
   }, []);
 
@@ -170,6 +167,7 @@ export default function SolarCalculatorForm() {
     }
 
     if (field === 'roofArea') {
+      setAttemptedRoofInput(true);
       if (value === '' || /^\d*\.?\d*$/.test(value)) {
         const roofNum = parseFloat(value);
         let roofError = null;
@@ -220,33 +218,24 @@ export default function SolarCalculatorForm() {
     setFormValues({ electricityCost: '', systemType: '', roofArea: '', dayUsage: 60 });
     setErrors({});
     setResults(null);
+    setAttemptedRoofInput(false);
   };
 
-  // แก้ getRecommendedItems ให้ใช้ API จริง
-  // ฟังก์ชันคำนวณสินค้าที่แนะนำ
   const getRecommendedItems = (systemType) => {
     if (!systemType || productsData.length === 0) return [];
-
     const phase = systemType === 'single' ? '1' : '3';
-
-    // กรองสินค้าที่ตรงกับ systemType / phase
     const filtered = productsData.filter(item =>
       item.phase === phase && item.installationsize.includes('kW')
     );
-
-    // sort: promotion > pinned > อื่นๆ
     filtered.sort((a, b) => {
       const aPriority = (a.promotion ? 2 : 0) + (a.isPinned ? 1 : 0);
       const bPriority = (b.promotion ? 2 : 0) + (b.isPinned ? 1 : 0);
       return bPriority - aPriority;
     });
-
     return filtered;
   };
 
-  // ประกาศตัวแปร recommendedItems หลังจากประกาศ getRecommendedItems
   const recommendedItems = getRecommendedItems(formValues.systemType);
-
 
   return (
     <div className={styles.containersolar}>
