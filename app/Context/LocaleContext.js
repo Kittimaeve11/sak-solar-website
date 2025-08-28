@@ -33,3 +33,13 @@ export function useLocale() {
   return useContext(LocaleContext);
   // สร้าง hook ให้ component อื่นเรียกใช้ Context นี้ง่ายขึ้น
 }
+
+
+
+
+
+
+
+
+
+

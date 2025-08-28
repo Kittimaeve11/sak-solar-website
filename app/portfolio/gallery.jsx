@@ -3,7 +3,7 @@
 import React, { useCallback, useRef } from 'react';
 import LightGallery from 'lightgallery/react';
 import Image from 'next/image';
-import styles from './Gallery.module.css';
+import styles from './gallery.module.css';
 
 import 'lightgallery/css/lightgallery.css';
 import 'lightgallery/css/lg-zoom.css';

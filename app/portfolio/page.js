@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import '../../styles/portfolio.css';
+import '@/styles/portfolio.css';
 import { IoIosArrowDown, IoIosArrowBack, IoIosArrowForward } from 'react-icons/io';
 import { FaCalendar } from "react-icons/fa";
 import { useLocale } from '../Context/LocaleContext'; // <-- import useLocale

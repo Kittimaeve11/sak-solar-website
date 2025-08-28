@@ -2,7 +2,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import '../../styles/editorial.css';
+import '@/styles/editorial.css';
 import { IoIosArrowBack, IoIosArrowForward, IoIosArrowDown } from 'react-icons/io';
 import { FaArrowRightLong } from "react-icons/fa6";
 import { useLocale } from '../Context/LocaleContext';
