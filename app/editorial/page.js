@@ -40,7 +40,7 @@ export default function EditorialListPage() {
         const [resType, resArticles, resBanner] = await Promise.all([
           fetch(`${baseUrl}/api/edittorTypepageapi`, { headers: { 'X-API-KEY': apiKey } }),
           fetch(`${baseUrl}/api/edittorpageapi`, { headers: { 'X-API-KEY': apiKey } }),
-          fetch(`${baseUrl}/api/branderIDapi/1`, { headers: { 'X-API-KEY': apiKey } }),
+          fetch(`${baseUrl}/api/branderIDapi/15`, { headers: { 'X-API-KEY': apiKey } }),
         ]);
 
         if (!resType.ok) throw new Error(`Type API failed: ${resType.status}`);

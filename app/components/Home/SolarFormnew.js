@@ -17,34 +17,36 @@ const handlePrintScreenshot = () => {
     return;
   }
 
-  html2canvas(element, { scale: 2 }).then(canvas => {
-    const imgData = canvas.toDataURL('image/png');
-    const printWindow = window.open('', '_blank');
+  html2canvas(element, { scale: 2 })
+    .then((canvas) => {
+      const imgData = canvas.toDataURL('image/png');
+      const printWindow = window.open('', '_blank');
 
-    printWindow.document.write(`
-      <html>
-        <head>
-          <title>ปริ้นภาพผลลัพธ์</title>
-          <style>
-            @page { size: landscape; margin: 0; }
-            body { margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-            h1 { font-size: clamp(1.2rem, 5vw, 2rem); font-weight: 600; text-align: center; margin-bottom: 0.5rem; color: #F2780C; }
-            img { max-width: 90%; max-height: 80%; height: auto; display: block; }
-          </style>
-        </head>
-        <body>
-          <h1>ผลการคำนวณขนาดติดตั้ง</h1>
-          <img src="${imgData}" />
-          <script>
-            window.onload = function() { window.print(); window.onafterprint = function() { window.close(); }; };
-          </script>
-        </body>
-      </html>
-    `);
-    printWindow.document.close();
-  }).catch(err => {
-    console.error('เกิดข้อผิดพลาดในการแคปภาพ:', err);
-  });
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>ปริ้นภาพผลลัพธ์</title>
+            <style>
+              @page { size: landscape; margin: 0; }
+              body { margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+              h1 { font-size: clamp(1.2rem, 5vw, 2rem); font-weight: 600; text-align: center; margin-bottom: 0.5rem; color: #F2780C; }
+              img { max-width: 90%; max-height: 80%; height: auto; display: block; }
+            </style>
+          </head>
+          <body>
+            <h1>ผลการคำนวณขนาดติดตั้ง</h1>
+            <img src="${imgData}" />
+            <script>
+              window.onload = function() { window.print(); window.onafterprint = function() { window.close(); }; };
+            </script>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+    })
+    .catch((err) => {
+      console.error('เกิดข้อผิดพลาดในการแคปภาพ:', err);
+    });
 };
 
 const calculateSolarSize = (electricityCost, dayUsage, installationCost = 0) => {
@@ -55,20 +57,20 @@ const calculateSolarSize = (electricityCost, dayUsage, installationCost = 0) => 
   const C = usageUnits * (dayUsage / 100);
 
   const sizeTable = [
-    { size: "1.8 kW", max: 270 },
-    { size: "3.1 kW", max: 465 },
-    { size: "5 kW", max: 750 },
-    { size: "10 kW", max: 1500 },
-    { size: "15 kW", max: 2250 },
-    { size: "20 kW", max: 3000 },
-    { size: "25 kW", max: 3750 },
-    { size: "30 kW", max: 4500 },
-    { size: "35 kW", max: 5250 },
-    { size: "40 kW", max: 6000 },
+    { size: '1.8 kW', max: 270 },
+    { size: '3.1 kW', max: 465 },
+    { size: '5 kW', max: 750 },
+    { size: '10 kW', max: 1500 },
+    { size: '15 kW', max: 2250 },
+    { size: '20 kW', max: 3000 },
+    { size: '25 kW', max: 3750 },
+    { size: '30 kW', max: 4500 },
+    { size: '35 kW', max: 5250 },
+    { size: '40 kW', max: 6000 },
   ];
 
   const recommendedItem = sizeTable.find((item) => C <= item.max);
-  const recommended = recommendedItem?.size || "เกิน 60 kW";
+  const recommended = recommendedItem?.size || 'เกิน 60 kW';
 
   const savingsPerMonth = electricityCost * (dayUsage / 100);
   const savingsPerYear = savingsPerMonth * 12;
@@ -100,6 +102,9 @@ export default function SolarCalculatorForm() {
     dayUsage: 60,
   });
 
+  // state แยก input เพื่อ format ค่าไฟ
+  const [electricityCostInput, setElectricityCostInput] = useState('');
+
   const [errors, setErrors] = useState({});
   const [results, setResults] = useState(null);
   const [productsData, setProductsData] = useState([]);
@@ -110,8 +115,8 @@ export default function SolarCalculatorForm() {
       try {
         const res = await fetch(`${baseUrl}/api/productpageapi`, {
           headers: {
-            'X-API-KEY': apiKey
-          }
+            'X-API-KEY': apiKey,
+          },
         });
         const data = await res.json();
         if (data.status) {
@@ -131,7 +136,10 @@ export default function SolarCalculatorForm() {
 
     if (!formValues.electricityCost) {
       newErrors.electricityCost = '*กรุณากรอกค่าไฟฟ้า';
-    } else if (isNaN(Number(formValues.electricityCost)) || Number(formValues.electricityCost) <= 0) {
+    } else if (
+      isNaN(Number(formValues.electricityCost)) ||
+      Number(formValues.electricityCost) <= 0
+    ) {
       newErrors.electricityCost = '*กรุณากรอกค่าไฟฟ้าเป็นตัวเลขบวก';
     }
 
@@ -142,15 +150,24 @@ export default function SolarCalculatorForm() {
     if (!formValues.roofArea && formValues.roofArea !== 0) {
       newErrors.roofArea = '*กรุณากรอกพื้นที่หลังคา';
     } else if (!formValues.systemType && formValues.roofArea !== '') {
-      newErrors.roofArea = '*กรุณาเลือกระบบไฟฟ้าก่อนจึงจะกรอกพื้นที่หลังคาได้';
+      newErrors.roofArea =
+        '*กรุณาเลือกระบบไฟฟ้าก่อนจึงจะกรอกพื้นที่หลังคาได้';
     } else {
       const roofNum = parseFloat(formValues.roofArea);
       if (formValues.systemType === 'single') {
-        if (roofNum < 9) newErrors.roofArea = '*พื้นที่สำหรับ 1 เฟส ต้องไม่ต่ำกว่า 9 ตารางเมตร.';
-        else if (roofNum > 45) newErrors.roofArea = '*พื้นที่สำหรับ 1 เฟส ต้องไม่เกิน 45 ตารางเมตร.';
+        if (roofNum < 9)
+          newErrors.roofArea =
+            '*พื้นที่สำหรับ 1 เฟส ต้องไม่ต่ำกว่า 9 ตารางเมตร.';
+        else if (roofNum > 45)
+          newErrors.roofArea =
+            '*พื้นที่สำหรับ 1 เฟส ต้องไม่เกิน 45 ตารางเมตร.';
       } else if (formValues.systemType === 'three') {
-        if (roofNum < 45) newErrors.roofArea = '*พื้นที่สำหรับ 3 เฟส ต้องไม่ต่ำกว่า 45 ตารางเมตร.';
-        else if (roofNum > 179) newErrors.roofArea = '*พื้นที่สำหรับ 3 เฟส ต้องไม่เกิน 179 ตารางเมตร.';
+        if (roofNum < 45)
+          newErrors.roofArea =
+            '*พื้นที่สำหรับ 3 เฟส ต้องไม่ต่ำกว่า 45 ตารางเมตร.';
+        else if (roofNum > 179)
+          newErrors.roofArea =
+            '*พื้นที่สำหรับ 3 เฟส ต้องไม่เกิน 179 ตารางเมตร.';
       }
     }
 
@@ -164,6 +181,9 @@ export default function SolarCalculatorForm() {
     if (field === 'electricityCost') {
       value = value.replace(/,/g, '');
       if (!/^\d*$/.test(value)) return;
+      setElectricityCostInput(
+        value === '' ? '' : Number(value).toLocaleString('en-US')
+      );
     }
 
     if (field === 'roofArea') {
@@ -175,7 +195,10 @@ export default function SolarCalculatorForm() {
         const minArea = formValues.systemType === 'single' ? 9 : 45;
 
         if (value !== '' && !isNaN(roofNum)) {
-          if (roofNum < minArea) roofError = `*พื้นที่สำหรับ ${formValues.systemType === 'single' ? '1 เฟส' : '3 เฟส'} ต้องไม่ต่ำกว่า ${minArea} ตารางเมตร.`;
+          if (roofNum < minArea)
+            roofError = `*พื้นที่สำหรับ ${
+              formValues.systemType === 'single' ? '1 เฟส' : '3 เฟส'
+            } ต้องไม่ต่ำกว่า ${minArea} ตารางเมตร.`;
           else if (roofNum > maxArea) return;
         }
 
@@ -210,12 +233,22 @@ export default function SolarCalculatorForm() {
     }
 
     const installationCost = 100000;
-    const result = calculateSolarSize(electricityCostNum, dayUsage, installationCost);
+    const result = calculateSolarSize(
+      electricityCostNum,
+      dayUsage,
+      installationCost
+    );
     setResults(result);
   };
 
   const handleReset = () => {
-    setFormValues({ electricityCost: '', systemType: '', roofArea: '', dayUsage: 60 });
+    setFormValues({
+      electricityCost: '',
+      systemType: '',
+      roofArea: '',
+      dayUsage: 60,
+    });
+    setElectricityCostInput('');
     setErrors({});
     setResults(null);
     setAttemptedRoofInput(false);
@@ -224,8 +257,8 @@ export default function SolarCalculatorForm() {
   const getRecommendedItems = (systemType) => {
     if (!systemType || productsData.length === 0) return [];
     const phase = systemType === 'single' ? '1' : '3';
-    const filtered = productsData.filter(item =>
-      item.phase === phase && item.installationsize.includes('kW')
+    const filtered = productsData.filter(
+      (item) => item.phase === phase && item.installationsize.includes('kW')
     );
     filtered.sort((a, b) => {
       const aPriority = (a.promotion ? 2 : 0) + (a.isPinned ? 1 : 0);
@@ -238,26 +271,37 @@ export default function SolarCalculatorForm() {
   const recommendedItems = getRecommendedItems(formValues.systemType);
 
   return (
-    <div className={styles.containersolar}>
-      <div className={`${styles.formWrapper} ${results ? styles.formWrapperResult : styles.formWrapperInitial}`}>
+    <div className={styles.containersolar || ''}>
+      <div
+        className={`${styles.formWrapper || ''} ${
+          results ? styles.formWrapperResult || '' : styles.formWrapperInitial || ''
+        }`}
+      >
         <h1 className="headtitleone" style={{ marginBottom: '-1rem' }}>
-          {!results ? 'ระบบคำนวณขนาด Solar Rooftop ที่เหมาะสม' : 'ผลการคำนวณขนาดติดตั้ง'}
+          {!results
+            ? 'ระบบคำนวณขนาด Solar Rooftop ที่เหมาะสม'
+            : 'ผลการคำนวณขนาดติดตั้ง'}
         </h1>
 
         {!results && (
           <form noValidate onSubmit={handleSubmit}>
-            <div className={styles.row}>
-              <div className={`${styles.formGroup} ${styles.flexGrow}`}>
+            <div className={styles.row || ''}>
+              <div className={`${styles.formGroup || ''} ${styles.flexGrow || ''}`}>
                 <label className="form-label">ค่าไฟฟ้าต่อเดือน (บาท) :</label>
                 <input
+                  suppressHydrationWarning
                   type="text"
                   inputMode="numeric"
-                  className={`form-field ${errors.electricityCost ? 'input-error' : ''}`}
+                  className={`form-field ${
+                    errors.electricityCost ? 'input-error' : ''
+                  }`}
                   placeholder="กรุณากรอกค่าไฟต่อเดือนของท่าน**"
-                  value={formValues.electricityCost !== '' ? Number(formValues.electricityCost).toLocaleString('en-US') : ''}
+                  value={electricityCostInput}
                   onChange={handleChange('electricityCost')}
                 />
-                {errors.electricityCost && <div className="error-text">{errors.electricityCost}</div>}
+                {errors.electricityCost && (
+                  <div className="error-text">{errors.electricityCost}</div>
+                )}
               </div>
 
               <div className="form-group align-right">
@@ -265,9 +309,12 @@ export default function SolarCalculatorForm() {
                   ระบบไฟฟ้า :
                 </label>
 
-                <div className={`radio-group ${errors.systemType ? 'error-border' : ''}`}>
+                <div
+                  className={`radio-group ${errors.systemType ? 'error-border' : ''}`}
+                >
                   <label className="form-radio">
                     <input
+                      suppressHydrationWarning
                       type="radio"
                       name="systemType"
                       value="single"
@@ -280,6 +327,7 @@ export default function SolarCalculatorForm() {
 
                   <label className="form-radio">
                     <input
+                      suppressHydrationWarning
                       type="radio"
                       name="systemType"
                       value="three"
@@ -298,7 +346,6 @@ export default function SolarCalculatorForm() {
                 )}
               </div>
             </div>
-
 
             <label className="form-label">เปอร์เซ็นต์การใช้ไฟฟ้าในช่วงกลางวันและกลางคืน</label>
             <input
