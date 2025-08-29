@@ -21,7 +21,6 @@ const sukhumvitTadmai = localFont({
   display: 'swap',
 });
 
-
 export const metadata = {
   title: 'Saksiame Solar ศักดิ์สยามโซลาร์',
   description: 'เว็บไซต์ Saksiame Solar',
@@ -33,11 +32,12 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="th" className={sukhumvitTadmai.variable} suppressHydrationWarning>
-  <body className={`${sukhumvitTadmai.variable} font-sukhumvit`} suppressHydrationWarning>
+      <body className={`${sukhumvitTadmai.variable} font-sukhumvit`} suppressHydrationWarning>
         <LocaleProvider>
           <Navbartest />
           <TabMenu />
 
+          {/* Google Analytics เป็น client component */}
           <GoogleAnalytics GA_MEASUREMENT_ID="G-GRQS76P3XV" />
           <main>{children}</main>
 

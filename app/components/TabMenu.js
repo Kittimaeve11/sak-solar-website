@@ -25,54 +25,60 @@ export default function TabMenu() {
   const isActive = (path) => (path === '/' ? pathname === '/' : pathname.startsWith(path));
   const isInProductsSection = pathname.startsWith('/products');
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      setLoading(true);
-      try {
-        const res = await fetch(`${baseUrl}/api/productHeaderapi`, {
-          headers: { 'X-API-KEY': `${apiKey}` },
-        });
-        const data = await res.json();
+useEffect(() => {
+  // โหลด products
+  const fetchProducts = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`${baseUrl}/api/productHeaderapi`, {
+        headers: { 'X-API-KEY': `${apiKey}` },
+      });
+      const data = await res.json();
 
-        if (data.status && Array.isArray(data.result)) {
-          const formatted = data.result.map((item) => ({
-            slug: item.producttypeID,
-            name: {
-              th: item.producttypenameTH.trim(),
-              en: item.producttypenameEN.trim(),
-            },
-            brands: item.Brand?.map((b) => ({
+      if (data.status && Array.isArray(data.result)) {
+        const formatted = data.result.map((item) => ({
+          slug: item.producttypeID,
+          name: {
+            th: item.producttypenameTH.trim(),
+            en: item.producttypenameEN.trim(),
+          },
+          brands:
+            item.Brand?.map((b) => ({
               slug: b.productbrandID,
               name: b.productbrandname,
             })) || [],
-          }));
-          setProducts(formatted);
-        }
-      } catch (err) {
-        console.error('Error fetching products:', err);
-      } finally {
-        setLoading(false);
+        }));
+        setProducts(formatted);
       }
-    };
+    } catch (err) {
+      console.error('Error fetching products:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchProducts();
-  }, []);
+  // เช็ค mobile
+  const checkMobile = () => {
+    setIsMobile(window.matchMedia('(max-width: 991px)').matches);
+  };
 
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.matchMedia('(max-width: 991px)').matches);
-    };
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
+  // ริ่มทำงาน
+  fetchProducts();
+  checkMobile();
+  window.addEventListener('resize', checkMobile);
 
-  useEffect(() => {
-    setOpen(false);
-    setServiceOpen(false);
-    setActiveProductSlug(null);
+  // reset state ทุกครั้งที่ pathname เปลี่ยน
+  setOpen(false);
+  setServiceOpen(false);
+  setActiveProductSlug(null);
+  clearTimeout(timeoutRef.current);
+
+  // cleanup
+  return () => {
+    window.removeEventListener('resize', checkMobile);
     clearTimeout(timeoutRef.current);
-  }, [pathname]);
+  };
+}, [pathname]);
 
   const handleMouseEnter = () => {
     clearTimeout(timeoutRef.current);
