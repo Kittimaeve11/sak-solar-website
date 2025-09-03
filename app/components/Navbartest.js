@@ -3,10 +3,10 @@
 import React from 'react';
 import { useLocale } from '../Context/LocaleContext';
 import { usePathname } from 'next/navigation';
-import Image from 'next/image';
 import { FaPhone } from "react-icons/fa6";
 import Link from 'next/link';
 import styles from '../../styles/Navbar.module.css';
+import Image from 'next/image';
 
 export default function Navbar() {
     const { messages, switchLocale, locale } = useLocale();
