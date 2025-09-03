@@ -793,7 +793,7 @@ export const products = [
           {
             id: 'item44',
             model: 'SIHC 24BIF/ SOHC - 24BIF',
-            size: '22,000 BTU',
+            size: '17,500 BTU',
             panel_type: 'Longi Hi-Mo 7 (625 Watt)',
             panel_count: 5,
             price: 66000,
@@ -807,7 +807,7 @@ export const products = [
           {
             id: 'item45',
             model: 'SIHC 24BIF/ SOHC - 24BIF',
-            size: '22,044 BTU',
+            size: '22,000 BTU',
             panel_type: 'Longi Hi-Mo 7 (625 Watt)',
             panel_count: 5,
             price: 66444,

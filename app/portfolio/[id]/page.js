@@ -53,8 +53,8 @@ export default function PortfolioDetailPage({ params: paramsPromise }) {
             titleTH: item.adddressTH,
             titleEN: item.adddressEN,
             size: item.installationsize,
-            productTypeTH: item.TypeProduct_nameTH,
-            productTypeEN: item.TypeProduct_nameEN || item.TypeProduct_nameTH,
+            detailTH: item.portfolio_detailTH,
+            detailEN: item.portfolio_detailEN,
             panelCount: item.panelsolarcout,
             postDate: item.portfolio_datainstall,
             gallery: gallery.map((img) => `${baseUrl}/${img}`),
@@ -188,8 +188,7 @@ export default function PortfolioDetailPage({ params: paramsPromise }) {
           <div className={styles.section}>
             <h2 className={styles.topicportfolio}>{t.detail}</h2>
             <h5 className={styles.Detailsportfolio}>
-              {locale === 'th' ? project.titleTH : project.titleEN}
-            </h5>
+              {locale === 'th' ? JSON.parse(project.detailTH) : JSON.parse(project.detailEN)}            </h5>
           </div>
 
           {/* ขั้นตอนการดำเนินงาน */}
@@ -248,7 +247,7 @@ export default function PortfolioDetailPage({ params: paramsPromise }) {
               <>
                 {matchedProduct.item.mainImage && (
                   <div style={{ marginBottom: 12, display: 'flex', justifyContent: 'center' }}>
-                    <div style={{ borderRadius: '6px', overflow: 'hidden', width: 300, height: 300 ,marginBottom:16}}>
+                    <div style={{ borderRadius: '6px', overflow: 'hidden', width: 300, height: 300, marginBottom: 16 }}>
                       <Image
                         src={`${baseUrl}/${matchedProduct.item.mainImage}`}
                         alt="Main product image"
@@ -280,7 +279,7 @@ export default function PortfolioDetailPage({ params: paramsPromise }) {
                     </div>
                     <div className={styles.detailRow}>
                       <span className={styles.labelsd}>พื้นที่ติดตั้ง</span>
-                      <span className={styles.valuesd}>{matchedProduct.item.area || '-' } ตารางเมตร</span>
+                      <span className={styles.valuesd}>{matchedProduct.item.area || '-'} ตารางเมตร</span>
                     </div>
                   </>
                 ) : (

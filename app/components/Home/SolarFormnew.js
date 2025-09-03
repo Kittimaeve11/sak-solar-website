@@ -17,36 +17,34 @@ const handlePrintScreenshot = () => {
     return;
   }
 
-  html2canvas(element, { scale: 2 })
-    .then((canvas) => {
-      const imgData = canvas.toDataURL('image/png');
-      const printWindow = window.open('', '_blank');
+  html2canvas(element, { scale: 2 }).then(canvas => {
+    const imgData = canvas.toDataURL('image/png');
+    const printWindow = window.open('', '_blank');
 
-      printWindow.document.write(`
-        <html>
-          <head>
-            <title>ปริ้นภาพผลลัพธ์</title>
-            <style>
-              @page { size: landscape; margin: 0; }
-              body { margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-              h1 { font-size: clamp(1.2rem, 5vw, 2rem); font-weight: 600; text-align: center; margin-bottom: 0.5rem; color: #F2780C; }
-              img { max-width: 90%; max-height: 80%; height: auto; display: block; }
-            </style>
-          </head>
-          <body>
-            <h1>ผลการคำนวณขนาดติดตั้ง</h1>
-            <img src="${imgData}" />
-            <script>
-              window.onload = function() { window.print(); window.onafterprint = function() { window.close(); }; };
-            </script>
-          </body>
-        </html>
-      `);
-      printWindow.document.close();
-    })
-    .catch((err) => {
-      console.error('เกิดข้อผิดพลาดในการแคปภาพ:', err);
-    });
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>ปริ้นภาพผลลัพธ์</title>
+          <style>
+            @page { size: landscape; margin: 0; }
+            body { margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+            h1 { font-size: clamp(1.2rem, 5vw, 2rem); font-weight: 600; text-align: center; margin-bottom: 0.5rem; color: #F2780C; }
+            img { max-width: 90%; max-height: 80%; height: auto; display: block; }
+          </style>
+        </head>
+        <body>
+          <h1>ผลการคำนวณขนาดติดตั้ง</h1>
+          <img src="${imgData}" />
+          <script>
+            window.onload = function() { window.print(); window.onafterprint = function() { window.close(); }; };
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+  }).catch(err => {
+    console.error('เกิดข้อผิดพลาดในการแคปภาพ:', err);
+  });
 };
 
 const calculateSolarSize = (electricityCost, dayUsage, installationCost = 0) => {
@@ -57,20 +55,20 @@ const calculateSolarSize = (electricityCost, dayUsage, installationCost = 0) => 
   const C = usageUnits * (dayUsage / 100);
 
   const sizeTable = [
-    { size: '1.8 kW', max: 270 },
-    { size: '3.1 kW', max: 465 },
-    { size: '5 kW', max: 750 },
-    { size: '10 kW', max: 1500 },
-    { size: '15 kW', max: 2250 },
-    { size: '20 kW', max: 3000 },
-    { size: '25 kW', max: 3750 },
-    { size: '30 kW', max: 4500 },
-    { size: '35 kW', max: 5250 },
-    { size: '40 kW', max: 6000 },
+    { size: "1.8 kW", max: 270 },
+    { size: "3.1 kW", max: 465 },
+    { size: "5 kW", max: 750 },
+    { size: "10 kW", max: 1500 },
+    { size: "15 kW", max: 2250 },
+    { size: "20 kW", max: 3000 },
+    { size: "25 kW", max: 3750 },
+    { size: "30 kW", max: 4500 },
+    { size: "35 kW", max: 5250 },
+    { size: "40 kW", max: 6000 },
   ];
 
   const recommendedItem = sizeTable.find((item) => C <= item.max);
-  const recommended = recommendedItem?.size || 'เกิน 60 kW';
+  const recommended = recommendedItem?.size || "เกิน 60 kW";
 
   const savingsPerMonth = electricityCost * (dayUsage / 100);
   const savingsPerYear = savingsPerMonth * 12;
@@ -107,31 +105,13 @@ export default function SolarCalculatorForm() {
   const [productsData, setProductsData] = useState([]);
   const [attemptedRoofInput, setAttemptedRoofInput] = useState(false);
 
-  // 👇 useEffect ที่จะลบ attribute fdprocessedid ทุกครั้ง (กัน McAfee WebAdvisor)
-  useEffect(() => {
-    const observer = new MutationObserver(() => {
-      document.querySelectorAll('[fdprocessedid]').forEach((el) => {
-        el.removeAttribute('fdprocessedid');
-      });
-    });
-
-    observer.observe(document.body, {
-      attributes: true,
-      childList: true,
-      subtree: true,
-    });
-
-    return () => observer.disconnect();
-  }, []);
-
-
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const res = await fetch(`${baseUrl}/api/productpageapi`, {
           headers: {
-            'X-API-KEY': apiKey,
-          },
+            'X-API-KEY': apiKey
+          }
         });
         const data = await res.json();
         if (data.status) {
@@ -148,27 +128,72 @@ export default function SolarCalculatorForm() {
 
   const validate = () => {
     const newErrors = {};
+
     if (!formValues.electricityCost) {
       newErrors.electricityCost = '*กรุณากรอกค่าไฟฟ้า';
-    } else if (
-      isNaN(Number(formValues.electricityCost)) ||
-      Number(formValues.electricityCost) <= 0
-    ) {
+    } else if (isNaN(Number(formValues.electricityCost)) || Number(formValues.electricityCost) <= 0) {
       newErrors.electricityCost = '*กรุณากรอกค่าไฟฟ้าเป็นตัวเลขบวก';
     }
+
     if (!formValues.systemType) {
       newErrors.systemType = '*กรุณาเลือกระบบไฟฟ้า';
     }
+
     if (!formValues.roofArea && formValues.roofArea !== 0) {
       newErrors.roofArea = '*กรุณากรอกพื้นที่หลังคา';
+    } else if (!formValues.systemType && formValues.roofArea !== '') {
+      newErrors.roofArea = '*กรุณาเลือกระบบไฟฟ้าก่อนจึงจะกรอกพื้นที่หลังคาได้';
+    } else {
+      const roofNum = parseFloat(formValues.roofArea);
+      if (formValues.systemType === 'single') {
+        if (roofNum < 9) newErrors.roofArea = '*พื้นที่สำหรับ 1 เฟส ต้องไม่ต่ำกว่า 9 ตารางเมตร.';
+        else if (roofNum > 45) newErrors.roofArea = '*พื้นที่สำหรับ 1 เฟส ต้องไม่เกิน 45 ตารางเมตร.';
+      } else if (formValues.systemType === 'three') {
+        if (roofNum < 45) newErrors.roofArea = '*พื้นที่สำหรับ 3 เฟส ต้องไม่ต่ำกว่า 45 ตารางเมตร.';
+        else if (roofNum > 179) newErrors.roofArea = '*พื้นที่สำหรับ 3 เฟส ต้องไม่เกิน 179 ตารางเมตร.';
+      }
     }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
+  const [roofAttempts, setRoofAttempts] = useState(0);
+
+
   const handleChange = (field) => (e) => {
     let value = e.target.value;
+
+    if (field === 'electricityCost') {
+      value = value.replace(/,/g, '');
+      if (!/^\d*$/.test(value)) return;
+    }
+
+    if (field === 'roofArea') {
+      setAttemptedRoofInput(true);
+      if (value === '' || /^\d*\.?\d*$/.test(value)) {
+        const roofNum = parseFloat(value);
+        let roofError = null;
+        const maxArea = formValues.systemType === 'single' ? 45 : 179;
+        const minArea = formValues.systemType === 'single' ? 9 : 45;
+
+        if (value !== '' && !isNaN(roofNum)) {
+          if (roofNum < minArea) roofError = `*พื้นที่สำหรับ ${formValues.systemType === 'single' ? '1 เฟส' : '3 เฟส'} ต้องไม่ต่ำกว่า ${minArea} ตารางเมตร.`;
+          else if (roofNum > maxArea) return;
+        }
+
+        setErrors((prev) => ({ ...prev, roofArea: roofError }));
+      } else return;
+    }
+
     setFormValues((prev) => ({ ...prev, [field]: value }));
+
+    setErrors((prevErrors) => {
+      if (!prevErrors[field]) return prevErrors;
+      const updatedErrors = { ...prevErrors };
+      delete updatedErrors[field];
+      return updatedErrors;
+    });
   };
 
   const handleSubmit = (e) => {
@@ -176,112 +201,157 @@ export default function SolarCalculatorForm() {
     if (!validate()) return;
 
     const electricityCostNum = Number(formValues.electricityCost);
+    const roofAreaNum = Number(formValues.roofArea);
+    const { systemType, dayUsage } = formValues;
+
+    if (
+      (systemType === 'single' && (roofAreaNum < 9 || roofAreaNum > 45)) ||
+      (systemType === 'three' && (roofAreaNum < 45 || roofAreaNum > 179))
+    ) {
+      alert('พื้นที่หลังคาไม่เหมาะสมกับประเภทของระบบไฟฟ้าที่เลือก');
+      return;
+    }
+
     const installationCost = 100000;
-    const result = calculateSolarSize(
-      electricityCostNum,
-      formValues.dayUsage,
-      installationCost
-    );
+    const result = calculateSolarSize(electricityCostNum, dayUsage, installationCost);
     setResults(result);
   };
 
   const handleReset = () => {
-    setFormValues({
-      electricityCost: '',
-      systemType: '',
-      roofArea: '',
-      dayUsage: 60,
-    });
+    setFormValues({ electricityCost: '', systemType: '', roofArea: '', dayUsage: 60 });
     setErrors({});
     setResults(null);
     setAttemptedRoofInput(false);
   };
 
+  const getRecommendedItems = (systemType) => {
+    if (!systemType || productsData.length === 0) return [];
+    const phase = systemType === 'single' ? '1' : '3';
+    const filtered = productsData.filter(item =>
+      item.phase === phase && item.installationsize.includes('kW')
+    );
+    filtered.sort((a, b) => {
+      const aPriority = (a.promotion ? 2 : 0) + (a.isPinned ? 1 : 0);
+      const bPriority = (b.promotion ? 2 : 0) + (b.isPinned ? 1 : 0);
+      return bPriority - aPriority;
+    });
+    return filtered;
+  };
+
+  const recommendedItems = getRecommendedItems(formValues.systemType);
+
   return (
-    <div className={styles.containersolar || ''}>
-      <div
-        className={`${styles.formWrapper || ''} ${results ? styles.formWrapperResult || '' : styles.formWrapperInitial || ''
-          }`}
-      >
-        <h1 className="headtitleone" style={{ marginBottom: '-1rem' }}>
+    <div className={styles.containersolar}>
+      <div className={`${styles.formWrapper} ${results ? styles.formWrapperResult : styles.formWrapperInitial}`}>
+        <h1 className={styles.headtitleonesolar} lang="th" style={{ marginBottom: '1rem' }}>
           {!results
-            ? 'ระบบคำนวณขนาด Solar Rooftop ที่เหมาะสม'
-            : 'ผลการคำนวณขนาดติดตั้ง'}
+            ? <>ระบบคำนวณขนาด <span className="keep-together">Solar Rooftop</span> <span className="keep-together">ที่เหมาะสม</span></>
+            : (
+              <>
+                ผลการคำนวณ<br />ขนาดติดตั้ง
+              </>
+            )}
         </h1>
+
+
+
 
         {!results && (
           <form noValidate onSubmit={handleSubmit}>
-            <div className={styles.row || ''}>
-              <div className={`${styles.formGroup || ''} ${styles.flexGrow || ''}`}>
-                <label className="form-label">ค่าไฟฟ้าต่อเดือน (บาท) :</label>
+            <div className={styles.row}>
+              <div className={`${styles.formGroup} ${styles.flexGrow}`}>
+                <label htmlFor="electricityCost" className="form-label">
+                  ค่าไฟฟ้าต่อเดือน (บาท) :
+                </label>
                 <input
-                  suppressHydrationWarning
+                  id="electricityCost"
+                  name="electricityCost"
                   type="text"
                   inputMode="numeric"
                   className={`form-field ${errors.electricityCost ? 'input-error' : ''}`}
                   placeholder="กรุณากรอกค่าไฟต่อเดือนของท่าน**"
-                  value={formValues.electricityCost}
+                  value={formValues.electricityCost !== '' ? Number(formValues.electricityCost).toLocaleString('en-US') : ''}
                   onChange={handleChange('electricityCost')}
+                  autoComplete="off"
+                  suppressHydrationWarning
                 />
-                {errors.electricityCost && (
-                  <div className="error-text">{errors.electricityCost}</div>
-                )}
+                {errors.electricityCost && <div className="error-text">{errors.electricityCost}</div>}
               </div>
 
               <div className="form-group align-right">
-                <label className="form-label" style={{ marginBottom: '1rem' }}>
+                <span className="form-label" style={{ marginBottom: '1rem' }}>
                   ระบบไฟฟ้า :
-                </label>
-                <div
-                  className={`radio-group ${errors.systemType ? 'error-border' : ''}`}
-                >
-                  <label className="form-radio">
+                </span>
+
+                <div className={`radio-group ${errors.systemType ? 'error-border' : ''}`}>
+                  <label className="form-radio" htmlFor="systemTypeSingle">
                     <input
-                      suppressHydrationWarning
-                      type="radio"
+                      id="systemTypeSingle"
                       name="systemType"
+                      type="radio"
                       value="single"
                       checked={formValues.systemType === 'single'}
                       onChange={handleChange('systemType')}
                       className="radio-input"
+                      suppressHydrationWarning
                     />
                     1 เฟส
                   </label>
-                  <label className="form-radio">
+
+                  <label className="form-radio" htmlFor="systemTypeThree">
                     <input
-                      suppressHydrationWarning
-                      type="radio"
+                      id="systemTypeThree"
                       name="systemType"
+                      type="radio"
                       value="three"
                       checked={formValues.systemType === 'three'}
                       onChange={handleChange('systemType')}
                       className="radio-input"
+                      suppressHydrationWarning
                     />
                     3 เฟส
                   </label>
                 </div>
+
+                {errors.systemType && (
+                  <div className="error-text" style={{ marginTop: '0.5rem' }}>
+                    {errors.systemType}
+                  </div>
+                )}
               </div>
             </div>
 
-            <label className="form-label">เปอร์เซ็นต์การใช้ไฟฟ้าในช่วงกลางวันและกลางคืน</label>
+            <label htmlFor="dayUsage" className="form-label">
+              เปอร์เซ็นต์การใช้ไฟฟ้า <span className={styles.keepTogethersolar}>ในช่วงกลางวันและกลางคืน :</span>
+            </label>
+
+
             <input
-              suppressHydrationWarning
+              id="dayUsage"
+              name="dayUsage"
               type="range"
               min="0"
               max="100"
               value={formValues.dayUsage}
-              onChange={handleChange('dayUsage')}
+              onChange={(e) => setFormValues((prev) => ({ ...prev, dayUsage: Number(e.target.value) }))}
               className={styles.rangeControl}
               style={{
                 background: `linear-gradient(to right, #F2780C ${formValues.dayUsage}%, #F2F2F2 ${formValues.dayUsage}%)`,
               }}
+              suppressHydrationWarning
             />
+            <div className={styles.usageSplit}>
+              <span>ช่วงกลางวัน {formValues.dayUsage} %</span>
+              <span>ช่วงกลางคืน {100 - formValues.dayUsage} %</span>
+            </div>
 
             <div className={styles.formGroup}>
-              <label className="form-label">
-                พื้นที่หลังคาโดยประมาณ (ตารางเมตร) :</label>
+              <label htmlFor="roofArea" className="form-label">
+                พื้นที่หลังคาโดยประมาณ (ตารางเมตร) :
+              </label>
               <input
-                suppressHydrationWarning
+                id="roofArea"
+                name="roofArea"
                 type="text"
                 inputMode="decimal"
                 className={`form-field ${errors.roofArea ? 'input-error' : ''}`}
@@ -294,10 +364,29 @@ export default function SolarCalculatorForm() {
                       ? 'กรุณากรอกพื้นที่หลังคาในช่วง 9-45 ตารางเมตร'
                       : 'กรุณากรอกพื้นที่หลังคาในช่วง 45-179 ตารางเมตร'
                     : 'กรุณาเลือกระบบไฟฟ้าก่อน**'
+
                 }
+                style={{
+                  backgroundColor: !formValues.systemType ? '#f5f5f5' : 'white',
+                  cursor: !formValues.systemType ? 'not-allowed' : 'text',
+                }}
+                autoComplete="off"
+                suppressHydrationWarning
               />
               {errors.roofArea && <div className="error-text">{errors.roofArea}</div>}
+              {!formValues.systemType && (
+                <div className="error-text">
+                  *กรุณาเลือกระบบไฟฟ้าก่อนจึงจะสามารถกรอกพื้นที่หลังคาได้
+                </div>
+              )}
             </div>
+
+            <h6 className={`${styles.instructions} ${styles.hideOnMobile}`}>
+              <span style={{ color: 'red', fontWeight: '600' }}>หมายเหตุ : </span> ระบบไฟ 1 เฟส ต้องระบุพื้นที่หลังคา 9–45 ตร.ม.
+            </h6>
+            <h6 className={`${styles.instructions1} ${styles.hideOnMobile}`} style={{ marginLeft: '4rem' }}>
+              ระบบไฟ 3 เฟส ต้องระบุพื้นที่หลังคา 45–179 ตร.ม.
+            </h6>
 
             <div className={styles.buttonGroup}>
               <button type="submit" className="buttonSecondaryonebule">
@@ -311,13 +400,14 @@ export default function SolarCalculatorForm() {
                 เคลียร์ข้อมูลและรีเฟรชหน้า
               </button>
             </div>
+
           </form>
         )}
 
         {results && (
           <>
             <h4 className={styles.headtitelsolar}>
-              แพ็กเกจที่ออกแบบมาให้เหมาะกับพื้นที่หลังคาและรูปแบบการใช้พลังงานของคุณ
+              แพ็กเกจที่ออกแบบมาให้เหมาะกับพื้นที่หลังคา และรูปแบบการใช้พลังงานของคุณ
             </h4>
 
             <div className={styles.resultGrid}>
@@ -482,14 +572,16 @@ export default function SolarCalculatorForm() {
 
                   <ul className={styles.costList}>
                     <h4 className={styles.solardeteil}> ผลตอบแทนระบบโซลาร์ </h4>
-
                     <li>
                       <div className={styles.rowds}>
                         <span className={styles.bullet}></span>
                         <span className={styles.labelds}>ค่าไฟที่ลดได้ต่อปี</span>
-                        <strong className={styles.valueds}>{results.savingsPerYear?.toLocaleString() || '-'} บาท</strong>
+                        <strong className={styles.valueds}>
+                          {results.savingsPerYear?.toLocaleString('th-TH', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) || '-'} บาท
+                        </strong>
                       </div>
                     </li>
+
 
                     <li>
                       <div className={styles.rowds}>
@@ -531,6 +623,8 @@ export default function SolarCalculatorForm() {
                   setAttemptedRoofInput(false);
                   document.querySelector(`.${styles.formWrapper}`)?.scrollIntoView({ behavior: 'smooth' });
                 }}
+                suppressHydrationWarning
+                style={{ marginBottom: '1rem' }}
               >
                 คำนวณใหม่
               </button>
@@ -538,6 +632,7 @@ export default function SolarCalculatorForm() {
               <button
                 className="buttonPrimary"
                 onClick={handlePrintScreenshot}
+                suppressHydrationWarning
               >
                 ปริ้นผลการคำนวณขนาดติดตั้ง
               </button>
@@ -552,4 +647,3 @@ export default function SolarCalculatorForm() {
     </div >
   );
 }
-

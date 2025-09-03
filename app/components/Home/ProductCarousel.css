@@ -24,7 +24,6 @@
   align-items: center;
   justify-content: center;
   padding: 0 !important;
-  /* ✅ ลบ padding ซ้ำซ้อน */
   box-sizing: border-box;
 }
 
@@ -81,21 +80,6 @@
   width: 330px;
 }
 
-/* Responsive: Tablet (3 ใบต่อแถว) */
-@media (max-width: 1024px) {
-  .carouselStaticWrapper .carouselCard {
-    width: calc(33.33% - 24px);
-  }
-}
-
-/* Responsive: มือถือ (เต็มแถว) */
-@media (max-width: 640px) {
-  .carouselStaticWrapper .carouselCard {
-    width: 100%;
-  }
-}
-
-/* ✅ Card */
 .carouselCard {
   background-color: #ffffff;
   border-radius: 6px;
@@ -115,7 +99,7 @@
 
 .carouselCard:hover {
   transform: translateY(-6px);
-  /* box-shadow: 0 2px 10px rgba(65, 65, 65, 0.1); */
+  box-shadow: 0 2px 10px rgba(65, 65, 65, 0.1);
 
 }
 
@@ -131,48 +115,30 @@
 .product-info h6 {
   margin-top: 1rem;
   margin-bottom: 0.5rem;
-  line-height: 1.6; /* ปรับให้ชิดกันมากขึ้น */
+  line-height: 1.6;
+  /* ปรับให้ชิดกันมากขึ้น */
 }
 
 
 .carouselCard img {
-  width: 100%;
-  height: auto;
+  width: 330px;
+  height: 330px;
   object-fit: cover;
   border-top-left-radius: 6px;
   border-top-right-radius: 6px;
 }
 
-/* .carouselCard h3 {
-  font-size: px;
-  font-weight: 600;
-  color: #2a3e5e;
-  margin: 0.75rem 1rem 0rem;
-  min-height: 2.6em;
-} */
-
 .carouselCard h3 {
   font-size: 17px;
   font-weight: 600;
-  color: #2a3e5e; 
-  /* margin: 0.75rem 0rem 0rem 1rem;
-  min-height: 2.0em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-
-  max-width: calc(100% - 2rem);
-  /* ลบ margin ซ้ายขวา 1rem ออก */
+  color: #2a3e5e;
 }
-
 
 .carouselCard p {
   font-weight: 600;
   font-size: 20px;
   color: #000000;
 }
-
-
 
 .product-size {
   font-weight: 600 !important;
@@ -218,7 +184,7 @@
   text-decoration: none !important;
 }
 
-/* สำหรับโปโมชั่น */
+/* โปโมชั่น */
 .product-promo-ribbon {
   position: absolute;
   top: 10px;
@@ -235,4 +201,226 @@
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   z-index: 10;
   font-size: 16px;
+}
+
+@media (max-width: 1499px) {
+  .carouselWrapper {
+    max-width: 1200px;
+    gap: 10px;
+  }
+
+  .carouselInner {
+    max-width: 1100px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .carouselWrapper {
+    max-width: 800px;
+
+  }
+
+  .carouselInner {
+    max-width: 720px;
+  }
+
+  .carouselStaticWrapper {
+    gap: 32px !important;
+  }
+
+}
+
+
+@media (max-width: 800px) {
+  .carouselWrapper {
+    max-width: 500px;
+
+  }
+
+  .carouselInner {
+    max-width: 360px;
+  }
+
+  .carouselArrow {
+    width: 50px;
+    height: 50px;
+  }
+}
+
+@media (max-width: 500px) {
+  .carouselWrapper {
+    max-width: 400px;
+
+  }
+
+  .carouselInner {
+    max-width: 320px;
+  }
+
+  .carouselArrow {
+    width: 45px;
+    height: 45px;
+  }
+
+  .carouselHeader {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .carouselLink {
+    align-self: flex-end;
+    margin-top: -2rem;
+    margin-bottom: 1rem;
+
+  }
+
+  .carouselCard {
+    width: 300px !important;
+  }
+
+  .carouselCard img {
+    width: 300px !important;
+    height: 300px !important;
+  }
+
+  /*  ใช้ขนาดเดียวกันกับ carouselCard */
+  .carouselStaticWrapper .carouselCard {
+    width: 300px !important;
+
+  }
+
+
+  .carouselCard h3 {
+    font-size: 17px;
+    font-weight: 600;
+    color: #2a3e5e;
+  }
+
+  .carouselCard p {
+    font-weight: 600;
+    font-size: 20px;
+    color: #000000;
+  }
+
+  .product-size {
+    font-weight: 600 !important;
+    font-size: 18px;
+  }
+
+}
+
+@media (max-width: 370px) {
+  .carouselWrapper {
+    max-width: 390px;
+
+  }
+
+  .carouselInner {
+    max-width: 290px;
+  }
+
+  .carouselArrow {
+    width: 40px;
+    height: 40px;
+  }
+
+
+
+  .carouselCard {
+    width: 260px !important;
+  }
+
+  .carouselCard img {
+    width: 260px !important;
+    height: 260px !important;
+  }
+
+  /*  ใช้ขนาดเดียวกันกับ carouselCard */
+  .carouselStaticWrapper .carouselCard {
+    width: 260px !important;
+
+  }
+
+
+  .carouselCard h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #2a3e5e;
+  }
+
+  .carouselCard p {
+    font-weight: 600;
+    font-size: 20px;
+    color: #000000;
+  }
+
+  .product-size {
+    font-weight: 600 !important;
+    font-size: 18px;
+  }
+
+}
+
+
+@keyframes pulse {
+  0% {
+    background-color: #e0e0e0;
+  }
+
+  50% {
+    background-color: #f0f0f0;
+  }
+
+  100% {
+    background-color: #e0e0e0;
+  }
+}
+
+.carouselSkeletonWrapper {
+  display: flex;
+  gap: 16px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding: 10px 0;
+}
+
+.skeletonCard {
+  width: 330px;
+  min-width: 330px;
+  border-radius: 8px;
+  animation: pulse 1.5s infinite;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: white;
+}
+
+.skeletonImage {
+  width: 100%;
+  height: 200px;
+  border-top-right-radius: 8px;
+  border-top-left-radius: 8px;
+  background-color: #e0e0e0;
+}
+
+.skeletonText {
+  height: 16px;
+  border-radius: 4px;
+  background-color: #e0e0e0;
+}
+
+.skeletonText.title {
+  width: 80%;
+  height: 20px;
+}
+
+.skeletonText.subTitle {
+  width: 60%;
+}
+
+.skeletonText.price {
+  width: 40%;
+  height: 18px;
 }

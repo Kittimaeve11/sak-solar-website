@@ -1,8 +1,9 @@
 /* พื้นหลังฟอร์ม */
 .containersolar {
   background-color: #FAFBFF;
-  padding: 1rem 0;
+  padding: 1rem;
   width: 100%;
+  margin-top: 1.5rem;
 }
 
 .formWrapper {
@@ -159,7 +160,7 @@
   display: flex;
   align-items: center;
   /* กึ่งกลางแนวดิ่ง */
-  padding: 1rem 2rem;
+  padding: 2rem;
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
@@ -499,4 +500,191 @@
   justify-content: flex-end;
   margin-top: 1rem;
   /* เพิ่มระยะห่างด้านบนถ้าต้องการ */
+}
+
+.headtitleonesolar {
+  font-size: 2rem;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 0.5rem;
+  color: #F27C1B;
+}
+
+.keepTogethersolar {
+  white-space: nowrap;
+  /* ห้ามตัดบรรทัดกลางข้อความ */
+}
+
+@media (max-width: 1200px) {
+  .formWrapperResult {
+    max-width: 900px;
+  }
+
+  .topGrid,
+  .bottomGrid {
+    grid-template-columns: 1fr;
+    /* เรียงลงทีละแถว */
+  }
+
+  .productList {
+    flex-direction: row;
+    /* ✅ ให้เรียงแนวนอนเสมอ */
+    justify-content: center;
+    gap: 1rem;
+  }
+
+
+}
+
+
+@media (max-width: 764px) {
+
+  /* ฟอร์มหลัก */
+  .formWrapper {
+    width: 80%;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 1rem;
+    border-radius: 8px;
+    box-sizing: border-box;
+  }
+
+  /* คำแนะนำ */
+  .instructions,
+  .instructions1,
+  .instructions2 {
+    font-size: 0.9rem;
+    margin-left: 1rem;
+  }
+
+  /* input, slider */
+  .solar-form {
+    max-width: 100%;
+  }
+
+
+
+  /* กล่องผลลัพธ์ */
+  .topGrid,
+  .bottomGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .resultBox {
+    padding: 1rem 2.5rem;
+  }
+
+  .labelhead,
+  .labelheadc {
+    font-size: 1.5rem;
+  }
+
+  .recommendedNumber,
+  .recommendedNumberc {
+    font-size: 2rem;
+  }
+
+  .recommendedUnit,
+  .recommendedUnitc {
+    font-size: 1.2rem;
+  }
+
+
+  /* package title */
+  .packageTitle {
+    font-size: 25px;
+    margin-top: 0.5rem;
+  }
+
+  .solarTitle {
+    font-size: 25px;
+  }
+
+  .systemType {
+    font-size: 1rem;
+  }
+
+  /* product cards */
+  .productList {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .productCard {
+    width: 100%;
+    margin: 0 auto 0;
+  }
+
+  .productImage {
+    width: 100%;
+    height: auto;
+  }
+
+  /* ตารางสินค้า */
+  .productTable h3 {
+    font-size: 1rem;
+  }
+
+  /* cost section */
+  .costLabel,
+  .costValue {
+    font-size: 1rem;
+  }
+
+  .rowds {
+    padding-left: 3rem;
+    font-size: 0.9rem;
+  }
+
+  .valueds {
+    min-width: auto;
+    font-size: 0.9rem;
+  }
+
+  .product-info {
+    padding: -0.5rem!important; ;
+  }
+
+}
+
+
+@media (max-width: 560px) {
+  .hideOnMobile {
+    display: none;
+  }
+
+  .buttonGroup {
+    flex-direction: column;
+    align-items: flex-end;
+  }
+
+  .headtitleonesolar {
+    font-size: 1.5rem;
+  }
+
+  .buttonWrapper {
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .productTable {
+    width: 100%;
+    padding: 0 2px;
+    border-radius: 8px;
+  }
+
+  .productCard {
+    width: 60%;
+    margin: 0 auto 0;
+  }
+
+  /* .productTable .product-info h3,
+.productTable .product-info p {
+  text-align: left;
+  margin: 0rem 0;
+} */
+
 }

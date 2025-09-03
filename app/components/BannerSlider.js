@@ -66,12 +66,21 @@ export default function BannerSlider() {
   const [loadedIndexes, setLoadedIndexes] = useState({});
   const [initialSlide, setInitialSlide] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
-  const [loading, setLoading] = useState(true); 
+  const [loading, setLoading] = useState(true);
   const isDragging = useRef(false);
 
-  // Detect window size
+  // ✅ Detect window size & reset slider index when switch mobile <-> desktop
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    const checkMobile = () => {
+      const mobile = window.innerWidth <= 767;
+      setIsMobile((prev) => {
+        if (prev !== mobile) {
+          localStorage.removeItem("bannerSlideIndex"); // reset index
+          setInitialSlide(0);
+        }
+        return mobile;
+      });
+    };
     checkMobile();
     window.addEventListener("resize", checkMobile);
 
@@ -81,7 +90,7 @@ export default function BannerSlider() {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  // Fetch banners
+  // ✅ Fetch banners
   useEffect(() => {
     let isMounted = true;
     const fetchBanners = async () => {
@@ -142,16 +151,16 @@ export default function BannerSlider() {
 
   return (
     <div className="w-full relative" style={{ lineHeight: 0, fontSize: 0 }}>
-      {/* ✅ แสดง skeleton ตอน SSR แน่นอน */}
+      {/* ✅ Skeleton SSR */}
       {(loading || banners.length === 0) && (
         <div className="banner-skeleton">
           <div className="skeleton-overlay" />
         </div>
       )}
 
-      {/* Slider */}
+      {/* ✅ Slider */}
       {!loading && banners.length > 0 && (
-        <Slider ref={sliderRef} {...settings}>
+        <Slider key={isMobile ? "mobile" : "desktop"} ref={sliderRef} {...settings}>
           {banners.map((banner, index) => {
             const imgSrc = isMobile
               ? `${baseUrl}/${banner.brander_pictureMoblie}`
@@ -177,10 +186,12 @@ export default function BannerSlider() {
                       opacity: isLoaded ? 1 : 0,
                       transition: "opacity 0.5s ease-in-out",
                     }}
-                    onLoadingComplete={() =>
+                    onLoad={() =>
                       setLoadedIndexes((prev) => ({ ...prev, [index]: true }))
                     }
+                    
                   />
+
                   {!isLoaded && <div className="skeleton-overlay" />}
                 </div>
               </div>
@@ -196,11 +207,14 @@ export default function BannerSlider() {
           height: auto;
         }
 
+        /* ✅ PC ≥ 768px */
         @media (min-width: 768px) {
           .banner-container {
             aspect-ratio: 3840/1191;
           }
         }
+
+        /* ✅ Mobile ≤ 767px */
         @media (max-width: 767px) {
           .banner-container {
             aspect-ratio: 768/1032;
@@ -214,7 +228,7 @@ export default function BannerSlider() {
           position: relative;
           overflow: hidden;
         }
-          
+
         @media (max-width: 767px) {
           .banner-skeleton {
             aspect-ratio: 768/1032;
@@ -229,6 +243,7 @@ export default function BannerSlider() {
           animation: pulse 1.5s infinite ease-in-out;
           z-index: 2;
         }
+
         @keyframes pulse {
           0% { opacity: 1; }
           50% { opacity: 0.5; }

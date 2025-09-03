@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import styles from "../../styles/Footer.module.css"; // ✅ ปรับ path ตามโปรเจกต์คุณ
+import styles from "../../styles/Footer.module.css"; // ✅ ปรับ path ตามโปรเจกต์
 import { menuItems } from "../config/footer"; // ✅ ต้องมีไฟล์นี้
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
@@ -24,32 +24,29 @@ export default function Footer() {
     const fetchPolicies = async () => {
       try {
         const res = await fetch(`${baseUrl}/api/policyapi`, {
-          headers: {
-            'X-API-KEY': `${apiKey}`,
-          },
+          headers: { 'X-API-KEY': `${apiKey}` },
         });
         const data = await res.json();
-
-        if (data.status && Array.isArray(data.result)) {
-          setPolicies(data.result);
-        } else {
-          setPolicies([]);
-        }
+        if (data.status && Array.isArray(data.result)) setPolicies(data.result);
+        else setPolicies([]);
       } catch (error) {
         console.error("Error fetching policies:", error);
         setPolicies([]);
       }
     };
-
     fetchPolicies();
   }, []);
-  const iconPath = useMemo(() => ({
-    facebook: "/images/facebook.png",
-    instagram: "/images/instagram.png",
-    tiktok: "/images/tiktok.png",
-    line: "/images/line.png",
-    youtube: "/images/youtube.png",
-  }), []);
+
+  const iconPath = useMemo(
+    () => ({
+      facebook: "/images/facebook.png",
+      instagram: "/images/instagram.png",
+      tiktok: "/images/tiktok.png",
+      line: "/images/line.png",
+      youtube: "/images/youtube.png",
+    }),
+    []
+  );
 
   const firstTwoMenus = menuItems.slice(0, 2);
   const contactMenu = menuItems.find((item) => item.title === "ติดต่อเรา");
@@ -84,7 +81,6 @@ export default function Footer() {
                 </ul>
               </>
             )}
-
           </div>
 
           {/* คอลัมน์ที่สอง */}
@@ -111,6 +107,7 @@ export default function Footer() {
                     </li>
                   ))}
                 </ul>
+
                 <div className={styles.socialIcons}>
                   {socials.map(({ id, url, icon }) => (
                     <Link
@@ -126,6 +123,7 @@ export default function Footer() {
                         alt={id}
                         width={36}
                         height={36}
+                        priority // ✅ เพิ่ม priority สำหรับ LCP
                       />
                     </Link>
                   ))}
@@ -149,6 +147,7 @@ export default function Footer() {
               alt="โลโก้สีส้ม"
               width={100}
               height={40}
+              priority
             />
             <Link
               href="/file/Inverter.pdf"
@@ -161,6 +160,7 @@ export default function Footer() {
                 alt="โลโก้การไฟฟ้าส่วนภูมิภาค"
                 width={100}
                 height={40}
+                priority
               />
             </Link>
             <Image
@@ -168,6 +168,7 @@ export default function Footer() {
               alt="โลโก้กกพ"
               width={100}
               height={40}
+              priority
             />
           </div>
         </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Slider from 'react-slick';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -25,15 +25,54 @@ function Arrow({ onClick, direction }) {
   );
 }
 
+// Skeleton Component
+function ProductSkeleton({ count }) {
+  return (
+    <div className="carouselSkeletonWrapper">
+      {Array.from({ length: count }).map((_, idx) => (
+        <div key={idx} className="carouselCard skeletonCard">
+          <div className="skeletonImage"></div>
+          <div className="skeletonText title"></div>
+          <div className="skeletonText subTitle"></div>
+          <div className="skeletonText price"></div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function ProductCarousel({ title, items, link }) {
-  const showSlider = items.length > 4;
   const [isDragging, setIsDragging] = useState(false);
+  const [slidesToShow, setSlidesToShow] = useState(4);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Responsive slides
+  useEffect(() => {
+    const updateSlides = () => {
+      const width = window.innerWidth;
+      if (width < 801) setSlidesToShow(1);
+      else if (width < 1200) setSlidesToShow(2);
+      else if (width < 1500) setSlidesToShow(3);
+      else setSlidesToShow(4);
+    };
+    updateSlides();
+    window.addEventListener('resize', updateSlides);
+    return () => window.removeEventListener('resize', updateSlides);
+  }, []);
+
+  // Simulate loading
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 1500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const showSlider = items.length > slidesToShow;
 
   const settings = {
     dots: false,
     infinite: true,
     speed: 400,
-    slidesToShow: 4,
+    slidesToShow,
     slidesToScroll: 1,
     arrows: true,
     swipeToSlide: true,
@@ -42,14 +81,11 @@ export default function ProductCarousel({ title, items, link }) {
     prevArrow: <Arrow direction="left" />,
     beforeChange: () => setIsDragging(true),
     afterChange: () => setTimeout(() => setIsDragging(false), 50),
-    responsive: [
-      { breakpoint: 1024, settings: { slidesToShow: 2, slidesToScroll: 1 } },
-      { breakpoint: 640, settings: { slidesToShow: 1, slidesToScroll: 1 } },
-    ],
   };
 
   const getProductName = (item) =>
     item.name ?? item.model ?? item.solarpanel ?? item.title ?? 'ไม่พบข้อมูลชื่อ';
+
   const renderCard = (item) => {
     let finalPrice = null;
     if (item.isprice === "1" && item.price) {
@@ -63,13 +99,11 @@ export default function ProductCarousel({ title, items, link }) {
 
     return (
       <Link
+        key={item.product_ID ?? item.id}
         href={`/products/${item.producttypeID}/${item.productbrandID}/${item.product_ID}`}
         className="carouselCard no-underline hover:no-underline"
         onClick={(e) => { if (isDragging) e.preventDefault(); }}
       >
-
-
-        {/* รูปสินค้า + ป้ายโปรโมชั่น */}
         {item.image && (
           <div className="product-image-wrapper" style={{ position: 'relative' }}>
             <Image
@@ -78,6 +112,8 @@ export default function ProductCarousel({ title, items, link }) {
               width={330}
               height={330}
               style={{ objectFit: 'cover' }}
+              draggable={false}
+              priority
             />
             {item.productpro_ispromotion === "1" && item.productpro_percent && (
               <div className="product-promo-ribbon">-{item.productpro_percent}</div>
@@ -85,43 +121,35 @@ export default function ProductCarousel({ title, items, link }) {
           </div>
         )}
 
-        {/* ข้อมูลสินค้า */}
-        <div className="product-info" >
-          <h3>
-            {item.productbrandName ? `${item.productbrandName} ` : ''}
-            {getProductName(item)}
-          </h3>
-
-          {item.battery && (
-            <h6 style={{ marginTop: '0.5rem' }}>รุ่นแบตเตอรี่ {item.battery} kWh</h6>
-          )}
-
+        <div className="product-info">
+          <h3>{item.productbrandName ? `${item.productbrandName} ` : ''}{getProductName(item)}</h3>
+          {item.battery && <h6 style={{ marginTop: '0.5rem' }}>รุ่นแบตเตอรี่ {item.battery} kWh</h6>}
           {(item.isprice == 0 || item.isprice === "0") && item.size && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '1rem' }}>
-
               <p style={{ display: 'flex', alignItems: 'center', fontWeight: 600, fontSize: '18px', margin: 0, lineHeight: 1 }}>
-                <MdOutlineElectricBolt size={25} color='#ffc300'  /> {item.size}
+                <MdOutlineElectricBolt size={25} color='#ffc300' /> {item.size}
               </p>
             </div>
           )}
-
           {item.isprice === "1" && item.price && (
-            <div>
-              {item.productpro_ispromotion === "1" && item.productpro_percent ? (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', marginTop: '1rem' }}>
-                  <p style={{ display: 'flex', alignItems: 'center', fontWeight: 600, fontSize: '18px', margin: 0, lineHeight: 1 }}>
-                    <TbCurrencyBaht size={25} color='#000000ff' /> {Number(finalPrice).toLocaleString()} บาท
-                  </p>
-                  <span style={{ fontSize: '16px', color: '#888', textDecoration: 'line-through' }}>
-                    {Number(item.price).toLocaleString()} บาท
-                  </span>
-                </div>
-              ) : (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', marginTop: '1rem' }}>
-                  <p style={{ display: 'flex', alignItems: 'center', fontWeight: 600, fontSize: '18px', margin: 0, lineHeight: 1 }}>
-                    <TbCurrencyBaht size={25} color='#000000ff' /> {Number(item.price).toLocaleString()} บาท
-                  </p>
-                </div>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.3rem',
+              marginTop: '1rem',
+              color: '#000000',
+              fontWeight: 700 // ตัวหนังสือหนา
+            }}>
+              <TbCurrencyBaht
+                size={25}       // ลดขนาดไอคอนให้เล็กลง
+                
+                style={{ verticalAlign: 'middle' }} // ให้ตรงกลางกับข้อความ
+              />
+              {Number(finalPrice ?? item.price).toLocaleString()} บาท
+              {item.productpro_ispromotion === "1" && item.productpro_percent && (
+                <span style={{ fontSize: '16px', color: '#888', textDecoration: 'line-through', marginLeft: '0.5rem' }}>
+                  {Number(item.price).toLocaleString()} บาท
+                </span>
               )}
             </div>
           )}
@@ -132,40 +160,36 @@ export default function ProductCarousel({ title, items, link }) {
 
   return (
     <div className="carouselWrapper">
-      {/* Header */}
       <div className="carouselHeader">
         <h2 className="carouselTitle">{title}</h2>
         <Link href={link} className="carouselLink no-underline hover:no-underline">
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: 600 }}>
-            <HiPlusCircle />
-            ผลิตภัณฑ์ทั้งหมด
+            <HiPlusCircle /> ผลิตภัณฑ์ทั้งหมด
           </span>
         </Link>
       </div>
 
-      {/* Slider / Static */}
       <div className="carouselInner">
-        {showSlider ? (
+        {isLoading ? (
+          <ProductSkeleton count={slidesToShow} />
+        ) : showSlider ? (
           <Slider {...settings}>
             {items.map((item) => (
-              <div
-                key={item.id || item.product_ID || `${item.name}-${Math.random()}`}
-                className="carouselStaticWrapper"
-              >
+              <div key={item.product_ID ?? item.id} className="carouselStaticWrapper">
                 {renderCard(item)}
               </div>
             ))}
           </Slider>
         ) : (
           <div className="carouselStaticWrapper">
-            {items.map((item) => (
-              <React.Fragment
-                key={item.id || item.product_ID || `${item.name}-${Math.random()}`}
-              >
+            {items.map((item, index) => (
+              <React.Fragment key={item.product_ID ?? item.id ?? index}>
                 {renderCard(item)}
               </React.Fragment>
             ))}
+
           </div>
+
         )}
       </div>
     </div>

@@ -116,9 +116,9 @@ export default function HomePage() {
 
   return (
     <>
-<div className="banner-wrapper">
-  <BannerSlider />
-</div>
+      <div className="banner-wrapper">
+        <BannerSlider />
+      </div>
 
       <h5 className="headline" style={{ marginTop: '-0.5px' }}>
         ติดตั้งโซลาร์เซลล์กับทีมช่างที่ได้มารฐาน <br />
@@ -154,21 +154,21 @@ export default function HomePage() {
           initialProduct={productFromUrl}
         />
       </div>
-
-      <SlideEditorial />
+      
+      {/* <SlideEditorial />
       <SlidePortfolio />
-      <SlideReview />
+      <SlideReview /> */}
 
       <style jsx>{`
   .banner-wrapper {
     position: relative;
     width: 100%;
-    height: auto; /* ✅ ไม่ fix ด้วย aspect-ratio */
+    height: auto; /*  ไม่ fix ด้วย aspect-ratio */
   }
 
   .banner-wrapper :global(img) {
     width: 100%;
-    height: auto;     /* ✅ ปรับตามสัดส่วนจริง */
+    height: auto;     /*  ปรับตามสัดส่วนจริง */
     object-fit: cover;
     display: block;
   }

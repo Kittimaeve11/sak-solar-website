@@ -150,7 +150,7 @@ h6 {
 }
 
 .headtitle {
-  font-size: clamp(1.2rem, 5vw, 2rem);
+  font-size: clamp(1.5rem, 5vw, 2rem);
   font-weight: 600;
   text-align: center;
   margin-bottom: 0.5rem;
@@ -164,6 +164,22 @@ h6 {
   margin-bottom: 0.5rem;
   color: #F27C1B;
 }
+
+.headtitle,
+.headtitleone {
+  white-space: normal;          /* อนุญาตให้ขึ้นบรรทัดใหม่ */
+  word-break: keep-all;         /* ไม่ตัดคำกลางพยางค์ */
+  line-break: strict;           /* จัดการตัดคำภาษาไทยให้ถูกต้อง */
+  overflow-wrap: break-word;    /* ถ้าจำเป็นจริง ๆ ค่อยตัดทั้งคำ */
+}
+
+.keep-together {
+  white-space: nowrap; /* ห้ามแตกบรรทัดใน span นี้ */
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
 
 .buttonPrimary {
   font-weight: 400;

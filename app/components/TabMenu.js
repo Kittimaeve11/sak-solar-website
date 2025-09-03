@@ -14,88 +14,94 @@ const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 export default function TabMenu() {
   const { messages, locale } = useLocale();
   const pathname = usePathname();
-  const [open, setOpen] = useState(false);
-  const [serviceOpen, setServiceOpen] = useState(false);
-  const [activeProductSlug, setActiveProductSlug] = useState(null);
-  const [isMobile, setIsMobile] = useState(false);
+
+  const [open, setOpen] = useState(false); // main menu toggle
+  const [serviceOpen, setServiceOpen] = useState(false); // products submenu toggle
+  const [activeProductSlug, setActiveProductSlug] = useState(null); // active product type
+  const [isMobile, setIsMobile] = useState(false); // detect mobile
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
+
   const timeoutRef = useRef(null);
 
-  const isActive = (path) => (path === '/' ? pathname === '/' : pathname.startsWith(path));
+  // ตรวจสอบ active path
+  const isActive = (path) =>
+    path === '/' ? pathname === '/' : pathname.startsWith(path);
+
   const isInProductsSection = pathname.startsWith('/products');
 
-useEffect(() => {
-  // โหลด products
-  const fetchProducts = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch(`${baseUrl}/api/productHeaderapi`, {
-        headers: { 'X-API-KEY': `${apiKey}` },
-      });
-      const data = await res.json();
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch(`${baseUrl}/api/productHeaderapi`, {
+          headers: { 'X-API-KEY': apiKey },
+        });
 
-      if (data.status && Array.isArray(data.result)) {
-        const formatted = data.result.map((item) => ({
-          slug: item.producttypeID,
-          name: {
-            th: item.producttypenameTH.trim(),
-            en: item.producttypenameEN.trim(),
-          },
-          brands:
-            item.Brand?.map((b) => ({
-              slug: b.productbrandID,
-              name: b.productbrandname,
-            })) || [],
-        }));
-        setProducts(formatted);
+        if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
+
+        const data = await res.json();
+        if (data.status && Array.isArray(data.result)) {
+          const formatted = data.result.map((item) => ({
+            slug: item.producttypeID,
+            name: {
+              th: item.producttypenameTH?.trim() || '',
+              en: item.producttypenameEN?.trim() || '',
+            },
+            brands:
+              item.Brand?.map((b) => ({
+                slug: b.productbrandID,
+                name: b.productbrandname,
+              })) || [],
+          }));
+          setProducts(formatted);
+        }
+      } catch (err) {
+        console.error('Error fetching products:', err);
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      console.error('Error fetching products:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
-  // เช็ค mobile
-  const checkMobile = () => {
-    setIsMobile(window.matchMedia('(max-width: 991px)').matches);
-  };
+    const checkMobile = () => {
+      setIsMobile(window.matchMedia('(max-width: 991px)').matches);
+    };
 
-  // ริ่มทำงาน
-  fetchProducts();
-  checkMobile();
-  window.addEventListener('resize', checkMobile);
+    // run once
+    fetchProducts();
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
 
-  // reset state ทุกครั้งที่ pathname เปลี่ยน
-  setOpen(false);
-  setServiceOpen(false);
-  setActiveProductSlug(null);
-  clearTimeout(timeoutRef.current);
-
-  // cleanup
-  return () => {
-    window.removeEventListener('resize', checkMobile);
+    // reset state when pathname changes
+    setOpen(false);
+    setServiceOpen(false);
+    setActiveProductSlug(null);
     clearTimeout(timeoutRef.current);
-  };
-}, [pathname]);
+
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+      clearTimeout(timeoutRef.current);
+    };
+  }, [pathname]);
 
   const handleMouseEnter = () => {
-    clearTimeout(timeoutRef.current);
-    setServiceOpen(true);
+    if (!isMobile) {
+      clearTimeout(timeoutRef.current);
+      setServiceOpen(true);
+    }
   };
 
   const handleMouseLeave = () => {
-    timeoutRef.current = setTimeout(() => {
-      setServiceOpen(false);
-      setActiveProductSlug(null);
-    }, 200);
+    if (!isMobile) {
+      timeoutRef.current = setTimeout(() => {
+        setServiceOpen(false);
+        setActiveProductSlug(null);
+      }, 200);
+    }
   };
 
   const toggleBrandSubmenu = (slug) => {
-    if (isMobile) {
-      setActiveProductSlug((prev) => (prev === slug ? null : slug));
-    }
+    setActiveProductSlug((prev) => (prev === slug ? null : slug));
   };
 
   const handleLinkClick = () => {
@@ -106,27 +112,38 @@ useEffect(() => {
 
   return (
     <nav className="navbar">
+      {/* Hamburger button */}
       <button
         className="hamburger"
-        onClick={() => setOpen(!open)}
+        onClick={() => setOpen((prev) => !prev)}
         aria-label="Toggle menu"
         aria-expanded={open}
       >
         <IoMenu />
       </button>
 
-      <nav id="navmenu" className={`navmenu ${open ? 'active' : ''}`} role="navigation">
+      <nav
+        id="navmenu"
+        className={`navmenu ${open ? 'active' : ''}`}
+        role="navigation"
+      >
         <ul className="nav-root">
+          {/* Home */}
           <li>
-            <Link href="/" className={isActive('/') ? 'active' : ''} onClick={handleLinkClick}>
+            <Link
+              href="/"
+              className={isActive('/') ? 'active' : ''}
+              onClick={handleLinkClick}
+            >
               {messages.home}
             </Link>
           </li>
 
+          {/* Products */}
           <li
             className={`dropdown ${isInProductsSection ? 'active' : ''}`}
-            onMouseEnter={() => !isMobile && handleMouseEnter()}
-            onMouseLeave={() => !isMobile && handleMouseLeave()}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
           >
             <div className="dropdown-header">
               <Link
@@ -154,7 +171,13 @@ useEffect(() => {
             {serviceOpen && (
               <ul className="dropdown-menu level-1">
                 {loading ? (
-                  <li style={{ padding: '10px', color: '#ccc', fontStyle: 'italic' }}>
+                  <li
+                    style={{
+                      padding: '10px',
+                      color: '#ccc',
+                      fontStyle: 'italic',
+                    }}
+                  >
                     กำลังโหลดข้อมูล...
                   </li>
                 ) : (
@@ -168,21 +191,36 @@ useEffect(() => {
                       <li
                         key={product.slug}
                         className={`dropdown-item ${isCurrent ? 'active' : ''}`}
-                        onMouseEnter={() => !isMobile && setActiveProductSlug(product.slug)}
-                        onMouseLeave={() => !isMobile && setActiveProductSlug(null)}
+                        onMouseEnter={() =>
+                          !isMobile && setActiveProductSlug(product.slug)
+                        }
+                        onMouseLeave={() =>
+                          !isMobile && setActiveProductSlug(null)
+                        }
                       >
-                        <div className="dropdown-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                          {/* ข้อความ (กดแล้วไปที่หน้า product นั้นๆ) */}
+                        <div
+                          className="dropdown-header"
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                          }}
+                        >
+                          {/* Product link */}
                           <Link
                             href={`/products/${product.slug}`}
-                            className={`dropdown-toggle ${isOpen ? 'hovered' : ''}`}
+                            className={`dropdown-toggle ${
+                              isOpen ? 'hovered' : ''
+                            }`}
                             onClick={handleLinkClick}
                             style={{ flexGrow: 1, textDecoration: 'none' }}
                           >
-                            {locale === 'th' ? product.name.th : product.name.en}
+                            {locale === 'th'
+                              ? product.name.th
+                              : product.name.en}
                           </Link>
 
-                          {/* ลูกศร (กดแล้วแค่เปิด/ปิด brand submenu) */}
+                          {/* Brand toggle (only on mobile) */}
                           {isMobile && product.brands.length > 0 && (
                             <button
                               onClick={(e) => {
@@ -193,20 +231,28 @@ useEffect(() => {
                               aria-expanded={isOpen}
                               className="dropdown-toggle-button"
                             >
-                              {isOpen ? <IoIosArrowUp /> : <IoIosArrowDown />}
+                              {isOpen ? (
+                                <IoIosArrowUp />
+                              ) : (
+                                <IoIosArrowDown />
+                              )}
                             </button>
                           )}
-
                         </div>
 
-                        {/* submenu แบรนด์ */}
+                        {/* Brand submenu */}
                         {isOpen && product.brands.length > 0 && (
                           <ul className="brand-submenu">
                             {product.brands.map((brand, index) => (
                               <li key={`${product.slug}-${brand.slug}-${index}`}>
                                 <Link
                                   href={`/products/${product.slug}/${brand.slug}`}
-                                  className={pathname === `/products/${product.slug}/${brand.slug}` ? 'active' : ''}
+                                  className={
+                                    pathname ===
+                                    `/products/${product.slug}/${brand.slug}`
+                                      ? 'active'
+                                      : ''
+                                  }
                                   onClick={handleLinkClick}
                                 >
                                   {brand.name}
@@ -216,7 +262,6 @@ useEffect(() => {
                           </ul>
                         )}
                       </li>
-
                     );
                   })
                 )}
@@ -224,25 +269,46 @@ useEffect(() => {
             )}
           </li>
 
+          {/* Faq */}
           <li>
-            <Link href="/Faq" className={isActive('/Faq') ? 'active' : ''} onClick={handleLinkClick}>
+            <Link
+              href="/Faq"
+              className={isActive('/Faq') ? 'active' : ''}
+              onClick={handleLinkClick}
+            >
               {messages.faq}
             </Link>
           </li>
 
+          {/* Portfolio */}
           <li>
-            <Link href="/portfolio" className={isActive('/portfolio') ? 'active' : ''} onClick={handleLinkClick}>
+            <Link
+              href="/portfolio"
+              className={isActive('/portfolio') ? 'active' : ''}
+              onClick={handleLinkClick}
+            >
               {messages.portfolio}
             </Link>
           </li>
+
+          {/* Review */}
           <li>
-            <Link href="/review" className={isActive('/review') ? 'active' : ''} onClick={handleLinkClick}>
+            <Link
+              href="/review"
+              className={isActive('/review') ? 'active' : ''}
+              onClick={handleLinkClick}
+            >
               {messages.review}
             </Link>
           </li>
 
+          {/* Editorial */}
           <li>
-            <Link href="/editorial" className={isActive('/editorial') ? 'active' : ''} onClick={handleLinkClick}>
+            <Link
+              href="/editorial"
+              className={isActive('/editorial') ? 'active' : ''}
+              onClick={handleLinkClick}
+            >
               {messages.editorial}
             </Link>
           </li>

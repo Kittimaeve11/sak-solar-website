@@ -37,6 +37,8 @@ function ThumbnailWithFallback({ videoId, alt }) {
             width={374}
             height={210}
             className="thumbnailslide"
+            style={{ width: "100%", height: "auto" }} // ป้องกัน ratio เพี้ยน
+            onLoad={() => console.log("Thumbnail loaded")} // แทน onLoadingComplete
             onError={() => {
                 if (srcIndex < thumbnailUrls.length - 1) {
                     setSrcIndex(srcIndex + 1);
@@ -44,6 +46,7 @@ function ThumbnailWithFallback({ videoId, alt }) {
             }}
             unoptimized
         />
+
     );
 }
 
