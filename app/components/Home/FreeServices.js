@@ -169,7 +169,7 @@ const sliderSettings = {
   // ---------------- Render จริง ---------------- //
   return (
     <div className={styles.serviceSection}>
-      <h1 className="headtitle">ข้อมูลบริการฟรี</h1>
+      <h1 className="headtitle">ข้อมูลบริการฟรีAHHHHHHHHHHH</h1>
       <h4
         style={{
           textAlign: 'center',
