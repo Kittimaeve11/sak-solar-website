@@ -21,14 +21,18 @@ export default function Navbar() {
 
                 <div className={styles.leftSection}>
                     <div className={styles.logoContainer}>
-                        <Image
-                            src="/logo/logo-Sukhumvit.png"
-                            alt="Logo"
-                            fill
-                            style={{ objectFit: 'contain' }}
-                            sizes="470px"
-                            priority 
-                        />
+                        <div className={styles.logoContainer}>
+                            <Image
+                                src="/logo/logo-Sukhumvit.png"
+                                alt="Saksiame Solar ศักดิ์สยามโซลาร์"
+                                fill
+                                sizes="(max-width: 768px) 180px, (max-width: 1200px) 300px, 450px"
+                                style={{ objectFit: 'contain' }}
+                                priority
+                            />
+
+                        </div>
+
 
 
 

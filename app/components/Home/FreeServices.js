@@ -7,7 +7,7 @@ import dynamic from 'next/dynamic';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
-// ✅ โหลด Slider แบบ dynamic ปิด SSR
+// โหลด Slider แบบ dynamic ปิด SSR
 const Slider = dynamic(() => import("react-slick"), { ssr: false });
 
 export default function FreeServices({ contacts = [], locale, loading, baseUrl }) {
@@ -27,7 +27,9 @@ export default function FreeServices({ contacts = [], locale, loading, baseUrl }
     const handleResize = () => setSkeletonConfig(calcSkeleton(window.innerWidth));
     handleResize();
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
   }, [calcSkeleton]);
 
   // ---------------- Skeleton UI ---------------- //
@@ -117,7 +119,7 @@ export default function FreeServices({ contacts = [], locale, loading, baseUrl }
           height={90}
           className={styles.icon}
           draggable={false}
-          onError={(e) => { e.currentTarget.src = "/images/fallback.png"; }} // ✅ fallback
+          onError={(e) => { e.currentTarget.src = "/images/fallback.png"; }}
         />
       </div>
 
@@ -142,29 +144,27 @@ export default function FreeServices({ contacts = [], locale, loading, baseUrl }
   );
 
   // ---------------- Slider Settings ---------------- //
-  const sliderSettings = {
-    dots: true,
-    infinite: true,
-    arrows: true,
-    speed: 500,
-    cssEase: "ease-in-out",
-    slidesToShow: 3,
-    slidesToScroll: 1,
-    autoplay: true,
-    autoplaySpeed: 3000,
-    centerMode: true, // desktop only
-    centerPadding: "0px",
-    swipeToSlide: true,
-    touchThreshold: 20,
-    draggable: true,
-    adaptiveHeight: false,
-    responsive: [
-      { breakpoint: 1490, settings: { slidesToShow: 3 } },
-      { breakpoint: 1170, settings: { slidesToShow: 2 } },
-      { breakpoint: 830, settings: { slidesToShow: 1, centerMode: false } },   // ปิด centerMode
-      { breakpoint: 475, settings: { slidesToShow: 1, arrows: false, centerMode: false } }, // ปิด centerMode
-    ],
-  };
+const sliderSettings = {
+  dots: true,
+  infinite: true,
+  arrows: true,
+  speed: 500,
+  cssEase: "ease-in-out",
+  slidesToShow: 3,
+  slidesToScroll: 1,
+  autoplay: true,
+  autoplaySpeed: 3000,
+  centerMode: false, //  ปิด centerMode จะจัดกึ่งกลางง่ายกว่า
+  swipeToSlide: true,
+  touchThreshold: 20,
+  draggable: true,
+  responsive: [
+    { breakpoint: 1490, settings: { slidesToShow: 3 } },
+    { breakpoint: 1170, settings: { slidesToShow: 2 } },
+    { breakpoint: 830,  settings: { slidesToShow: 1, arrows: false } },
+  ],
+};
+
 
   // ---------------- Render จริง ---------------- //
   return (

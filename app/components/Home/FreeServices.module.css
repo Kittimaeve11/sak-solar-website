@@ -5,7 +5,6 @@
   background-position: center;
   background-repeat: no-repeat;
   padding: 2rem 1rem;
-  position: relative;
   z-index: 0;
 }
 
@@ -23,6 +22,7 @@
   z-index: 2;
 }
 
+/* -------------------- GRID (Desktop) -------------------- */
 .gridWrapper {
   display: flex;
   justify-content: center;
@@ -35,10 +35,8 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  column-gap: 1.2rem;
-  /* ระยะห่างแนวนอน */
-  row-gap: 2rem;
-  /* ระยะห่างแนวตั้ง */
+  gap: 1.5rem 2rem;
+  /* แทน column-gap / row-gap */
   max-width: 1500px;
   margin: 0 auto;
   padding: 0 1rem;
@@ -48,8 +46,6 @@
   height: 100%;
 }
 
-
-/* การ์ด */
 .cardfree {
   background-color: #ffffff;
   padding: 1.3rem;
@@ -60,9 +56,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-
-  width: 100%;
-  width: 340px !important;
+  width: 330px;
   flex: 0 0 auto;
   box-sizing: border-box;
 }
@@ -70,18 +64,14 @@
 .cardfree:hover {
   transform: translateY(-6px);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
-  /* เพิ่มเงาด้านล่างเล็กน้อย */
 }
-
 
 .iconWrapper {
   height: 80px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 1rem;
-  margin-bottom: 0.5rem;
-  /* ระยะห่างไอคอนกับ title */
+  margin: 1rem 0 0.5rem;
 }
 
 .icon {
@@ -90,37 +80,31 @@
   object-fit: contain;
 }
 
-/* ทำให้หัวข้อเท่ากัน */
+/* -------------------- TITLE & TEXT -------------------- */
 .titlefree {
   color: #264798;
   font-size: 16px;
   font-weight: bold;
   text-align: center;
   min-height: 48px;
-  /* ความสูงหัวข้อที่เท่ากัน */
   margin-bottom: -0.2rem;
-  /* ระยะห่างจาก subtitle */
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* subtitle ที่อยู่ใต้หัวข้อ */
 .subtitlefree {
   color: #505052;
   font-size: 14px;
   text-align: left;
-  /* min-height: 50px; */
   margin-bottom: 1rem;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  justify-content: flex-start;
   padding: 0 0.5rem;
   width: 100%;
 }
 
-/* list รายการ */
 .listfree {
   text-align: left;
   width: 100%;
@@ -133,21 +117,17 @@
 
 .textfree {
   line-height: 1.6;
-  margin-bottom: 0rem;
+  margin-bottom: 0;
   text-align: left;
   color: #505052;
 }
 
-/* เปลี่ยนสี bullet จุดหน้าข้อความ */
 .textfree::marker {
   color: #E88534;
   font-size: 18px;
-
 }
 
-
-/* FreeServices.module.css */
-
+/* -------------------- Desktop / Mobile Switch -------------------- */
 .desktopGrid {
   display: block;
 }
@@ -166,87 +146,54 @@
   }
 
   .cardfree {
-    margin-top: 0.5rem;
-    margin-bottom: 1.5rem;
-  }
-
-  /* ตัว wrapper slider */
-
-}
-
-@media (max-width: 1490px) {
-
-  /* ตัว wrapper slider */
-  .serviceSection {
-    padding: 2rem 1rem;
+    margin: 0.5rem 0 1.5rem;
   }
 }
 
-
-
-
+/* -------------------- SLIDER -------------------- */
 .responsiveSlider {
   position: relative;
   max-width: 1100px;
   margin: 0 auto;
 }
 
-/* slick-list ให้มี margin auto (ตรงกลาง container) */
-.responsiveSlider .slick-list {
+.responsiveSlider :global(.slick-list) {
   margin: 0 auto !important;
 }
 
-/* slick-track ใช้ flex center */
-.responsiveSlider .slick-track {
-  display: flex !important;
-  justify-content: center !important;
-}
-
-/* สไลด์มี padding ซ้าย–ขวา */
-.responsiveSlider .slick-slide {
-  padding: 0 12px;
-  box-sizing: border-box;
-}
-
-/* FreeServices.module.css */
-
 .responsiveSlider :global(.slick-track) {
   display: flex !important;
+  justify-content: center !important;
   align-items: stretch;
 }
 
-/* ปรับ slick-slide บน mobile ไม่ให้ซ้อน */
-.responsiveSlider :global(.slick-slide) {
-  display: block !important;
-  flex: 0 0 auto !important;
-  max-width: 100% !important;
-}
-/* ปุ่มลูกศรด้านซ้าย */
+.responsiveSlider :global(.slick-slide)
 .responsiveSlider :global(.slick-prev),
 .responsiveSlider :global(.slick-next) {
   width: 40px;
-  /* ขนาดกล่องปุ่ม */
   height: 40px;
-  gap: 12px !important;
   z-index: 10;
+}
+
+.responsiveSlider .cardfree {
+  width: 100%;
+  max-width: 340px;      /* fix ความกว้างสูงสุด */
+  margin: 0 auto;        /* จัดกึ่งกลาง */
+  height: 100%;
 }
 
 .responsiveSlider :global(.slick-prev:before),
 .responsiveSlider :global(.slick-next:before) {
   font-size: 30px;
-  /* ปรับขนาดลูกศร */
 }
 
-/* ปรับตำแหน่ง dot */
+/* dots */
 .responsiveSlider :global(.slick-dots) {
   bottom: -20px;
-  /* ค่าลบคือเลื่อนลง */
 }
 
-/* ปรับขนาด dot */
 .responsiveSlider :global(.slick-dots li button:before) {
   font-size: 14px;
-  /* ขยาย dot */
   opacity: 0.6;
 }
 
@@ -254,15 +201,11 @@
   opacity: 1;
 }
 
+/* -------------------- RESPONSIVE -------------------- */
 @media (max-width: 1170px) {
   .responsiveSlider {
     max-width: 750px;
   }
-
-  .cardfree {
-    margin-bottom: 1.5rem;
-  }
-
 }
 
 @media (max-width: 830px) {
@@ -271,16 +214,14 @@
   }
 }
 
-
 @media (max-width: 373px) {
   .cardfree {
     width: 80%;
   }
-    .responsiveSlider :global(.slick-dots) {
-    bottom: -40px;
-    /* ค่าลบคือเลื่อนลง */
-  }
 
+  .responsiveSlider :global(.slick-dots) {
+    bottom: -40px;
+  }
 }
 
 @media (max-width: 350px) {
@@ -290,7 +231,6 @@
 
   .responsiveSlider :global(.slick-dots) {
     bottom: -80px;
-    /* ค่าลบคือเลื่อนลง */
   }
 
   .cardfree {
@@ -302,39 +242,20 @@
     height: 75px;
   }
 
-  /* ทำให้หัวข้อเท่ากัน */
   .titlefree {
     font-size: 14px;
   }
 
-  /* subtitle ที่อยู่ใต้หัวข้อ */
   .subtitlefree {
-    color: #505052;
     font-size: 14px;
-    text-align: left;
-    /* min-height: 50px; */
-    margin-bottom: 1rem;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: flex-start;
-    padding: 0 0.5rem;
-    width: 100%;
   }
 
-  /* list รายการ */
   .listfree {
-    text-align: left;
-    width: 100%;
-    padding-left: 1.2rem;
-    margin: 0;
-    list-style: disc;
     font-size: 14px;
-    color: inherit;
   }
 }
 
-/* การ์ด skeleton */
+/* -------------------- Skeleton -------------------- */
 .skeletonCard {
   display: flex;
   flex-direction: column;
@@ -344,7 +265,6 @@
   width: 340px;
 }
 
-/* วงกลม */
 .skeletonCircle {
   width: 90px;
   height: 90px;
@@ -353,14 +273,12 @@
   animation: pulse 1.5s infinite ease-in-out;
 }
 
-/* เส้น */
 .skeletonLine {
   border-radius: 4px;
   background-color: #e0e0e0;
   animation: pulse 1.5s infinite ease-in-out;
 }
 
-/* pulse effect */
 @keyframes pulse {
   0% {
     background-color: #e0e0e0;
@@ -374,7 +292,6 @@
     background-color: #e0e0e0;
   }
 }
-
 
 .blinkOnce {
   animation: blinkOnce 0.6s ease-in-out;
