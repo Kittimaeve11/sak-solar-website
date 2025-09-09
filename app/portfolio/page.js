@@ -276,7 +276,7 @@ export default function PortfolioPage() {
       )}
 
       <main
-        className={`layout-container ${fadeIn ? 'fade-in' : ''}`}
+        className={`layout-portfolio ${fadeIn ? 'fade-in' : ''}`}
         ref={topRef}
         style={{ minHeight: isLoading ? '100vh' : 'auto' }}
       >

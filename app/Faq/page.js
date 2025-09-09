@@ -12,13 +12,17 @@ export default function FAQPage() {
   const [faqs, setFaqs] = useState([]);
   const [openIndex, setOpenIndex] = useState(null);
   const [fadeIn, setFadeIn] = useState(false);
-  const [fadeInBanner, setFadeInBanner] = useState(false); // <-- สำหรับ Banner
-  const answerRefs = useRef([]);
-  const [brander, setBrander] = useState([]);
-  const [loadingBanner, setLoadingBanner] = useState(true);
-  const [loadingFaq, setLoadingFaq] = useState(true);
 
-  // ---------------- Fetch FAQ & Banner ----------------
+  // ---------------- Banner ----------------
+  const [banners, setBanners] = useState([]);
+  const [loadingBanner, setLoadingBanner] = useState(true);
+  const [bannerLoaded, setBannerLoaded] = useState({});
+
+  // ---------------- FAQ ----------------
+  const [loadingFaq, setLoadingFaq] = useState(true);
+  const answerRefs = useRef([]);
+
+  // ---------------- Fetch Data ----------------
   useEffect(() => {
     const fetchFaqs = async () => {
       setLoadingFaq(true);
@@ -48,12 +52,11 @@ export default function FAQPage() {
           : data.data
             ? [data.data]
             : [];
-        setBrander(branderArray);
+        setBanners(branderArray);
       } catch {
-        setBrander([]);
+        setBanners([]);
       } finally {
         setLoadingBanner(false);
-        setTimeout(() => setFadeInBanner(true), 100); // <-- fade-in หลังโหลด
       }
     };
 
@@ -61,6 +64,7 @@ export default function FAQPage() {
     fetchBanner();
   }, []);
 
+  // ---------------- Toggle Answer ----------------
   const toggle = (index) => setOpenIndex(prev => (prev === index ? null : index));
 
   useEffect(() => {
@@ -78,6 +82,7 @@ export default function FAQPage() {
     });
   }, [openIndex, faqs]);
 
+  // ---------------- Clean HTML ----------------
   const cleanHtml = (str) => {
     if (!str || typeof str !== 'string') return '';
     return str
@@ -93,64 +98,128 @@ export default function FAQPage() {
       .trim();
   };
 
+  // ---------------- Skeleton ----------------
   const SkeletonFaq = () => (
     <div className="faq-skeleton-card">
       <div className="faq-skeleton-question skeleton" />
-      <div className="faq-skeleton-answer">
-      </div>
+      <div className="faq-skeleton-answer"></div>
     </div>
   );
 
+  // ---------------- Render ----------------
   return (
     <div className="no-margin">
-      {/* Banner */}
-      {loadingBanner
-        ? <div className="skeleton-banner" />
-        : brander.map(item => (
+      {/* ---------------- Banner ---------------- */}
+      <div
+        style={{
+          width: '100%',
+          aspectRatio: '3.22/1',
+          position: 'relative',
+          marginBottom: '1rem'
+        }}
+      >
+        {loadingBanner && (
           <div
-            key={item.brander_ID}
-            className={`banner-container ${fadeInBanner ? 'fade-in' : ''}`} // <-- เพิ่ม fade-in
-          >
-            <picture>
-              <source
-                srcSet={`${baseUrl}/${item.brander_pictureMoblie}`}
-                media="(max-width: 768px)"
-              />
-              <Image
-                src={`${baseUrl}/${item.brander_picturePC}`}
-                alt={item.brander_name || 'FAQ Banner'}
-                className="banner-image"
-                width={1530}
-                height={800}
-                unoptimized
-              />
-            </picture>
-          </div>
-        ))
-      }
+            className="skeleton-banner"
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%'
+            }}
+          />
+        )}
 
-      <main className={`layout-container ${fadeIn ? 'fade-in' : ''}`}>
+        {banners.length > 0 &&
+          banners.map((item) => {
+            const loaded = bannerLoaded[item.brander_ID] || false;
+            return (
+              <picture
+                key={item.brander_ID}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0
+                }}
+              >
+                <source
+                  srcSet={`${baseUrl}/${item.brander_pictureMoblie}`}
+                  media="(max-width: 768px)"
+                />
+                <Image
+                  src={`${baseUrl}/${item.brander_picturePC}`}
+                  alt={item.brander_name || 'Editorial Banner'}
+                  fill
+                  style={{
+                    objectFit: 'cover',
+                    opacity: loaded ? 1 : 0,
+                    transition: 'opacity 0.5s ease'
+                  }}
+                  onLoadingComplete={() =>
+                    setBannerLoaded((prev) => ({
+                      ...prev,
+                      [item.brander_ID]: true
+                    }))
+                  }
+                  unoptimized
+                />
+              </picture>
+            );
+          })}
+
+        {!loadingBanner && banners.length === 0 && (
+          <Image
+            src="/images/no-image.jpg"
+            alt="Banner fallback"
+            fill
+            style={{ objectFit: 'cover' }}
+          />
+        )}
+      </div>
+
+      {/* ---------------- FAQ ---------------- */}
+      <main className={`layout-faq ${fadeIn ? 'fade-in' : ''}`}>
         <h1 className="headtitle">คำถามที่พบบ่อยเกี่ยวกับโซลาร์เซลล์</h1>
 
         {loadingFaq
           ? Array.from({ length: 5 }).map((_, i) => <SkeletonFaq key={i} />)
           : faqs.map((item, index) => (
-            <div key={item.fqa_id} className={`faq-item ${openIndex === index ? 'open' : ''}`}>
-              <button onClick={() => toggle(index)} className="faq-button" type="button">
-                {cleanHtml(item.fqa_questionTH)}
-                <span className={`faq-icon ${openIndex === index ? 'open' : ''}`}>
-                  <MdOutlineArrowForwardIos />
-                </span>
-              </button>
               <div
-                ref={el => answerRefs.current[index] = el}
-                className={`faq-answer ${openIndex === index ? 'open' : ''}`}
+                key={item.fqa_id}
+                className={`faq-item ${openIndex === index ? 'open' : ''}`}
               >
-                <div dangerouslySetInnerHTML={{ __html: cleanHtml(item.fqa_answersTH) }} />
+                <button
+                  onClick={() => toggle(index)}
+                  className="faq-button"
+                  type="button"
+                >
+                  {cleanHtml(item.fqa_questionTH)}
+                  <span
+                    className={`faq-icon ${
+                      openIndex === index ? 'open' : ''
+                    }`}
+                  >
+                    <MdOutlineArrowForwardIos />
+                  </span>
+                </button>
+                <div
+                  ref={(el) => (answerRefs.current[index] = el)}
+                  className={`faq-answer ${
+                    openIndex === index ? 'open' : ''
+                  }`}
+                >
+                  <div
+                    dangerouslySetInnerHTML={{
+                      __html: cleanHtml(item.fqa_answersTH)
+                    }}
+                  />
+                </div>
               </div>
-            </div>
-          ))
-        }
+            ))}
+            
       </main>
     </div>
   );

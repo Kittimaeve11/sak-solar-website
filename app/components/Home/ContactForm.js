@@ -425,8 +425,8 @@ export default function ContactForm({
           </div>
 
           {/* Feedback */}
-          {status === 'success' && <p style={{ color: 'green', textAlign: 'center' }}>ส่งข้อมูลเรียบร้อย ✅</p>}
-          {status === 'error' && <p style={{ color: 'red', textAlign: 'center' }}>ส่งข้อมูลล้มเหลว ❌ กรุณาลองใหม่</p>}
+          {status === 'success' && <p style={{ color: 'green', textAlign: 'center' }}>ส่งข้อมูลเรียบร้อย </p>}
+          {status === 'error' && <p style={{ color: 'red', textAlign: 'center' }}>ส่งข้อมูลล้มเหลว  กรุณาลองใหม่อีกครั้งค่ะ</p>}
         </form>
 
       </div>

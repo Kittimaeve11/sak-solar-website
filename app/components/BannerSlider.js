@@ -151,14 +151,14 @@ export default function BannerSlider() {
 
   return (
     <div className="w-full relative" style={{ lineHeight: 0, fontSize: 0 }}>
-      {/* ✅ Skeleton SSR */}
+      {/* Skeleton SSR */}
       {(loading || banners.length === 0) && (
         <div className="banner-skeleton">
           <div className="skeleton-overlay" />
         </div>
       )}
 
-      {/* ✅ Slider */}
+      {/* Slider */}
       {!loading && banners.length > 0 && (
         <Slider key={isMobile ? "mobile" : "desktop"} ref={sliderRef} {...settings}>
           {banners.map((banner, index) => {

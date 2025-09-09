@@ -40,12 +40,16 @@ export default function PortfolioDetailPage({ params: paramsPromise }) {
           let gallery = [];
           try {
             gallery = item.portfolio_gallery ? JSON.parse(item.portfolio_gallery) : [];
-          } catch { gallery = []; }
+          } catch {
+            gallery = [];
+          }
 
           let workSteps = [];
           try {
             workSteps = item.workssteps_description ? JSON.parse(item.workssteps_description) : [];
-          } catch { workSteps = []; }
+          } catch {
+            workSteps = [];
+          }
 
           setProject({
             id: item.portfolio_id,
@@ -60,7 +64,10 @@ export default function PortfolioDetailPage({ params: paramsPromise }) {
             gallery: gallery.map((img) => `${baseUrl}/${img}`),
             workSteps,
             product_ID: item.product_ID,
+            productTypeTH: item.TypeProduct_nameTH,
+            productTypeEN: item.TypeProduct_nameEN,
           });
+
         } else {
           setProject(null);
         }
@@ -93,9 +100,9 @@ export default function PortfolioDetailPage({ params: paramsPromise }) {
               panel_type: p.solarpanel,
               panel_count: p.panelsolarcout,
               area: p.roofarea,
-              inverter_model: p.inverter || '-',
-              power_system: p.phase || '-',
-              battery: p.battery || '-',
+              inverter_model: p.inverter || null, // ✅ null ถ้าไม่มี
+              power_system: p.phase || null,
+              battery: p.battery || null,
             },
             type: p.protypeID === '1' ? 'SolarRooftop' : 'SolarAir',
           }));
@@ -111,7 +118,7 @@ export default function PortfolioDetailPage({ params: paramsPromise }) {
   // หา product ที่ตรงกับ project.product_ID
   useEffect(() => {
     if (project && products.length > 0) {
-      const matched = products.find(p => p.item.product_ID === project.product_ID);
+      const matched = products.find((p) => p.item.product_ID === project.product_ID);
       setMatchedProduct(matched || null);
     }
   }, [project, products]);
@@ -119,7 +126,9 @@ export default function PortfolioDetailPage({ params: paramsPromise }) {
   // ปิด scroll หน้าเวลามี lightbox
   useEffect(() => {
     document.body.style.overflow = lightboxIndex !== null ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
+    return () => {
+      document.body.style.overflow = '';
+    };
   }, [lightboxIndex]);
 
   if (loading) return <p style={{ textAlign: 'center', marginTop: 50 }}>Loading...</p>;
@@ -140,6 +149,20 @@ export default function PortfolioDetailPage({ params: paramsPromise }) {
 
   const isSolarAir = matchedProduct?.type === 'SolarAir';
 
+  // ฟังก์ชัน helper สำหรับ render detail ที่อาจเป็น JSON หรือข้อความ
+  const renderDetail = (text) => {
+    if (!text) return '-';
+    try {
+      const parsed = JSON.parse(text);
+      if (Array.isArray(parsed)) {
+        return parsed.map((d, i) => <p key={i}>{d}</p>);
+      }
+      return parsed;
+    } catch {
+      return text; // ถ้าไม่ใช่ JSON แสดงเป็นข้อความปกติ
+    }
+  };
+
   return (
     <main className={`${styles.container} ${styles.fadeIn}`}>
       {/* Header */}
@@ -154,17 +177,16 @@ export default function PortfolioDetailPage({ params: paramsPromise }) {
           </Link>
           <span className={styles.iconText}>
             <FaSolarPanel />{' '}
-            <span style={{ marginLeft: 2 }}>
-              {locale === 'th' ? project.productTypeTH : project.productTypeEN}
-            </span>
+            <span style={{ marginLeft: 2 }}>{locale === 'th' ? project.productTypeTH : project.productTypeEN}</span>
           </span>
           <span className={styles.iconText}>
             <BsCalendarCheck />{' '}
             <span style={{ marginLeft: 2 }}>
-              {new Date(project.postDate).toLocaleDateString(
-                locale === 'th' ? 'th-TH' : 'en-US',
-                { year: 'numeric', month: 'long', day: 'numeric' }
-              )}
+              {new Date(project.postDate).toLocaleDateString(locale === 'th' ? 'th-TH' : 'en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              })}
             </span>
           </span>
         </div>
@@ -187,8 +209,9 @@ export default function PortfolioDetailPage({ params: paramsPromise }) {
           {/* รายละเอียด */}
           <div className={styles.section}>
             <h2 className={styles.topicportfolio}>{t.detail}</h2>
-            <h5 className={styles.Detailsportfolio}>
-              {locale === 'th' ? JSON.parse(project.detailTH) : JSON.parse(project.detailEN)}            </h5>
+            <div className={styles.Detailsportfolio}>
+              {locale === 'th' ? renderDetail(project.detailTH) : renderDetail(project.detailEN)}
+            </div>
           </div>
 
           {/* ขั้นตอนการดำเนินงาน */}
@@ -247,7 +270,19 @@ export default function PortfolioDetailPage({ params: paramsPromise }) {
               <>
                 {matchedProduct.item.mainImage && (
                   <div style={{ marginBottom: 12, display: 'flex', justifyContent: 'center' }}>
-                    <div style={{ borderRadius: '6px', overflow: 'hidden', width: 300, height: 300, marginBottom: 16 }}>
+                    <Link
+                      href={`/products/${matchedProduct.item.protypeID}/${matchedProduct.item.probrandID}/${matchedProduct.item.product_ID}`}
+                      className={styles.cardContainer}
+                      style={{
+                        borderRadius: '6px',
+                        overflow: 'hidden',
+                        width: 300,
+                        height: 300,
+                        marginBottom: 16,
+                        position: 'relative',
+                        display: 'block',
+                      }}
+                    >
                       <Image
                         src={`${baseUrl}/${matchedProduct.item.mainImage}`}
                         alt="Main product image"
@@ -255,9 +290,13 @@ export default function PortfolioDetailPage({ params: paramsPromise }) {
                         height={300}
                         style={{ objectFit: 'cover' }}
                       />
-                    </div>
+                      <div className={styles.cardOverlay}>
+                        ดูรายละเอียดสินค้า
+                      </div>
+                    </Link>
                   </div>
                 )}
+
 
                 {isSolarAir ? (
                   <>
@@ -284,17 +323,22 @@ export default function PortfolioDetailPage({ params: paramsPromise }) {
                   </>
                 ) : (
                   <>
-                    <div className={styles.detailRow}>
-                      <span className={styles.labelsds}>รุ่นอินเวอร์เตอร์</span>
-                      <span className={styles.valuesds}>{matchedProduct.item.inverter_model || '-'}</span>
-                    </div>
+                    {matchedProduct.item.inverter_model && (
+                      <div className={styles.detailRow}>
+                        <span className={styles.labelsds}>รุ่นอินเวอร์เตอร์</span>
+                        <span className={styles.valuesds}>{matchedProduct.item.inverter_model}</span>
+                      </div>
+                    )}
+
                     <div className={styles.detailRow}>
                       <span className={styles.labelsd}>ขนาด</span>
                       <span className={styles.valuesd}>{matchedProduct.item.size || '-'}</span>
                     </div>
                     <div className={styles.detailRow}>
                       <span className={styles.labelsd}>ระบบไฟฟ้า</span>
-                      <span className={styles.valuesd}>{matchedProduct.item.power_system || '-'} เฟส </span>
+                      <span className={styles.valuesd}>
+                        {matchedProduct.item.power_system ? `${matchedProduct.item.power_system} เฟส` : '-'}
+                      </span>
                     </div>
                     <div className={styles.detailRow}>
                       <span className={styles.labelsds}>จำนวนแผงโซลาร์</span>
@@ -304,7 +348,7 @@ export default function PortfolioDetailPage({ params: paramsPromise }) {
                       <span className={styles.labelsds}>ประเภทแผง</span>
                       <span className={styles.valuesds}>{matchedProduct.item.panel_type || '-'}</span>
                     </div>
-                    {matchedProduct.item.battery && matchedProduct.item.battery !== '-' && (
+                    {matchedProduct.item.battery && (
                       <div className={styles.detailRow}>
                         <span className={styles.labelsds}>แบตเตอรี่</span>
                         <span className={styles.valuesds}>{matchedProduct.item.battery}</span>

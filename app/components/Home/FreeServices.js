@@ -11,26 +11,33 @@ import "slick-carousel/slick/slick-theme.css";
 const Slider = dynamic(() => import("react-slick"), { ssr: false });
 
 export default function FreeServices({ contacts = [], locale, loading, baseUrl }) {
-  // ---------------- Skeleton Config ---------------- //
+  const [windowWidth, setWindowWidth] = useState(1920);
+
+  // ตรวจขนาดจอ
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const updateSize = () => setWindowWidth(window.innerWidth);
+    updateSize();
+    window.addEventListener("resize", updateSize);
+    return () => window.removeEventListener("resize", updateSize);
+  }, []);
+
+  const isSlider = windowWidth < 1490;
+
+  // ---------------- Skeleton ---------------- //
   const calcSkeleton = useCallback((width) => {
-    if (!width) return { rows: 1, cards: 3 };
-    if (width > 1490) return { rows: 2, cards: 4 };
-    if (width >= 1170) return { rows: 1, cards: 3 };
-    if (width >= 830) return { rows: 1, cards: 2 };
+    if (!width) return { rows: 1, cards: 2 };
+    if (width >= 1490) return { rows: 2, cards: 4 };
+    if (width >= 1123) return { rows: 1, cards: 3 };
+    if (width >= 781) return { rows: 1, cards: 2 };
     return { rows: 1, cards: 1 };
   }, []);
 
-  const [skeletonConfig, setSkeletonConfig] = useState({ rows: 1, cards: 3 });
+  const [skeletonConfig, setSkeletonConfig] = useState({ rows: 1, cards: 2 });
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    const handleResize = () => setSkeletonConfig(calcSkeleton(window.innerWidth));
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, [calcSkeleton]);
+    setSkeletonConfig(calcSkeleton(windowWidth));
+  }, [windowWidth, calcSkeleton]);
 
   // ---------------- Skeleton UI ---------------- //
   if (loading) {
@@ -50,7 +57,6 @@ export default function FreeServices({ contacts = [], locale, loading, baseUrl }
         >
           กำลังโหลดข้อมูลบริการ...
         </h4>
-
         {Array.from({ length: skeletonConfig.rows }).map((_, row) => (
           <div key={`row-${row}`} className={styles.gridWrapper}>
             <div className={styles.gridContainer}>
@@ -60,8 +66,14 @@ export default function FreeServices({ contacts = [], locale, loading, baseUrl }
                   className={`${styles.cardfree} ${styles.skeletonCard}`}
                 >
                   <div className={`${styles.iconWrapper} ${styles.skeletonCircle}`} />
-                  <div className={styles.skeletonLine} style={{ marginTop: 15, width: '70%', height: 18 }} />
-                  <div className={styles.skeletonLine} style={{ marginTop: 15, width: '100%', height: 16 }} />
+                  <div
+                    className={styles.skeletonLine}
+                    style={{ marginTop: 15, width: '70%', height: 18 }}
+                  />
+                  <div
+                    className={styles.skeletonLine}
+                    style={{ marginTop: 15, width: '100%', height: 16 }}
+                  />
                   {Array.from({ length: 4 }).map((_, j) => (
                     <div
                       key={`line-${i}-${j}`}
@@ -83,24 +95,19 @@ export default function FreeServices({ contacts = [], locale, loading, baseUrl }
     );
   }
 
-  // ---------------- ถ้าไม่มี contacts ---------------- //
   if (!contacts || contacts.length === 0) return null;
 
-  // ---------------- แยก Contacts ---------------- //
+  // ---------------- Contacts Split ---------------- //
   const limitedContacts = contacts.slice(0, 8);
-  let topContacts = [];
-  let bottomContacts = [];
-  const len = limitedContacts.length;
-
-  if (len <= 4) {
-    topContacts = limitedContacts;
-  } else if (len === 5) {
+  let topContacts = [], bottomContacts = [];
+  if (limitedContacts.length <= 4) topContacts = limitedContacts;
+  else if (limitedContacts.length === 5) {
     topContacts = limitedContacts.slice(0, 2);
     bottomContacts = limitedContacts.slice(2);
-  } else if (len === 6 || len === 7) {
+  } else if (limitedContacts.length <= 7) {
     topContacts = limitedContacts.slice(0, 3);
     bottomContacts = limitedContacts.slice(3);
-  } else if (len === 8) {
+  } else {
     topContacts = limitedContacts.slice(0, 4);
     bottomContacts = limitedContacts.slice(4);
   }
@@ -119,23 +126,25 @@ export default function FreeServices({ contacts = [], locale, loading, baseUrl }
           height={90}
           className={styles.icon}
           draggable={false}
-          onError={(e) => { e.currentTarget.src = "/images/fallback.png"; }}
+          onError={(e) => {
+            e.currentTarget.src = "/images/fallback.png";
+          }}
         />
       </div>
-
       <p className={styles.titlefree}>
         {locale === 'th' ? item.titleTH : item.titleEN}
       </p>
-
       <p className={styles.subtitlefree}>
         {locale === 'th' ? item.subtitleTH : item.subtitleEN}
       </p>
-
       <ul className={styles.listfree}>
         {(locale === 'th' ? item.detailTH : item.detailEN)
           ?.split('/')
           .map((text, i) => (
-            <li key={`${item.service_ID || index}-detail-${i}`} className={styles.textfree}>
+            <li
+              key={`${item.service_ID || index}-detail-${i}`}
+              className={styles.textfree}
+            >
               {text.trim()}
             </li>
           ))}
@@ -144,32 +153,30 @@ export default function FreeServices({ contacts = [], locale, loading, baseUrl }
   );
 
   // ---------------- Slider Settings ---------------- //
-const sliderSettings = {
-  dots: true,
-  infinite: true,
-  arrows: true,
-  speed: 500,
-  cssEase: "ease-in-out",
-  slidesToShow: 3,
-  slidesToScroll: 1,
-  autoplay: true,
-  autoplaySpeed: 3000,
-  centerMode: false, //  ปิด centerMode จะจัดกึ่งกลางง่ายกว่า
-  swipeToSlide: true,
-  touchThreshold: 20,
-  draggable: true,
-  responsive: [
-    { breakpoint: 1490, settings: { slidesToShow: 3 } },
-    { breakpoint: 1170, settings: { slidesToShow: 2 } },
-    { breakpoint: 830,  settings: { slidesToShow: 1, arrows: false } },
-  ],
-};
+  const getSlidesToShow = () => {
+    if (windowWidth < 800) return 1;
+    if (windowWidth < 1200) return 2;
+    return 3;
+  };
 
+  const sliderSettings = {
+    dots: true,
+    infinite: true,            //  วนลูป
+    arrows: windowWidth >= 800,
+    speed: 500,
+    slidesToShow: getSlidesToShow(),
+    slidesToScroll: 1,
+    autoplay: true,            //  ให้เลื่อนอัตโนมัติ
+    autoplaySpeed: 3000,       //  ทุก 3 วิ
+    pauseOnHover: true,        // หยุดถ้ามี hover
+    swipeToSlide: true,        //  สามารถลากแล้วไปสไลด์ถัดไปได้เลย
+    centerMode: false,         // ถ้าอยากให้อยู่ตรงกลางค่อยเปิดเป็น true
+  };
 
-  // ---------------- Render จริง ---------------- //
+  // ---------------- Render ---------------- //
   return (
     <div className={styles.serviceSection}>
-      <h1 className="headtitle">ข้อมูลบริการฟรีAHHHHHHHHHHH</h1>
+      <h1 className="headtitle">ข้อมูลบริการฟรี</h1>
       <h4
         style={{
           textAlign: 'center',
@@ -184,7 +191,14 @@ const sliderSettings = {
         <span className="keep-together">ติดตั้งฟรี จนถึงการดูแลหลังการขาย</span>
       </h4>
 
-      {/* Desktop ≥1490px */}
+      {isSlider ? (
+        <div className={styles.responsiveSlider}>
+          <Slider key={getSlidesToShow()} {...sliderSettings}>
+            {limitedContacts.map((item, index) => renderCard(item, index))}
+          </Slider>
+        </div>
+      ) : (
+
       <div className={styles.desktopGrid}>
         <div className={styles.gridWrapper}>
           <div className={styles.gridContainer}>
@@ -199,13 +213,7 @@ const sliderSettings = {
           </div>
         )}
       </div>
-
-      {/* Mobile <1490px */}
-      <div className={styles.responsiveSlider}>
-        <Slider {...sliderSettings}>
-          {limitedContacts.map((item, index) => renderCard(item, index))}
-        </Slider>
-      </div>
+      )}
     </div>
   );
 }

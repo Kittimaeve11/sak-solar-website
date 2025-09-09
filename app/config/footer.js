@@ -12,14 +12,14 @@ export const menuItems = [
   {
     title: "เกี่ยวกับบริษัท",
     items: [
-      { label: "ประวัติความเป็นมา", href: "/about/history" },
-      { label: "วิสัยทัศน์", href: "/about/vision" },
-      { label: "พันธกิจ", href: "/about/vision1" },
-      { label: "คณะกรรมการบริษัท", href: "/about/board" },
-      { label: "คำถามที่พบบ่อย", href: "/about/news" },
-      { label: "ผลงานของเรา", href: "/about/faq" },
-      { label: "รีวิวจากลูกค้า", href: "/investor1" },
-      { label: "บทความ", href: "/investor" },
+      { label: "ประวัติความเป็นมา", href: "/About" },
+      { label: "วิสัยทัศน์", href: "/About1" },
+      { label: "พันธกิจ", href: "/About2" },
+      { label: "คณะกรรมการบริษัท", href: "/About3" },
+      { label: "คำถามที่พบบ่อย", href: "/Faq" },
+      { label: "ผลงานของเรา", href: "/portfolio" },
+      { label: "รีวิวจากลูกค้า", href: "/review" },
+      { label: "บทความ", href: "/editorial" },
     ],
   },
   // {

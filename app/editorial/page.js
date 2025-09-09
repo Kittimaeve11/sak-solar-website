@@ -188,7 +188,7 @@ export default function EditorialListPage() {
         )}
       </div>
 
-      <main className="layout-container">
+      <main className="layout-editorial">
         <h1 className="headtitle">{locale === 'en' ? 'Editorials' : 'บทความ'}</h1>
 
         {/* ---------------- Filter ---------------- */}

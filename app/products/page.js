@@ -164,13 +164,24 @@ export default function ProductsPage() {
     });
 
     // sort: โปรโมชั่น > ปักหมุด > อื่น ๆ
-    const sortedItems = [...filteredItems].sort((a, b) => {
-        if (a.productpro_ispromotion === "1" && b.productpro_ispromotion !== "1") return -1;
-        if (a.productpro_ispromotion !== "1" && b.productpro_ispromotion === "1") return 1;
-        if (a.product_pin === "1" && b.product_pin !== "1") return -1;
-        if (a.product_pin !== "1" && b.product_pin === "1") return 1;
-        return 0;
-    });
+// sort: เรียงตามหมวดหมู่ > โปรโมชั่น > ปักหมุด > อื่น ๆ
+const sortedItems = [...filteredItems].sort((a, b) => {
+    // 1) เรียงตาม categoryId ก่อน
+    if (a.categoryId !== b.categoryId) {
+        return a.categoryId.localeCompare(b.categoryId);
+    }
+
+    // 2) ถ้า categoryId เท่ากัน → โปรโมชั่นมาก่อน
+    if (a.productpro_ispromotion === "1" && b.productpro_ispromotion !== "1") return -1;
+    if (a.productpro_ispromotion !== "1" && b.productpro_ispromotion === "1") return 1;
+
+    // 3) ถ้ายังเท่ากัน → ปักหมุดมาก่อน
+    if (a.product_pin === "1" && b.product_pin !== "1") return -1;
+    if (a.product_pin !== "1" && b.product_pin === "1") return 1;
+
+    return 0;
+});
+
 
     if (loading) return <p>กำลังโหลด...</p>;
 

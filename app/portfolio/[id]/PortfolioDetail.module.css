@@ -294,6 +294,34 @@
 }
 
 
+.cardContainer {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.cardContainer:hover .cardOverlay {
+  opacity: 1;
+}
+ 
+/*  overlay ปิดทับการ์ด */
+.cardOverlay {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.651);
+  color: #fff;
+  font-weight: 600;
+  font-size: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+
+
 /* Skeleton loading effect */
 .skeleton {
     background-color: #e0e0e0;

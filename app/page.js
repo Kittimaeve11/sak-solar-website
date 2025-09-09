@@ -157,7 +157,7 @@ export default function HomePage() {
       
       {/* <SlideEditorial />
       <SlidePortfolio />
-      <SlideReview /> */}
+      <SlideReview />  */}
 
       <style jsx>{`
   .banner-wrapper {

@@ -141,7 +141,7 @@ export default function ReviewPage() {
       )}
 
       {/* ---------- Main Content ---------- */}
-      <main className="layout-container">
+      <main className="layout-review ">
         <h1 className="headtitle">
           {locale === 'en'
             ? 'Customer Reviews on Our Solar Installations'
@@ -150,7 +150,7 @@ export default function ReviewPage() {
 
         <div className="video-grid">
           {loadingData ? (
-            // 🔹 Loading Skeleton
+            //  Loading Skeleton
             Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="skeleton-card skeleton fade-in">
                 <div className="skeleton-image skeleton"></div>
@@ -159,14 +159,14 @@ export default function ReviewPage() {
               </div>
             ))
           ) : reviews.length === 0 ? (
-            // 🔹 No Data
+            // No Data
             <p>
               {locale === 'en'
                 ? 'No video reviews available at the moment.'
                 : 'ไม่มีรีวิววิดีโอในขณะนี้'}
             </p>
           ) : (
-            // 🔹 Render Reviews
+            //  Render Reviews
             reviews.map((review) => {
               if (!review?.vedio_link) return null;
               const videoId = extractVideoId(review.vedio_link);

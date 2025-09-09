@@ -4,8 +4,10 @@
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  padding: 2rem 1rem;
+  padding-top: 1rem;
+  padding-bottom: 4rem;
   z-index: 0;
+  margin-bottom: 0;
 }
 
 .serviceSection::before {
@@ -29,17 +31,21 @@
   align-items: center;
   width: 100%;
   padding: 1rem 0rem;
+  max-width: 1500px;
+  margin: 0 auto;
+
 }
 
 .gridContainer {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 1.5rem 2rem;
+  gap: 1rem;
   /* แทน column-gap / row-gap */
   max-width: 1500px;
+  width: 100%;
   margin: 0 auto;
-  padding: 0 1rem;
+  padding: 0rem;
 }
 
 .gridContainer>* {
@@ -56,10 +62,13 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  width: 330px;
   flex: 0 0 auto;
   box-sizing: border-box;
+  height: auto;
+  width: 100%;     
+  max-width: 340px;
 }
+
 
 .cardfree:hover {
   transform: translateY(-6px);
@@ -87,7 +96,7 @@
   font-weight: bold;
   text-align: center;
   min-height: 48px;
-  margin-bottom: -0.2rem;
+  margin-bottom: 0.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -140,11 +149,9 @@
   .desktopGrid {
     display: none;
   }
-
   .responsiveSlider {
     display: block;
   }
-
   .cardfree {
     margin: 0.5rem 0 1.5rem;
   }
@@ -158,28 +165,33 @@
 }
 
 .responsiveSlider :global(.slick-list) {
-  margin: 0 auto !important;
+  margin: 0 auto;
 }
 
 .responsiveSlider :global(.slick-track) {
-  display: flex !important;
-  justify-content: center !important;
+  display: flex;
+  justify-content: center;
   align-items: stretch;
+  margin: 0 auto;
 }
 
-.responsiveSlider :global(.slick-slide)
+.responsiveSlider :global(.slick-slide) {
+  display: flex;
+  justify-content: center;
+}
+
+.responsiveSlider .cardfree {
+  width: 100%;
+  max-width: 340px;
+  margin: 0 auto;
+  height: 100%;
+}
+
 .responsiveSlider :global(.slick-prev),
 .responsiveSlider :global(.slick-next) {
   width: 40px;
   height: 40px;
   z-index: 10;
-}
-
-.responsiveSlider .cardfree {
-  width: 100%;
-  max-width: 340px;      /* fix ความกว้างสูงสุด */
-  margin: 0 auto;        /* จัดกึ่งกลาง */
-  height: 100%;
 }
 
 .responsiveSlider :global(.slick-prev:before),
@@ -189,28 +201,33 @@
 
 /* dots */
 .responsiveSlider :global(.slick-dots) {
-  bottom: -20px;
+  bottom: -40px;
 }
-
+/* reset ค่า default ของ slick */
 .responsiveSlider :global(.slick-dots li button:before) {
-  font-size: 14px;
-  opacity: 0.6;
-}
-
-.responsiveSlider :global(.slick-dots li.slick-active button:before) {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ffffff50;       /* ✅ สีจุดปกติ */
+  display: inline-block;
   opacity: 1;
 }
 
+.responsiveSlider :global(.slick-dots li.slick-active button:before) {
+  background: #ffffffb7;    /* ✅ สีจุด active */
+}
+
 /* -------------------- RESPONSIVE -------------------- */
-@media (max-width: 1170px) {
+@media (max-width: 1200px) {
   .responsiveSlider {
-    max-width: 750px;
+    max-width: 750px; /* 2 การ์ด */
   }
 }
 
-@media (max-width: 830px) {
+@media (max-width: 800px) {
   .responsiveSlider {
-    max-width: 400px;
+    max-width: 400px; /* 1 การ์ด */
   }
 }
 
@@ -218,38 +235,23 @@
   .cardfree {
     width: 80%;
   }
-
-  .responsiveSlider :global(.slick-dots) {
-    bottom: -40px;
-  }
 }
 
 @media (max-width: 350px) {
   .serviceSection {
     height: 700px;
   }
-
-  .responsiveSlider :global(.slick-dots) {
-    bottom: -80px;
-  }
-
   .cardfree {
-    width: 50%;
+    width: 30%;
   }
-
   .icon {
     width: 75px;
     height: 75px;
   }
-
   .titlefree {
     font-size: 14px;
   }
-
-  .subtitlefree {
-    font-size: 14px;
-  }
-
+  .subtitlefree,
   .listfree {
     font-size: 14px;
   }

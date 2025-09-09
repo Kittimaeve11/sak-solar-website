@@ -125,9 +125,13 @@ export default function ProductCarousel({ title, items, link }) {
           <h3>{item.productbrandName ? `${item.productbrandName} ` : ''}{getProductName(item)}</h3>
           {item.battery && <h6 style={{ marginTop: '0.5rem' }}>รุ่นแบตเตอรี่ {item.battery} kWh</h6>}
           {(item.isprice == 0 || item.isprice === "0") && item.size && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '1rem' }}>
+            <div 
+            style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '1rem' }}>
               <p style={{ display: 'flex', alignItems: 'center', fontWeight: 600, fontSize: '18px', margin: 0, lineHeight: 1 }}>
-                <MdOutlineElectricBolt size={25} color='#ffc300' /> {item.size}
+                <MdOutlineElectricBolt 
+                size={25} 
+                color='#ffc300' /> 
+                {item.size}
               </p>
             </div>
           )}
@@ -135,7 +139,7 @@ export default function ProductCarousel({ title, items, link }) {
             <div style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '0.3rem',
+              gap: '0',
               marginTop: '1rem',
               color: '#000000',
               fontWeight: 700 // ตัวหนังสือหนา

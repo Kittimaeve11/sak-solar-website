@@ -156,15 +156,25 @@ export default function ProductsByTypeBrandPage() {
     });
   }, [products, selectedCategories, selectedBrands]);
 
-  const sortedItems = useMemo(() => {
-    return [...filteredItems].sort((a, b) => {
-      if (a.productpro_ispromotion === '1' && b.productpro_ispromotion !== '1') return -1;
-      if (a.productpro_ispromotion !== '1' && b.productpro_ispromotion === '1') return 1;
-      if (a.product_pin === '1' && b.product_pin !== '1') return -1;
-      if (a.product_pin !== '1' && b.product_pin === '1') return 1;
-      return 0;
-    });
-  }, [filteredItems]);
+const sortedItems = useMemo(() => {
+  return [...filteredItems].sort((a, b) => {
+    // 1) เรียงตาม categoryId ก่อน
+    if (a.categoryId !== b.categoryId) {
+      return String(a.categoryId).localeCompare(String(b.categoryId));
+    }
+
+    // 2) ถ้า categoryId เท่ากัน → โปรโมชั่นมาก่อน
+    if (a.productpro_ispromotion === '1' && b.productpro_ispromotion !== '1') return -1;
+    if (a.productpro_ispromotion !== '1' && b.productpro_ispromotion === '1') return 1;
+
+    // 3) ถ้ายังเท่ากัน → ปักหมุดมาก่อน
+    if (a.product_pin === '1' && b.product_pin !== '1') return -1;
+    if (a.product_pin !== '1' && b.product_pin === '1') return 1;
+
+    return 0;
+  });
+}, [filteredItems]);
+
 
   if (loading) return <p>กำลังโหลด...</p>;
 
