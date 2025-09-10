@@ -96,9 +96,12 @@ const nextConfig = {
         port: '8080',
         pathname: '/Gallery/**',
       },
-
-    ],
-  },
-};
+    {
+      protocol: 'https',
+      hostname: 'api.saksiamesolar.com',
+      pathname: '/**',
+    },
+  ],
+},
 
 module.exports = nextConfig;
