@@ -2,29 +2,19 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import styles from './FreeServices.module.css';
-import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import Image from 'next/image';
 
-// โหลด Slider แบบ dynamic ปิด SSR
 const Slider = dynamic(() => import("react-slick"), { ssr: false });
 
 export default function FreeServices({ contacts = [], locale, loading, baseUrl }) {
   const [windowWidth, setWindowWidth] = useState(1920);
+  const [skeletonConfig, setSkeletonConfig] = useState({ rows: 1, cards: 2 });
+  const [loaded, setLoaded] = useState(false); // สำหรับ fade-in หลังโหลด API
 
-  // ตรวจขนาดจอ
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const updateSize = () => setWindowWidth(window.innerWidth);
-    updateSize();
-    window.addEventListener("resize", updateSize);
-    return () => window.removeEventListener("resize", updateSize);
-  }, []);
-
-  const isSlider = windowWidth < 1490;
-
-  // ---------------- Skeleton ---------------- //
+  // ---------------- Skeleton Config ---------------- //
   const calcSkeleton = useCallback((width) => {
     if (!width) return { rows: 1, cards: 2 };
     if (width >= 1490) return { rows: 2, cards: 4 };
@@ -33,11 +23,32 @@ export default function FreeServices({ contacts = [], locale, loading, baseUrl }
     return { rows: 1, cards: 1 };
   }, []);
 
-  const [skeletonConfig, setSkeletonConfig] = useState({ rows: 1, cards: 2 });
-
+  // ---------------- useEffect รวม ---------------- //
   useEffect(() => {
-    setSkeletonConfig(calcSkeleton(windowWidth));
-  }, [windowWidth, calcSkeleton]);
+    if (typeof window === "undefined") return;
+
+    const updateSize = () => {
+      const width = window.innerWidth;
+      setWindowWidth(width);
+      setSkeletonConfig(calcSkeleton(width));
+    };
+
+    updateSize();
+    window.addEventListener("resize", updateSize);
+
+    // Trigger fade-in หลังโหลด API
+    if (!loading) {
+      const timer = setTimeout(() => setLoaded(true), 50); // delay เล็กน้อยให้ animation ทำงาน
+      return () => {
+        clearTimeout(timer);
+        window.removeEventListener("resize", updateSize);
+      };
+    }
+
+    return () => window.removeEventListener("resize", updateSize);
+  }, [loading, calcSkeleton]);
+
+  const isSlider = windowWidth < 1490;
 
   // ---------------- Skeleton UI ---------------- //
   if (loading) {
@@ -66,14 +77,8 @@ export default function FreeServices({ contacts = [], locale, loading, baseUrl }
                   className={`${styles.cardfree} ${styles.skeletonCard}`}
                 >
                   <div className={`${styles.iconWrapper} ${styles.skeletonCircle}`} />
-                  <div
-                    className={styles.skeletonLine}
-                    style={{ marginTop: 15, width: '70%', height: 18 }}
-                  />
-                  <div
-                    className={styles.skeletonLine}
-                    style={{ marginTop: 15, width: '100%', height: 16 }}
-                  />
+                  <div className={styles.skeletonLine} style={{ marginTop: 15, width: '70%', height: 18 }} />
+                  <div className={styles.skeletonLine} style={{ marginTop: 15, width: '100%', height: 16 }} />
                   {Array.from({ length: 4 }).map((_, j) => (
                     <div
                       key={`line-${i}-${j}`}
@@ -116,7 +121,7 @@ export default function FreeServices({ contacts = [], locale, loading, baseUrl }
   const renderCard = (item, index) => (
     <div
       key={item.service_ID || `service-${index}`}
-      className={`${styles.cardfree} ${styles.fadeIn}`}
+      className={`${styles.cardfree} ${loaded ? styles.fadeIn : styles.hiddenBeforeLoad}`}
     >
       <div className={styles.iconWrapper}>
         <Image
@@ -126,28 +131,17 @@ export default function FreeServices({ contacts = [], locale, loading, baseUrl }
           height={90}
           className={styles.icon}
           draggable={false}
-          onError={(e) => {
-            e.currentTarget.src = "/images/fallback.png";
-          }}
+          onError={(e) => { e.currentTarget.src = "/images/fallback.png"; }}
         />
       </div>
-      <p className={styles.titlefree}>
-        {locale === 'th' ? item.titleTH : item.titleEN}
-      </p>
-      <p className={styles.subtitlefree}>
-        {locale === 'th' ? item.subtitleTH : item.subtitleEN}
-      </p>
+      <p className={styles.titlefree}>{locale === 'th' ? item.titleTH : item.titleEN}</p>
+      <p className={styles.subtitlefree}>{locale === 'th' ? item.subtitleTH : item.subtitleEN}</p>
       <ul className={styles.listfree}>
-        {(locale === 'th' ? item.detailTH : item.detailEN)
-          ?.split('/')
-          .map((text, i) => (
-            <li
-              key={`${item.service_ID || index}-detail-${i}`}
-              className={styles.textfree}
-            >
-              {text.trim()}
-            </li>
-          ))}
+        {(locale === 'th' ? item.detailTH : item.detailEN)?.split('/').map((text, i) => (
+          <li key={`${item.service_ID || index}-detail-${i}`} className={styles.textfree}>
+            {text.trim()}
+          </li>
+        ))}
       </ul>
     </div>
   );
@@ -161,32 +155,23 @@ export default function FreeServices({ contacts = [], locale, loading, baseUrl }
 
   const sliderSettings = {
     dots: true,
-    infinite: true,            //  วนลูป
+    infinite: true,
     arrows: windowWidth >= 800,
     speed: 500,
     slidesToShow: getSlidesToShow(),
     slidesToScroll: 1,
-    autoplay: true,            //  ให้เลื่อนอัตโนมัติ
-    autoplaySpeed: 3000,       //  ทุก 3 วิ
-    pauseOnHover: true,        // หยุดถ้ามี hover
-    swipeToSlide: true,        //  สามารถลากแล้วไปสไลด์ถัดไปได้เลย
-    centerMode: false,         // ถ้าอยากให้อยู่ตรงกลางค่อยเปิดเป็น true
+    autoplay: true,
+    autoplaySpeed: 3000,
+    pauseOnHover: true,
+    swipeToSlide: true,
+    centerMode: false,
   };
 
   // ---------------- Render ---------------- //
   return (
     <div className={styles.serviceSection}>
       <h1 className="headtitle">ข้อมูลบริการฟรี</h1>
-      <h4
-        style={{
-          textAlign: 'center',
-          marginTop: -10,
-          marginBottom: 20,
-          fontWeight: 600,
-          color: '#243865',
-          fontSize: 'clamp(1rem, 3vw, 1.25rem)',
-        }}
-      >
+      <h4 className={styles.headingfree}>
         <span className="keep-together">บริการครบครันตั้งแต่การปรึกษา</span>{' '}
         <span className="keep-together">ติดตั้งฟรี จนถึงการดูแลหลังการขาย</span>
       </h4>
@@ -198,21 +183,16 @@ export default function FreeServices({ contacts = [], locale, loading, baseUrl }
           </Slider>
         </div>
       ) : (
-
-      <div className={styles.desktopGrid}>
-        <div className={styles.gridWrapper}>
-          <div className={styles.gridContainer}>
-            {topContacts.map((item, index) => renderCard(item, index))}
-          </div>
-        </div>
-        {bottomContacts.length > 0 && (
+        <div className={styles.desktopGrid}>
           <div className={styles.gridWrapper}>
-            <div className={styles.gridContainer}>
-              {bottomContacts.map((item, index) => renderCard(item, index))}
-            </div>
+            <div className={styles.gridContainer}>{topContacts.map((item, index) => renderCard(item, index))}</div>
           </div>
-        )}
-      </div>
+          {bottomContacts.length > 0 && (
+            <div className={styles.gridWrapper}>
+              <div className={styles.gridContainer}>{bottomContacts.map((item, index) => renderCard(item, index))}</div>
+            </div>
+          )}
+        </div>
       )}
     </div>
   );

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import Slider from 'react-slick';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -41,23 +41,33 @@ function ProductSkeleton({ count }) {
   );
 }
 
-export default function ProductCarousel({ title, items, link }) {
+// ฟังก์ชันกำหนด slides ตามขนาดหน้าจอ
+const getSlidesByWidth = (width) => {
+  if (width < 801) return 1;
+  if (width < 1200) return 2;
+  if (width < 1500) return 3;
+  return 4;
+};
+
+export default function ProductCarousel({ title, items = [], link }) {
   const [isDragging, setIsDragging] = useState(false);
-  const [slidesToShow, setSlidesToShow] = useState(4);
+  const [slidesToShow, setSlidesToShow] = useState(() => {
+    // default สำหรับ SSR หรือก่อน window
+    if (typeof window !== 'undefined') return getSlidesByWidth(window.innerWidth);
+    return 4;
+  });
   const [isLoading, setIsLoading] = useState(true);
 
-  // Responsive slides
-  useEffect(() => {
-    const updateSlides = () => {
-      const width = window.innerWidth;
-      if (width < 801) setSlidesToShow(1);
-      else if (width < 1200) setSlidesToShow(2);
-      else if (width < 1500) setSlidesToShow(3);
-      else setSlidesToShow(4);
+  const defaultSkeletonCount = 3; // แสดง Skeleton อย่างน้อย 3 ตัว
+
+  // Responsive: update slides ก่อน render
+  useLayoutEffect(() => {
+    const handleResize = () => {
+      setSlidesToShow(getSlidesByWidth(window.innerWidth));
     };
-    updateSlides();
-    window.addEventListener('resize', updateSlides);
-    return () => window.removeEventListener('resize', updateSlides);
+    handleResize(); // เรียกทันที
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   // Simulate loading
@@ -116,7 +126,7 @@ export default function ProductCarousel({ title, items, link }) {
               priority
             />
             {item.productpro_ispromotion === "1" && item.productpro_percent && (
-              <div className="product-promo-ribbon">-{item.productpro_percent}</div>
+              <div className="product-promo-ribbon">-{item.productpro_percent}%</div>
             )}
           </div>
         )}
@@ -125,13 +135,9 @@ export default function ProductCarousel({ title, items, link }) {
           <h3>{item.productbrandName ? `${item.productbrandName} ` : ''}{getProductName(item)}</h3>
           {item.battery && <h6 style={{ marginTop: '0.5rem' }}>รุ่นแบตเตอรี่ {item.battery} kWh</h6>}
           {(item.isprice == 0 || item.isprice === "0") && item.size && (
-            <div 
-            style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '1rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '1rem' }}>
               <p style={{ display: 'flex', alignItems: 'center', fontWeight: 600, fontSize: '18px', margin: 0, lineHeight: 1 }}>
-                <MdOutlineElectricBolt 
-                size={25} 
-                color='#ffc300' /> 
-                {item.size}
+                <MdOutlineElectricBolt size={25} color='#ffc300' /> {item.size}
               </p>
             </div>
           )}
@@ -142,13 +148,9 @@ export default function ProductCarousel({ title, items, link }) {
               gap: '0',
               marginTop: '1rem',
               color: '#000000',
-              fontWeight: 700 // ตัวหนังสือหนา
+              fontWeight: 700
             }}>
-              <TbCurrencyBaht
-                size={25}       // ลดขนาดไอคอนให้เล็กลง
-                
-                style={{ verticalAlign: 'middle' }} // ให้ตรงกลางกับข้อความ
-              />
+              <TbCurrencyBaht size={25} style={{ verticalAlign: 'middle' }} />
               {Number(finalPrice ?? item.price).toLocaleString()} บาท
               {item.productpro_ispromotion === "1" && item.productpro_percent && (
                 <span style={{ fontSize: '16px', color: '#888', textDecoration: 'line-through', marginLeft: '0.5rem' }}>
@@ -175,7 +177,7 @@ export default function ProductCarousel({ title, items, link }) {
 
       <div className="carouselInner">
         {isLoading ? (
-          <ProductSkeleton count={slidesToShow} />
+          <ProductSkeleton count={Math.max(slidesToShow, defaultSkeletonCount)} />
         ) : showSlider ? (
           <Slider {...settings}>
             {items.map((item) => (
@@ -191,9 +193,7 @@ export default function ProductCarousel({ title, items, link }) {
                 {renderCard(item)}
               </React.Fragment>
             ))}
-
           </div>
-
         )}
       </div>
     </div>

@@ -182,7 +182,7 @@ export default function BannerSlider() {
                     draggable={false}
                     unoptimized
                     style={{
-                      objectFit: "contain",
+                      objectFit: "cover",
                       opacity: isLoaded ? 1 : 0,
                       transition: "opacity 0.5s ease-in-out",
                     }}
@@ -207,14 +207,14 @@ export default function BannerSlider() {
           height: auto;
         }
 
-        /* ✅ PC ≥ 768px */
+        /*  PC ≥ 768px */
         @media (min-width: 768px) {
           .banner-container {
             aspect-ratio: 3840/1191;
           }
         }
 
-        /* ✅ Mobile ≤ 767px */
+        /* Mobile ≤ 767px */
         @media (max-width: 767px) {
           .banner-container {
             aspect-ratio: 768/1032;

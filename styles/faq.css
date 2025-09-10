@@ -194,3 +194,15 @@
     min-height: 160px;
   }
 }
+
+
+@media (max-width: 640px) {
+
+  .skeleton-banner {
+    width: 100%;
+    aspect-ratio: 3.22 / 1;
+    background-color: #e0e0e0;
+    border-radius: 4px;
+    animation: pulse 1.5s infinite ease-in-out;
+  }
+}
