@@ -116,7 +116,7 @@ export default function HomePage() {
 
   return (
     <>
-      {/* <div className="banner-wrapper">
+      <div className="banner-wrapper">
         <BannerSlider />
       </div>
 
@@ -130,7 +130,7 @@ export default function HomePage() {
         locale={locale}
         loading={loadingServices}
         baseUrl={baseUrl}
-      /> */}
+      />
 
       <div>
         {productTypes.map(ptype => (
