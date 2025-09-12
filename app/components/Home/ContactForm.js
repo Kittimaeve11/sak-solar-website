@@ -254,14 +254,21 @@ export default function ContactForm({
     <div className={styles.containersolar}>
       <div className={styles.formWrapper} style={{ marginTop: '3rem' }}>
         <h1 className="headtitleone">สนใจโซลาร์เซลล์</h1>
-        <h4 style={{ textAlign: 'center', marginTop: -10, marginBottom: 20, fontWeight: 400 }}>
-          หรือต้องการปรึกษาการติดตั้ง เรายินดีให้คำแนะนำ
+        <h4
+          style={{
+            textAlign: 'center',
+            marginTop: -10,
+            marginBottom: 20,
+            fontWeight: '600',
+            color: '#19489D',
+          }}
+        >          หรือต้องการปรึกษาการติดตั้ง เรายินดีให้คำแนะนำ
         </h4>
 
         <form onSubmit={handleSubmit}>
           {/* สินค้า */}
           <div>
-            <span className="form-label">สินค้าหรือบริการที่สนใจ :</span> {/* ✅ ใช้ span แทน */}
+            <span className="form-label">สินค้าหรือบริการที่สนใจ :</span> 
             <div className={`radio-group ${errors.product ? 'error-border' : ''}`}>
               {productOptions.map((product) => {
                 const productName = locale === 'th' ? product.producttypenameTH : product.producttypenameEN;

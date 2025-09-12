@@ -4,12 +4,15 @@ import React, { useEffect, useState, useRef } from 'react';
 import Slider from 'react-slick';
 import Image from 'next/image';
 import Link from 'next/link';
+import './SlidePortfolio.css';
 import { FaCalendar } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import { HiPlusSm } from "react-icons/hi";
-import './SlidePortfolio.css';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
+
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
+const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 
 export default function SlidePortfolio() {
   const [projects, setProjects] = useState([]);
@@ -20,16 +23,43 @@ export default function SlidePortfolio() {
   const router = useRouter();
 
   useEffect(() => {
-    setIsLoading(true);
-    fetch('/api/portfolio?page=1')
-      .then((res) => res.json())
-      .then((data) => {
-        // เพิ่ม delay เพื่อเห็น skeleton (ลบออกได้)
-        setTimeout(() => {
-          setProjects(data.projects);
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+
+        const res = await fetch(`${baseUrl}/api/portfoliomainpageapi`, {
+          headers: { 'X-API-KEY': apiKey },
+        });
+
+        const data = await res.json();
+
+        if (data?.status && Array.isArray(data.result)) {
+          const mappedProjects = data.result.map((item) => ({
+            id: item.portfolio_id,
+            title: item.adddressTH, // ✅ ใช้ addressTH
+            size: item.installationsize,
+            productType: item.TypeProduct_nameTH,
+            panelCount: item.panelsolarcout,
+            postDate: item.portfolio_datainstall,
+            coverImage: item.portfolio_gallery
+              ? JSON.parse(item.portfolio_gallery)[0]
+              : '/images/placeholder.png',
+          }));
+
+          setTimeout(() => {
+            setProjects(mappedProjects);
+            setIsLoading(false);
+          }, 1000);
+        } else {
           setIsLoading(false);
-        }, 1000);
-      });
+        }
+      } catch (error) {
+        console.error("Error fetching portfolio:", error);
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
   }, []);
 
   const totalGroups = Math.ceil(projects.length / 3);
@@ -47,6 +77,7 @@ export default function SlidePortfolio() {
     setTimeout(() => setDragging(false), 50);
   };
 
+  // ✅ Custom Dots (bar-style)
   const CustomDots = () => (
     <div className="custom-dots">
       {Array.from({ length: totalGroups }).map((_, index) => (
@@ -56,6 +87,36 @@ export default function SlidePortfolio() {
           onClick={() => handleDotClick(index)}
         />
       ))}
+      <style jsx>{`
+        /* จุด slide แบบแทบส้ม */
+        .custom-dots {
+          display: flex;
+          justify-content: center;
+          margin-top: 1.5rem;
+        }
+
+        .dot-bar {
+          height: 4px;
+          width: 24px;
+          background-color: #ffe0b2;
+          border-radius: 8px;
+          margin: 0 4px;
+          cursor: pointer;
+          transition: width 0.5s ease-in-out, background-color 0.5s ease-in-out;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .dot-bar.active {
+          width: 40px;
+          background-color: #ff6d00;
+        }
+
+        .slide-item {
+          padding: 0 12px;
+          box-sizing: border-box;
+        }
+      `}</style>
     </div>
   );
 
@@ -70,28 +131,28 @@ export default function SlidePortfolio() {
     </div>
   );
 
-const settings = {
-  dots: true,
-  infinite: true,          
-  speed: 500,
-  slidesToShow: 3,
-  slidesToScroll: 1,
-  swipeToSlide: true,
-  arrows: false,
-  centerMode: false,
-  beforeChange: handleBeforeChange,
-  afterChange: handleAfterChange,
-  appendDots: () => <CustomDots />,
-  responsive: [
-    { breakpoint: 1024, settings: { slidesToShow: 2, slidesToScroll: 1, swipeToSlide: true } },
-    { breakpoint: 640, settings: { slidesToShow: 1, slidesToScroll: 1, swipeToSlide: true } },
-  ],
-};
+  const settings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 3,
+    slidesToScroll: 1,
+    swipeToSlide: true,
+    arrows: false,
+    centerMode: false,
+    beforeChange: handleBeforeChange,
+    afterChange: handleAfterChange,
+    appendDots: () => <CustomDots />,
+    responsive: [
+      { breakpoint: 1024, settings: { slidesToShow: 2, slidesToScroll: 1, swipeToSlide: true } },
+      { breakpoint: 640, settings: { slidesToShow: 1, slidesToScroll: 1, swipeToSlide: true } },
+    ],
+  };
 
   return (
     <div className="portfolio-wrapperslide">
       <br />
-      <h1 className="headersolarslide">ผลงานของเรา</h1>
+      <h1 className="headtitleone">ผลงานของเรา</h1>
       <div className="portfolio-headerslide">
         <Link href="/portfolio" className="view-all flex items-center gap-2">
           <HiPlusSm className="icon-view" />
@@ -113,7 +174,7 @@ const settings = {
               >
                 <div className="portfolioslide-image-wrapper" style={{ position: 'relative', height: 200 }}>
                   <Image
-                    src={proj?.coverImage || '/images/placeholder.png'}
+                    src={`${baseUrl}/${proj?.coverImage}` || '/images/placeholder.png'}
                     alt={proj?.title || 'ไม่ระบุ'}
                     className="portfolioslide-image"
                     fill

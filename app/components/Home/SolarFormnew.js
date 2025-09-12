@@ -6,6 +6,8 @@ import Image from 'next/image';
 import { MdOutlineElectricBolt } from 'react-icons/md';
 import html2canvas from 'html2canvas';
 import Link from 'next/link';
+import { MdSunny } from "react-icons/md";
+import { IoMdMoon } from "react-icons/io"
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
@@ -243,7 +245,7 @@ export default function SolarCalculatorForm() {
   return (
     <div className={styles.containersolar}>
       <div className={`${styles.formWrapper} ${results ? styles.formWrapperResult : styles.formWrapperInitial}`}>
-        <h1 className={styles.headtitleonesolar} lang="th" style={{ marginBottom: '1rem' }}>
+        <h1 className={styles.headtitleonesolar} lang="th" style={{ marginBottom: '1rem', marginTop: '-0.5rem' }}>
           {!results
             ? <>ระบบคำนวณขนาด <span className="keep-together">Solar Rooftop</span> <span className="keep-together">ที่เหมาะสม</span></>
             : (
@@ -341,14 +343,24 @@ export default function SolarCalculatorForm() {
               suppressHydrationWarning
             />
             <div className={styles.usageSplit}>
-              <span>ช่วงกลางวัน {formValues.dayUsage} %</span>
-              <span>ช่วงกลางคืน {100 - formValues.dayUsage} %</span>
+              <span className={styles.day}>
+                <span className={styles.text}>ช่วงกลางวัน</span>
+                <MdSunny className={styles.icon} />
+                {formValues.dayUsage} %
+              </span>
+              <span className={styles.night}>
+                <span className={styles.text}>ช่วงกลางคืน</span>
+                <IoMdMoon className={styles.icon} />
+                {100 - formValues.dayUsage} %
+              </span>
             </div>
 
             <div className={styles.formGroup}>
               <label htmlFor="roofArea" className="form-label">
-                พื้นที่หลังคาโดยประมาณ (ตารางเมตร) :
+                พื้นที่หลังคาโดยประมาณ
+                <span className={styles.unit}> (ตารางเมตร) :</span>
               </label>
+
               <input
                 id="roofArea"
                 name="roofArea"
@@ -382,10 +394,10 @@ export default function SolarCalculatorForm() {
             </div>
 
             <h6 className={`${styles.instructions} ${styles.hideOnMobile}`}>
-              <span style={{ color: 'red', fontWeight: '600' }}>หมายเหตุ : </span> ระบบไฟ 1 เฟส ต้องระบุพื้นที่หลังคา 9–45 ตร.ม.
+              <span style={{ color: 'red', fontWeight: '600' }}>หมายเหตุ : </span> ระบบไฟ 1 เฟส ต้องระบุพื้นที่หลังคา 9 – 45 ตารางเมตร
             </h6>
             <h6 className={`${styles.instructions1} ${styles.hideOnMobile}`} style={{ marginLeft: '4rem' }}>
-              ระบบไฟ 3 เฟส ต้องระบุพื้นที่หลังคา 45–179 ตร.ม.
+              ระบบไฟ 3 เฟส ต้องระบุพื้นที่หลังคา 45 – 179 ตารางเมตร
             </h6>
 
             <div className={styles.buttonGroup}>

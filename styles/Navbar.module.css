@@ -81,7 +81,7 @@
   z-index: 1;
 }
 
-/* 🔶 Yellow bottom line */
+/* Yellow bottom line */
 .navWrapper::before {
   content: "";
   position: absolute;
@@ -95,8 +95,7 @@
 
 .leftSection {
   display: flex;
-  align-items: center;
-  /* ✅ กึ่งกลางแนวตั้ง */
+  align-items: center;/*  กึ่งกลางแนวตั้ง */
   gap: 16px;
 }
 
@@ -106,7 +105,7 @@
   height: 100px;
   display: flex;
   align-items: center;
-  /* ✅ กึ่งกลางแนวตั้งใน logoContainer */
+  /* กึ่งกลางแนวตั้งใน logoContainer */
   justify-content: center;
   /* เฉพาะถ้าคุณต้องการให้รูปภาพอยู่กลาง container */
 }

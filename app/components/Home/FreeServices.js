@@ -12,7 +12,7 @@ const Slider = dynamic(() => import("react-slick"), { ssr: false });
 export default function FreeServices({ contacts = [], locale, loading, baseUrl }) {
   const [windowWidth, setWindowWidth] = useState(1920);
   const [skeletonConfig, setSkeletonConfig] = useState({ rows: 1, cards: 2 });
-  const [loaded, setLoaded] = useState(false); // สำหรับ fade-in หลังโหลด API
+  const [loaded, setLoaded] = useState(false);
 
   // ---------------- Skeleton Config ---------------- //
   const calcSkeleton = useCallback((width) => {
@@ -23,7 +23,7 @@ export default function FreeServices({ contacts = [], locale, loading, baseUrl }
     return { rows: 1, cards: 1 };
   }, []);
 
-  // ---------------- useEffect รวม ---------------- //
+  // ---------------- useEffect ---------------- //
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -36,9 +36,8 @@ export default function FreeServices({ contacts = [], locale, loading, baseUrl }
     updateSize();
     window.addEventListener("resize", updateSize);
 
-    // Trigger fade-in หลังโหลด API
     if (!loading) {
-      const timer = setTimeout(() => setLoaded(true), 50); // delay เล็กน้อยให้ animation ทำงาน
+      const timer = setTimeout(() => setLoaded(true), 50);
       return () => {
         clearTimeout(timer);
         window.removeEventListener("resize", updateSize);
@@ -148,7 +147,7 @@ export default function FreeServices({ contacts = [], locale, loading, baseUrl }
 
   // ---------------- Slider Settings ---------------- //
   const getSlidesToShow = () => {
-    if (windowWidth < 800) return 1;
+    if (windowWidth < 830) return 1;
     if (windowWidth < 1200) return 2;
     return 3;
   };
@@ -156,8 +155,8 @@ export default function FreeServices({ contacts = [], locale, loading, baseUrl }
   const sliderSettings = {
     dots: true,
     infinite: true,
-    arrows: windowWidth >= 800,
-    speed: 500,
+    arrows: windowWidth >= 830,
+    speed: 600,
     slidesToShow: getSlidesToShow(),
     slidesToScroll: 1,
     autoplay: true,
@@ -165,6 +164,26 @@ export default function FreeServices({ contacts = [], locale, loading, baseUrl }
     pauseOnHover: true,
     swipeToSlide: true,
     centerMode: false,
+    beforeChange: (_, next) => {
+      const slides = document.querySelectorAll(".slick-slide");
+      slides.forEach((slide, i) => {
+        if (i === next) {
+          slide.removeAttribute("inert"); // active → focus ได้
+        } else {
+          slide.setAttribute("inert", ""); // hidden → focus ไม่ได้
+        }
+      });
+    },
+    afterChange: (current) => {
+      const slides = document.querySelectorAll(".slick-slide");
+      slides.forEach((slide, i) => {
+        if (i === current) {
+          slide.removeAttribute("inert");
+        } else {
+          slide.setAttribute("inert", "");
+        }
+      });
+    }
   };
 
   // ---------------- Render ---------------- //

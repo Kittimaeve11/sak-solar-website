@@ -13,6 +13,7 @@ import { HiPlusSm } from 'react-icons/hi';
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 
+// Extract YouTube video ID
 function extractVideoId(url) {
     if (!url) return null;
     const regex = /(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/))([\w-]+)/;
@@ -20,8 +21,9 @@ function extractVideoId(url) {
     return match ? match[1] : null;
 }
 
+// Thumbnail component with fallback
 function ThumbnailWithFallback({ videoId, alt }) {
-    const [srcIndex, setSrcIndex] = React.useState(0);
+    const [srcIndex, setSrcIndex] = useState(0);
 
     const thumbnailUrls = [
         `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
@@ -37,8 +39,7 @@ function ThumbnailWithFallback({ videoId, alt }) {
             width={374}
             height={210}
             className="thumbnailslide"
-            style={{ width: "100%", height: "auto" }} // ป้องกัน ratio เพี้ยน
-            onLoad={() => console.log("Thumbnail loaded")} // แทน onLoadingComplete
+            style={{ width: "100%", height: "auto" }}
             onError={() => {
                 if (srcIndex < thumbnailUrls.length - 1) {
                     setSrcIndex(srcIndex + 1);
@@ -46,7 +47,6 @@ function ThumbnailWithFallback({ videoId, alt }) {
             }}
             unoptimized
         />
-
     );
 }
 
@@ -58,6 +58,7 @@ export default function SlideReview() {
     const [dragging, setDragging] = useState(false);
     const sliderRef = useRef(null);
 
+    // Fetch reviews
     useEffect(() => {
         async function fetchReviews() {
             if (!baseUrl || !apiKey) {
@@ -68,15 +69,9 @@ export default function SlideReview() {
             setIsLoading(true);
             try {
                 const res = await fetch(`${baseUrl}/api/Reviewapi`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-API-KEY': apiKey,
-                    },
+                    headers: { 'X-API-KEY': apiKey },
                 });
-                if (!res.ok) {
-                    throw new Error(`Failed to fetch: ${res.status}`);
-                }
+                if (!res.ok) throw new Error(`Failed to fetch: ${res.status}`);
                 const data = await res.json();
                 setReviews(data.result?.data || []);
             } catch (error) {
@@ -89,21 +84,24 @@ export default function SlideReview() {
         fetchReviews();
     }, []);
 
-    const totalGroups = Math.ceil(reviews.length / 3);
+    // Calculate total groups for custom dots
+    const slidesPerGroup = 3;
+    const totalGroups = reviews.length > 0 ? Math.ceil(reviews.length / slidesPerGroup) : 0;
 
     const handleDotClick = (index) => {
         if (sliderRef.current) {
-            sliderRef.current.slickGoTo(index * 3);
+            sliderRef.current.slickGoTo(index * slidesPerGroup);
             setActiveSlide(index);
         }
     };
 
     const handleBeforeChange = () => setDragging(true);
-    const handleAfterChange = (i) => {
-        setActiveSlide(Math.floor(i / 3));
+    const handleAfterChange = (current) => {
+        setActiveSlide(Math.floor(current / slidesPerGroup));
         setTimeout(() => setDragging(false), 50);
     };
 
+    // Custom dots component
     const CustomDots = () => (
         <div className="custom-dots">
             {Array.from({ length: totalGroups }).map((_, i) => (
@@ -116,6 +114,7 @@ export default function SlideReview() {
         </div>
     );
 
+    // Skeleton card for loading state
     const SkeletonCard = () => (
         <div className="slide-item">
             <div className="skeleton-card fade-in">
@@ -128,7 +127,9 @@ export default function SlideReview() {
 
     return (
         <div className="review-wrapperslide">
-            <h1 className="headersolarslide">{locale === 'en' ? 'Customer Reviews' : 'รีวิวจากลูกค้า'}</h1>
+            <h1 className="headtitleone">
+                {locale === 'en' ? 'Customer Reviews' : 'รีวิวจากลูกค้า'}
+            </h1>
 
             <div className="review-header-linkslide">
                 <Link href="/review" className="view-all">
@@ -146,8 +147,8 @@ export default function SlideReview() {
             ) : (
                 <Slider
                     ref={sliderRef}
-                    dots={true}
-                    infinite={true}
+                    dots={false} // ปิด default dots
+                    infinite={reviews.length > slidesPerGroup} // infinite เฉพาะเมื่อมีหลาย slides
                     speed={500}
                     slidesToShow={3}
                     slidesToScroll={1}
@@ -181,23 +182,14 @@ export default function SlideReview() {
                             <div key={review.vedio_id} className="slide-item">
                                 <div
                                     className="video-cardslide"
-                                    onClick={() => {
-                                        if (!dragging) {
-                                            window.open(review.vedio_link, '_blank', 'noopener noreferrer');
-                                        }
-                                    }}
+                                    onClick={() => !dragging && window.open(review.vedio_link, '_blank')}
                                 >
                                     <div className="thumbnail-wrapperslide">
                                         <ThumbnailWithFallback videoId={videoId} alt={videoTitle} />
                                     </div>
                                     <div className="infoslide">
                                         <h3 className="titleslide">{videoTitle}</h3>
-                                        <p className="dateslide"> {' '}
-                                            {new Date(review.vedio_creationdate).toLocaleDateString(dateLocale, {
-                                                year: 'numeric',
-                                                month: 'long',
-                                                day: 'numeric',
-                                            })}</p>
+                                        <p className="dateslide">{formattedDate}</p>
                                     </div>
                                 </div>
                             </div>

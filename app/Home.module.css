@@ -75,7 +75,9 @@
 
 
 .containersolar {
-  background-image: url('/images/solar-cellbackfrom.jpg');
+  /* background-image: url('/images/solar-cellbackfrom.jpg'); */
+    /* background-color: #FAFBFF; */
+
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -85,4 +87,10 @@
 
 
 
-
+.interestedsolar {
+  text-align: center;
+  font-size: clamp(1rem, 3vw, 1.25rem);
+  font-weight: bold;
+  color: #243865;
+  margin-top: -5px;
+}

@@ -5,7 +5,7 @@ export const menuItems = [
       { label: "โซลาร์รูฟท็อป", href: "/products/solar-rooftop" },
       { label: "โซลาร์รูฟท็อปไฮบริด", href: "/products/solar-air" }, 
       { label: "โซลาร์แอร์", href: "/loan/solar2" },
-      { label: "สินเชื่อโซล่ารูฟ", href: "/loan/solar3" },
+      { label: "สินเชื่อโซล่ารูฟ", href: "https://saksiam.com/service/solarrooftop" },
       { label: "ใบรับรองการไฟฟ้า", href: "/file/Inverter.pdf" },
     ],
   },

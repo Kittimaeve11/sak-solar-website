@@ -1,9 +1,10 @@
 /* พื้นหลังฟอร์ม */
 .containersolar {
   background-color: #FAFBFF;
-  padding: 1rem;
+  padding-top: 3rem;
+  padding-bottom: 3rem;
   width: 100%;
-  margin-top: 1.5rem;
+  margin-top: 2rem;
 }
 
 .formWrapper {
@@ -515,6 +516,26 @@
   /* ห้ามตัดบรรทัดกลางข้อความ */
 }
 
+
+.unit {
+  white-space: nowrap; /* ปกติให้อยู่ข้างหลัง */
+}
+
+.usageSplit {
+  display: flex;
+  gap: 20px;
+}
+
+.day, .night {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.icon {
+  display: none; /* ปกติซ่อนไอคอน */
+}
+
 @media (max-width: 1200px) {
   .formWrapperResult {
     max-width: 900px;
@@ -643,20 +664,24 @@
   }
 
   .product-info {
-    padding: -0.5rem!important; ;
+    padding: -0.5rem !important;
+    ;
   }
 
+  .hideOnMobile {
+    display: none;
+  }
 }
 
 
 @media (max-width: 560px) {
-  .hideOnMobile {
-    display: none;
-  }
-
   .buttonGroup {
     flex-direction: column;
     align-items: flex-end;
+  }
+
+  .buttonGroup button {
+    width: 100%; /* ให้ปุ่มเต็มความกว้าง */
   }
 
   .headtitleonesolar {
@@ -668,6 +693,7 @@
     justify-content: center;
     align-items: stretch;
     gap: 0.75rem;
+    
   }
 
   .productTable {
@@ -688,3 +714,30 @@
 } */
 
 }
+
+
+@media (max-width: 450px) {
+  .unit {
+    display: block; /* ขึ้นบรรทัดใหม่ */
+  }
+    .text {
+    display: none;
+  }
+
+  .icon {
+    display: inline; /* แสดงไอคอนแทนข้อความ */
+    font-size: 18px;
+  }
+  .containersolar {
+  padding: 0.3rem;
+}
+
+.formWrapperInitial {
+  max-width: 320px;
+}
+}
+
+
+
+
+

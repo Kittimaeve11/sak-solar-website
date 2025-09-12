@@ -177,7 +177,7 @@ export default function BannerSlider() {
                     src={imgSrc}
                     alt={banner.brander_name}
                     fill
-                    priority={index === initialSlide}
+                    priority={index === initialSlide}  //  เฉพาะภาพแรก
                     loading={index === initialSlide ? "eager" : "lazy"}
                     draggable={false}
                     unoptimized
@@ -189,8 +189,8 @@ export default function BannerSlider() {
                     onLoad={() =>
                       setLoadedIndexes((prev) => ({ ...prev, [index]: true }))
                     }
-                    
                   />
+
 
                   {!isLoaded && <div className="skeleton-overlay" />}
                 </div>

@@ -133,7 +133,7 @@ export default function SlideEditorial() {
 
   return (
     <div className="editorial-wrapperslide">
-      <h1 className="headersolarslide">บทความ</h1>
+      <h1 className="headtitleone">บทความ</h1>
 
       <div className="editorial-headerslide">
         <Link href="/editorial" className="view-all">
@@ -153,7 +153,7 @@ export default function SlideEditorial() {
             const globalMiddleIndex = currentGroupStart + middleIndexInGroup;
             const isMiddle = index === globalMiddleIndex;
 
-            // ✅ ใช้ snippet จาก content ที่ทำความสะอาดแล้ว
+            //  ใช้ snippet จาก content ที่ทำความสะอาดแล้ว
             const snippet = item.content.length > 100
               ? item.content.slice(0, 100) + '...'
               : item.content;

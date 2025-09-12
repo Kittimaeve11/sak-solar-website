@@ -154,10 +154,20 @@ export default function HomePage() {
           initialProduct={productFromUrl}
         />
       </div>
-      
-      {/* <SlideEditorial />
+
+      <div
+        style={{
+          borderBottom: '2.5px solid #fa8722c4',
+          width: '70%',
+          margin: '20px auto',
+        }}
+      ></div>
+
+
+
+      <SlideEditorial />
       <SlidePortfolio />
-      <SlideReview />  */}
+      <SlideReview />
 
       <style jsx>{`
   .banner-wrapper {
