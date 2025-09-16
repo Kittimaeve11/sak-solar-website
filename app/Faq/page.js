@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import '../../styles/faq.css';
 import { MdOutlineArrowForwardIos } from 'react-icons/md';
 import Image from 'next/image';
+import { useLocale } from '../Context/LocaleContext';
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
@@ -11,69 +12,93 @@ const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 export default function FAQPage() {
   const [faqs, setFaqs] = useState([]);
   const [openIndex, setOpenIndex] = useState(null);
-  const [fadeIn, setFadeIn] = useState(false);
 
-  // ---------------- Banner ----------------
+  // Banner
   const [banners, setBanners] = useState([]);
   const [loadingBanner, setLoadingBanner] = useState(true);
-  const [bannerLoaded, setBannerLoaded] = useState({});
+  const [fadeInBanner, setFadeInBanner] = useState(false);
 
-  // ---------------- FAQ ----------------
+  // FAQ loading state
   const [loadingFaq, setLoadingFaq] = useState(true);
-  const answerRefs = useRef([]);
+  const [fadeInFaq, setFadeInFaq] = useState(false);
 
-  // ---------------- Fetch Data ----------------
+  const answerRefs = useRef([]);
+  const locale = useLocale(); // ใช้ locale จาก context
+
+
   useEffect(() => {
-    const fetchFaqs = async () => {
-      setLoadingFaq(true);
-      setFadeIn(false);
+    // ตรวจสอบ locale ก่อนใช้งาน
+    const loc = typeof locale === 'string' ? locale.toLowerCase() : 'th';
+    const isThai = loc.startsWith('th');
+
+    // ---------- SEO ----------
+    document.title = isThai
+      ? 'คำถามที่พบบ่อย | บริษัท ศักดิ์สยาม โซลาร์ เอ็นเนอร์ยี่ จำกัด'
+      : 'FAQ | Sak Siam Solar Energy Co., Ltd.';
+
+    const metaDescription = document.querySelector("meta[name='description']");
+    const content = isThai ? 'คำถามที่พบบ่อย' : 'Our Portfolio';
+    if (metaDescription) {
+      metaDescription.setAttribute('content', content);
+    } else {
+      const meta = document.createElement('meta');
+      meta.name = 'description';
+      meta.content = content;
+      document.head.appendChild(meta);
+    }
+
+    // ---------- Fetch Data ----------
+    const fetchData = async () => {
+      // Fetch FAQs
       try {
-        const res = await fetch(`${baseUrl}/api/FQAapi`, {
+        setLoadingFaq(true);
+        const resFaq = await fetch(`${baseUrl}/api/FQAapi`, {
           headers: { 'X-API-KEY': apiKey },
         });
-        const data = await res.json();
-        setFaqs(data.status && data.result ? data.result : []);
+        const dataFaq = await resFaq.json();
+        setFaqs(dataFaq.status && dataFaq.result ? dataFaq.result : []);
       } catch {
         setFaqs([]);
       } finally {
         setLoadingFaq(false);
-        setTimeout(() => setFadeIn(true), 100);
+        setFadeInFaq(true);
       }
-    };
 
-    const fetchBanner = async () => {
+      // Fetch Banner
       try {
-        const res = await fetch(`${baseUrl}/api/branderIDapi/1`, {
+        setLoadingBanner(true);
+        const resBanner = await fetch(`${baseUrl}/api/branderIDapi/1`, {
           headers: { 'X-API-KEY': apiKey },
         });
-        const data = await res.json();
-        const branderArray = Array.isArray(data.data)
-          ? data.data
-          : data.data
-            ? [data.data]
+        const dataBanner = await resBanner.json();
+        const arr = Array.isArray(dataBanner.data)
+          ? dataBanner.data
+          : dataBanner.data
+            ? [dataBanner.data]
             : [];
-        setBanners(branderArray);
+        setBanners(arr);
       } catch {
         setBanners([]);
       } finally {
         setLoadingBanner(false);
+        setTimeout(() => setFadeInBanner(true), 50);
       }
     };
 
-    fetchFaqs();
-    fetchBanner();
-  }, []);
+    fetchData();
+  }, [locale]);
 
-  // ---------------- Toggle Answer ----------------
-  const toggle = (index) => setOpenIndex(prev => (prev === index ? null : index));
+  const toggle = (index) =>
+    setOpenIndex((prev) => (prev === index ? null : index));
 
+  // เปิด-ปิด FAQ แบบ dynamic
   useEffect(() => {
     answerRefs.current.forEach((el, i) => {
       if (!el) return;
       if (i === openIndex) {
         el.style.maxHeight = el.scrollHeight + 'px';
-        el.style.paddingTop = '0.5rem';
-        el.style.paddingBottom = '0.5rem';
+        el.style.paddingTop = '1rem';
+        el.style.paddingBottom = '1rem';
       } else {
         el.style.maxHeight = '0px';
         el.style.paddingTop = '0';
@@ -82,23 +107,19 @@ export default function FAQPage() {
     });
   }, [openIndex, faqs]);
 
-  // ---------------- Clean HTML ----------------
   const cleanHtml = (str) => {
     if (!str || typeof str !== 'string') return '';
     return str
       .replace(/^"|"$/g, '')
       .replace(/\\\//g, '/')
       .replace(/\\"/g, '"')
-      .replace(/\\n/g, '')
+      .replace(/\\n/g, ' ')
       .replace(/&nbsp;/g, ' ')
-      .replace(/ style="[^"]*"/g, '')
-      .replace(/<br\s*\/?>/gi, ' ')
-      .replace(/<p>/g, '<p style="margin:0; padding:0">')
-      .replace(/<li>/g, '<li style="margin:0; padding:0">')
+      .replace(/ style="[^"]*"/g, '') // เอา inline style ออก
+      .replace(/<br\s*\/?>/gi, '<br/>')
       .trim();
   };
 
-  // ---------------- Skeleton ----------------
   const SkeletonFaq = () => (
     <div className="faq-skeleton-card">
       <div className="faq-skeleton-question skeleton" />
@@ -106,120 +127,64 @@ export default function FAQPage() {
     </div>
   );
 
-  // ---------------- Render ----------------
   return (
     <div className="no-margin">
-      {/* ---------------- Banner ---------------- */}
-      <div
-        style={{
-          width: '100%',
-          aspectRatio: '3.22/1',
-          position: 'relative',
-          marginBottom: '1rem'
-        }}
-      >
-        {loadingBanner && (
+      {/* Banner */}
+      {loadingBanner ? (
+        <div className="skeleton-banner"></div>
+      ) : (
+        banners.map((item) => (
           <div
-            className="skeleton-banner"
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%'
-            }}
-          />
-        )}
+            key={item.brander_ID}
+            className={`banner-container ${fadeInBanner ? 'fade-in' : ''}`}
+          >
+            <picture>
+              <source
+                srcSet={`${baseUrl}/${item.brander_pictureMoblie}`}
+                media="(max-width: 768px)"
+              />
+              <Image
+                src={`${baseUrl}/${item.brander_picturePC}`}
+                alt={item.brander_name || 'Banner Image'}
+                width={1530}
+                height={800}
+                className="banner-image"
+                style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+                unoptimized
+              />
+            </picture>
+          </div>
+        ))
+      )}
 
-        {banners.length > 0 &&
-          banners.map((item) => {
-            const loaded = bannerLoaded[item.brander_ID] || false;
-            return (
-              <picture
-                key={item.brander_ID}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  position: 'absolute',
-                  top: 0,
-                  left: 0
-                }}
-              >
-                <source
-                  srcSet={`${baseUrl}/${item.brander_pictureMoblie}`}
-                  media="(max-width: 768px)"
-                />
-                <Image
-                  src={`${baseUrl}/${item.brander_picturePC}`}
-                  alt={item.brander_name || 'Editorial Banner'}
-                  fill
-                  style={{
-                    objectFit: 'cover',
-                    opacity: loaded ? 1 : 0,
-                    transition: 'opacity 0.5s ease'
-                  }}
-                  onLoadingComplete={() =>
-                    setBannerLoaded((prev) => ({
-                      ...prev,
-                      [item.brander_ID]: true
-                    }))
-                  }
-                  unoptimized
-                />
-              </picture>
-            );
-          })}
-
-        {!loadingBanner && banners.length === 0 && (
-          <Image
-            src="/images/no-image.jpg"
-            alt="Banner fallback"
-            fill
-            style={{ objectFit: 'cover' }}
-          />
-        )}
-      </div>
-
-      {/* ---------------- FAQ ---------------- */}
-      <main className={`layout-faq ${fadeIn ? 'fade-in' : ''}`}>
+      {/* FAQ */}
+      <main className={`layout-faq ${fadeInFaq ? 'fade-in' : ''}`}>
         <h1 className="headtitle">คำถามที่พบบ่อยเกี่ยวกับโซลาร์เซลล์</h1>
 
         {loadingFaq
           ? Array.from({ length: 5 }).map((_, i) => <SkeletonFaq key={i} />)
           : faqs.map((item, index) => (
-              <div
-                key={item.fqa_id}
-                className={`faq-item ${openIndex === index ? 'open' : ''}`}
+            <div key={item.fqa_id} className="faq-item">
+              <button
+                onClick={() => toggle(index)}
+                className="faq-button"
+                type="button"
               >
-                <button
-                  onClick={() => toggle(index)}
-                  className="faq-button"
-                  type="button"
-                >
-                  {cleanHtml(item.fqa_questionTH)}
-                  <span
-                    className={`faq-icon ${
-                      openIndex === index ? 'open' : ''
-                    }`}
-                  >
-                    <MdOutlineArrowForwardIos />
-                  </span>
-                </button>
+                {cleanHtml(item.fqa_questionTH)}
+                <span className={`faq-icon ${openIndex === index ? 'open' : ''}`}>
+                  <MdOutlineArrowForwardIos />
+                </span>
+              </button>
+              <div
+                ref={(el) => (answerRefs.current[index] = el)}
+                className="faq-answer"
+              >
                 <div
-                  ref={(el) => (answerRefs.current[index] = el)}
-                  className={`faq-answer ${
-                    openIndex === index ? 'open' : ''
-                  }`}
-                >
-                  <div
-                    dangerouslySetInnerHTML={{
-                      __html: cleanHtml(item.fqa_answersTH)
-                    }}
-                  />
-                </div>
+                  dangerouslySetInnerHTML={{ __html: cleanHtml(item.fqa_answersTH) }}
+                />
               </div>
-            ))}
-            
+            </div>
+          ))}
       </main>
     </div>
   );

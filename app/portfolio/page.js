@@ -6,33 +6,21 @@ import Image from 'next/image';
 import '@/styles/portfolio.css';
 import { IoIosArrowDown, IoIosArrowBack, IoIosArrowForward } from 'react-icons/io';
 import { FaCalendar } from "react-icons/fa";
-import { useLocale } from '../Context/LocaleContext'; // <-- import useLocale
+import { useLocale } from '../Context/LocaleContext';
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 
-// ฟังก์ชันแปลงวันที่
 const formatDate = (dateString, locale = "th") => {
   if (!dateString || dateString === "-") return "-";
   const date = new Date(dateString);
-
-  if (locale === "th") {
-    return new Intl.DateTimeFormat("th-TH", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    }).format(date); // จะได้ปี พ.ศ.
-  }
-
-  return new Intl.DateTimeFormat("en-US", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  }).format(date);
+  return locale === "th"
+    ? new Intl.DateTimeFormat("th-TH", { day: "numeric", month: "long", year: "numeric" }).format(date)
+    : new Intl.DateTimeFormat("en-US", { day: "numeric", month: "long", year: "numeric" }).format(date);
 };
 
 export default function PortfolioPage() {
-  const { locale } = useLocale(); // <-- ดึง locale
+  const { locale } = useLocale();
   const [projects, setProjects] = useState([]);
   const [types, setTypes] = useState([]);
   const [filter, setFilter] = useState('ทั้งหมด');
@@ -48,17 +36,20 @@ export default function PortfolioPage() {
   const topRef = useRef(null);
 
   useEffect(() => {
+    let scrollUpTimer;
+
+    // SEO
     document.title = locale === 'th'
       ? 'ผลงานของเรา | บริษัท ศักดิ์สยาม โซลาร์ เอ็นเนอร์ยี่ จำกัด'
       : 'Our Portfolio | Sak Siam Solar Energy Co., Ltd.';
-
     const metaDescription = document.querySelector("meta[name='description']");
+    const content = locale === 'th' ? 'ผลงานของเรา' : 'Our Portfolio';
     if (metaDescription) {
-      metaDescription.setAttribute("content", locale === 'th' ? "ผลงานของเรา" : "Our Portfolio");
+      metaDescription.setAttribute('content', content);
     } else {
       const meta = document.createElement('meta');
       meta.name = 'description';
-      meta.content = locale === 'th' ? "ผลงานของเรา" : "Our Portfolio";
+      meta.content = content;
       document.head.appendChild(meta);
     }
 
@@ -70,104 +61,74 @@ export default function PortfolioPage() {
     };
     window.addEventListener('error', handleChunkError);
 
-    const fetchTypes = async () => {
-      try {
-        const res = await fetch(`${baseUrl}/api/portfoliotypepageapi`, {
-          headers: { 'X-API-KEY': apiKey },
-        });
-        const data = await res.json();
-        if (data.status && Array.isArray(data.result)) {
-          setTypes(data.result);
-        }
-      } catch (err) {
-        console.error('Error fetching portfolio types:', err);
-      }
-    };
-
-    const fetchProjects = async () => {
+    const fetchAllData = async () => {
       setIsLoading(true);
       try {
-        const res = await fetch(`${baseUrl}/api/portfoliopageapi`, {
-          headers: { 'X-API-KEY': apiKey },
-        });
-        const data = await res.json();
+        // Fetch types
+        const typesRes = await fetch(`${baseUrl}/api/portfoliotypepageapi`, { headers: { 'X-API-KEY': apiKey } });
+        const typesData = await typesRes.json();
+        if (typesData.status && Array.isArray(typesData.result)) setTypes(typesData.result);
 
-        if (data.status && data.result?.data) {
-          const mapped = data.result.data.map(item => {
+        // Fetch projects
+        const projectsRes = await fetch(`${baseUrl}/api/portfoliopageapi`, { headers: { 'X-API-KEY': apiKey } });
+        const projectsData = await projectsRes.json();
+        if (projectsData.status && projectsData.result?.data) {
+          const mapped = projectsData.result.data.map(item => {
             let gallery = [];
-            try {
-              gallery = item.portfolio_gallery ? JSON.parse(item.portfolio_gallery) : [];
-            } catch {
-              gallery = [];
-            }
-
+            try { gallery = item.portfolio_gallery ? JSON.parse(item.portfolio_gallery) : []; } catch { gallery = []; }
             return {
               id: item.portfolio_num,
-              titleTH: item.adddressTH || '-',   // <-- ใช้ adddressTH
-              titleEN: item.adddressEN || '-',   // <-- ใช้ adddressEN
+              titleTH: item.adddressTH || '-',
+              titleEN: item.adddressEN || '-',
               size: item.installationsize || '-',
               productTypeTH: item.TypeProduct_nameTH || '-',
               productTypeEN: item.TypeProduct_nameEN || '-',
               panelCount: item.panelsolarcout || '-',
-              postDate: item.portfolio_datainstall || '-', // <-- raw date
+              postDate: item.portfolio_datainstall || '-',
               coverImage: gallery.length > 0 ? `${baseUrl}/${gallery[0]}` : '/images/placeholder.png',
               type: item.portfolio_typeID,
             };
           });
           setProjects(mapped);
-        } else {
-          setProjects([]);
-        }
-      } catch (err) {
-        console.error('Error fetching projects:', err);
+        } else setProjects([]);
+
+        // Fetch banner
+        const bannerRes = await fetch(`${baseUrl}/api/branderIDapi/10`, { headers: { 'X-API-KEY': apiKey } });
+        const bannerData = await bannerRes.json();
+        const branderArray = Array.isArray(bannerData.data)
+          ? bannerData.data
+          : bannerData.data ? [bannerData.data] : [];
+        setBrander(branderArray);
+
+      } catch (error) {
+        console.error('Error fetching data:', error);
         setProjects([]);
+        setTypes([]);
       } finally {
         setTimeout(() => {
           setIsLoading(false);
           setFadeIn(true);
+          setLoadingBanner(false);
         }, 300);
       }
     };
 
-    const fetchBanner = async () => {
-      try {
-        const res = await fetch(`${baseUrl}/api/branderIDapi/10`, {
-          method: 'GET',
-          headers: { 'X-API-KEY': apiKey },
-        });
-        const branderData = await res.json();
-        const branderArray = Array.isArray(branderData.data)
-          ? branderData.data
-          : branderData.data
-            ? [branderData.data]
-            : [];
-        setBrander(branderArray);
-      } catch (error) {
-        console.error('Error fetching banner:', error);
-      } finally {
-        setLoadingBanner(false);
-      }
-    };
-
-    fetchTypes();
-    fetchProjects();
-    fetchBanner();
+    fetchAllData();
 
     return () => {
       window.removeEventListener('error', handleChunkError);
+      if (scrollUpTimer) clearTimeout(scrollUpTimer);
     };
   }, [locale]);
 
+  // Update localStorage & scroll up timer inside a single effect
   useEffect(() => {
     localStorage.setItem('portfolioCurrentPage', currentPage.toString());
-  }, [currentPage]);
-
-  useEffect(() => {
     if (isScrollingUp) {
       const timer = setTimeout(() => setIsScrollingUp(false), 300);
       return () => clearTimeout(timer);
     }
-  }, [isScrollingUp]);
+  }, [currentPage, isScrollingUp]);
 
   const filteredProjects = filter === 'ทั้งหมด'
     ? projects

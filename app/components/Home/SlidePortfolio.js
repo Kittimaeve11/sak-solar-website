@@ -109,7 +109,8 @@ export default function SlidePortfolio() {
 
         .dot-bar.active {
           width: 40px;
-          background-color: #ff6d00;
+          background-color: #E88534;
+;
         }
 
         .slide-item {

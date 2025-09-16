@@ -3,8 +3,8 @@
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import styles from "../../styles/Footer.module.css"; // ✅ ปรับ path ตามโปรเจกต์คุณ
-import { menuItems } from "../config/footer"; // ✅ ต้องมีไฟล์นี้
+import styles from "../../styles/Footer.module.css";
+import { menuItems as staticMenu } from "../config/footer";
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
@@ -12,24 +12,23 @@ const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 export default function Footer() {
   const [socials, setSocials] = useState([]);
   const [policies, setPolicies] = useState([]);
+  const [dynamicProducts, setDynamicProducts] = useState([]); 
+  const [contact, setContact] = useState(null); // ✅ contact จาก API
 
   useEffect(() => {
-    // โหลด social media จาก local API
+    // โหลด social media (จากไฟล์ local api/data เดิม ถ้ายังต้องใช้)
     fetch("/api/data")
       .then((res) => res.json())
       .then((data) => setSocials(data.socials || []))
       .catch(() => setSocials([]));
 
-    // โหลดนโยบายจาก API
+    // โหลดนโยบาย
     const fetchPolicies = async () => {
       try {
         const res = await fetch(`${baseUrl}/api/policyapi`, {
-          headers: {
-            'X-API-KEY': `${apiKey}`,
-          },
+          headers: { "X-API-KEY": `${apiKey}` },
         });
         const data = await res.json();
-
         if (data.status && Array.isArray(data.result)) {
           setPolicies(data.result);
         } else {
@@ -41,24 +40,75 @@ export default function Footer() {
       }
     };
 
-    fetchPolicies();
-  }, []);
-  const iconPath = useMemo(() => ({
-    facebook: "/images/facebook.png",
-    instagram: "/images/instagram.png",
-    tiktok: "/images/tiktok.png",
-    line: "/images/line.png",
-    youtube: "/images/youtube.png",
-  }), []);
+    // โหลดสินค้า
+    const fetchProducts = async () => {
+      try {
+        const res = await fetch(`${baseUrl}/api/productHeaderapi`, {
+          headers: { "X-API-KEY": `${apiKey}` },
+        });
+        const data = await res.json();
+        if (data.status && Array.isArray(data.result)) {
+          const productMenus = data.result.map((item) => ({
+            label: item.producttypenameTH.trim(),
+            href: `/products/${item.producttypeID}`,
+          }));
+          const extraMenus = [
+            { label: "สินเชื่อโซล่ารูฟ", href: "https://saksiam.com/service/solarrooftop" },
+            { label: "ใบรับรองการไฟฟ้า", href: "/file/Inverter.pdf" },
+          ];
+          setDynamicProducts([...productMenus, ...extraMenus]);
+        }
+      } catch (err) {
+        console.error("Error fetching products:", err);
+      }
+    };
 
-  const firstTwoMenus = menuItems.slice(0, 2);
-  const contactMenu = menuItems.find((item) => item.title === "ติดต่อเรา");
+    // ✅ โหลดข้อมูลติดต่อ
+    const fetchContact = async () => {
+      try {
+        const res = await fetch(`${baseUrl}/api/contactapi`, {
+          headers: { "X-API-KEY": `${apiKey}` },
+        });
+        const data = await res.json();
+        if (data.status && Array.isArray(data.result) && data.result.length > 0) {
+          setContact(data.result[0]); // ใช้ record แรก
+        }
+      } catch (err) {
+        console.error("Error fetching contact:", err);
+      }
+    };
+
+    fetchPolicies();
+    fetchProducts();
+    fetchContact();
+  }, []);
+
+  // icon map
+  const iconPath = useMemo(
+    () => ({
+      facebook: "/images/facebook.png",
+      instagram: "/images/instagram.png",
+      tiktok: "/images/tiktok.png",
+      line: "/images/line.png",
+      youtube: "/images/youtube.png",
+    }),
+    []
+  );
+
+  // เมนูสินค้า
+  const firstTwoMenus = [
+    {
+      ...staticMenu[0],
+      items: dynamicProducts.length > 0 ? dynamicProducts : staticMenu[0].items,
+    },
+    staticMenu[1],
+  ];
 
   return (
     <div>
       <footer className={styles.footer}>
         <div className={styles.footerContent}>
-          {/* คอลัมน์แรก */}
+          {/* คอลัมน์แรก: บริการของเรา + นโยบาย */}
           <div className={styles.column}>
             <h4>{firstTwoMenus[0].title}</h4>
             <ul>
@@ -69,7 +119,6 @@ export default function Footer() {
               ))}
             </ul>
 
-            {/* แสดงนโยบายจาก API */}
             {policies.length > 0 && (
               <>
                 <h4>นโยบาย</h4>
@@ -84,7 +133,6 @@ export default function Footer() {
                 </ul>
               </>
             )}
-
           </div>
 
           {/* คอลัมน์ที่สอง */}
@@ -101,55 +149,58 @@ export default function Footer() {
 
           {/* คอลัมน์ที่สาม: ติดต่อเรา + social icons */}
           <div className={styles.column}>
-            {contactMenu && (
+            {contact && (
               <>
-                <h4>{contactMenu.title}</h4>
+                <h4>ติดต่อเรา</h4>
                 <ul>
-                  {contactMenu.items.map(({ label }, i) => (
-                    <li key={label + i}>
-                      <span style={{ color: "white" }}>{label}</span>
-                    </li>
-                  ))}
+                  <li> บริษัท ศักดิ์สยามลิสซิ่ง จำกัด (มหาชน) </li>
+                  <li>{contact.address_th}</li>
+                  {/* <li>โทรศัพท์ : {contact.phone_number}</li> */}
+                  <li>โทรศัพท์ : {contact.call_center}</li>
+                  <li>แฟกซ์ : {contact.fax}</li>
+                  <li>อีเมล : {contact.email_main}</li>
+                  {/* <li>{contact.officehours_th}</li> */}
                 </ul>
                 <div className={styles.socialIcons}>
-                  {socials.map(({ id, url, icon }) => (
-                    <Link
-                      key={id}
-                      href={url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label={id}
-                      className={styles.iconWrapper}
-                    >
-                      <Image
-                        src={iconPath[icon] || "/images/default-icon.png"}
-                        alt={id}
-                        width={36}
-                        height={36}
-                      />
-                    </Link>
-                  ))}
+                  {Object.entries({
+                    facebook: contact.facebook,
+                    line: contact.line,
+                    instagram: contact.instagram,
+                    youtube: contact.youtube,
+                    tiktok: contact.tiktok,
+                  })
+                    .filter(([_, url]) => url && url !== "null") //  แสดงเฉพาะที่มีลิงก์จริง
+                    .map(([key, url]) => (
+                      <Link
+                        key={key}
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={key}
+                        className={styles.iconWrapper}
+                      >
+                        <Image
+                          src={iconPath[key] || "/images/default-icon.png"}
+                          alt={key}
+                          width={36}
+                          height={36}
+                        />
+                      </Link>
+                    ))}
                 </div>
               </>
             )}
           </div>
         </div>
 
-        {/* รูปตกแต่งด้านล่าง */}
         <div className={styles.footerBottomImage}></div>
       </footer>
 
-      {/* ส่วนลิขสิทธิ์ + โลโก้ */}
       <div className={styles.footerBottomWrapper}>
         <div className={styles.footerBottom}>
           © 2025 Copyright: SAKSIAM SOLAR ENERGY CO., LTD BY SAKSIAM LEASING PUBLIC COMPANY LIMITED. All Rights Reserved.
           <div className={styles.logoGroup}>
-            <Image
-              src="/images/logo3.8549861c.png"
-              alt="โลโก้สีส้ม"
-              width={100}
-              height={40}
-            />
+            <Image src="/images/logo3.8549861c.png" alt="โลโก้สีส้ม" width={100} height={40} />
             <Link
               href="/file/Inverter.pdf"
               target="_blank"
@@ -163,12 +214,7 @@ export default function Footer() {
                 height={40}
               />
             </Link>
-            <Image
-              src="/images/ERCNewLogo.png"
-              alt="โลโก้กกพ"
-              width={100}
-              height={40}
-            />
+            <Image src="/images/ERCNewLogo.png" alt="โลโก้กกพ" width={100} height={40} />
           </div>
         </div>
       </div>

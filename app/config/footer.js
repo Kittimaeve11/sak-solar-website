@@ -3,7 +3,7 @@ export const menuItems = [
     title: "บริการของเรา",
     items: [
       { label: "โซลาร์รูฟท็อป", href: "/products/solar-rooftop" },
-      { label: "โซลาร์รูฟท็อปไฮบริด", href: "/products/solar-air" }, 
+      { label: "โซลาร์รูฟท็อปไฮบริด", href: "/products/solar-air" },
       { label: "โซลาร์แอร์", href: "/loan/solar2" },
       { label: "สินเชื่อโซล่ารูฟ", href: "https://saksiam.com/service/solarrooftop" },
       { label: "ใบรับรองการไฟฟ้า", href: "/file/Inverter.pdf" },
@@ -12,11 +12,10 @@ export const menuItems = [
   {
     title: "เกี่ยวกับบริษัท",
     items: [
-      { label: "ประวัติความเป็นมา", href: "/About" },
-      { label: "วิสัยทัศน์", href: "/About1" },
-      { label: "พันธกิจ", href: "/About2" },
-      { label: "คณะกรรมการบริษัท", href: "/About3" },
-      { label: "คำถามที่พบบ่อย", href: "/Faq" },
+      { label: "ประวัติความเป็นมา", href: "/About#history" },
+      { label: "วิสัยทัศน์", href: "/About#vision" },
+      { label: "พันธกิจ", href: "/About#mission" },
+      { label: "คณะกรรมการบริษัท", href: "/About#teams" }, { label: "คำถามที่พบบ่อย", href: "/Faq" },
       { label: "ผลงานของเรา", href: "/portfolio" },
       { label: "รีวิวจากลูกค้า", href: "/review" },
       { label: "บทความ", href: "/editorial" },

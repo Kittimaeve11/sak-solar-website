@@ -3,6 +3,7 @@
   max-width: 1200px;
   margin: 0 auto;
 }
+
 .portfolio-filters {
   display: flex;
   flex-direction: column;
@@ -107,6 +108,7 @@
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
   cursor: pointer;
   outline: none;
+
 }
 
 .filter-dropdown.short:hover {
@@ -122,6 +124,7 @@
   position: relative;
   display: inline-block;
 }
+
 
 /*---------------------------*/
 
@@ -258,10 +261,12 @@
   text-overflow: ellipsis;
 
   /* สำคัญ */
-  max-height: 1.2em;  /* 1 บรรทัด */
+  max-height: 1.2em;
+  /* 1 บรรทัด */
   line-height: 1.2em;
 
-  white-space: nowrap; /* ทำให้เป็น 1 บรรทัด */
+  white-space: nowrap;
+  /* ทำให้เป็น 1 บรรทัด */
 }
 
 
@@ -337,13 +342,16 @@
 
 .banner-container {
   position: relative;
-  width: 100%;
+  width: 100vw;
+  /* ใช้ viewport แทน % */
   aspect-ratio: 3.22 / 1;
-  /* คุมอัตราส่วน */
   min-height: 300px;
-  /* fallback กัน layout shift */
   overflow: hidden;
+
+  /* กันไม่ให้โดนบีบจาก parent */
+  margin-left: calc(-50vw + 50%);
 }
+
 
 .banner-image {
   object-fit: cover;
@@ -439,13 +447,26 @@
 /* มุมมองโทรศัพท์ */
 /* Responsive */
 @media (max-width: 768px) {
-
-  .portfolio-filters,
-  .filter-row {
-    width: 100%;
-    flex-direction: column;
-    align-items: stretch;
+  .banner-container {
+    aspect-ratio: 1.92 / 1;
+    /* เหมาะกับมือถือ */
   }
+
+/* เลือกประเภทบทความ : */
+.portfolio-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 1.5rem;
+}
+
+  .filter-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
 
   .filter-dropdown {
     width: 100%;
