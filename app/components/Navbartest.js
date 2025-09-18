@@ -24,13 +24,15 @@ export default function Navbar() {
                 <div className={styles.leftSection}>
                     <div className={styles.logoContainer}>
                         <Image
-                            src={logo}
-                            alt="โลโก้บริษัท ศักดิ์สยาม โซลาร์"
+                            src="/logo/logosolar.png"
+                            alt="โลโก้บริษัท"
                             width={450}
                             height={100}
                             style={{ objectFit: 'contain' }}
                             priority
+                            unoptimized // เพิ่มบรรทัดนี้
                         />
+
                     </div>
                 </div>
 

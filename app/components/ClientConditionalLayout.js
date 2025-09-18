@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import Navbartest from './Navbartest';
+import Navbar from './Navbar';
 import TabMenu from './TabMenu';
 import Footer from './Footer';
 import BackToTopButton from './BackToTopButton';
@@ -34,7 +34,7 @@ export default function ClientConditionalLayout({ children }) {
       {!hideLayout && (
         <>
           {/* ❌ ไม่มีอนิเมชั่น */}
-          <Navbartest />
+          <Navbar />
           <TabMenu />
         </>
       )}
@@ -43,7 +43,7 @@ export default function ClientConditionalLayout({ children }) {
 
       {!hideLayout && (
         <>
-          {/* ✅ ส่วนนี้ยังมีอนิเมชั่น */}
+          {/* ส่วนนี้ยังมีอนิเมชั่น */}
           <motion.div
             key={pathname}
             initial={{ opacity: 0 }}

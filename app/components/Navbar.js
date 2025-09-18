@@ -2,61 +2,91 @@
 
 import React from 'react';
 import { useLocale } from '../Context/LocaleContext';
-import Link from 'next/link';
-import '../../styles/navbar.css';
-import { FaPhone } from 'react-icons/fa6';
 import { usePathname } from 'next/navigation';
+import { FaPhone } from "react-icons/fa6";
+import styles from '../../styles/Navbar.module.css';
+import Image from 'next/image';
+import Link from 'next/link';
+
+// import รูปแบบ deploy-safe
+import logo from '../../public/logo/logosolar.png';
 
 export default function Navbar() {
-  const { messages, switchLocale, locale } = useLocale();
-  const pathname = usePathname();
-  const isContactPage = pathname === '/Contact';
+    const { messages, switchLocale, locale } = useLocale();
+    const pathname = usePathname();
+    const isAboutPage = pathname === '/About';
+    const isContactPage = pathname === '/Contact';
 
-  return (
-    <nav className="navbar">
-      {/* กลุ่มโลโก้และชื่อบริษัท */}
-      <div className="logoTitleGroup">
-        <img
-          src="/images/logosak-solar.png"
-          alt="Saksiam Solar Logo"
-        />
-        <div className="companyName">
-          <h1>บริษัท ศักดิ์สยาม โซลาร์ เอ็นเนอร์ยี่ จำกัด</h1>
-          <h3>SAKSIAM SOLAR ENERGY CO., LTD.</h3>
+    return (
+        <div className={styles.navWrapper}>
+            <nav className={styles.navbar}>
+                {/* โลโก้ */}
+                <div className={styles.leftSection}>
+                    <div className={styles.logoContainer}>
+                        <Image
+                            src="/logo/logosolar.png"
+                            alt="โลโก้บริษัท"
+                            width={450}
+                            height={100}
+                            style={{ objectFit: 'contain' }}
+                            priority
+                            unoptimized // เพิ่มบรรทัดนี้
+                        />
+
+                    </div>
+                </div>
+
+                {/* ภาษา + เมนู */}
+                <div className={styles.localeContactGroup}>
+                    {/* ปุ่มเปลี่ยนภาษา */}
+                    <div className={styles.localeButtons}>
+                        <span
+                            className={`${styles.localeItem} ${locale === 'th' ? styles.disabled : ''}`}
+                            onClick={() => locale !== 'th' && switchLocale('th')}
+                        >
+                            TH
+                        </span>
+                        <span className={styles.localeDivider}> | </span>
+                        <span
+                            className={`${styles.localeItem} ${locale === 'en' ? styles.disabled : ''}`}
+                            onClick={() => locale !== 'en' && switchLocale('en')}
+                        >
+                            ENG
+                        </span>
+                    </div>
+
+                    {/* ปุ่มติดต่อเรา */}
+                    <div className={styles.contactActions}>
+                        <Link href="tel:1487" className={styles.callLink} title="โทร 1487">
+                            <FaPhone className={styles.phoneIcon} />
+                            <span className={styles.phoneNumber}>1487</span>
+                        </Link>
+
+                        <div className="flex items-center gap-2">
+                            <Link
+                                href="https://saksiam.com/home"
+                                className={`${styles.contact} font-500`}
+                            >
+                                {messages.backpage}
+                            </Link>
+                            <span> | </span>
+                            <Link
+                                href="/About/"
+                                className={`${styles.contact} ${isAboutPage ? styles.active : ''} font-500`}
+                            >
+                                {messages.about}
+                            </Link>
+                            <span> | </span>
+                            <Link
+                                href="/Contact/"
+                                className={`${styles.contact} ${isContactPage ? styles.active : ''} font-500`}
+                            >
+                                {messages.contact}
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            </nav>
         </div>
-      </div>
-
-      {/* กลุ่มภาษา + ปุ่มติดต่อเรา */}
-      <div className="localeContactGroup">
-        <div className="localeButtons">
-          <span
-            className={`localeItem ${locale === 'th' ? 'disabled' : ''}`}
-            onClick={() => locale !== 'th' && switchLocale('th')}
-          >
-            TH
-          </span>
-          <span className="separator"></span>
-          <span
-            className={`localeItem ${locale === 'en' ? 'disabled' : ''}`}
-            onClick={() => locale !== 'en' && switchLocale('en')}
-          >
-            ENG
-          </span>
-        </div>
-        {/* ปุ่มติดต่อเรา + โทร */}
-        {/* <div className="contactActions">
-          <a href="tel:1487" className="callLink" title="โทร 1487">
-            <FaPhone className="phoneIcon" />
-            <span className="phoneNumber">1487</span>          </a> */}
-          <Link href="/Contact/">
-            <button className={`contactButton ${isContactPage ? 'active' : ''}`}>
-              {messages.contact}
-            </button>
-          </Link>
-        {/* </div> */}
-      </div>
-
-    </nav >
-
-  );
+    );
 }
