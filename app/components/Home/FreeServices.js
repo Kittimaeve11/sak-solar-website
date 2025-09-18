@@ -14,7 +14,6 @@ export default function FreeServices({ contacts = [], locale, loading, baseUrl }
   const [skeletonConfig, setSkeletonConfig] = useState({ rows: 1, cards: 2 });
   const [loaded, setLoaded] = useState(false);
 
-  // ---------------- Skeleton Config ---------------- //
   const calcSkeleton = useCallback((width) => {
     if (!width) return { rows: 1, cards: 2 };
     if (width >= 1490) return { rows: 2, cards: 4 };
@@ -23,7 +22,6 @@ export default function FreeServices({ contacts = [], locale, loading, baseUrl }
     return { rows: 1, cards: 1 };
   }, []);
 
-  // ---------------- useEffect ---------------- //
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -49,7 +47,6 @@ export default function FreeServices({ contacts = [], locale, loading, baseUrl }
 
   const isSlider = windowWidth < 1490;
 
-  // ---------------- Skeleton UI ---------------- //
   if (loading) {
     return (
       <div className={styles.serviceSection} aria-busy>
@@ -101,7 +98,6 @@ export default function FreeServices({ contacts = [], locale, loading, baseUrl }
 
   if (!contacts || contacts.length === 0) return null;
 
-  // ---------------- Contacts Split ---------------- //
   const limitedContacts = contacts.slice(0, 8);
   let topContacts = [], bottomContacts = [];
   if (limitedContacts.length <= 4) topContacts = limitedContacts;
@@ -116,36 +112,41 @@ export default function FreeServices({ contacts = [], locale, loading, baseUrl }
     bottomContacts = limitedContacts.slice(4);
   }
 
-  // ---------------- Render Card ---------------- //
-  const renderCard = (item, index) => (
-    <div
-      key={item.service_ID || `service-${index}`}
-      className={`${styles.cardfree} ${loaded ? styles.fadeIn : styles.hiddenBeforeLoad}`}
-    >
-      <div className={styles.iconWrapper}>
-        <Image
-          src={`${baseUrl}/${item.picture}`}
-          alt={locale === 'th' ? item.titleTH : (item.titleEN || 'Service')}
-          width={90}
-          height={90}
-          className={styles.icon}
-          draggable={false}
-          onError={(e) => { e.currentTarget.src = "/images/fallback.png"; }}
-        />
-      </div>
-      <p className={styles.titlefree}>{locale === 'th' ? item.titleTH : item.titleEN}</p>
-      <p className={styles.subtitlefree}>{locale === 'th' ? item.subtitleTH : item.subtitleEN}</p>
-      <ul className={styles.listfree}>
-        {(locale === 'th' ? item.detailTH : item.detailEN)?.split('/').map((text, i) => (
-          <li key={`${item.service_ID || index}-detail-${i}`} className={styles.textfree}>
-            {text.trim()}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
+  const renderCard = (item, index) => {
+    const imgSrc = item.picture
+      ? `${baseUrl}/${item.picture}`
+      : "/images/fallback.png";
 
-  // ---------------- Slider Settings ---------------- //
+    return (
+      <div
+        key={item.service_ID || `service-${index}`}
+        className={`${styles.cardfree} ${loaded ? styles.fadeIn : styles.hiddenBeforeLoad}`}
+      >
+        <div className={styles.iconWrapper}>
+          <Image
+            src={imgSrc}
+            alt={locale === 'th' ? item.titleTH : (item.titleEN || 'Service')}
+            width={90}
+            height={90}
+            className={styles.icon}
+            draggable={false}
+            unoptimized // ป้องกันปัญหา image optimization
+            onError={(e) => { e.currentTarget.src = "/images/fallback.png"; }}
+          />
+        </div>
+        <p className={styles.titlefree}>{locale === 'th' ? item.titleTH : item.titleEN}</p>
+        <p className={styles.subtitlefree}>{locale === 'th' ? item.subtitleTH : item.subtitleEN}</p>
+        <ul className={styles.listfree}>
+          {(locale === 'th' ? item.detailTH : item.detailEN)?.split('/').map((text, i) => (
+            <li key={`${item.service_ID || index}-detail-${i}`} className={styles.textfree}>
+              {text.trim()}
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  };
+
   const getSlidesToShow = () => {
     if (windowWidth < 830) return 1;
     if (windowWidth < 1200) return 2;
@@ -167,26 +168,19 @@ export default function FreeServices({ contacts = [], locale, loading, baseUrl }
     beforeChange: (_, next) => {
       const slides = document.querySelectorAll(".slick-slide");
       slides.forEach((slide, i) => {
-        if (i === next) {
-          slide.removeAttribute("inert"); // active → focus ได้
-        } else {
-          slide.setAttribute("inert", ""); // hidden → focus ไม่ได้
-        }
+        if (i === next) slide.removeAttribute("inert");
+        else slide.setAttribute("inert", "");
       });
     },
     afterChange: (current) => {
       const slides = document.querySelectorAll(".slick-slide");
       slides.forEach((slide, i) => {
-        if (i === current) {
-          slide.removeAttribute("inert");
-        } else {
-          slide.setAttribute("inert", "");
-        }
+        if (i === current) slide.removeAttribute("inert");
+        else slide.setAttribute("inert", "");
       });
     }
   };
 
-  // ---------------- Render ---------------- //
   return (
     <div className={styles.serviceSection}>
       <h1 className="headtitle">ข้อมูลบริการฟรี</h1>

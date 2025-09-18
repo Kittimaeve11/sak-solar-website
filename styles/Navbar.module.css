@@ -195,6 +195,19 @@
   width: 0rem;
 }
 
+/* เส้นตรงกลางปุ่มเปลี่ยนภาษา */
+/* .separator {
+  border-left: 1.8px solid #0d3973;
+  height: 16px;
+  margin: 0 8px;
+} */
+/* เส้นตรงกลาง เกี่ยวกับเรา ติดต่อเรา */
+/* .separatorone {
+  border-left: 1.8px solid #ffffff;
+  height: 16px;
+  margin: 0 8px;
+} */
+
 .contactActions {
   display: flex;
   flex-direction: column;
@@ -241,11 +254,29 @@
   transition: border-bottom 0.2s ease;
 }
 
+/* .contact:hover {
+  background-image: linear-gradient(120deg, #ffffff, #243765ad, #ffffff);
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: shine 3s linear infinite;
+}
+
+@keyframes shine {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+} */
 
 .contact:hover {
   /* background-color: #11377c;*/
   color: #11377c;
 }
+
 
 .contact.active {
   /* background-color: #f87f0b; */
@@ -286,7 +317,7 @@
     z-index: 0;
   }
 
-  /*  พื้นหลังสีส้มด้านล่าง ไม่เปลี่ยนแปลง */
+  /* 🔶 พื้นหลังสีส้มด้านล่าง ไม่เปลี่ยนแปลง */
   .navWrapper::before {
     content: "";
     position: absolute;
@@ -298,7 +329,7 @@
     z-index: 0;
   }
 
-  /*  พื้นหลังสามเหลี่ยมด้านขวา */
+  /* 🔷 พื้นหลังสามเหลี่ยมด้านขวา */
   .navWrapper::after {
     width: 200px;
     clip-path: polygon(100px 0, 100% 0%, 100% 100%, 0% 100%);
@@ -322,7 +353,8 @@
   }
 
   .logoImage {
-    max-height: 80px;/* ไม่เลยเส้นสีส้ม */
+    max-height: 80px;
+    /* ไม่เลยเส้นสีส้ม */
     width: auto;
     height: auto;
     max-width: 100%;
@@ -378,7 +410,9 @@
   }
 }
 
+/* ย่อขนาดและเลื่อนตำแหน่งตามจอเล็กลง */
 
+/* <= 800px */
 @media (max-width: 800px) {
   .logoContainer {
     width: clamp(250px, 60vw, 500px);
@@ -459,7 +493,8 @@
 
 @media (max-width: 400px) {
   .navbar {
-    padding: 10px clamp(5px, 2vw, 20px) 47px clamp(0px, 1vw, 15px);/* เพิ่ม padding-top ให้ลงมา */
+    padding: 10px clamp(5px, 2vw, 20px) 47px clamp(0px, 1vw, 15px);
+    /* เพิ่ม padding-top ให้ลงมา */
     transition: padding 0.4s ease;
     display: flex;
     align-items: center;
@@ -471,7 +506,9 @@
     padding-left: clamp(5px, 2vw, 15px);
     display: flex;
     align-items: center;
+    /* ถ้าต้องการเลื่อนลงอีก */
     margin-top: 10px;
+    /* ปรับเพิ่ม-ลดได้ตามชอบ */
     transition: margin-top 0.4s ease;
   }
 
@@ -493,6 +530,7 @@
     display: flex;
     align-items: center;
     padding-top: 10px;
+    /* เพิ่ม padding-top เล็กน้อย */
   }
 
   .logoContainer {
@@ -500,6 +538,7 @@
     display: flex;
     align-items: center;
     margin-top: 10px;
+    /* เพิ่ม margin-top */
     transition: margin-top 0.4s ease;
   }
 
