@@ -21,7 +21,7 @@ export default function Navbar() {
                 <div className={styles.leftSection}>
                     <div className={styles.logoContainer}>
                         <Image
-                            src="/logo/logo-sukhumvit.png"
+                            src="/logo/logosolar.png"
                             alt="โลโก้บริษัท ศักดิ์สยาม โซลาร์"
                             width={450}
                             height={100}
