@@ -4,9 +4,9 @@ import React from 'react';
 import { useLocale } from '../Context/LocaleContext';
 import { usePathname } from 'next/navigation';
 import { FaPhone } from "react-icons/fa6";
-import Link from 'next/link';
 import styles from '../../styles/Navbar.module.css';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export default function Navbar() {
     const { messages, switchLocale, locale } = useLocale();
@@ -21,12 +21,14 @@ export default function Navbar() {
                 <div className={styles.leftSection}>
                     <div className={styles.logoContainer}>
                         <Image
-                            src="/logo/logo-sukhumvit.png" 
+                            src="/logo/logo-sukhumvit.png"
+                            alt="โลโก้บริษัท ศักดิ์สยาม โซลาร์"
                             width={450}
-                            height={80}
+                            height={100}
                             style={{ objectFit: 'contain' }}
                             priority
                         />
+
                     </div>
                 </div>
 
@@ -50,10 +52,10 @@ export default function Navbar() {
 
                     {/* ปุ่มติดต่อเรา */}
                     <div className={styles.contactActions}>
-                        <a href="tel:1487" className={styles.callLink} title="โทร 1487">
+                        <Link href="tel:1487" className={styles.callLink} title="โทร 1487">
                             <FaPhone className={styles.phoneIcon} />
                             <span className={styles.phoneNumber}>1487</span>
-                        </a>
+                        </Link>
                         <div className="flex items-center gap-2">
                             <Link
                                 href="https://saksiam.com/home"
