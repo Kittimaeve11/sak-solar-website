@@ -8,6 +8,9 @@ import styles from '../../styles/Navbar.module.css';
 import Image from 'next/image';
 import Link from 'next/link';
 
+// import รูปแบบ deploy-safe
+import logo from '../../public/logo/logosolar.png';
+
 export default function Navbar() {
     const { messages, switchLocale, locale } = useLocale();
     const pathname = usePathname();
@@ -21,19 +24,19 @@ export default function Navbar() {
                 <div className={styles.leftSection}>
                     <div className={styles.logoContainer}>
                         <Image
-                            src="/logo/logosolar.png"
+                            src={logo}
                             alt="โลโก้บริษัท ศักดิ์สยาม โซลาร์"
                             width={450}
                             height={100}
                             style={{ objectFit: 'contain' }}
                             priority
                         />
-
                     </div>
                 </div>
 
                 {/* ภาษา + เมนู */}
                 <div className={styles.localeContactGroup}>
+                    {/* ปุ่มเปลี่ยนภาษา */}
                     <div className={styles.localeButtons}>
                         <span
                             className={`${styles.localeItem} ${locale === 'th' ? styles.disabled : ''}`}
@@ -56,6 +59,7 @@ export default function Navbar() {
                             <FaPhone className={styles.phoneIcon} />
                             <span className={styles.phoneNumber}>1487</span>
                         </Link>
+
                         <div className="flex items-center gap-2">
                             <Link
                                 href="https://saksiam.com/home"
