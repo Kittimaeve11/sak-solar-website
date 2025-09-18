@@ -94,3 +94,10 @@
   color: #243865;
   margin-top: -5px;
 }
+
+@media (max-width: 764px) {
+  .formWrapper {
+    width: 80%;
+  max-width: 670px;
+}
+}

@@ -93,34 +93,34 @@ html {
 
 h1 {
   font-size: 30px;
-  color: #243865;
+  color: #0D3973;
 }
 
 h2 {
   font-size: 24px;
-  color: #243865;
+  color: #0D3973;
 
 }
 
 h3 {
   font-size: 20px;
-  color: #243865;
+  color: #0D3973;
 }
 
 h4 {
   font-size: 18px;
-  color: #243865;
+  color: #0D3973;
 }
 
 h5 {
   font-size: 16px;
-  color: #243865;
+  color: #0D3973;
 
 }
 
 h6 {
   font-size: 14px;
-  color: #243865;
+  color: #0D3973;
 
 }
 
@@ -294,7 +294,7 @@ h6 {
 .buttonPrimaryorange {
   font-weight: 400;
   padding: 0.6rem 1.8rem;
-  background-color: #FF5E06;
+  background-color: #E88534;
   color: white;
   border: none;
   border-radius: 4px;
@@ -305,15 +305,15 @@ h6 {
 }
 
 .buttonPrimaryorange:hover {
-  background: #E55100;
+  background: #d9742a;
 }
 
 .buttonSecondaryorange {
   font-weight: 400;
   padding: 0.6rem 1.8rem;
   background-color: white;
-  color: #FF5E06;
-  border: 2px solid #FF5E06;
+  color: #E88534;
+  border: 2px solid #E88534;
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -323,7 +323,7 @@ h6 {
 }
 
 .buttonSecondaryorange:hover {
-  background-color: #FF5E06;
+  background-color: #E88534;
   color: white;
 }
 
@@ -331,7 +331,7 @@ h6 {
   font-weight: 400;
   padding: 0.6rem 1.8rem;
   background-color: white;
-  color: #FF5E06;
+  color: #E88534;
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -342,7 +342,7 @@ h6 {
 }
 
 .buttonSecondaryoneorange:hover {
-  background-color: #FF5E06;
+  background-color: #E88534;
   color: white;
 }
 
@@ -771,7 +771,7 @@ h6 {
 }
 
 .view-all:hover {
-  color: #F25C05;
+  color: #E88534;
 }
 
 .icon-view{

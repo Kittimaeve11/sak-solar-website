@@ -7,7 +7,8 @@ import Link from 'next/link';
 import './SlidePortfolio.css';
 import { FaCalendar } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
-import { HiPlusSm } from "react-icons/hi";
+import { HiPlusSm } from 'react-icons/hi';
+import { useLocale } from '@/app/Context/LocaleContext';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
@@ -21,6 +22,7 @@ export default function SlidePortfolio() {
   const [dragging, setDragging] = useState(false);
   const sliderRef = useRef(null);
   const router = useRouter();
+  const { locale } = useLocale();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -36,7 +38,7 @@ export default function SlidePortfolio() {
         if (data?.status && Array.isArray(data.result)) {
           const mappedProjects = data.result.map((item) => ({
             id: item.portfolio_id,
-            title: item.adddressTH, // ✅ ใช้ addressTH
+            title: item.adddressTH,
             size: item.installationsize,
             productType: item.TypeProduct_nameTH,
             panelCount: item.panelsolarcout,
@@ -54,7 +56,7 @@ export default function SlidePortfolio() {
           setIsLoading(false);
         }
       } catch (error) {
-        console.error("Error fetching portfolio:", error);
+        console.error('Error fetching portfolio:', error);
         setIsLoading(false);
       }
     };
@@ -62,22 +64,44 @@ export default function SlidePortfolio() {
     fetchData();
   }, []);
 
-  const totalGroups = Math.ceil(projects.length / 3);
+  // ฟังก์ชันแปลงวันที่
+  const formatDate = (dateString) => {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+
+    if (locale === 'th') {
+      const buddhistYear = date.getFullYear() + 543;
+      const month = date.toLocaleDateString('th-TH', { month: 'long' });
+      const day = date.getDate();
+      return `${day} ${month} ${buddhistYear}`;
+    } else {
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
+    }
+  };
+
+  // คำนวนจำนวน group
+  const slidesPerGroup = 3;
+  const totalGroups =
+    projects.length > 0 ? Math.ceil(projects.length / slidesPerGroup) : 0;
 
   const handleDotClick = (index) => {
     if (sliderRef.current) {
-      sliderRef.current.slickGoTo(index * 3);
+      sliderRef.current.slickGoTo(index * slidesPerGroup);
       setActiveSlide(index);
     }
   };
 
   const handleBeforeChange = () => setDragging(true);
   const handleAfterChange = (i) => {
-    setActiveSlide(Math.floor(i / 3));
+    setActiveSlide(Math.floor(i / slidesPerGroup));
     setTimeout(() => setDragging(false), 50);
   };
 
-  // ✅ Custom Dots (bar-style)
+  // Custom Dots (ใช้ global CSS)
   const CustomDots = () => (
     <div className="custom-dots">
       {Array.from({ length: totalGroups }).map((_, index) => (
@@ -87,37 +111,6 @@ export default function SlidePortfolio() {
           onClick={() => handleDotClick(index)}
         />
       ))}
-      <style jsx>{`
-        /* จุด slide แบบแทบส้ม */
-        .custom-dots {
-          display: flex;
-          justify-content: center;
-          margin-top: 1.5rem;
-        }
-
-        .dot-bar {
-          height: 4px;
-          width: 24px;
-          background-color: #ffe0b2;
-          border-radius: 8px;
-          margin: 0 4px;
-          cursor: pointer;
-          transition: width 0.5s ease-in-out, background-color 0.5s ease-in-out;
-          position: relative;
-          overflow: hidden;
-        }
-
-        .dot-bar.active {
-          width: 40px;
-          background-color: #E88534;
-;
-        }
-
-        .slide-item {
-          padding: 0 12px;
-          box-sizing: border-box;
-        }
-      `}</style>
     </div>
   );
 
@@ -132,24 +125,6 @@ export default function SlidePortfolio() {
     </div>
   );
 
-  const settings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 3,
-    slidesToScroll: 1,
-    swipeToSlide: true,
-    arrows: false,
-    centerMode: false,
-    beforeChange: handleBeforeChange,
-    afterChange: handleAfterChange,
-    appendDots: () => <CustomDots />,
-    responsive: [
-      { breakpoint: 1024, settings: { slidesToShow: 2, slidesToScroll: 1, swipeToSlide: true } },
-      { breakpoint: 640, settings: { slidesToShow: 1, slidesToScroll: 1, swipeToSlide: true } },
-    ],
-  };
-
   return (
     <div className="portfolio-wrapperslide">
       <br />
@@ -163,64 +138,114 @@ export default function SlidePortfolio() {
 
       {isLoading ? (
         <div className="portfolio-loading-grid">
-          {[...Array(3)].map((_, i) => <SkeletonCard key={i} />)}
+          {[...Array(3)].map((_, i) => (
+            <SkeletonCard key={i} />
+          ))}
         </div>
       ) : (
-        <Slider ref={sliderRef} {...settings}>
-          {projects.map((proj, i) => (
-            <div key={proj?.id || `proj-${i}`} className="slide-item">
-              <div
-                className="portfolio-cardslide"
-                onClick={() => !dragging && router.push(`/portfolio/${proj?.id}`)}
-              >
-                <div className="portfolioslide-image-wrapper" style={{ position: 'relative', height: 200 }}>
-                  <Image
-                    src={`${baseUrl}/${proj?.coverImage}` || '/images/placeholder.png'}
-                    alt={proj?.title || 'ไม่ระบุ'}
-                    className="portfolioslide-image"
-                    fill
-                    sizes="(max-width: 768px) 100vw, 33vw"
-                    quality={75}
-                    style={{ objectFit: 'cover' }}
-                  />
-                  <div className="portfolio-bannerslide">
+        <>
+          <Slider
+            ref={sliderRef}
+            dots={false}
+            infinite={projects.length > slidesPerGroup}
+            speed={500}
+            slidesToShow={3}
+            slidesToScroll={1}
+            swipeToSlide
+            arrows={false}
+            centerMode={false}
+            beforeChange={handleBeforeChange}
+            afterChange={handleAfterChange}
+            responsive={[
+              {
+                breakpoint: 1024,
+                settings: { slidesToShow: 2, slidesToScroll: 1, swipeToSlide: true },
+              },
+              {
+                breakpoint: 640,
+                settings: { slidesToShow: 1, slidesToScroll: 1, swipeToSlide: true },
+              },
+            ]}
+          >
+            {projects.map((proj, i) => (
+              <div key={proj?.id || `proj-${i}`} className="slide-item">
+                <div
+                  className="portfolio-cardslide"
+                  onClick={() =>
+                    !dragging && router.push(`/portfolio/${proj?.id}`)
+                  }
+                >
+                  <div
+                    className="portfolioslide-image-wrapper"
+                    style={{ position: 'relative', height: 200 }}
+                  >
                     <Image
-                      src="/images/logosak-solar.png"
-                      alt="logo"
-                      width={120}
-                      height={40}
-                      className="banner-logoslide"
+                      src={`${baseUrl}/${proj?.coverImage}` || '/images/placeholder.png'}
+                      alt={proj?.title || 'ไม่ระบุ'}
+                      className="portfolioslide-image"
+                      fill
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                      quality={75}
+                      style={{ objectFit: 'cover' }}
                     />
-                    <div className="banner-textslide">ศักดิ์สยาม โซลาร์ เอ็นเนอร์ยี่ จำกัด</div>
+                    <div className="portfolio-bannerslide">
+                      <Image
+                        src="/images/logosak-solar.png"
+                        alt="logo"
+                        width={120}
+                        height={40}
+                        className="banner-logoslide"
+                      />
+                      <div className="banner-textslide">
+                        ศักดิ์สยาม โซลาร์ เอ็นเนอร์ยี่ จำกัด
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="portfolio-contentslide">
+                    <h3
+                      className="project-titleslide"
+                      style={{
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        wordBreak: 'break-word',
+                      }}
+                    >
+                      {proj?.title || '-'}
+                    </h3>
+
+                    <ul className="project-detailsslide">
+                      <li>
+                        <strong>ขนาดติดตั้ง</strong>
+                        <span>{proj?.size || '-'}</span>
+                      </li>
+                      <li>
+                        <strong>ประเภทผลิตภัณฑ์</strong>
+                        <span>{proj?.productType || '-'}</span>
+                      </li>
+                      <li>
+                        <strong>จำนวนแผง</strong>
+                        <span>{proj?.panelCount || '-'} แผง</span>
+                      </li>
+                      <li className="date-postslide">
+                        <strong>
+                          <FaCalendar />
+                        </strong>
+                        <span>{formatDate(proj?.postDate)}</span>
+                      </li>
+                    </ul>
                   </div>
                 </div>
-
-                <div className="portfolio-contentslide">
-                  <h3 className="project-titleslide" style={{
-                    display: '-webkit-box',
-                    WebkitLineClamp: 2,
-                    WebkitBoxOrient: 'vertical',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    wordBreak: 'break-word',
-                  }}>
-                    {proj?.title || '-'}
-                  </h3>
-
-                  <ul className="project-detailsslide">
-                    <li><strong>ขนาดติดตั้ง</strong><span>{proj?.size || '-'}</span></li>
-                    <li><strong>ประเภทผลิตภัณฑ์</strong><span>{proj?.productType || '-'}</span></li>
-                    <li><strong>จำนวนแผง</strong><span>{proj?.panelCount || '-'} แผง</span></li>
-                    <li className="date-postslide">
-                      <strong><FaCalendar /></strong>
-                      <span>{proj?.postDate || '-'}</span>
-                    </li>
-                  </ul>
-                </div>
               </div>
-            </div>
-          ))}
-        </Slider>
+            ))}
+          </Slider>
+
+          {/* custom dots */}
+          <CustomDots />
+        </>
       )}
     </div>
   );

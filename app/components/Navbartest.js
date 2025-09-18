@@ -11,53 +11,45 @@ import Image from 'next/image';
 export default function Navbar() {
     const { messages, switchLocale, locale } = useLocale();
     const pathname = usePathname();
-    const isHomePage = pathname === '/';
     const isAboutPage = pathname === '/About';
     const isContactPage = pathname === '/Contact';
 
     return (
         <div className={styles.navWrapper}>
             <nav className={styles.navbar}>
-
+                {/* โลโก้ */}
                 <div className={styles.leftSection}>
                     <div className={styles.logoContainer}>
-                        <div className={styles.logoContainer}>
-                            <Image
-                                src="/logo/logo-Sukhumvit.png"
-                                alt="Saksiame Solar ศักดิ์สยามโซลาร์"
-                                fill
-                                sizes="(max-width: 768px) 180px, (max-width: 1200px) 300px, 450px"
-                                style={{ objectFit: 'contain' }}
-                                priority
-                            />
-
-                        </div>
-
-
-
-
+                        <Image
+                            src="/logo/logo-Sukhumvit.png" // ต้องมีไฟล์จริงใน public/logo/
+                            alt="Saksiame Solar ศักดิ์สยามโซลาร์"
+                            width={200}
+                            height={60}
+                            style={{ objectFit: 'contain' }}
+                            priority
+                        />
                     </div>
                 </div>
 
+                {/* ภาษา + เมนู */}
                 <div className={styles.localeContactGroup}>
                     <div className={styles.localeButtons}>
                         <span
-                            className={`${styles.localeItem} ${locale === 'th' ? styles.disabled : ''} `}
+                            className={`${styles.localeItem} ${locale === 'th' ? styles.disabled : ''}`}
                             onClick={() => locale !== 'th' && switchLocale('th')}
                         >
                             TH
                         </span>
-
                         <span className={styles.localeDivider}> | </span>
-
                         <span
-                            className={`${styles.localeItem} ${locale === 'en' ? styles.disabled : ''} `}
+                            className={`${styles.localeItem} ${locale === 'en' ? styles.disabled : ''}`}
                             onClick={() => locale !== 'en' && switchLocale('en')}
                         >
                             ENG
                         </span>
                     </div>
-                    {/* ✅ ปุ่มติดต่อเรา + เกี่ยวกับเรา+ โทร */}
+
+                    {/* ปุ่มติดต่อเรา */}
                     <div className={styles.contactActions}>
                         <a href="tel:1487" className={styles.callLink} title="โทร 1487">
                             <FaPhone className={styles.phoneIcon} />
@@ -66,23 +58,18 @@ export default function Navbar() {
                         <div className="flex items-center gap-2">
                             <Link
                                 href="https://saksiam.com/home"
-                                className={`${styles.contact}  font-500`}
+                                className={`${styles.contact} font-500`}
                             >
                                 {messages.backpage}
                             </Link>
-
                             <span> | </span>
-
-
                             <Link
                                 href="/About/"
                                 className={`${styles.contact} ${isAboutPage ? styles.active : ''} font-500`}
                             >
                                 {messages.about}
                             </Link>
-
                             <span> | </span>
-
                             <Link
                                 href="/Contact/"
                                 className={`${styles.contact} ${isContactPage ? styles.active : ''} font-500`}
@@ -91,9 +78,8 @@ export default function Navbar() {
                             </Link>
                         </div>
                     </div>
-                </div >
-            </nav >
-        </div >
-
+                </div>
+            </nav>
+        </div>
     );
 }

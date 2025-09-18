@@ -1,28 +1,14 @@
 .navbar {
-  width: calc(100% - 70px); /* ลดความกว้าง 20px (ซ้าย+ขวา = 10px+10px) */
+  width: calc(100% - 70px); /* ลดความกว้าง 70px (ซ้าย+ขวา) */
   margin: 0 auto; /* กึ่งกลาง */
-  padding: 0.5rem 5rem; /*เว้นขอบซ้าย-ขวาให้ห่างขึ้น */
+  padding: 0.5rem 5rem; /* เว้นขอบซ้าย-ขวาให้ห่างขึ้น */
   display: flex;
   justify-content: space-between;
-  background-color: rgb(255, 255, 255);
+  background-color: #fff;
   border-bottom: 2.5px solid #F2780C;
-  
-  position: relative; /* ต้องมีสำหรับ ::after */
+  position: relative;
 }
-/* .navbar::after {
-  content: '';
-  position: absolute;
-  bottom: -19px; /* ปรับค่าลงล่างมากขึ้น */
-  /* left:50%;
-  transform: translateX(-50%);
-  width: 40%;
-  height: 50px;
-  background-image: url('/images/wave-On.png');
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center;
-  z-index: 1;
-/* } */  
+
 /* กลุ่มโลโก้ + ชื่อบริษัท */
 .logoTitleGroup {
   display: flex;
@@ -39,7 +25,7 @@
   font-size: 23px;
   margin: 0;
   color: #11377c;
-  font-weight: 400; /*ตัวไม่หนา */
+  font-weight: 400;
 }
 
 .companyName h3 {
@@ -65,19 +51,20 @@
   font-size: 16px;
   color: #cbdceb;
   user-select: none;
-  gap: 0rem; /* เพิ่มช่องว่างระหว่างภาษา */
-  margin: 0px 8px;
+  margin: 0 8px;
   margin-left: auto;
 }
+
 .localeButtons > :hover {
   color: #f87f0b;
   cursor: pointer;
   transition: color 0.3s ease;
 }
+
 .localeItem {
   cursor: pointer;
   transition: opacity 0.2s ease;
-  font-weight: 400 !important; /* ใช้ Thin */
+  font-weight: 400 !important;
 }
 
 .localeItem.disabled {
@@ -85,9 +72,6 @@
   pointer-events: none;
 }
 
-.separator {
-  width: 0rem;
-}
 /* เส้นตรงกลางปุ่มเปลี่ยนภาษา */
 .separator {
   border-left: 1.8px solid #19489d;
@@ -97,65 +81,38 @@
 
 /* ปุ่มติดต่อเรา */
 .contactButton {
-  /* background-color:; */
   border: none;
   border-radius: 6px;
   padding: 9px 12px;
-  color: white;
+  color: #fff;
   font-weight: 400;
   cursor: pointer;
   font-size: 14px;
   user-select: none;
-  /* transition: background-color 0.2s; */
 }
 
 .contactButton:hover {
-  /* background-color: #11377c; */
   color: #cbdceb;
 }
+
+.contactButton.active {
+  background-color: #f87f0b;
+  color: #fff;
+}
+
 .contactActions {
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
-.contactButton.active {
-  background-color: #f87f0b;
-  color: white;
-}
 
-/*   
-  ปุ่มโทรศัพท์
-  .callLink {
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-    color: #19489D;
-    font-size: 16px;
-    font-weight: 500;
-    gap: 6px;
-    line-height: 1; 
-  }
-  
-  .phoneIcon {
-    font-size: 23px;
-    color: #19489D;
-    display: flex;
-    align-items: center; 
-  }
-    .phoneNumber {
-    color: #19489D;
-    font-size: 25px;
-    font-weight: 600; 
-
-  }
-     */
 /* ========== เดสก์ท็อปหน้าจอแคบ (ไม่ให้ h1/h3 ตกบรรทัด) ========== */
 @media (max-width: 1280px) {
   .companyName {
-    white-space: nowrap; /* ไม่ให้ตัดบรรทัด */
+    white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis; /* ถ้ายาวเกินให้ ... */
-    max-width: 400px; /* ปรับตามพื้นที่ที่เหลือ */
+    text-overflow: ellipsis;
+    max-width: 400px;
   }
 
   .companyName h1 {
@@ -200,14 +157,6 @@
     font-size: 12px;
   }
 
-  /* ซ่อนข้อความชื่อบริษัทเมื่อหน้าจอแคบมาก */
-  @media (max-width: 480px) {
-    .companyName h1,
-    .companyName h3 {
-      display: none;
-    }
-  }
-
   .localeContactGroup {
     flex-direction: column;
     align-items: flex-end;
@@ -226,5 +175,13 @@
   .separator {
     height: 16px;
     margin: 0 4px;
+  }
+}
+
+/* ========== จอเล็กมาก (มือถือ <= 480px) ========== */
+@media (max-width: 480px) {
+  .companyName h1,
+  .companyName h3 {
+    display: none;
   }
 }

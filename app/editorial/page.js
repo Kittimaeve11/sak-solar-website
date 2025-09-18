@@ -11,7 +11,7 @@ const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 
 export default function EditorialListPage() {
-  const locale = useLocale(); // 'th' หรือ 'en'
+  const locale = useLocale(); 
   const [articles, setArticles] = useState([]);
   const [types, setTypes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -21,7 +21,8 @@ export default function EditorialListPage() {
   const [shouldAnimate, setShouldAnimate] = useState(false);
   const [banners, setBanners] = useState([]);
   const [loadingBanner, setLoadingBanner] = useState(true);
-  const [bannerLoaded, setBannerLoaded] = useState({}); // track การโหลดแต่ละ Banner
+  const [bannerLoaded, setBannerLoaded] = useState({}); 
+  const [imgError, setImgError] = useState({});
 
   const router = useRouter();
   const topRef = useRef(null);
@@ -164,12 +165,13 @@ export default function EditorialListPage() {
                 src={`${baseUrl}/${item.brander_picturePC}`}
                 alt={item.brander_name || 'Editorial Banner'}
                 fill
+                priority
                 style={{
                   objectFit: 'cover',
                   opacity: loaded ? 1 : 0,
                   transition: 'opacity 0.5s ease'
                 }}
-                onLoadingComplete={() =>
+                onLoad={() =>
                   setBannerLoaded(prev => ({ ...prev, [item.brander_ID]: true }))
                 }
                 unoptimized
@@ -183,6 +185,7 @@ export default function EditorialListPage() {
             src="/images/no-image.jpg"
             alt="Banner fallback"
             fill
+            priority
             style={{ objectFit: 'cover' }}
           />
         )}
@@ -233,15 +236,20 @@ export default function EditorialListPage() {
               const title = locale === 'en' ? item.editoria_titieEN : item.editoria_titieTH;
               const description = locale === 'en' ? item.editoria_descriptionEN : item.editoria_descriptionTH;
 
+              const imgSrc = imgError[item.editoria_num]
+                ? '/images/no-image.jpg'
+                : getImageUrl(item.editoria_gallary);
+
               return (
                 <div key={item.editoria_num} className="editorial-card" onClick={() => router.push(`/editorial/${item.editoria_num}`)}>
                   <Image
-                    src={getImageUrl(item.editoria_gallary)}
+                    src={imgSrc}
                     alt={title}
                     width={400}
                     height={200}
+                    style={{ width: '100%', height: 'auto' }}
                     className="card-image"
-                    onError={(e) => { e.currentTarget.src = '/images/no-image.jpg'; }}
+                    onError={() => setImgError(prev => ({ ...prev, [item.editoria_num]: true }))}
                   />
                   <div className="card-content">
                     <h3 className="card-title">{title}</h3>

@@ -49,16 +49,14 @@ export default function SlideEditorial() {
             title: item.editoria_titieTH,
             date: new Date(item.editoria_creacteAt).toLocaleDateString('th-TH', {
               day: 'numeric',
-              month: 'long', // เปลี่ยนเป็น long → สิงหาคม
+              month: 'long',
               year: 'numeric'
             }),
-            content: parseDescription(item.editoria_descriptionTH), // ✅ ใช้ parseDescription แทน parseHtmlString
+            content: parseDescription(item.editoria_descriptionTH),
             mainImage: item.editoria_gallary
               ? `${baseUrl}/${item.editoria_gallary.replace(/^"+|"+$/g, '').replace(/\\/g, '/')}`
               : '/images/no-image.jpg'
           }));
-
-
           setEditorials(formatted);
         } else {
           setEditorials([]);
@@ -127,7 +125,6 @@ export default function SlideEditorial() {
         <span className="skeleton skeleton-lineeditorial" />
         <span className="skeleton skeleton-lineeditorial" />
       </div>
-
     </div>
   );
 
@@ -153,7 +150,6 @@ export default function SlideEditorial() {
             const globalMiddleIndex = currentGroupStart + middleIndexInGroup;
             const isMiddle = index === globalMiddleIndex;
 
-            //  ใช้ snippet จาก content ที่ทำความสะอาดแล้ว
             const snippet = item.content.length > 100
               ? item.content.slice(0, 100) + '...'
               : item.content;
@@ -173,8 +169,8 @@ export default function SlideEditorial() {
                       alt={item.title}
                       width={400}
                       height={200}
-                      className="card-img"
-                      onError={(e) => { e.currentTarget.src = '/images/no-image.jpg'; }}
+                      style={{ width: '100%', height: 'auto' }} // ป้องกัน aspect ratio error
+                      onErrorCapture={(e) => { e.currentTarget.src = '/images/no-image.jpg'; }}
                     />
                   </div>
                   <div className="card-contentslide">

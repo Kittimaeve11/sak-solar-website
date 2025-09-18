@@ -464,7 +464,7 @@
   justify-content: space-between;
   padding: 8px 0;
   padding-left: 3rem;
-  /* ✅ ย่อหน้าเข้าไปทั้งบรรทัด */
+  /*  ย่อหน้าเข้าไปทั้งบรรทัด */
   position: relative;
   border-bottom: 1px dashed #ccc;
 
@@ -543,13 +543,12 @@
 
   .topGrid,
   .bottomGrid {
-    grid-template-columns: 1fr;
-    /* เรียงลงทีละแถว */
+    grid-template-columns: 1fr; /* เรียงลงทีละแถว */
   }
 
   .productList {
     flex-direction: row;
-    /* ✅ ให้เรียงแนวนอนเสมอ */
+    /*  ให้เรียงแนวนอนเสมอ */
     justify-content: center;
     gap: 1rem;
   }
