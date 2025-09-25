@@ -39,15 +39,18 @@ const Gallery = ({ images = [] }) => {
     .map((src) => ({ src, thumb: src }));
 
   const visibleCount = 2; // ภาพที่แสดงจริง
-  const showMoreIndex = visibleCount; // index สำหรับปุ่ม
   const total = dynamicElements.length;
 
-  const hasMore = total > visibleCount;
+  // ✅ มีปุ่ม "ดูเพิ่มเติม" ถ้าเกิน 3 รูป
+  const hasMore = total > visibleCount + 1;
+  const showMoreIndex = visibleCount;
+
+  // ✅ จำนวนภาพที่เหลือจริง
   const hiddenCount = hasMore ? total - (visibleCount + 1) : 0;
 
   const visibleImages = hasMore
-    ? dynamicElements.slice(0, visibleCount) // แสดงแค่ 2 ภาพแรก
-    : dynamicElements.slice(0, total);      // แสดงทั้งหมดถ้าน้อยกว่า 3
+    ? dynamicElements.slice(0, visibleCount)
+    : dynamicElements;
 
   return (
     <LightGallery
@@ -57,7 +60,7 @@ const Gallery = ({ images = [] }) => {
       speed={500}
       dynamicEl={dynamicElements}
       plugins={[lgThumbnail, lgAutoplay, lgZoom, lgVideo, lgRotate, lgShare]}
-      licenseKey="your_license_key" // ใช้ license จริงถ้ามี
+      licenseKey="your_license_key"
     >
       <div className={styles.galleryGrid}>
         {visibleImages.map((item, index) => (
@@ -93,7 +96,7 @@ const Gallery = ({ images = [] }) => {
             <div className={styles.overlay}>
               ดูเพิ่มเติม
               <br />
-              {hiddenCount > 0 ? `${hiddenCount} ภาพ` : '0 ภาพ'}
+              {hiddenCount} ภาพ
             </div>
           </div>
         )}

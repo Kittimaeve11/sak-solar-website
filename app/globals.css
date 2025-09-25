@@ -1,28 +1,34 @@
+/* ================================
+   ฟอนต์ SukhumvitTadmai
+   ================================ */
 @font-face {
   font-family: 'SukhumvitTadmai';
   src: url('/fonts/SukhumvitTadmai-Text.otf') format('opentype');
-  font-weight: 400;
-  /* normal */
+  font-weight: 400; /* น้ำหนักปกติ */
 }
 
 @font-face {
   font-family: 'SukhumvitTadmai';
   src: url('/fonts/SukhumvitTadmai-UltraLight.otf') format('opentype');
-  font-weight: 200;
+  font-weight: 200; /* น้ำหนักบางพิเศษ */
 }
 
 @font-face {
   font-family: 'SukhumvitTadmai';
   src: url('/fonts/SukhumvitTadmai-SemiBold.otf') format('opentype');
-  font-weight: 600;
+  font-weight: 600; /* กึ่งหนา */
 }
 
 @font-face {
   font-family: 'SukhumvitTadmai';
   src: url('/fonts/SukhumvitTadmai-ExtraBold.otf') format('opentype');
-  font-weight: 800;
+  font-weight: 800; /* หนามาก */
 }
 
+
+/* ================================
+   คลาสฟอนต์เพิ่มเติม
+   ================================ */
 .font-300 {
   font-family: 'SukhumvitTadmai', sans-serif;
   font-weight: 200;
@@ -33,46 +39,29 @@
 .font-500 {
   font-family: 'SukhumvitTadmai', sans-serif;
   font-weight: 400;
-  text-shadow: 0 0 0 0.2px black;
+  text-shadow: 0 0 0 0.2px black; /* เพิ่มความคมเล็กน้อย */
 }
 
 .font-700 {
   font-family: 'SukhumvitTadmai', sans-serif;
   font-weight: 600;
-  text-shadow: 0.3px 0 black, -0.3px 0 black;
+  text-shadow: 0.3px 0 black, -0.3px 0 black; /* ขอบตัวอักษรบาง */
 }
 
 
-/* ใช้ SukhumvitTadmai แบบที่ฝังไว้ */
+/* ================================
+   การตั้งค่าพื้นฐาน
+   ================================ */
 * {
   font-family: "SukhumvitTadmai", sans-serif;
   font-weight: 400;
   box-sizing: border-box;
 }
 
-.error-page {
-  font-family: "SukhumvitTadmai", sans-serif;
-  font-weight: 400;
-  color: #243865;
-}
-
-/* :root {
-  --nav-color: #102e50;
-  --nav-hover-color: gray;
-  --accent-color: #e78b48;
-  --nav-dropdown-background-color: #fff;
-  --nav-dropdown-color: #102e50;
-  --nav-dropdown-hover-color: gray;
-  --nav-font: Arial, sans-serif;
-  --nav-mobile-background-color: #fff;
-  --default-color: #000;
-  --contrast-color: #fff;
-} */
-
 body {
   margin: 0;
   padding: 0;
-  overflow-x: hidden;
+  overflow-x: hidden; /* ป้องกันการเลื่อนในแนวนอน */
 }
 
 html {
@@ -81,16 +70,19 @@ html {
 }
 
 
-/* แทปใต้ Banner */
-.headline {
-  background-color: #0D3973;
-  color: white;
-  text-align: center;
-  padding: 10px 5px;
-  margin: 0px 0;
-  line-height: 1.8;
+/* ================================
+   สไตล์หน้า Error
+   ================================ */
+.error-page {
+  font-family: "SukhumvitTadmai", sans-serif;
+  font-weight: 400;
+  color: #243865;
 }
 
+
+/* ================================
+   หัวข้อ (Heading)
+   ================================ */
 h1 {
   font-size: 30px;
   color: #0D3973;
@@ -99,7 +91,6 @@ h1 {
 h2 {
   font-size: 24px;
   color: #0D3973;
-
 }
 
 h3 {
@@ -115,19 +106,38 @@ h4 {
 h5 {
   font-size: 16px;
   color: #0D3973;
-
 }
 
 h6 {
   font-size: 14px;
   color: #0D3973;
-
 }
 
+
+/* ================================
+   ส่วนหัวข้อใต้ Banner
+   ================================ */
+.headline {
+  background-color: #0D3973;
+  color: white;
+  text-align: center;
+  padding: 10px 5px;
+  margin: 0;
+  line-height: 1.8;
+}
+
+
+/* ================================
+   คลาสยูทิลิตี้
+   ================================ */
 .no-margin {
   margin-top: -1rem !important;
 }
 
+
+/* ================================
+   โครงร่างเลย์เอาท์
+   ================================ */
 .container {
   padding: 0;
   margin: 0;
@@ -136,19 +146,19 @@ h6 {
 }
 
 .layout-container {
-  width: 1200px;
-  /*  ปกติจะอยู่ที่ 1200px */
-  max-width: 1500px;
-  /*  จำกัดไม่ให้เกิน 1500px ตอนซูม */
+  width: 1200px;       /* ขนาดมาตรฐาน */
+  max-width: 1500px;   /* จำกัดขนาดสูงสุดเมื่อซูม */
   margin: 0 auto;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   padding: 0 16px 50px 16px;
   gap: 24px;
-  /* ช่องไฟระหว่างบล็อก */
 }
 
+/* ================================
+   หัวข้อ (Title)
+   ================================ */
 .headtitle {
   font-size: clamp(1.5rem, 5vw, 2rem);
   font-weight: 600;
@@ -165,22 +175,27 @@ h6 {
   color: #F27C1B;
 }
 
+/* ปรับการตัดคำให้รองรับภาษาไทยและไม่บีบข้อความ */
 .headtitle,
 .headtitleone {
-  white-space: normal;          /* อนุญาตให้ขึ้นบรรทัดใหม่ */
-  word-break: keep-all;         /* ไม่ตัดคำกลางพยางค์ */
-  line-break: strict;           /* จัดการตัดคำภาษาไทยให้ถูกต้อง */
-  overflow-wrap: break-word;    /* ถ้าจำเป็นจริง ๆ ค่อยตัดทั้งคำ */
+  white-space: normal;       /* อนุญาตให้ขึ้นบรรทัดใหม่ */
+  word-break: keep-all;      /* ไม่ตัดคำกลางพยางค์ */
+  line-break: strict;        /* ตัดคำภาษาไทยให้ถูกต้อง */
+  overflow-wrap: break-word; /* ตัดคำเมื่อยาวเกินจริง ๆ */
 }
 
+/* สำหรับข้อความที่ต้องการไม่ให้แตกบรรทัด */
 .keep-together {
-  white-space: nowrap; /* ห้ามแตกบรรทัดใน span นี้ */
+  white-space: nowrap;
   font-weight: 600;
   text-align: center;
   margin-bottom: 0.5rem;
 }
 
 
+/* ================================
+   ปุ่มหลัก (Primary Button)
+   ================================ */
 .buttonPrimary {
   font-weight: 400;
   padding: 0.6rem 1.8rem;
@@ -191,13 +206,14 @@ h6 {
   cursor: pointer;
   transition: background-color 0.2s ease;
   margin: 1rem 0.5rem;
-  /* ✅ เพิ่มระยะห่างซ้ายขวา */
 }
 
 .buttonPrimary:hover {
   background: #1E61DC;
 }
 
+
+/* ปุ่มลบหลัก (Delete Button) */
 .buttonDelete {
   font-weight: 400;
   padding: 0.6rem 1.8rem;
@@ -208,13 +224,16 @@ h6 {
   cursor: pointer;
   transition: background-color 0.2s ease;
   margin: 1rem 0.5rem;
-  /* ✅ เพิ่มระยะห่างซ้ายขวา */
 }
 
 .buttonDelete:hover {
   background: #d50000;
 }
 
+
+/* ================================
+   ปุ่มรองโทนสีน้ำเงิน (Secondary Blue)
+   ================================ */
 .buttonSecondarybule {
   font-weight: 400;
   padding: 0.6rem 1.8rem;
@@ -225,8 +244,6 @@ h6 {
   cursor: pointer;
   transition: all 0.2s ease;
   margin: 1rem 0.5rem;
-  /*  เพิ่มระยะห่างซ้ายขวา */
-
 }
 
 .buttonSecondarybule:hover {
@@ -234,6 +251,7 @@ h6 {
   color: white;
 }
 
+/* ปุ่มรองโทนสีน้ำเงิน พร้อมเงา */
 .buttonSecondaryonebule {
   font-weight: 400;
   padding: 0.6rem 1.8rem;
@@ -244,7 +262,6 @@ h6 {
   cursor: pointer;
   transition: all 0.2s ease;
   margin: 1rem 0.5rem;
-  /*  เพิ่มระยะห่างซ้ายขวา */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
@@ -253,6 +270,10 @@ h6 {
   color: white;
 }
 
+
+/* ================================
+   ปุ่มรองโทนสีแดง (Secondary Red)
+   ================================ */
 .buttonSecondarydelte {
   font-weight: 400;
   padding: 0.6rem 1.8rem;
@@ -263,8 +284,6 @@ h6 {
   cursor: pointer;
   transition: all 0.2s ease;
   margin: 1rem 0.5rem;
-  /*  เพิ่มระยะห่างซ้ายขวา */
-
 }
 
 .buttonSecondarydelte:hover {
@@ -272,6 +291,7 @@ h6 {
   color: white;
 }
 
+/* ปุ่มรองโทนสีแดง พร้อมเงา */
 .buttonSecondaryonedelte {
   font-weight: 400;
   padding: 0.6rem 1.8rem;
@@ -282,7 +302,6 @@ h6 {
   cursor: pointer;
   transition: all 0.2s ease;
   margin: 1rem 0.5rem;
-  /*  เพิ่มระยะห่างซ้ายขวา */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
@@ -291,6 +310,10 @@ h6 {
   color: white;
 }
 
+
+/* ================================
+   ปุ่มหลักโทนสีส้ม (Primary Orange)
+   ================================ */
 .buttonPrimaryorange {
   font-weight: 400;
   padding: 0.6rem 1.8rem;
@@ -301,13 +324,16 @@ h6 {
   cursor: pointer;
   transition: background-color 0.2s ease;
   margin: 1rem 0.5rem;
-  /* ✅ เพิ่มระยะห่างซ้ายขวา */
 }
 
 .buttonPrimaryorange:hover {
   background: #d9742a;
 }
 
+
+/* ================================
+   ปุ่มรองโทนสีส้ม (Secondary Orange)
+   ================================ */
 .buttonSecondaryorange {
   font-weight: 400;
   padding: 0.6rem 1.8rem;
@@ -318,8 +344,6 @@ h6 {
   cursor: pointer;
   transition: all 0.2s ease;
   margin: 1rem 0.5rem;
-  /*  เพิ่มระยะห่างซ้ายขวา */
-
 }
 
 .buttonSecondaryorange:hover {
@@ -327,6 +351,7 @@ h6 {
   color: white;
 }
 
+/* ปุ่มรองโทนสีส้ม พร้อมเงา */
 .buttonSecondaryoneorange {
   font-weight: 400;
   padding: 0.6rem 1.8rem;
@@ -337,7 +362,6 @@ h6 {
   cursor: pointer;
   transition: all 0.2s ease;
   margin: 1rem 0.5rem;
-  /*  เพิ่มระยะห่างซ้ายขวา */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
@@ -346,17 +370,18 @@ h6 {
   color: white;
 }
 
-/* ฟอร์ม */
+/* ====== ฟอร์มหลัก ====== */
 .form-container {
-  /* background-color: #FAFBFF; */
+  /* กล่องครอบฟอร์ม */
   width: 100%;
-  /* padding: 2rem; */
+  max-width: 500px;       /* จำกัดความกว้างสูงสุด */
+  margin: 0 auto;         /* จัดกึ่งกลาง */
   border-radius: 8px;
-  max-width: 500px;
-  margin: 0 auto;
+  /* background-color: #FAFBFF;  ถ้าต้องการสีพื้นหลังเปิดอันนี้ */
+  /* padding: 2rem;        สามารถเพิ่ม padding ได้ถ้าต้องการ */
 }
 
-/* ====== Label ====== */
+/* ====== ป้ายกำกับ (Label) ====== */
 .form-label {
   display: block;
   margin-top: 1rem;
@@ -364,7 +389,7 @@ h6 {
   color: #264798;
 }
 
-/* ====== Text Input Field ====== */
+/* ====== ช่องกรอกข้อความ (Input Text) ====== */
 .form-field {
   width: 100%;
   padding: 0.6rem;
@@ -377,6 +402,7 @@ h6 {
   transition: border-color 0.3s ease, background-color 0.3s ease;
 }
 
+/* เอฟเฟกต์เมื่อโฟกัส input */
 .form-field:focus {
   border-color: #367AF5;
   outline: none;
@@ -385,11 +411,12 @@ h6 {
   color: #264798;
 }
 
+/* สีตัวอักษร placeholder */
 .form-field::placeholder {
   color: #AAAAAB;
 }
 
-/* ====== Select Dropdown ====== */
+/* ====== กล่องเลือก (Select Dropdown) ====== */
 .form-select-wrapper {
   margin-bottom: 1rem;
 }
@@ -406,7 +433,7 @@ h6 {
   border: 1px solid #ccc;
   border-radius: 4px;
   background-color: white;
-  appearance: none;
+  appearance: none; /* ซ่อน UI เริ่มต้นของ browser */
   font-size: 15px;
   color: #264798;
   line-height: 1.5;
@@ -420,8 +447,7 @@ h6 {
 }
 
 .form-select.placeholder {
-  color: #AAAAAB;
-  /* สีอ่อนสำหรับ placeholder */
+  color: #AAAAAB; /* สีอ่อน ใช้แทน placeholder */
 }
 
 .form-select:focus {
@@ -432,6 +458,7 @@ h6 {
   background-color: #fff;
 }
 
+/* ลูกศรของ select (สามารถปรับแต่งเองได้) */
 .select-arrow {
   position: absolute;
   right: 1rem;
@@ -442,18 +469,14 @@ h6 {
   font-size: 1.3rem;
 }
 
-/* ====== Checkbox ====== */
-.form-checkbox {
-  margin-right: 0.5rem;
-}
-
+/* ====== กล่องข้อความยาว (Textarea) ====== */
 .form-textarea {
   width: 100%;
   padding: 0.6rem;
   border: 1px solid #ccc;
   border-radius: 4px;
   font-size: 15px;
-  resize: vertical;
+  resize: vertical; /* ปรับความสูงได้ */
   color: #264798;
   transition: border-color 0.3s ease, background-color 0.3s ease;
 }
@@ -465,7 +488,7 @@ h6 {
   background-color: #fff;
 }
 
-/* ====== Error Message ====== */
+/* ====== ข้อความแสดง error ====== */
 .error-text {
   color: rgb(236, 3, 3);
   font-size: 14px;
@@ -474,10 +497,10 @@ h6 {
 }
 
 .required-asterisk {
-  color: rgb(236, 3, 3);
+  color: rgb(236, 3, 3); /* ดาวสีแดง สำหรับช่องบังคับ */
 }
 
-/* ====== Checkbox Custom Styling ====== */
+/* ====== Checkbox ====== */
 .checkbox-wrapper {
   margin-top: 1rem;
 }
@@ -504,12 +527,13 @@ h6 {
   height: 1rem;
   width: 1rem;
   border: 2px solid #367AF5;
-  border-radius: 50%;
+  border-radius: 50%; /* ถ้าต้องการสี่เหลี่ยมเปลี่ยนเป็น 4px */
   background-color: #fff;
   transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-.checkbox-input:checked~.custom-checkbox {
+/* เมื่อ checkbox ถูกเลือก */
+.checkbox-input:checked ~ .custom-checkbox {
   background-color: #367AF5;
   box-shadow: inset 0 0 0 2.5px white;
 }
@@ -537,6 +561,7 @@ h6 {
   transition: border-color 0.3s ease, background-color 0.3s ease;
 }
 
+/* จุดกลางเมื่อ radio ถูกเลือก */
 .radio-input:checked::before {
   content: "";
   position: absolute;
@@ -550,9 +575,9 @@ h6 {
   transition: background-color 0.3s ease;
 }
 
-/* ====== Error Styling ====== */
+/* ====== สถานะ Error ====== */
 
-/* สำหรับกลุ่ม radio ที่มี error */
+/* radio มี error */
 .error-border .radio-input {
   border-color: red !important;
 }
@@ -561,34 +586,23 @@ h6 {
   background-color: red !important;
 }
 
-/* สำหรับ input, select, textarea ที่มี error */
-.error-border .radio-input {
-  border-color: red;
-}
-
-.error-border .radio-input:checked::before {
-  background-color: red;
-}
-
+/* input, select, textarea ที่มี error */
 .input-error {
   border: 1px solid red !important;
 }
 
-/* กรณี input, select ที่ใช้ class error-border */
 .form-field.error-border,
 .form-select.error-border,
 .form-textarea.error-border {
   border: 2px solid red !important;
 }
 
-/* เมาส์ชี้แล้วดุ๊กดิ๊ก */
-@keyframes wiggle {
 
-  0%,
-  100% {
+/* ====== เอฟเฟกต์ wiggle เวลา hover ====== */
+@keyframes wiggle {
+  0%, 100% {
     transform: rotate(0deg);
   }
-
   50% {
     transform: rotate(5deg);
   }
@@ -598,24 +612,23 @@ h6 {
   animation: wiggle 0.6s ease-in-out infinite;
 }
 
-
+/* ====== กรอบวงกลมพร้อมเงา ====== */
 .circle-shadow {
   width: 55px;
   height: 55px;
-  border-radius: 50%;
-  overflow: hidden;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-  /* ลดความฟุ้งลง */
+  border-radius: 50%;                /* ทำให้เป็นวงกลม */
+  overflow: hidden;                  /* ตัดเนื้อหาที่เกิน */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* เงา */
   display: inline-block;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .circle-shadow:hover {
-  transform: scale(1.05);
+  transform: scale(1.05);            /* ขยายเล็กน้อย */
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-  /* เงาเวลา hover นุ่มขึ้นแต่ยังคม */
 }
 
+/* ====== พื้นที่แบนเนอร์ ====== */
 .banner-container {
   width: 100%;
 }
@@ -629,15 +642,15 @@ h6 {
 .banner-image {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: cover; /* ครอบพื้นที่ให้เต็ม */
 }
 
+/* ====== สปินเนอร์ (วงกลมหมุนโหลดข้อมูล) ====== */
 .spinner-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100px;
-  /* 👈 ปรับสูงพอให้ spinner อยู่กลาง */
+  min-height: 100px; /* ความสูงขั้นต่ำเพื่อให้อยู่ตรงกลาง */
   width: 100%;
 }
 
@@ -645,7 +658,7 @@ h6 {
   width: 60px;
   height: 60px;
   border: 6px solid #ccc;
-  border-top: 6px solid #F25C05;
+  border-top: 6px solid #F25C05;  /* แถบสีหมุน */
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -656,7 +669,7 @@ h6 {
   }
 }
 
-
+/* ====== ข้อความ ... (ellipsis) ====== */
 .ellipsis {
   display: flex;
   align-items: center;
@@ -664,15 +677,13 @@ h6 {
   font-weight: 600;
 }
 
-
-
+/* ====== ปุ่มเปลี่ยนหน้า (pagination) ====== */
 .page-buttons {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   justify-content: center;
 }
-
 
 .page-buttons button {
   padding: 6px 12px;
@@ -685,7 +696,6 @@ h6 {
   transition: background-color 0.2s ease;
   flex-direction: row;
 }
-
 
 .page-buttons button:hover {
   background-color: #f0f0f0;
@@ -703,7 +713,7 @@ h6 {
   opacity: 0.5;
 }
 
-/* Button with arrow */
+/* ====== ปุ่มพร้อมลูกศร ====== */
 .btn-with-arrow {
   display: inline-flex;
   align-items: center;
@@ -722,8 +732,6 @@ h6 {
   background-color: #f0f0f0;
 }
 
-
-
 .arrow-icon {
   font-size: 14px;
   line-height: 1;
@@ -731,6 +739,7 @@ h6 {
   color: #313131;
 }
 
+/* ====== ลิงก์อ่านเพิ่มเติม (Read More) ====== */
 .read-more {
   display: inline-flex;
   align-items: center;
@@ -757,6 +766,7 @@ h6 {
   text-decoration: none !important;
 }
 
+/* ====== ลิงก์ดูทั้งหมด ====== */
 .view-all {
   font-size: 1rem;
   color: #0056b3;
@@ -766,19 +776,19 @@ h6 {
   transition: color 0.3s ease;
   display: inline-flex;
   align-items: center;
-  gap: 0.1rem;
-  /* หรือ 4px */
+  gap: 0.1rem; /* ระยะห่างเล็กน้อย */
 }
 
 .view-all:hover {
   color: #E88534;
 }
 
-.icon-view{
+.icon-view {
   width: 20px;
   height: 20px;
 }
-/* จุด slide แบบแทบส้ม */
+
+/* ====== จุด slide แบบแท่งส้ม ====== */
 .custom-dots {
   display: flex;
   justify-content: center;
@@ -800,10 +810,25 @@ h6 {
 .dot-bar.active {
   width: 40px;
   background-color: #E88534;
-;
 }
 
 .slide-item {
   padding: 0 12px;
   box-sizing: border-box;
 }
+
+/* ====== Fade-in animation ====== */
+.fade-in {
+  opacity: 0;
+  animation: fadeIn 0.8s ease-in forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+

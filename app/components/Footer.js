@@ -12,17 +12,18 @@ const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 export default function Footer() {
   const [socials, setSocials] = useState([]);
   const [policies, setPolicies] = useState([]);
-  const [dynamicProducts, setDynamicProducts] = useState([]); 
-  const [contact, setContact] = useState(null); // ✅ contact จาก API
+  const [dynamicProducts, setDynamicProducts] = useState([]);
+  const [contact, setContact] = useState(null);
+
+  const [loadingPolicies, setLoadingPolicies] = useState(true);
+  const [loadingContact, setLoadingContact] = useState(true);
 
   useEffect(() => {
-    // โหลด social media (จากไฟล์ local api/data เดิม ถ้ายังต้องใช้)
     fetch("/api/data")
       .then((res) => res.json())
       .then((data) => setSocials(data.socials || []))
       .catch(() => setSocials([]));
 
-    // โหลดนโยบาย
     const fetchPolicies = async () => {
       try {
         const res = await fetch(`${baseUrl}/api/policyapi`, {
@@ -37,10 +38,11 @@ export default function Footer() {
       } catch (error) {
         console.error("Error fetching policies:", error);
         setPolicies([]);
+      } finally {
+        setLoadingPolicies(false);
       }
     };
 
-    // โหลดสินค้า
     const fetchProducts = async () => {
       try {
         const res = await fetch(`${baseUrl}/api/productHeaderapi`, {
@@ -53,7 +55,10 @@ export default function Footer() {
             href: `/products/${item.producttypeID}`,
           }));
           const extraMenus = [
-            { label: "สินเชื่อโซล่ารูฟ", href: "https://saksiam.com/service/solarrooftop" },
+            {
+              label: "สินเชื่อโซล่ารูฟ",
+              href: "https://saksiam.com/service/solarrooftop",
+            },
             { label: "ใบรับรองการไฟฟ้า", href: "/file/Inverter.pdf" },
           ];
           setDynamicProducts([...productMenus, ...extraMenus]);
@@ -63,18 +68,23 @@ export default function Footer() {
       }
     };
 
-    // ✅ โหลดข้อมูลติดต่อ
     const fetchContact = async () => {
       try {
         const res = await fetch(`${baseUrl}/api/contactapi`, {
           headers: { "X-API-KEY": `${apiKey}` },
         });
         const data = await res.json();
-        if (data.status && Array.isArray(data.result) && data.result.length > 0) {
-          setContact(data.result[0]); // ใช้ record แรก
+        if (
+          data.status &&
+          Array.isArray(data.result) &&
+          data.result.length > 0
+        ) {
+          setContact(data.result[0]);
         }
       } catch (err) {
         console.error("Error fetching contact:", err);
+      } finally {
+        setLoadingContact(false);
       }
     };
 
@@ -83,7 +93,6 @@ export default function Footer() {
     fetchContact();
   }, []);
 
-  // icon map
   const iconPath = useMemo(
     () => ({
       facebook: "/images/facebook.png",
@@ -95,7 +104,6 @@ export default function Footer() {
     []
   );
 
-  // เมนูสินค้า
   const firstTwoMenus = [
     {
       ...staticMenu[0],
@@ -119,19 +127,26 @@ export default function Footer() {
               ))}
             </ul>
 
-            {policies.length > 0 && (
-              <>
-                <h4>นโยบาย</h4>
-                <ul>
-                  {policies.map((policy) => (
-                    <li key={policy.policyID}>
-                      <Link href={`/policy/${policy.policy_Num}`}>
-                        {policy.policy_nameTH}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </>
+            {/* หัวข้อนโยบาย */}
+            <h4>นโยบาย</h4>
+            {loadingPolicies ? (
+              <p>กำลังโหลด...</p>
+            ) : policies.length > 0 ? (
+              <ul>
+                {policies.map((policy, i) => (
+                  <li
+                    key={policy.policyID}
+                    className="fade-in"
+                    style={{ animationDelay: `${i * 0.1}s` }}
+                  >
+                    <Link href={`/policy/${policy.policy_Num}`}>
+                      {policy.policy_nameTH}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>ไม่มีนโยบาย</p>
             )}
           </div>
 
@@ -149,17 +164,17 @@ export default function Footer() {
 
           {/* คอลัมน์ที่สาม: ติดต่อเรา + social icons */}
           <div className={styles.column}>
-            {contact && (
-              <>
-                <h4>ติดต่อเรา</h4>
+            <h4>ติดต่อเรา</h4>
+            {loadingContact ? (
+              <p>กำลังโหลด...</p>
+            ) : contact ? (
+              <div className="fade-in">
                 <ul>
-                  <li> บริษัท ศักดิ์สยามลิสซิ่ง จำกัด (มหาชน) </li>
+                  <li>บริษัท ศักดิ์สยามลิสซิ่ง จำกัด (มหาชน)</li>
                   <li>{contact.address_th}</li>
-                  {/* <li>โทรศัพท์ : {contact.phone_number}</li> */}
                   <li>โทรศัพท์ : {contact.call_center}</li>
                   <li>แฟกซ์ : {contact.fax}</li>
                   <li>อีเมล : {contact.email_main}</li>
-                  {/* <li>{contact.officehours_th}</li> */}
                 </ul>
                 <div className={styles.socialIcons}>
                   {Object.entries({
@@ -169,15 +184,16 @@ export default function Footer() {
                     youtube: contact.youtube,
                     tiktok: contact.tiktok,
                   })
-                    .filter(([_, url]) => url && url !== "null") //  แสดงเฉพาะที่มีลิงก์จริง
-                    .map(([key, url]) => (
+                    .filter(([_, url]) => url && url !== "null")
+                    .map(([key, url], i) => (
                       <Link
                         key={key}
                         href={url}
                         target="_blank"
                         rel="noopener noreferrer"
                         aria-label={key}
-                        className={styles.iconWrapper}
+                        className="fade-in"
+                        style={{ animationDelay: `${i * 0.1}s` }}
                       >
                         <Image
                           src={iconPath[key] || "/images/default-icon.png"}
@@ -188,7 +204,9 @@ export default function Footer() {
                       </Link>
                     ))}
                 </div>
-              </>
+              </div>
+            ) : (
+              <p>ไม่มีข้อมูลติดต่อ</p>
             )}
           </div>
         </div>
@@ -200,7 +218,12 @@ export default function Footer() {
         <div className={styles.footerBottom}>
           © 2025 Copyright: SAKSIAM SOLAR ENERGY CO., LTD BY SAKSIAM LEASING PUBLIC COMPANY LIMITED. All Rights Reserved.
           <div className={styles.logoGroup}>
-            <Image src="/images/logo3.8549861c.png" alt="โลโก้สีส้ม" width={100} height={40} />
+            <Image
+              src="/images/logo3.8549861c.png"
+              alt="โลโก้สีส้ม"
+              width={100}
+              height={40}
+            />
             <Link
               href="/file/Inverter.pdf"
               target="_blank"
@@ -214,7 +237,12 @@ export default function Footer() {
                 height={40}
               />
             </Link>
-            <Image src="/images/ERCNewLogo.png" alt="โลโก้กกพ" width={100} height={40} />
+            <Image
+              src="/images/ERCNewLogo.png"
+              alt="โลโก้กกพ"
+              width={100}
+              height={40}
+            />
           </div>
         </div>
       </div>

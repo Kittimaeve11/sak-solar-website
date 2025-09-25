@@ -1,0 +1,117 @@
+.wrapper {
+  width: 100%;
+  display: block;
+  margin: 0 auto;
+  padding: 0 1rem; 
+}
+
+.layout {
+  width: 1500px;
+  margin: 0 auto;
+  display: flex;
+  gap: 1rem;
+}
+
+.scrollContainer {
+  display: flex;
+  overflow-x: auto;
+  gap: 2rem;
+  padding: 1rem;
+  margin-bottom: 2rem;
+}
+
+/* ชื่อ section */
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #0c3c78;
+  margin: 0rem;
+}
+
+/* Scroll container สำหรับ card */
+.scrollContainer {
+  display: flex;
+  overflow-x: auto;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  scroll-behavior: smooth;
+}
+
+.scrollContainer::-webkit-scrollbar {
+  height: 8px;
+}
+
+.scrollContainer::-webkit-scrollbar-thumb {
+  background-color: rgba(0,0,0,0.2);
+  border-radius: 4px;
+}
+
+/* Card */
+.card {
+  flex: 0 0 auto;
+  width: 350px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.cardImage {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+   transition: filter 0.3s ease;
+}
+.card:hover .cardImage {
+    filter: brightness(0.4);
+}
+
+
+.cardContent {
+  padding: 0.75rem 1rem;
+}
+
+.cardTitle {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0rem;
+
+  display: block;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+  box-sizing: border-box;
+}
+
+.editorial-date {
+  color: #888;
+  font-size: 14px;
+}
+
+.cardDescription {
+  color: #555;
+  font-size: 15px;
+  margin-top: 0.5rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  text-decoration: none;
+  /* เพิ่ม */
+  border-bottom: none;
+  /* เพิ่ม */
+  box-shadow: none;
+  /* เพิ่ม */
+}

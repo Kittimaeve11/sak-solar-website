@@ -1,8 +1,12 @@
+/* =============================
+   Layout
+============================= */
 .layout-review {
-    padding: 0 16px 50px 16px;
+  padding: 0 16px 50px 16px;
   max-width: 1200px;
   margin: 0 auto;
-} 
+}
+
 .video-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
@@ -10,6 +14,9 @@
   padding: 0rem;
 }
 
+/* =============================
+   Video Card
+============================= */
 .video-card {
   text-decoration: none;
   color: inherit;
@@ -40,14 +47,29 @@
   z-index: 1;
 }
 
-/* ทำให้ภาพมืดลงเมื่อ hover */
 .video-card:hover .thumbnail {
   filter: brightness(0.4);
 }
 
+.video-card .play-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 64px;
+  color: white;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.video-card:hover .play-icon {
+  opacity: 1;
+}
+
 .info {
   margin-top: 0.75rem;
-  /* text-align: center; */
 }
 
 .title {
@@ -61,25 +83,44 @@
   color: #555;
 }
 
+/* =============================
+   Banner
+============================= */
 .banner-container {
-  position: relative;
   width: 100%;
-  aspect-ratio: 3.22 / 1;
-  /* คุมอัตราส่วน */
-  min-height: 300px;
-  /* fallback กัน layout shift */
+  max-width: 100%;
   overflow: hidden;
+  margin: 0 auto;
+  line-height: 0; /* กันช่องว่างใต้รูป */
 }
 
 .banner-image {
-  object-fit: cover;
   width: 100%;
-  height: 100%;
+  height: auto;
+  max-height: 100vh;   /* ไม่ให้สูงเกินหน้าจอ */
+  object-fit: cover;   /* ครอบพอดี กว้าง=100% */
   display: block;
-  transition: opacity 0.6s ease-in-out;
 }
 
-/* Skeleton loading effect */
+
+/* บังคับสัดส่วนตามไฟล์จริง */
+@media (max-width: 768px) {
+  .banner-container {
+    aspect-ratio: 768 / 400; /* Mobile = 1.92:1 */
+    min-height: 200px;       /* ป้องกัน collapse */
+  }
+}
+
+@media (min-width: 769px) {
+  .banner-container {
+    aspect-ratio: 3840 / 1191; /* PC = 3.22:1 */
+    min-height: 300px;         /* กัน collapse */
+  }
+}
+
+/* =============================
+   Skeleton Loading
+============================= */
 .skeleton {
   background-color: #e0e0e0;
   border-radius: 4px;
@@ -87,17 +128,9 @@
 }
 
 @keyframes pulse {
-  0% {
-    background-color: #e0e0e0;
-  }
-
-  50% {
-    background-color: #f0f0f0;
-  }
-
-  100% {
-    background-color: #e0e0e0;
-  }
+  0%   { background-color: #e0e0e0; }
+  50%  { background-color: #f0f0f0; }
+  100% { background-color: #e0e0e0; }
 }
 
 .skeleton-card {
@@ -106,9 +139,7 @@
   border-radius: 10px;
   overflow: hidden;
   background-color: white;
-  /* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); */
-  /* padding-bottom: 1rem;  <-- ลบออกหรือแก้เป็น margin-bottom */
-  margin-bottom: 1.5rem; /* เพิ่มระยะห่าง */
+  margin-bottom: 1.5rem;
 }
 
 .skeleton-image {
@@ -129,55 +160,48 @@
   display: block;
 }
 
-/* Fade-in animation */
+/* =============================
+   Fade-in
+============================= */
 .fade-in {
   opacity: 0;
   animation: fadeIn 0.8s ease-in forwards;
 }
 
 @keyframes fadeIn {
-  to {
-    opacity: 1;
-  }
+  to { opacity: 1; }
 }
 
-@media (max-width: 640px) {
+/* =============================
+   Responsive
+============================= */
+@media (max-width: 768px) {
   .video-grid {
     grid-template-columns: 1fr;
     gap: 1rem;
     padding: 0 1rem;
   }
 
-  .skeleton-image {
-    height: 180px;
-  }
-
-  .skeleton-title {
-    width: 80%;
-  }
-
-  .skeleton-line {
-    width: 100%;
-  }
-
-  .title {
-    font-size: 16px;
-  }
-
-  .date {
-    font-size: 13px;
-  }
-    .skeleton-banner {
-    aspect-ratio: 1.9 / 1;
-    /* for mobile view */
-  }
-
+  .skeleton-image { height: 180px; }
+  .skeleton-title { width: 80%; }
+  .skeleton-line  { width: 100%; }
+  .title          { font-size: 16px; }
+  .date           { font-size: 13px; }
 }
 
+/* =============================
+   Skeleton Banner
+============================= */
 .skeleton-banner {
   width: 100%;
-  aspect-ratio: 3.22 / 1;
+  aspect-ratio: 3840 / 1191; /* PC */
   background-color: #e0e0e0;
   border-radius: 4px;
   animation: pulse 1.5s infinite ease-in-out;
+}
+
+@media (max-width: 768px) {
+  .skeleton-banner {
+    aspect-ratio: 768 / 400; /* Mobile */
+  }
 }

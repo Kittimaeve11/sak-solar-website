@@ -67,7 +67,7 @@
   text-decoration: underline;
 } */
 
-/* 🔷 Yellow Triangle Section (simulate diagonal cut) */
+/*  Yellow Triangle Section (simulate diagonal cut) */
 .navWrapper::after {
   content: "";
   position: absolute;
@@ -77,11 +77,12 @@
   /* คงที่หรือ responsive ได้ */
   height: 100%;
   background-color: #E88534;
+  /* background-color: #f87f0b; */
   clip-path: polygon(100px 0, 100% 0%, 100% 100%, 0% 100%);
   z-index: 1;
 }
 
-/* Yellow bottom line */
+/*  Yellow bottom line */
 .navWrapper::before {
   content: "";
   position: absolute;
@@ -95,7 +96,8 @@
 
 .leftSection {
   display: flex;
-  align-items: center;/*  กึ่งกลางแนวตั้ง */
+  align-items: center;
+  /*  กึ่งกลางแนวตั้ง */
   gap: 16px;
 }
 
@@ -105,14 +107,14 @@
   height: 100px;
   display: flex;
   align-items: center;
-  /* กึ่งกลางแนวตั้งใน logoContainer */
+  /*  กึ่งกลางแนวตั้งใน logoContainer */
   justify-content: center;
   /* เฉพาะถ้าคุณต้องการให้รูปภาพอยู่กลาง container */
 }
 
 .logoImage {
   height: 100%;
-  max-height: 80px;
+  width: 100%;
   padding: 0;
   object-fit: contain;
   display: block;
@@ -410,9 +412,6 @@
   }
 }
 
-/* ย่อขนาดและเลื่อนตำแหน่งตามจอเล็กลง */
-
-/* <= 800px */
 @media (max-width: 800px) {
   .logoContainer {
     width: clamp(250px, 60vw, 500px);
@@ -491,9 +490,9 @@
   }
 }
 
-@media (max-width: 400px) {
+@media (max-width: 420px) {
   .navbar {
-    padding: 10px clamp(5px, 2vw, 20px) 47px clamp(0px, 1vw, 15px);
+    padding: 0px clamp(5px, 2vw, 20px) 47px clamp(0px, 1vw, 15px);
     /* เพิ่ม padding-top ให้ลงมา */
     transition: padding 0.4s ease;
     display: flex;

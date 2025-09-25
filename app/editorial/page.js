@@ -141,10 +141,18 @@ export default function EditorialListPage() {
       .trim();
   }
 
-  const getImageUrl = (path) => {
-    if (!path) return '/images/no-image.jpg';
-    const cleaned = path.replace(/^"+|"+$/g, '').replace(/\\/g, '/').replace(/\/{2,}/g, '/');
-    return `${baseUrl}/${cleaned}`;
+  const getImageUrl = (galleryStr) => {
+    if (!galleryStr) return '/images/no-image.jpg';
+    try {
+      const parsed = JSON.parse(galleryStr);
+      const first = Array.isArray(parsed) && parsed.length > 0 ? parsed[0] : null;
+      if (!first) return '/images/no-image.jpg';
+      const cleaned = first.replace(/^"+|"+$/g, '').replace(/\\/g, '/').replace(/\/{2,}/g, '/');
+      return `${baseUrl}/${cleaned}`;
+    } catch {
+      // ถ้า parse ไม่ได้
+      return '/images/no-image.jpg';
+    }
   };
 
   return (

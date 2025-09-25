@@ -1,103 +1,104 @@
+/* ===== ส่วน highlight section ===== */
 .highlight-section {
-  text-align: center;
-  max-width: 900px;
-  width: 100%;
-  padding: 1rem;
-  background-color: rgba(255, 255, 255, 0.89);
-  border-radius: 12px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
+  text-align: center; /* จัดข้อความให้อยู่ตรงกลาง */
+  max-width: 900px;   /* กำหนดความกว้างสูงสุด */
+  width: 100%;        /* ใช้เต็มความกว้างที่มี */
+  padding: 1rem;      /* ระยะห่างด้านใน */
+  background-color: rgba(255, 255, 255, 0.89); /* พื้นหลังสีขาวโปร่ง */
+  border-radius: 12px; /* ขอบโค้งมน */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.08); /* เงาอ่อน */
 }
 
 .highlight-logo {
-  margin: 0 auto 0.25rem auto;
+  margin: 0 auto 0.25rem auto; /* จัดให้อยู่ตรงกลาง และมี margin ด้านล่างเล็กน้อย */
   display: block;
   width: 200px;
   height: auto;
 }
 
 .highlight-section h2 {
-  margin: 0;
-  /* ลบ margin ทั้งหมด */
-  font-weight: 400;
+  margin: 0;         
+  font-weight: 400;  
 }
 
 .highlight-section h5 {
-  margin: 0 0 2rem 0;
+  margin: 0 0 2rem 0; /* ลบ margin ด้านบนและซ้ายขวา เว้นด้านล่าง 2rem */
   font-weight: 400;
-  color: #19489D;
+  color: #19489D;     
 }
 
 .highlight-text h4 {
-  margin-top: 0.5rem;
-  /* ✅ เพิ่มระยะห่างจาก h5 */
-  margin-bottom: 0.5rem;
-  line-height: 1.5;
+  margin-top: 0.5rem;    /* เพิ่มระยะห่างด้านบนจาก h5 */
+  margin-bottom: 0.5rem; /* ระยะห่างด้านล่างเล็กน้อย */
+  line-height: 1.5;      /* ความสูงบรรทัด */
   font-weight: 400;
 }
 
+/* ===== ส่วนรูปภาพ ===== */
 .imageWrapper {
-  width: 100%;
-  overflow: hidden;
+  width: 100%;    /* ใช้เต็มความกว้าง */
+  overflow: hidden; /* ซ่อนส่วนที่เกิน */
 }
 
 .imageContainer {
-  position: relative;
+  position: relative; /* ใช้สำหรับวาง overlay ซ้อนทับ */
 }
 
+/* ปุ่มลิงก์ซ้อนทับบนรูป */
 .overlayLink {
   position: absolute;
-  bottom: 20px;
-  right: 20px;
+  bottom: 20px; /* วางชิดด้านล่าง */
+  right: 20px;  /* วางชิดด้านขวา */
   color: white;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.5); /* พื้นหลังดำโปร่ง */
   padding: 8px 16px;
   border-radius: 4px;
-  text-decoration: none;
+  text-decoration: none; /* ลบขีดเส้นใต้ลิงก์ */
   font-weight: bold;
   font-size: 1rem;
-  z-index: 9999;
+  z-index: 9999; /* ซ้อนทับทุกอย่าง */
   cursor: pointer;
-  transition: background 0.3s;
+  transition: background 0.3s; /* เอฟเฟกต์เปลี่ยนสีพื้นหลัง */
 }
 
 .overlayLink:hover {
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.7); /* เปลี่ยนสีเมื่อ hover */
 }
 
+/* ===== ส่วนฟอร์ม ===== */
 .formWrapper {
-  max-width: 670px;
-  margin: 0 auto;
-  padding: 0rem;
+  max-width: 670px;  /* กำหนดความกว้างสูงสุด */
+  margin: 0 auto;    /* จัดกึ่งกลาง */
+  padding: 0rem;     /* ไม่มี padding */
   font-family: sans-serif;
-  border-radius: 8px;
+  border-radius: 8px; /* ขอบโค้งมน */
 }
 
-
-
+/* ===== ส่วนคอนเทนเนอร์ Solar ===== */
 .containersolar {
-  /* background-image: url('/images/solar-cellbackfrom.jpg'); */
-    /* background-color: #FAFBFF; */
-
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  /* background-image: url('/images/solar-cellbackfrom.jpg'); */ /* ตัวเลือกใส่ภาพพื้นหลัง */
+  /* background-color: #FAFBFF; */ /* พื้นหลังสีฟ้าอ่อน */
+  
+  background-size: cover;       /* ปรับภาพพื้นหลังให้เต็ม */
+  background-position: center;  /* จัดให้อยู่ตรงกลาง */
+  background-repeat: no-repeat; /* ไม่ให้ซ้ำ */
   padding-bottom: 1rem;
   width: 100%;
 }
 
-
-
+/* ข้อความหัวข้อสนใจ Solar */
 .interestedsolar {
   text-align: center;
-  font-size: clamp(1rem, 3vw, 1.25rem);
+  font-size: clamp(1rem, 3vw, 1.25rem); /* responsive ขนาดฟอนต์ */
   font-weight: bold;
   color: #243865;
-  margin-top: -5px;
+  margin-top: -5px; /* ขยับขึ้นเล็กน้อย */
 }
 
+/* ===== Responsive: หน้าจอเล็กกว่า 764px ===== */
 @media (max-width: 764px) {
   .formWrapper {
-    width: 80%;
-  max-width: 670px;
-}
+    width: 80%;        /* ใช้ 80% ของหน้าจอ */
+    max-width: 670px;
+  }
 }

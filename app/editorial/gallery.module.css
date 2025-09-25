@@ -1,16 +1,17 @@
 .galleryGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(3, 1fr); /*  fix 3 คอลัมน์ */
   gap: 1rem;
 }
 
 .galleryImageWrapper {
   position: relative;
   width: 100%;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 16 / 9; /* สัดส่วนคงที่ */
   overflow: hidden;
   border-radius: 6px;
   cursor: pointer;
+  margin: 1rem;
 }
 
 .galleryImage {

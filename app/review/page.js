@@ -5,6 +5,7 @@ import Link from 'next/link';
 import '../../styles/review.css';
 import { useLocale } from '../Context/LocaleContext';
 import Image from 'next/image';
+import { IoPlayCircleOutline } from "react-icons/io5";
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
@@ -57,7 +58,7 @@ export default function ReviewPage() {
     setLoadingData(true);
 
     if (!baseUrl || !apiKey) {
-      console.error('❌ Missing baseUrl or apiKey:', { baseUrl, apiKey });
+      console.error(' Missing baseUrl or apiKey:', { baseUrl, apiKey });
       setLoadingData(false);
       return;
     }
@@ -88,11 +89,11 @@ export default function ReviewPage() {
       const branderArray = Array.isArray(branderData?.data)
         ? branderData.data
         : branderData?.data
-        ? [branderData.data]
-        : [];
+          ? [branderData.data]
+          : [];
       setBrander(branderArray);
     } catch (err) {
-      console.error('❌ Fetch error:', err);
+      console.error(' Fetch error:', err);
     } finally {
       setLoadingData(false);
     }
@@ -123,20 +124,21 @@ export default function ReviewPage() {
         brander.map((item) => (
           <div className="banner-container fade-in" key={item.brander_ID}>
             <picture>
+              {/* Mobile */}
               <source
                 srcSet={`${baseUrl}/${item.brander_pictureMoblie}`}
                 media="(max-width: 768px)"
               />
-              <Image
+              {/* PC */}
+              <img
                 src={`${baseUrl}/${item.brander_picturePC}`}
                 alt={item.brander_name || 'Banner Image'}
-                width={1530}
-                height={800}
                 className="banner-image"
-                unoptimized
               />
             </picture>
           </div>
+
+
         ))
       )}
 
@@ -150,7 +152,6 @@ export default function ReviewPage() {
 
         <div className="video-grid">
           {loadingData ? (
-            //  Loading Skeleton
             Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="skeleton-card skeleton fade-in">
                 <div className="skeleton-image skeleton"></div>
@@ -159,14 +160,12 @@ export default function ReviewPage() {
               </div>
             ))
           ) : reviews.length === 0 ? (
-            // No Data
             <p>
               {locale === 'en'
                 ? 'No video reviews available at the moment.'
                 : 'ไม่มีรีวิววิดีโอในขณะนี้'}
             </p>
           ) : (
-            //  Render Reviews
             reviews.map((review) => {
               if (!review?.vedio_link) return null;
               const videoId = extractVideoId(review.vedio_link);
@@ -189,6 +188,7 @@ export default function ReviewPage() {
                 >
                   <div className="thumbnail-placeholder">
                     <ThumbnailWithFallback videoId={videoId} alt={videoTitle} />
+                    <IoPlayCircleOutline className="play-icon" />
                   </div>
                   <div className="info">
                     <div className="title">{videoTitle}</div>

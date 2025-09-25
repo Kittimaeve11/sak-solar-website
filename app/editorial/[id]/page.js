@@ -1,223 +1,238 @@
 'use client';
-import React, { useEffect, useState, useRef } from "react";
-import Image from "next/image";
+
+import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import styles from "./EditorialDetailPage.module.css";
 import Link from "next/link";
+import Image from "next/image";
 import { MdKeyboardDoubleArrowRight } from "react-icons/md";
+import { useLocale } from "@/app/Context/LocaleContext";
 import Gallery from "../gallery";
-import SlideEditorial from "@/app/components/Home/SlideEditorial";
+import RecommendedArticles from "./RecommendedArticles";
+import styles from "./EditorialDetailPage.module.css";
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 
-async function getEditorialById(editorialNum) {
-  const res = await fetch(`${baseUrl}/api/edittorIDpageapi/${editorialNum}`, {
-    headers: { "X-API-KEY": apiKey },
-    cache: "no-store",
-  });
-  if (!res.ok) return null;
-  const data = await res.json();
-  return data.result?.[0] || null;
+// ---------------- ฟังก์ชันแปลง URL ของรูป ----------------
+function getImageUrls(galleryStr) {
+  if (!galleryStr) return [];
+
+  const normalizePath = (raw, firstDir = "") => {
+    let p = String(raw).replace(/^"+|"+$/g, "").trim();
+    p = p.replace(/\\/g, "/").replace(/\/{2,}/g, "/");
+    if (!p.includes("/") && firstDir) p = `${firstDir}/${p}`;
+    return `${baseUrl}/${p}`;
+  };
+
+  try {
+    const parsed = JSON.parse(galleryStr);
+    let items = [];
+    if (Array.isArray(parsed)) {
+      if (parsed.length === 1 && typeof parsed[0] === "string" && parsed[0].includes(",")) {
+        items = parsed[0].split(",").map(s => s.trim()).filter(Boolean);
+      } else {
+        items = parsed.map(String).filter(Boolean);
+      }
+    } else if (typeof parsed === "string") {
+      items = parsed.split(",").map(s => s.trim()).filter(Boolean);
+    }
+
+    const firstDir = (items[0] && items[0].includes("/"))
+      ? items[0].substring(0, items[0].lastIndexOf("/"))
+      : "";
+
+    return items.map(item => normalizePath(item, firstDir));
+  } catch {
+    const parts = String(galleryStr).includes(",")
+      ? String(galleryStr).split(",").map(s => s.trim()).filter(Boolean)
+      : [String(galleryStr).trim()];
+
+    const firstDir = (parts[0] && parts[0].includes("/"))
+      ? parts[0].substring(0, parts[0].lastIndexOf("/"))
+      : "";
+
+    return parts.map(part => normalizePath(part, firstDir));
+  }
 }
 
-function parseHtmlString(str) {
+// ---------------- ฟังก์ชัน parse HTML ----------------
+function parseHTML(str) {
   if (!str || typeof str !== "string") return "";
   return str
-    .replace(/^"+|"+$/g, "")
     .replace(/\\\//g, "/")
     .replace(/\\"/g, '"')
     .replace(/\\n/g, "")
     .replace(/&nbsp;/g, " ")
+    .replace(/<\\\/?span>/g, "")
+    .replace(/^"+|"+$/g, "")
     .trim();
 }
 
 export default function EditorialDetailPage() {
-  const { id } = useParams();
+  const params = useParams();
+  const id = params?.id;
+  const { locale } = useLocale();
+
   const [editorial, setEditorial] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [headings, setHeadings] = useState([]);
-  const [activeId, setActiveId] = useState(null);
-  const [isSticky, setIsSticky] = useState(false);
-  const observerRef = useRef(null);
-
-  const getImageUrl = (path) => {
-    if (!path) return "/images/no-image.jpg";
-    return `${baseUrl}/${path.replace(/^"+|"+$/g, "").replace(/\\/g, "/")}`;
-  };
-
-  const scrollToHeading = (id) => {
-    const el = document.getElementById(id);
-    if (el) {
-      const headerOffset = 80;
-      const elementPosition = el.getBoundingClientRect().top + window.scrollY;
-      const offsetPosition = elementPosition - headerOffset;
-      window.scrollTo({ top: offsetPosition, behavior: "smooth" });
-    }
-  };
 
   useEffect(() => {
     if (!id) return;
+    const controller = new AbortController();
 
-    let observer;
-    const handleSticky = () => setIsSticky(window.scrollY > 300);
-
-    const loadEditorial = async () => {
-      setLoading(true);
-      const res = await getEditorialById(id);
-      if (!res) {
-        setEditorial(null);
-        setLoading(false);
-        return;
-      }
-
-      const descriptionmainTH = parseHtmlString(res.descriptionmainTH);
-      const subEditoria = Array.isArray(res.subEditoria)
-        ? res.subEditoria.map((sub, index) => ({
-            ...sub,
-            id: `sub-${index}`,
-            subdescriptionTH: parseHtmlString(sub.subdescriptionTH),
-            subgallary: (() => {
-              try {
-                return sub.subgallary ? JSON.parse(sub.subgallary.replace(/^"+|"+$/g, "")) : [];
-              } catch {
-                return [];
-              }
-            })(),
-          }))
-        : [];
-
-      setEditorial({ ...res, descriptionmainTH, subEditoria });
-
-      const allHeadings = subEditoria.map((sub) => ({
-        id: sub.id,
-        text: sub.subtitiTH,
-        key: sub.id,
-      }));
-      setHeadings(allHeadings);
-
-      setLoading(false);
-
-      // IntersectionObserver สำหรับ TOC highlight
-      observer = new IntersectionObserver(
-        (entries) => {
-          const visibleEntries = entries.filter(e => e.isIntersecting);
-          if (visibleEntries.length) {
-            // เลือก section ที่ใกล้ top ของ viewport
-            const nearest = visibleEntries.reduce((prev, curr) => {
-              const prevTop = Math.abs(prev.boundingClientRect.top);
-              const currTop = Math.abs(curr.boundingClientRect.top);
-              return currTop < prevTop ? curr : prev;
-            });
-            setActiveId(nearest.target.id);
-          }
-        },
-        { root: null, rootMargin: "-80px 0px -20% 0px", threshold: [0, 0.1, 0.25, 0.5, 1] }
-      );
-
-      allHeadings.forEach(({ id }) => {
-        const el = document.getElementById(id);
-        if (el) observer.observe(el);
-      });
-    };
-
-    loadEditorial();
-    window.addEventListener("scroll", handleSticky);
-
-    return () => {
-      window.removeEventListener("scroll", handleSticky);
-      if (observer) {
-        headings.forEach(({ id }) => {
-          const el = document.getElementById(id);
-          if (el) observer.unobserve(el);
+    async function fetchData() {
+      try {
+        const res = await fetch(`${baseUrl}/api/edittorIDpageapi/${id}`, {
+          headers: { "X-API-KEY": apiKey },
+          signal: controller.signal,
         });
+
+        if (!res.ok) throw new Error(`API failed: ${res.status}`);
+        const data = await res.json();
+        console.log("📌 API response:", data);
+
+        let article = null;
+        if (Array.isArray(data?.result) && data.result.length > 0) {
+          article = data.result[0];
+        } else if (data?.result && typeof data.result === "object") {
+          article = data.result;
+        } else if (data?.data) {
+          article = data.data;
+        } else if (typeof data === "object") {
+          article = data;
+        }
+
+        setEditorial(article);
+      } catch (err) {
+        if (err.name !== "AbortError") console.error("Fetch error:", err);
       }
-    };
+    }
+
+    fetchData();
+    return () => controller.abort();
   }, [id]);
 
-  if (loading) return <div className={styles.notFound}>Loading...</div>;
-  if (!editorial) return <div className={styles.notFound}>ไม่พบบทความ</div>;
+  if (!editorial) return null;
+
+  const title = locale === "en"
+    ? editorial?.titiemainEN || editorial?.titiemainTH || editorial?.editoria_titieEN || editorial?.editoria_titieTH || "-"
+    : editorial?.titiemainTH || editorial?.editoria_titieTH || "-";
+
+  const description = locale === "en"
+    ? editorial?.descriptionmainEN || editorial?.descriptionmainTH || editorial?.editoria_descriptionEN || editorial?.editoria_descriptionTH || "-"
+    : editorial?.descriptionmainTH || editorial?.editoria_descriptionTH || "-";
+
+  const subList = editorial?.subEditoria || [];
 
   return (
-    <main className={styles.wrapper}>
-      <div className={styles.layout}>
-        <div className={styles.contentBox}>
-          <article className={styles.article}>
-            <div className={styles.headerportfolio}>
-              <h1 className={styles.title}>{editorial.titiemainTH}</h1>
-              <div className={styles.meta}>
-                <Link href="/" className={styles.link}>
-                  หน้าหลัก <MdKeyboardDoubleArrowRight style={{ fontSize: 19 }} />
-                </Link>
-                <Link href="/editorial" className={styles.link}>
-                  ย้อนกลับ <MdKeyboardDoubleArrowRight style={{ fontSize: 19 }} />
-                </Link>
-                <span className={styles.articleName}>{editorial.titiemainTH}</span>
+    <main>
+      <div className={styles.wrapper}>
+        <div className={styles.layout}>
+          {/* เนื้อหาหลัก */}
+          <div className={styles.contentBox}>
+            <article className={styles.article}>
+              {/* Header */}
+              <div className={styles.headerportfolio}>
+                <h1 className={styles.title}>{title}</h1>
+                <div className={styles.meta}>
+                  <Link href="/" className={styles.link}>
+                    {locale === "en" ? "Home" : "หน้าหลัก"}{" "}
+                    <MdKeyboardDoubleArrowRight style={{ fontSize: 19 }} />
+                  </Link>
+                  <Link href="/editorial" className={styles.link}>
+                    {locale === "en" ? "Back" : "ย้อนกลับ"}{" "}
+                    <MdKeyboardDoubleArrowRight style={{ fontSize: 19 }} />
+                  </Link>
+                  <span className={styles.articleName}>{title}</span>
+                </div>
               </div>
-            </div>
 
-            <time className={styles.date}>
-              วันที่โพสต์ :{" "}
-              {new Date(editorial.editoria_creacteAt).toLocaleDateString("th-TH", {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-              })}
-            </time>
+              {/* วันที่โพสต์ */}
+              <time className={styles.date}>
+                {locale === "en" ? "Posted on: " : "วันที่โพสต์ : "}
+                {editorial?.editoria_creacteAt
+                  ? new Date(editorial.editoria_creacteAt).toLocaleDateString(
+                    locale === "en" ? "en-EN" : "th-TH",
+                    { day: "numeric", month: "long", year: "numeric" }
+                  )
+                  : "-"}
+              </time>
 
-            {editorial.gallarymain && (
-              <Image
-                src={getImageUrl(editorial.gallarymain)}
-                alt={editorial.titiemainTH}
-                width={800}
-                height={400}
-                className={styles.mainImage}
-                priority
+              {/* รูปหลัก */}
+              {editorial?.gallarymain &&
+                getImageUrls(editorial.gallarymain).map((url, idx) => (
+                  <Image
+                    key={idx}
+                    src={url}
+                    alt={`${title} - ${idx + 1}`}
+                    width={800}
+                    height={400}
+                    className={styles.mainImage}
+                    priority={idx === 0}
+                  />
+                ))}
+
+              {/* เนื้อหาหลัก */}
+              <div
+                className={styles.mainContent}
+                dangerouslySetInnerHTML={{ __html: parseHTML(description) }}
               />
-            )}
 
-            <section
-              className={styles.content}
-              dangerouslySetInnerHTML={{ __html: editorial.descriptionmainTH }}
-            />
+              {/* เนื้อหาย่อย */}
+              {subList.map((sub, index) => {
+                const subTitle = locale === "en"
+                  ? sub?.subtitiEN || sub?.subtitiTH || "-"
+                  : sub?.subtitiTH || "-";
 
-            {editorial.subEditoria.map((sub) => (
-              <div key={sub.id} id={sub.id} className={styles.subArticle}>
-                <h2>{sub.subtitiTH}</h2>
-                <section dangerouslySetInnerHTML={{ __html: sub.subdescriptionTH }} />
-                {sub.subgallary.length > 0 && <Gallery images={sub.subgallary.map(getImageUrl)} />}
-              </div>
-            ))}
+                const subDesc = locale === "en"
+                  ? sub?.subdescriptionEN || sub?.subdescriptionTH || "-"
+                  : sub?.subdescriptionTH || "-";
 
-            {editorial.gallery?.length > 1 && (
-              <div className={styles.bottomGallery}>
-                <h1>แกลเลอรี่</h1>
-                <Gallery images={editorial.gallery.map(getImageUrl)} />
-              </div>
-            )}
+                const imageUrls = getImageUrls(sub?.subgallary || "");
 
-            <SlideEditorial />
-          </article>
-        </div>
+                return (
+                  <section key={index} id={`section-${index}`} className={styles.subSection}>
+                    <h2 className={styles.subTitle}>{subTitle}</h2>
+                    <div
+                      className={styles.subContent}
+                      dangerouslySetInnerHTML={{ __html: parseHTML(subDesc) }}
+                    />
+                    {imageUrls.length > 0 && (
+                      <div className={styles.section}>
+                        <Gallery images={imageUrls} />
+                      </div>
+                    )}
+                  </section>
+                );
+              })}
+            </article>
+          </div>
 
-        {headings.length > 1 && (
-          <nav className={`${styles.sidebar} ${isSticky ? styles.sticky : ""}`} aria-label="สารบัญบทความ">
-            <h2 className={styles.tocTitle}>เนื้อหาบทความ</h2>
+          {/* Sidebar */}
+          <aside className={styles.sidebar}>
+            <h3 className={styles.tocTitle}>
+              {locale === "en" ? "Table of Contents" : "สารบัญ"}
+            </h3>
             <ul className={styles.tocList}>
-              {headings.map(({ id, text, key }) => (
-                <li key={key} className={styles.tocItem}>
-                  <button
-                    type="button"
-                    className={`${styles.tocLinkSection} ${activeId === id ? styles.active : ""}`}
-                    onClick={() => scrollToHeading(id)}
-                  >
-                    {text}
-                  </button>
-                </li>
-              ))}
+              {subList.map((sub, index) => {
+                const subTitle = locale === "en"
+                  ? sub?.subtitiEN || sub?.subtitiTH || "-"
+                  : sub?.subtitiTH || "-";
+                return (
+                  <li key={index}>
+                    <a href={`#section-${index}`} className={styles.tocLink}>
+                      {subTitle}
+                    </a>
+                  </li>
+                );
+              })}
             </ul>
-          </nav>
-        )}
+          </aside>
+        </div>
+      </div>
+
+      {/* -------------------- Recommended Articles ด้านล่าง -------------------- */}
+      <div className={styles.recommendedSection} >
+        <RecommendedArticles typeID={3} currentId={editorial.editoria_id} />
       </div>
     </main>
   );

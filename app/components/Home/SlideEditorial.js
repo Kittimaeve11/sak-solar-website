@@ -14,7 +14,7 @@ import { HiPlusSm } from "react-icons/hi";
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 
-// 🔹 ฟังก์ชันทำความสะอาด description
+// ✅ ฟังก์ชันทำความสะอาด description
 function parseDescription(str) {
   if (!str || typeof str !== 'string') return '';
   return str
@@ -36,7 +36,7 @@ export default function SlideEditorial() {
   const sliderRef = useRef(null);
   const router = useRouter();
 
-  // 🔹 ดึงข้อมูลจาก API จริง
+  // ✅ ดึงข้อมูลจาก API จริง
   useEffect(() => {
     fetch(`${baseUrl}/api/edittormainpageapi`, {
       headers: { 'X-API-KEY': apiKey }
@@ -44,19 +44,30 @@ export default function SlideEditorial() {
       .then(res => res.json())
       .then(data => {
         if (data.status && Array.isArray(data.result)) {
-          const formatted = data.result.map(item => ({
-            id: item.editoria_num,
-            title: item.editoria_titieTH,
-            date: new Date(item.editoria_creacteAt).toLocaleDateString('th-TH', {
-              day: 'numeric',
-              month: 'long',
-              year: 'numeric'
-            }),
-            content: parseDescription(item.editoria_descriptionTH),
-            mainImage: item.editoria_gallary
-              ? `${baseUrl}/${item.editoria_gallary.replace(/^"+|"+$/g, '').replace(/\\/g, '/')}`
-              : '/images/no-image.jpg'
-          }));
+          const formatted = data.result.map(item => {
+            // ✅ parse gallery ให้ถูกต้อง
+            let imageUrl = '/images/no-image.jpg';
+            try {
+              const galleryArr = JSON.parse(item.editoria_gallary);
+              if (Array.isArray(galleryArr) && galleryArr.length > 0) {
+                imageUrl = `${baseUrl}/${galleryArr[0]}`;
+              }
+            } catch (e) {
+              console.warn('Invalid gallery format:', item.editoria_gallary);
+            }
+
+            return {
+              id: item.editoria_num,
+              title: item.editoria_titieTH,
+              date: new Date(item.editoria_creacteAt).toLocaleDateString('th-TH', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+              }),
+              content: parseDescription(item.editoria_descriptionTH || ''), // ✅ ป้องกัน undefined
+              mainImage: imageUrl
+            };
+          });
           setEditorials(formatted);
         } else {
           setEditorials([]);
@@ -143,48 +154,50 @@ export default function SlideEditorial() {
         {loading
           ? Array(3).fill(0).map((_, i) => <SkeletonCard key={i} />)
           : editorials.map((item, index) => {
-            const currentGroupStart = activeSlide * 3;
-            const currentGroupEnd = currentGroupStart + 3;
-            const visibleItems = editorials.slice(currentGroupStart, currentGroupEnd);
-            const middleIndexInGroup = Math.floor(visibleItems.length / 2);
-            const globalMiddleIndex = currentGroupStart + middleIndexInGroup;
-            const isMiddle = index === globalMiddleIndex;
+              const currentGroupStart = activeSlide * 3;
+              const currentGroupEnd = currentGroupStart + 3;
+              const visibleItems = editorials.slice(currentGroupStart, currentGroupEnd);
+              const middleIndexInGroup = Math.floor(visibleItems.length / 2);
+              const globalMiddleIndex = currentGroupStart + middleIndexInGroup;
+              const isMiddle = index === globalMiddleIndex;
 
-            const snippet = item.content.length > 100
-              ? item.content.slice(0, 100) + '...'
-              : item.content;
+              // ✅ ป้องกัน error ถ้า content เป็น undefined
+              const safeContent = item.content || '';
+              const snippet = safeContent.length > 100
+                ? safeContent.slice(0, 100) + '...'
+                : safeContent;
 
-            return (
-              <div key={item.id} className="slide-item">
-                <div
-                  className={`editorial-cardslide ${isMiddle ? 'highlight' : ''}`}
-                  onClick={() => {
-                    if (!dragging) router.push(`/editorial/${item.id}`);
-                  }}
-                  style={{ cursor: 'pointer' }}
-                >
-                  <div className="card-imageslide">
-                    <Image
-                      src={item.mainImage}
-                      alt={item.title}
-                      width={400}
-                      height={200}
-                      style={{ width: '100%', height: 'auto' }} // ป้องกัน aspect ratio error
-                      onErrorCapture={(e) => { e.currentTarget.src = '/images/no-image.jpg'; }}
-                    />
-                  </div>
-                  <div className="card-contentslide">
-                    <h3 className="card-titleslide">{item.title}</h3>
-                    <p className="editorial-dateslide">{item.date}</p>
-                    <p className="card-snippetslide">{snippet}</p>
-                    <p className="read-more">
-                      อ่านเพิ่มเติม <FaArrowRightLong />
-                    </p>
+              return (
+                <div key={item.id} className="slide-item">
+                  <div
+                    className={`editorial-cardslide ${isMiddle ? 'highlight' : ''}`}
+                    onClick={() => {
+                      if (!dragging) router.push(`/editorial/${item.id}`);
+                    }}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <div className="card-imageslide">
+                      <Image
+                        src={item.mainImage}
+                        alt={item.title}
+                        width={400}
+                        height={200}
+                        style={{ width: '100%', height: 'auto' }}
+                        onErrorCapture={(e) => { e.currentTarget.src = '/images/no-image.jpg'; }}
+                      />
+                    </div>
+                    <div className="card-contentslide">
+                      <h3 className="card-titleslide">{item.title}</h3>
+                      <p className="editorial-dateslide">{item.date}</p>
+                      <p className="card-snippetslide">{snippet}</p>
+                      <p className="read-more">
+                        อ่านเพิ่มเติม <FaArrowRightLong />
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
       </Slider>
     </div>
   );
