@@ -3,26 +3,26 @@
    ================================ */
 @font-face {
   font-family: 'SukhumvitTadmai';
-  src: url('/fonts/SukhumvitTadmai-Text.otf') format('opentype');
-  font-weight: 400; /* น้ำหนักปกติ */
+  src: url('/fonts/SukhumvitTadmai-UltraLight.otf') format('opentype');
+  font-weight: 200;
 }
 
 @font-face {
   font-family: 'SukhumvitTadmai';
-  src: url('/fonts/SukhumvitTadmai-UltraLight.otf') format('opentype');
-  font-weight: 200; /* น้ำหนักบางพิเศษ */
+  src: url('/fonts/SukhumvitTadmai-Text.otf') format('opentype');
+  font-weight: 400;
 }
 
 @font-face {
   font-family: 'SukhumvitTadmai';
   src: url('/fonts/SukhumvitTadmai-SemiBold.otf') format('opentype');
-  font-weight: 600; /* กึ่งหนา */
+  font-weight: 600;
 }
 
 @font-face {
   font-family: 'SukhumvitTadmai';
   src: url('/fonts/SukhumvitTadmai-ExtraBold.otf') format('opentype');
-  font-weight: 800; /* หนามาก */
+  font-weight: 800;
 }
 
 
@@ -744,7 +744,7 @@ h6 {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: #ff6600;
+  color: #E88534;
   font-size: 14px;
   margin-top: 4px;
   cursor: pointer;

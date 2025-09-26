@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, use } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import styles from './PortfolioDetail.module.css';
@@ -13,11 +13,11 @@ import { useLocale } from '@/app/Context/LocaleContext';
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 
-export default function PortfolioDetailPage({ params: paramsPromise }) {
-  const params = React.use(paramsPromise);
-  const { id } = params;
-  const { locale } = useLocale();
+export default function PortfolioDetailPage({ params }) {
+  const resolvedParams = use(params);  
+  const { id } = resolvedParams;
 
+  const { messages, locale } = useLocale();
   const [project, setProject] = useState(null);
   const [products, setProducts] = useState([]);
   const [matchedProduct, setMatchedProduct] = useState(null);
@@ -25,7 +25,7 @@ export default function PortfolioDetailPage({ params: paramsPromise }) {
   const [lightboxIndex, setLightboxIndex] = useState(null);
 
   useEffect(() => {
-    let isMounted = true; // ป้องกัน setState หลัง unmount
+    let isMounted = true;
 
     async function fetchData() {
       setLoading(true);
@@ -41,9 +41,13 @@ export default function PortfolioDetailPage({ params: paramsPromise }) {
           const item = dataProject.result;
 
           let gallery = [];
-          try { gallery = item.portfolio_gallery ? JSON.parse(item.portfolio_gallery) : []; } catch { }
+          try {
+            gallery = item.portfolio_gallery ? JSON.parse(item.portfolio_gallery) : [];
+          } catch { }
           let workSteps = [];
-          try { workSteps = item.workssteps_description ? JSON.parse(item.workssteps_description) : []; } catch { }
+          try {
+            workSteps = item.workssteps_description ? JSON.parse(item.workssteps_description) : [];
+          } catch { }
 
           projectData = {
             id: item.portfolio_id,
@@ -96,7 +100,6 @@ export default function PortfolioDetailPage({ params: paramsPromise }) {
           const matched = productsData.find((p) => p.item.product_ID === projectData.product_ID);
           setMatchedProduct(matched || null);
         }
-
       } catch (err) {
         console.error('Error fetching data:', err);
         if (isMounted) {
@@ -111,7 +114,7 @@ export default function PortfolioDetailPage({ params: paramsPromise }) {
 
     fetchData();
 
-    // ปิด scroll หน้าเวลามี lightbox
+    // ปิด scroll เวลา lightbox เปิด
     document.body.style.overflow = lightboxIndex !== null ? 'hidden' : '';
 
     return () => {
@@ -152,7 +155,6 @@ export default function PortfolioDetailPage({ params: paramsPromise }) {
   return (
     <main className={`${styles.container} ${styles.fadeIn}`}>
       {/* Header */}
-
       <div className={styles.headerportfolio}>
         <h2 className={styles.titleportfolio}>{locale === 'th' ? project.titleTH : project.titleEN}</h2>
         <div className={styles.meta}>
@@ -252,7 +254,10 @@ export default function PortfolioDetailPage({ params: paramsPromise }) {
           <div className={styles.section}>
             <h2 className={styles.topicportfolio}>{t.productDetail}</h2>
             {!matchedProduct ? (
-              <p>ไม่มีสินค้าในตอนี้</p>
+              <div className={styles.emptyState}>
+                <img src="/icons/noporducts.gif" alt="no products" className={styles.emptyIcon} />
+                <h4 className={styles.available}>{messages.available}</h4>
+              </div>
             ) : (
               <>
                 {matchedProduct.item.mainImage && (
@@ -277,13 +282,10 @@ export default function PortfolioDetailPage({ params: paramsPromise }) {
                         height={300}
                         style={{ objectFit: 'cover' }}
                       />
-                      <div className={styles.cardOverlay}>
-                        ดูรายละเอียดสินค้า
-                      </div>
+                      <div className={styles.cardOverlay}>ดูรายละเอียดสินค้า</div>
                     </Link>
                   </div>
                 )}
-
 
                 {isSolarAir ? (
                   <>
@@ -360,8 +362,8 @@ export default function PortfolioDetailPage({ params: paramsPromise }) {
               height={100}
               className={styles.contactIcon}
             />
-            <h3 style={{marginBottom:'-1.5rem',marginTop:'-0.2rem',fontWeight:'600'}}>{t.contactTitle}</h3>
-            <h5 style={{marginBottom:'0rem'}}>{t.contactSubtitle}</h5>
+            <h3 style={{ marginBottom: '-1.5rem', marginTop: '-0.2rem', fontWeight: '600' }}>{t.contactTitle}</h3>
+            <h5 style={{ marginBottom: '0rem' }}>{t.contactSubtitle}</h5>
             <Link href={`/?product=`}>
               <button className={styles.contactButton}>{t.contactButton}</button>
             </Link>

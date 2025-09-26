@@ -1,3 +1,6 @@
+/* ================================
+   โครงร่างหลัก (Layout Container)
+   ================================ */
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -5,6 +8,7 @@
   color: #333;
 }
 
+/* ปุ่มย้อนกลับ */
 .backWrapper {
   margin-top: 4px;
   margin-bottom: 8px;
@@ -23,7 +27,10 @@
   color: #1E61DC;
 }
 
-/* Header & Titles*/
+
+/* ================================
+   ส่วนหัว & ชื่อเรื่อง (Header & Titles)
+   ================================ */
 .headerportfolio {
   padding: 1rem 0;
 }
@@ -62,7 +69,10 @@
   margin-top: -0.5rem;
 }
 
-/* Meta & Icons*/
+
+/* ================================
+   Meta ข้อมูล & ไอคอน
+   ================================ */
 .meta {
   font-size: 18px;
   color: #666;
@@ -78,7 +88,10 @@
   gap: 0.4rem;
 }
 
-/* Cover Image*/
+
+/* ================================
+   ภาพหน้าปก (Cover Image)
+   ================================ */
 .coverWrapper,
 .coverImageContainer {
   position: relative;
@@ -98,7 +111,10 @@
   left: 0;
 }
 
-/* Grid Layout*/
+
+/* ================================
+   โครงร่าง Grid Layout
+   ================================ */
 .grid {
   display: flex;
   flex-direction: row;
@@ -126,7 +142,10 @@
   border: 1px solid #d1d1d1;
 }
 
-/*ขั้นตอนดำเนินงาน*/
+
+/* ================================
+   ขั้นตอนการดำเนินงาน (Work Steps)
+   ================================ */
 .workSteps {
   list-style: none;
   padding: 0;
@@ -168,7 +187,10 @@
   font-size: 1.2rem;
 }
 
-/* Lightbox*/
+
+/* ================================
+   Lightbox Gallery
+   ================================ */
 .navButton {
   font-size: 2rem;
   background: none;
@@ -201,7 +223,10 @@
   opacity: 1;
 }
 
-/* สนใจ*/
+
+/* ================================
+   กล่องติดต่อ (Contact Box)
+   ================================ */
 .contactBox {
   background-color: #ffffff;
   padding: 1.5rem;
@@ -229,7 +254,10 @@
   background-color: #d9742a;
 }
 
-/* รายละเอียดสินค้า*/
+
+/* ================================
+   รายละเอียดสินค้า (Product Details)
+   ================================ */
 .productDetails {
   margin-top: 1rem;
   font-size: 16px;
@@ -251,14 +279,29 @@
   text-align: left;
 }
 
-.labelsd { width: 35%; }
-.valuesd { width: 65%; }
+.labelsd {
+  width: 35%;
+}
 
-.labelpanels { width: 90%; }
-.valuepanels { width: 10%; }
+.valuesd {
+  width: 65%;
+}
 
-.labelsds { width: 40%; }
-.valuesds { width: 60%; }
+.labelpanels {
+  width: 90%;
+}
+
+.valuepanels {
+  width: 10%;
+}
+
+.labelsds {
+  width: 40%;
+}
+
+.valuesds {
+  width: 60%;
+}
 
 .valuesd,
 .valuepanels,
@@ -268,7 +311,10 @@
   margin: 0.2rem 0;
 }
 
-/* Card Overlay*/
+
+/* ================================
+   การ์ดสินค้า (Card Overlay)
+   ================================ */
 .cardContainer {
   position: relative;
   overflow: hidden;
@@ -294,7 +340,33 @@
   transition: opacity 0.3s ease;
 }
 
-/* Skeleton Loading*/
+
+/* ================================
+   กรณีไม่มีสินค้า (Empty State)
+   ================================ */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;     /* กึ่งกลางแนวนอน */
+  justify-content: center; /* กึ่งกลางแนวตั้ง */
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+.emptyIcon {
+  width: 120px;
+  height: auto;
+}
+
+.available {
+  font-weight: 600;
+  margin-top: 0;
+}
+
+
+/* ================================
+   Skeleton Loading
+   ================================ */
 .skeleton {
   background-color: #e0e0e0;
   border-radius: 6px;
@@ -363,7 +435,10 @@
   animation: pulse 1.5s infinite ease-in-out;
 }
 
-/* Responsive */
+
+/* ================================
+   Responsive Design
+   ================================ */
 @media (max-width: 970px) {
   .grid {
     flex-direction: column;

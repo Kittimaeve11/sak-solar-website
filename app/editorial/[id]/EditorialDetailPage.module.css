@@ -46,20 +46,16 @@
 
 .link {
   display: inline-flex;
-  align-items: center;
-  /* ให้ไอคอนกับข้อความอยู่กึ่งกลางในแนวตั้ง */
-  gap: 0.1rem;
-  /* ระยะห่างระหว่างไอคอนกับข้อความ */
+  align-items: center; /* ให้ไอคอนกับข้อความอยู่กึ่งกลางในแนวตั้ง */
+  gap: 0.1rem; /* ระยะห่างระหว่างไอคอนกับข้อความ */
   color: #FF5E06;
   text-decoration: none;
   font-size: 18px;
 }
 
 .link:hover {
-  text-decoration: none;
-  /* ห้ามแสดงเส้นใต้ตอน hover */
-  color: #E55100;
-  /* ถ้าต้องการเปลี่ยนสีตอน hover */
+  text-decoration: none;  /* ห้ามแสดงเส้นใต้ตอน hover */
+  color: #E55100; /* ถ้าต้องการเปลี่ยนสีตอน hover */
 }
 
 .articleName {
@@ -77,14 +73,14 @@
 .mainImage {
   border-radius: 0.25rem;
   margin: 1.5rem 0;
-  object-fit: cover;           /* ปรับรูปให้เต็มโดยไม่บิด */
+  object-fit: cover;     /* ปรับรูปให้เต็มโดยไม่บิด */
   width: 100%;
   height: auto;
 }
 
 .mainContent {
   font-size: 18px;
-  line-height: 1.8;            /* ระยะห่างบรรทัด */
+  line-height: 1.8;      /* ระยะห่างบรรทัด */
   color: #444;
 }
 
@@ -109,14 +105,22 @@
 
 .subContent {
   font-size: 18px;
-  line-height: 1.6;
-  color: #444;
+  line-height: 1.8;
+  color: #333;
+  text-align: justify;
+  text-justify: inter-word;
+  word-break: keep-all;         /* ป้องกันตัดคำแบบผิด ๆ */
+  word-spacing: 0.05em;         /* บังคับช่องไฟคงที่ */
+  letter-spacing: 0em;          /* ปรับได้ถ้าตัวอักษรถ่างเกินไป */
+  text-align-last: start;       /* บรรทัดสุดท้ายชิดซ้าย */
 }
 
+
 .subContent p {
-  text-indent: 2em;      /* ย่อหน้า */
-  margin-bottom: 1em;    /* เว้นระยะระหว่างย่อหน้า */
+  text-indent: 2em;       /* ย่อหน้า */
+  margin-bottom: 1em;     /* เว้นระยะระหว่างย่อหน้า */
 }
+
 
 .subGallery {
   text-align: center;
@@ -146,45 +150,67 @@
   border-radius: 6px;
 }
 
-
-
 /* --------------------- Sidebar --------------------- */
 .sidebar {
-  position: sticky;             /* ล็อคให้อยู่กับที่ตอนเลื่อน */
-  top: 2rem;                    /* เว้นด้านบน */
+  position: sticky;          /* ให้ sidebar ล็อคเวลา scroll */
+  top: 2rem;
   align-self: start;
-  /* background: #fafafa; */
   padding: 1rem;
 }
 
-/* --------------------- Table of Contents --------------------- */
+/* Title */
 .tocTitle {
-  font-size: 20px;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
+  font-family: 'SukhumvitTadmai', sans-serif;
+  font-weight: 800;          /* ExtraBold */
+  font-size: 18px;
+  margin-bottom: 1rem;
 }
 
-.tocList {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  padding-left: 0.5rem; /* เยื้องรายการออกจากหัวข้อ */
-}
-
+/* =============================
+   Sidebar TOC (Table of Contents)
+============================= */
 .tocLink {
-  display: block;
-  padding: 0.2rem 0;
-  color: #E88534;
+  display: inline-flex;
+  align-items: flex-start;   /* ให้ icon ตรงบรรทัดแรก */
+  gap: 6px;
+  font-family: 'SukhumvitTadmai', sans-serif;
   text-decoration: none;
-  font-weight: 400;
-  font-size: 0.95rem;
+  color: #333;
 }
 
-.tocLink:hover {
-  color: #0056b3;
+.tocText {
+  font-size: 16px;
+  line-height: 1.6;
+  font-weight: 400;          /* ปกติ */
+  transition: color 0.3s ease, font-weight 0.3s ease;
 }
-.tocLink:active {
-  font-weight: 600;
+
+.tocLink:hover .tocText {
+  color: #367AF5;
+}
+
+/* Active link */
+.tocLink.active .tocText {
+  font-weight: 600 !important; /* active = ExtraBold */
+  color: #E88534;
+}
+
+/* =============================
+   Icon (Arrow) 
+============================= */
+.tocIcon {
+  font-size: 18px;
+  color: #E88534;
+  flex-shrink: 0;
+  margin-top: 2px;         
+  opacity: 0;
+  transform: translateX(-5px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.tocLink.active .tocIcon {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 /* --------------------- Loading State --------------------- */
@@ -201,3 +227,15 @@
   display: flex;
   justify-content: center; /* ชิดกลาง */
 }
+
+/* --------------------- Responsive --------------------- */
+@media (max-width: 1200px) {
+  .layout {
+    grid-template-columns: 1fr; /* ให้ content กินเต็มจอ */
+  }
+
+  .sidebar {
+    display: none; /* ซ่อนสารบัญ */
+  }
+}
+

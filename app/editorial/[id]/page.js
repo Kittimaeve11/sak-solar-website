@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { MdKeyboardDoubleArrowRight } from "react-icons/md";
+import { IoMdArrowDropright } from "react-icons/io";
 import { useLocale } from "@/app/Context/LocaleContext";
 import Gallery from "../gallery";
 import RecommendedArticles from "./RecommendedArticles";
@@ -13,7 +14,7 @@ import styles from "./EditorialDetailPage.module.css";
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 
-// ---------------- ฟังก์ชันแปลง URL ของรูป ----------------
+/* ---------------- ฟังก์ชันแปลง URL ของรูป ---------------- */
 function getImageUrls(galleryStr) {
   if (!galleryStr) return [];
 
@@ -55,7 +56,7 @@ function getImageUrls(galleryStr) {
   }
 }
 
-// ---------------- ฟังก์ชัน parse HTML ----------------
+/* ---------------- ฟังก์ชัน parse HTML ---------------- */
 function parseHTML(str) {
   if (!str || typeof str !== "string") return "";
   return str
@@ -74,7 +75,10 @@ export default function EditorialDetailPage() {
   const { locale } = useLocale();
 
   const [editorial, setEditorial] = useState(null);
+  const [activeIndex, setActiveIndex] = useState(null);
+  const sectionsRef = useRef([]);
 
+  /* ---------------- ดึงข้อมูล ---------------- */
   useEffect(() => {
     if (!id) return;
     const controller = new AbortController();
@@ -88,7 +92,6 @@ export default function EditorialDetailPage() {
 
         if (!res.ok) throw new Error(`API failed: ${res.status}`);
         const data = await res.json();
-        console.log("📌 API response:", data);
 
         let article = null;
         if (Array.isArray(data?.result) && data.result.length > 0) {
@@ -111,6 +114,45 @@ export default function EditorialDetailPage() {
     return () => controller.abort();
   }, [id]);
 
+  /* ---------------- Scroll spy แบบแก้บัค ---------------- */
+  useEffect(() => {
+    if (!sectionsRef.current.length) return;
+
+    function onScroll() {
+      let currentIndex = -1; // เริ่ม -1 = ยังไม่เข้า section ไหน
+
+      sectionsRef.current.forEach((section, idx) => {
+        if (!section) return;
+        const rect = section.getBoundingClientRect();
+        const sectionTop = rect.top;
+        const sectionBottom = rect.bottom;
+
+        // เช็คว่า viewport อยู่ใน section นี้
+        if (sectionTop <= 120 && sectionBottom > 120) {
+          currentIndex = idx;
+        }
+      });
+
+      // ถ้าไม่เจอ section เลย → set null
+      if (currentIndex === -1) {
+        if (activeIndex !== null) setActiveIndex(null);
+      } else if (currentIndex !== activeIndex) {
+        setActiveIndex(currentIndex);
+      }
+    }
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, [editorial, activeIndex]);
+
+
+
+
+
   if (!editorial) return null;
 
   const title = locale === "en"
@@ -127,7 +169,7 @@ export default function EditorialDetailPage() {
     <main>
       <div className={styles.wrapper}>
         <div className={styles.layout}>
-          {/* เนื้อหาหลัก */}
+          {/* ---------------- เนื้อหาหลัก ---------------- */}
           <div className={styles.contentBox}>
             <article className={styles.article}>
               {/* Header */}
@@ -190,8 +232,16 @@ export default function EditorialDetailPage() {
                 const imageUrls = getImageUrls(sub?.subgallary || "");
 
                 return (
-                  <section key={index} id={`section-${index}`} className={styles.subSection}>
-                    <h2 className={styles.subTitle}>{subTitle}</h2>
+                  <section
+                    key={index}
+                    id={`section-${index}`}
+                    ref={(el) => (sectionsRef.current[index] = el)}
+                    className={styles.subSection}
+                  >
+                    <h2 className={`${styles.subTitle} ${activeIndex === index ? styles.activeTitle : ""}`}>
+                      {subTitle}
+                    </h2>
+
                     <div
                       className={styles.subContent}
                       dangerouslySetInnerHTML={{ __html: parseHTML(subDesc) }}
@@ -207,7 +257,7 @@ export default function EditorialDetailPage() {
             </article>
           </div>
 
-          {/* Sidebar */}
+          {/* ---------------- Sidebar ---------------- */}
           <aside className={styles.sidebar}>
             <h3 className={styles.tocTitle}>
               {locale === "en" ? "Table of Contents" : "สารบัญ"}
@@ -217,12 +267,19 @@ export default function EditorialDetailPage() {
                 const subTitle = locale === "en"
                   ? sub?.subtitiEN || sub?.subtitiTH || "-"
                   : sub?.subtitiTH || "-";
+                const isActive = activeIndex === index;
                 return (
-                  <li key={index}>
-                    <a href={`#section-${index}`} className={styles.tocLink}>
-                      {subTitle}
-                    </a>
+                  <li key={index} className={styles.tocItem}>
+                    <Link
+                      href={`#section-${index}`}
+                      className={`${styles.tocLink} ${isActive ? styles.active : ""}`}
+                    >
+                      <IoMdArrowDropright className={styles.tocIcon} />
+                      <span className={styles.tocText}>{subTitle}</span>
+                    </Link>
                   </li>
+
+
                 );
               })}
             </ul>
@@ -230,9 +287,9 @@ export default function EditorialDetailPage() {
         </div>
       </div>
 
-      {/* -------------------- Recommended Articles ด้านล่าง -------------------- */}
-      <div className={styles.recommendedSection} >
-        <RecommendedArticles typeID={3} currentId={editorial.editoria_id} />
+      {/* -------------------- Recommended Articles -------------------- */}
+      <div className={styles.recommendedSection}>
+        {/* <RecommendedArticles typeID={3} currentId={editorial.editoria_id} /> */}
       </div>
     </main>
   );
