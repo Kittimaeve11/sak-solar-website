@@ -352,7 +352,7 @@ export default function ProductsPage() {
                       {/* ริบบิ้นโปรโมชั่น */}
                       {item.isPromotion === "1" && item.discountPercent && (
                         <div className="product-promo-ribbon">
-                          - {item.discountPercent}
+                          -{item.discountPercent}%
                         </div>
                       )}
                     </div>
@@ -367,52 +367,59 @@ export default function ProductsPage() {
                       )}
 
                       {item.isprice === "0" && item.size && (
-                        <p style={{ display: "inline-flex", alignItems: "center", gap: "2px", fontWeight: 600 }}>
+                        <p
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "2px",
+                            fontWeight: 600,
+                          }}
+                        >
                           <MdOutlineElectricBolt size={25} color="#ffc300" /> {item.size}
                         </p>
                       )}
 
                       {item.isprice === "1" && item.price && (
                         <div style={{ position: "relative", display: "inline-block" }}>
-                          {item.isPromotion === "1" && item.discountPercent ? (
-                            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                              {/* ราคาหลังหักส่วนลด */}
-                              <p style={{
+                          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                            {/* ราคาหลัก (ถ้ามีโปรโมชั่นใช้ finalPrice ถ้าไม่มีก็ใช้ item.price) */}
+                            <p
+                              style={{
                                 display: "inline-flex",
                                 alignItems: "center",
                                 gap: "0px",
                                 fontWeight: 600,
                                 fontSize: "20px",
-                                margin: 0
-                              }}>
-                                <TbCurrencyBaht size={25} color="#000000ff" />{" "}
-                                {Number(finalPrice).toLocaleString()} บาท
-                              </p>
+                                margin: 0,
+                              }}
+                            >
+                              <TbCurrencyBaht size={25} color="#000000ff" />{" "}
+                              {Number(
+                                item.isPromotion === "1" && item.discountPercent
+                                  ? finalPrice
+                                  : item.price
+                              ).toLocaleString()}{" "}
+                              บาท
+                            </p>
 
-                              {/* ราคาจริงขีดฆ่า */}
-                              <span style={{
-                                fontSize: "14px",
-                                color: "#888",
-                                textDecoration: "line-through"
-                              }}>
+                            {/* ราคาขีดฆ่า (เฉพาะกรณีมีโปรโมชั่น) */}
+                            {item.isPromotion === "1" && item.discountPercent && (
+                              <span
+                                style={{
+                                  fontSize: "14px",
+                                  color: "#888",
+                                  textDecoration: "line-through",
+                                }}
+                              >
                                 {Number(item.price).toLocaleString()} บาท
                               </span>
-                            </div>
-                          ) : (
-                            <p style={{
-                              display: "inline-flex",
-                              alignItems: "center",
-                              gap: "0px",
-                              fontWeight: 600
-                            }}>
-                              <TbCurrencyBaht size={25} color="#000000ff" />{" "}
-                              {Number(item.price).toLocaleString()} บาท
-                            </p>
-                          )}
+                            )}
+                          </div>
                         </div>
                       )}
                     </div>
                   </Link>
+
                 );
               })}
             </div>
