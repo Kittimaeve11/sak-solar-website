@@ -15,84 +15,80 @@ export default function Footer() {
   const [dynamicProducts, setDynamicProducts] = useState([]);
   const [contact, setContact] = useState(null);
 
-  const [loadingPolicies, setLoadingPolicies] = useState(true);
-  const [loadingContact, setLoadingContact] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // โหลด socials (mock data local)
     fetch("/api/data")
       .then((res) => res.json())
       .then((data) => setSocials(data.socials || []))
       .catch(() => setSocials([]));
 
-    const fetchPolicies = async () => {
+    // โหลด API พร้อมกัน
+    const fetchData = async () => {
       try {
-        const res = await fetch(`${baseUrl}/api/policyapi`, {
-          headers: { "X-API-KEY": `${apiKey}` },
-        });
-        const data = await res.json();
-        if (data.status && Array.isArray(data.result)) {
-          setPolicies(data.result);
+        const [policiesRes, productsRes, contactRes] = await Promise.all([
+          fetch(`${baseUrl}/api/policyapi`, {
+            headers: { "X-API-KEY": apiKey },
+          }),
+          fetch(`${baseUrl}/api/productHeaderapi`, {
+            headers: { "X-API-KEY": apiKey },
+          }),
+          fetch(`${baseUrl}/api/contactapi`, {
+            headers: { "X-API-KEY": apiKey },
+          }),
+        ]);
+
+        const [policiesData, productsData, contactData] = await Promise.all([
+          policiesRes.json(),
+          productsRes.json(),
+          contactRes.json(),
+        ]);
+
+        // Policies
+        if (policiesData.status && Array.isArray(policiesData.result)) {
+          setPolicies(policiesData.result);
         } else {
           setPolicies([]);
         }
-      } catch (error) {
-        console.error("Error fetching policies:", error);
-        setPolicies([]);
-      } finally {
-        setLoadingPolicies(false);
-      }
-    };
 
-    const fetchProducts = async () => {
-      try {
-        const res = await fetch(`${baseUrl}/api/productHeaderapi`, {
-          headers: { "X-API-KEY": `${apiKey}` },
-        });
-        const data = await res.json();
-        if (data.status && Array.isArray(data.result)) {
-          const productMenus = data.result.map((item) => ({
+        //  Products
+        if (productsData.status && Array.isArray(productsData.result)) {
+          const productMenus = productsData.result.map((item) => ({
             label: item.producttypenameTH.trim(),
             href: `/products/${item.producttypeID}`,
           }));
           const extraMenus = [
-            {
-              label: "สินเชื่อโซล่ารูฟ",
-              href: "https://saksiam.com/service/solarrooftop",
-            },
+            { label: "สินเชื่อโซล่ารูฟ", href: "https://saksiam.com/service/solarrooftop" },
             { label: "ใบรับรองการไฟฟ้า", href: "/file/Inverter.pdf" },
           ];
           setDynamicProducts([...productMenus, ...extraMenus]);
         }
-      } catch (err) {
-        console.error("Error fetching products:", err);
-      }
-    };
 
-    const fetchContact = async () => {
-      try {
-        const res = await fetch(`${baseUrl}/api/contactapi`, {
-          headers: { "X-API-KEY": `${apiKey}` },
-        });
-        const data = await res.json();
+        //  Contact
         if (
-          data.status &&
-          Array.isArray(data.result) &&
-          data.result.length > 0
+          contactData.status &&
+          Array.isArray(contactData.result) &&
+          contactData.result.length > 0
         ) {
-          setContact(data.result[0]);
+          setContact(contactData.result[0]);
+        } else {
+          setContact(null);
         }
       } catch (err) {
-        console.error("Error fetching contact:", err);
+        console.error("Error fetching footer data:", err);
+        setPolicies([]);
+        setDynamicProducts([]);
+        setContact(null);
       } finally {
-        setLoadingContact(false);
+        setLoading(false);
       }
     };
 
-    fetchPolicies();
-    fetchProducts();
-    fetchContact();
+    fetchData();
   }, []);
 
+  // Path ไอคอนโซเชียล
   const iconPath = useMemo(
     () => ({
       facebook: "/images/facebook.png",
@@ -104,6 +100,7 @@ export default function Footer() {
     []
   );
 
+  // สองเมนูแรก (dynamic + static)
   const firstTwoMenus = [
     {
       ...staticMenu[0],
@@ -127,9 +124,8 @@ export default function Footer() {
               ))}
             </ul>
 
-            {/* หัวข้อนโยบาย */}
             <h4>นโยบาย</h4>
-            {loadingPolicies ? (
+            {loading ? (
               <p>กำลังโหลด...</p>
             ) : policies.length > 0 ? (
               <ul>
@@ -162,10 +158,10 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* คอลัมน์ที่สาม: ติดต่อเรา + social icons */}
+          {/* คอลัมน์ที่สาม: ติดต่อเรา + social */}
           <div className={styles.column}>
             <h4>ติดต่อเรา</h4>
-            {loadingContact ? (
+            {loading ? (
               <p>กำลังโหลด...</p>
             ) : contact ? (
               <div className="fade-in">

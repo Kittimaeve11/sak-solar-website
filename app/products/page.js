@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
 import { MdOutlineElectricBolt } from "react-icons/md";
 import { TbCurrencyBaht } from "react-icons/tb";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
-import Link from 'next/link';
 import { useLocale } from '@/app/Context/LocaleContext';
 import '@/styles/products.css';
 
@@ -14,23 +15,29 @@ const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 
 export default function ProductsPage() {
   const { locale } = useLocale();
+  const params = useParams();
+
+  const slug = params?.slug || [];
+  const typeId = slug?.[0] ? Number(slug[0]) : null;
+  const brandSlug = slug?.[1] || null;
+
+  // States
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [brands, setBrands] = useState([]);
   const [filteredBrands, setFilteredBrands] = useState([]);
-  const [loading, setLoading] = useState(false);
 
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedBrands, setSelectedBrands] = useState([]);
+
+  const [loading, setLoading] = useState(false);
+  const [isFading, setIsFading] = useState(false);
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
 
-  // Fade effect state
-  const [isFading, setIsFading] = useState(false);
-
-  /* ====== Helper: รูปภาพ ====== */
+  /* ===================== Helper ===================== */
   const getImageUrl = (path) => {
     if (!path) return '/images/no-image.jpg';
     if (path.startsWith('http')) return path;
@@ -41,24 +48,36 @@ export default function ProductsPage() {
     }
   };
 
-  /* ====== โหลดข้อมูล API ====== */
+  const normalizeBrandName = (name) => {
+    if (!name) return "";
+    let cleaned = name.trim().toLowerCase();
+
+    const mapping = {
+      "huawel": "Huawei",
+      "huawei": "Huawei",
+      "deye": "Deye",
+      "growatt": "Growatt",
+      "sinclair": "Sinclair"
+    };
+
+    return mapping[cleaned] || cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+  };
+
+  /* ===================== โหลด API ===================== */
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        // โหลด Header (หมวดหมู่ + ยี่ห้อ)
+        // Header API
         const resHeader = await fetch(`${baseUrl}/api/productHeaderapi`, {
           headers: { 'X-API-KEY': apiKey }
         });
         const headerData = await resHeader.json();
         if (headerData.status && Array.isArray(headerData.result)) {
           setCategories(headerData.result);
-          const allBrands = headerData.result.flatMap(cat => cat.Brand || []);
-          setBrands(allBrands);
-          setFilteredBrands(allBrands);
         }
 
-        // โหลดสินค้าทั้งหมด
+        // Products API
         const resProducts = await fetch(`${baseUrl}/api/productpageapi?offset=0&limit=9999`, {
           headers: { 'X-API-KEY': apiKey }
         });
@@ -70,9 +89,7 @@ export default function ProductsPage() {
             try {
               const gallery = JSON.parse(p.gallery || "[]");
               mainImage = gallery[0] || "";
-            } catch {
-              mainImage = "";
-            }
+            } catch { mainImage = ""; }
 
             return {
               id: p.product_ID,
@@ -85,13 +102,42 @@ export default function ProductsPage() {
               isprice: p.isprice,
               battery: p.battery,
               mainImage,
-              categoryId: p.protypeID,
-              brandId: p.probrandID,
+              categoryId: Number(p.protypeID),
+              brandName: normalizeBrandName(p.BrandProduct_name),
+              brandOrder: p.BrandProduct_order ? Number(p.BrandProduct_order) : 9999,
               product_pin: p.product_pin || "0",
+
+              // ✅ เพิ่ม field เกี่ยวกับโปรโมชั่น
+              isPromotion: p.productpro_ispromotion,
+              discountPercent: p.productpro_percent,
+              promoPrice: p.productpro_discountorice
+                ? parseFloat(p.productpro_discountorice)
+                : null,
             };
           });
 
           setProducts(formatted);
+
+          // ดึงยี่ห้อทั้งหมดจาก product list
+          const brandMap = new Map();
+          formatted.forEach(item => {
+            if (!brandMap.has(item.brandName)) {
+              brandMap.set(item.brandName, {
+                brandName: item.brandName,
+                categoryIds: [item.categoryId],
+                order: item.brandOrder
+              });
+            } else {
+              const exist = brandMap.get(item.brandName);
+              if (!exist.categoryIds.includes(item.categoryId)) {
+                exist.categoryIds.push(item.categoryId);
+              }
+            }
+          });
+
+          // เรียงยี่ห้อตาม order
+          const sortedBrands = Array.from(brandMap.values()).sort((a, b) => a.order - b.order);
+          setBrands(sortedBrands);
         }
       } catch (err) {
         console.error("API Error", err);
@@ -103,7 +149,38 @@ export default function ProductsPage() {
     fetchData();
   }, []);
 
-  /* ====== Toggle Category (แก้ใหม่) ====== */
+  /* ===================== Filter จาก params ===================== */
+  useEffect(() => {
+    if (categories.length > 0 && brands.length > 0) {
+      if (typeId) {
+        setSelectedCategories([typeId]);
+        let filtered = brands.filter(b => b.categoryIds.includes(typeId));
+        setFilteredBrands(filtered);
+      }
+      if (brandSlug) {
+        setSelectedBrands([normalizeBrandName(brandSlug)]);
+      }
+    }
+  }, [categories, brands, typeId, brandSlug]);
+
+  /* ===================== Filter Logic ===================== */
+  const filteredItems = useMemo(() => {
+    return products.filter(item => {
+      const inCategory =
+        selectedCategories.length === 0 || selectedCategories.includes(item.categoryId);
+
+      const inBrand =
+        selectedBrands.length === 0 || selectedBrands.includes(item.brandName);
+
+      return inCategory && inBrand;
+    });
+  }, [products, selectedCategories, selectedBrands]);
+
+  // Pagination
+  const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+  const currentItems = filteredItems.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  /* ===================== Event Handlers ===================== */
   const toggleCategory = (categoryId) => {
     setSelectedCategories(prev => {
       let newCategories;
@@ -113,20 +190,19 @@ export default function ProductsPage() {
         newCategories = [...prev, categoryId];
       }
 
-      // ฟิลเตอร์ยี่ห้อทันที
       let filtered = [];
       if (newCategories.length === 0) {
-        filtered = brands;
+        filtered = [];
       } else {
-        filtered = categories
-          .filter(cat => newCategories.includes(cat.producttypeID))
-          .flatMap(cat => cat.Brand || []);
+        filtered = brands.filter(b => b.categoryIds.some(cid => newCategories.includes(cid)));
       }
+
       setFilteredBrands(filtered);
 
-      // เคลียร์ selectedBrands ที่ไม่เกี่ยวข้อง
       setSelectedBrands(prevBrands =>
-        prevBrands.filter(b => filtered.some(fb => fb.productbrandID === b))
+        prevBrands.filter(bName =>
+          filtered.some(fb => fb.brandName === bName)
+        )
       );
 
       setCurrentPage(1);
@@ -134,39 +210,16 @@ export default function ProductsPage() {
     });
   };
 
-  /* ====== Toggle Brand ====== */
-  const toggleBrand = (brandId) => {
+  const toggleBrand = (brandName) => {
     setSelectedBrands(prev =>
-      prev.includes(brandId)
-        ? prev.filter(b => b !== brandId)
-        : [...prev, brandId]
+      prev.includes(brandName) ? prev.filter(b => b !== brandName) : [...prev, brandName]
     );
     setCurrentPage(1);
   };
 
-  /* ====== Filtered Items ====== */
-  const filteredItems = products.filter(item => {
-    const matchCategory =
-      selectedCategories.length === 0 ||
-      selectedCategories.includes(item.categoryId);
-    const matchBrand =
-      selectedBrands.length === 0 ||
-      selectedBrands.includes(item.brandId);
-    return matchCategory && matchBrand;
-  });
-
-  // Pagination logic
-  const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentItems = filteredItems.slice(startIndex, startIndex + itemsPerPage);
-
-  if (loading) return <p>กำลังโหลด...</p>;
-
-  // handlePageChange with fade-in + scroll top (ไม่เห็นการเลื่อน)
   const handlePageChange = (page) => {
     if (page !== currentPage) {
       setIsFading(true);
-
       setTimeout(() => {
         window.scrollTo({ top: 0, behavior: "auto" });
         setCurrentPage(page);
@@ -175,6 +228,31 @@ export default function ProductsPage() {
     }
   };
 
+  /* ===================== SEO ===================== */
+  useEffect(() => {
+    const loc = typeof locale === 'string' ? locale.toLowerCase() : 'th';
+    const isThai = loc.startsWith('th');
+
+    document.title = isThai
+      ? 'บริการและผลิตภัณฑ์ | บริษัท ศักดิ์สยาม โซลาร์ เอ็นเนอร์ยี่ จำกัด'
+      : 'Products & Services | Sak Siam Solar Energy Co., Ltd.';
+
+    const metaDescription = document.querySelector("meta[name='description']");
+    const content = isThai
+      ? 'บริการและผลิตภัณฑ์ของบริษัท ศักดิ์สยาม โซลาร์ เอ็นเนอร์ยี่ จำกัด ครบวงจรโซลาร์เซลล์'
+      : 'Products & services from Sak Siam Solar Energy Co., Ltd. - Solar panels, inverters, batteries, and full solar solutions';
+    if (metaDescription) {
+      metaDescription.setAttribute('content', content);
+    } else {
+      const meta = document.createElement('meta');
+      meta.name = 'description';
+      meta.content = content;
+      document.head.appendChild(meta);
+    }
+  }, [locale]);
+
+  /* ===================== Render ===================== */
+  if (loading) return <p>กำลังโหลด...</p>;
   return (
     <main className="products-container">
       {/* Sidebar */}
@@ -189,12 +267,10 @@ export default function ProductsPage() {
               <label key={cat.producttypeID} className="checkbox-item">
                 <input
                   type="checkbox"
-                  checked={selectedCategories.includes(cat.producttypeID)}
-                  onChange={() => toggleCategory(cat.producttypeID)}
+                  checked={selectedCategories.includes(Number(cat.producttypeID))}
+                  onChange={() => toggleCategory(Number(cat.producttypeID))}
                 />
-                {locale === 'en'
-                  ? cat.producttypenameEN
-                  : cat.producttypenameTH}
+                {locale === 'en' ? cat.producttypenameEN : cat.producttypenameTH}
               </label>
             ))}
           </div>
@@ -207,20 +283,19 @@ export default function ProductsPage() {
             <h3>ยี่ห้อ</h3>
             <div className="filter-box">
               {filteredBrands.map(b => (
-                <label key={b.productbrandID} className="checkbox-item">
+                <label key={b.brandName} className="checkbox-item">
                   <input
                     type="checkbox"
-                    checked={selectedBrands.includes(b.productbrandID)}
-                    onChange={() => toggleBrand(b.productbrandID)}
+                    checked={selectedBrands.includes(b.brandName)}
+                    onChange={() => toggleBrand(b.brandName)}
                   />
-                  {b.productbrandname}
+                  {b.brandName}
                 </label>
               ))}
             </div>
           </section>
         )}
 
-        {/* Reset */}
         {(selectedCategories.length > 0 || selectedBrands.length > 0) && (
           <button
             className="resetbutton"
@@ -228,7 +303,7 @@ export default function ProductsPage() {
             onClick={() => {
               setSelectedCategories([]);
               setSelectedBrands([]);
-              setFilteredBrands(brands);
+              setFilteredBrands([]);
               setCurrentPage(1);
             }}
           >
@@ -246,15 +321,25 @@ export default function ProductsPage() {
         ) : (
           <>
             <div className={`products-grid ${isFading ? 'fade' : ''}`}>
-              {currentItems.map((item, index) => (
-                <Link
-                  key={item.id}
-                  href={`/products/${item.categoryId}/${item.brandId}/${item.id}`}
-                  className="product-card fade-in"
-                  style={{ animationDelay: `${index * 0.08}s` }}
-                >
-                  {/* Image */}
-                  {item.mainImage && (
+              {currentItems.map((item, index) => {
+                // ✅ คำนวณราคาส่วนลด
+                let finalPrice = null;
+                if (item.isprice === "1" && item.price) {
+                  if (item.isPromotion === "1" && item.discountPercent) {
+                    const discountPercent = parseFloat(item.discountPercent) || 0;
+                    finalPrice = item.price - (item.price * discountPercent / 100);
+                  } else {
+                    finalPrice = item.price;
+                  }
+                }
+
+                return (
+                  <Link
+                    key={item.id}
+                    href={`/products/${item.categoryId}/${item.brandName}/${item.id}`}
+                    className="product-card fade-in"
+                    style={{ animationDelay: `${index * 0.08}s` }}
+                  >
                     <div className="product-image-wrapper" style={{ position: "relative" }}>
                       <Image
                         src={getImageUrl(item.mainImage)}
@@ -263,119 +348,96 @@ export default function ProductsPage() {
                         height={285}
                         unoptimized
                       />
+
+                      {/* ริบบิ้นโปรโมชั่น */}
+                      {item.isPromotion === "1" && item.discountPercent && (
+                        <div className="product-promo-ribbon">
+                          - {item.discountPercent}
+                        </div>
+                      )}
                     </div>
-                  )}
 
-                  {/* Info */}
-                  <div className="product-info">
-                    <h3 className="product-name">
-                      {item.modelair || item.model || item.solarpanel}
-                    </h3>
+                    <div className="product-info">
+                      <h3 className="product-name">
+                        {item.modelair || item.model || item.solarpanel}
+                      </h3>
 
-                    {item.battery && (
-                      <h6 className="product-battery">
-                        รุ่นแบตเตอรี่ {item.battery} kWh
-                      </h6>
-                    )}
+                      {item.battery && (
+                        <h6 className="product-battery">รุ่นแบตเตอรี่ {item.battery} kWh</h6>
+                      )}
 
-                    {item.isprice === "0" && item.size && (
-                      <p style={{ display: "inline-flex", alignItems: "center", gap: "2px", fontWeight: 600 }}>
-                        <MdOutlineElectricBolt size={25} color="#ffc300" /> {item.size}
-                      </p>
-                    )}
+                      {item.isprice === "0" && item.size && (
+                        <p style={{ display: "inline-flex", alignItems: "center", gap: "2px", fontWeight: 600 }}>
+                          <MdOutlineElectricBolt size={25} color="#ffc300" /> {item.size}
+                        </p>
+                      )}
 
-                    {item.isprice === "1" && item.price && (
-                      <p style={{ display: "inline-flex", alignItems: "center", fontWeight: 600, fontSize: "20px", margin: 0 }}>
-                        <TbCurrencyBaht size={25} /> {Number(item.price).toLocaleString()} บาท
-                      </p>
-                    )}
-                  </div>
-                </Link>
-              ))}
+                      {item.isprice === "1" && item.price && (
+                        <div style={{ position: "relative", display: "inline-block" }}>
+                          {item.isPromotion === "1" && item.discountPercent ? (
+                            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                              {/* ราคาหลังหักส่วนลด */}
+                              <p style={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "0px",
+                                fontWeight: 600,
+                                fontSize: "20px",
+                                margin: 0
+                              }}>
+                                <TbCurrencyBaht size={25} color="#000000ff" />{" "}
+                                {Number(finalPrice).toLocaleString()} บาท
+                              </p>
+
+                              {/* ราคาจริงขีดฆ่า */}
+                              <span style={{
+                                fontSize: "14px",
+                                color: "#888",
+                                textDecoration: "line-through"
+                              }}>
+                                {Number(item.price).toLocaleString()} บาท
+                              </span>
+                            </div>
+                          ) : (
+                            <p style={{
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "0px",
+                              fontWeight: 600
+                            }}>
+                              <TbCurrencyBaht size={25} color="#000000ff" />{" "}
+                              {Number(item.price).toLocaleString()} บาท
+                            </p>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </Link>
+                );
+              })}
             </div>
 
-            {/* Pagination */}
             {totalPages > 1 && (
               <div className="pagination-controls" style={{ marginTop: '1.5rem' }}>
                 <div className="page-buttons">
                   {currentPage > 1 && (
-                    <button
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      className="btn-with-arrow"
-                    >
+                    <button onClick={() => handlePageChange(currentPage - 1)} className="btn-with-arrow">
                       <IoIosArrowBack className="arrow-icon" />
                     </button>
                   )}
 
-                  {(() => {
-                    const pages = [];
-                    const totalNumbers = 5;
-                    const totalBlocks = totalNumbers + 2;
-
-                    if (totalPages > totalBlocks) {
-                      const startPage = Math.max(2, currentPage - 2);
-                      const endPage = Math.min(totalPages - 1, currentPage + 2);
-
-                      if (1 < startPage)
-                        pages.push(
-                          <button
-                            key={1}
-                            onClick={() => handlePageChange(1)}
-                            className={currentPage === 1 ? "active-page" : ""}
-                          >
-                            1
-                          </button>
-                        );
-
-                      if (startPage > 2)
-                        pages.push(<span key="start-ellipsis">...</span>);
-
-                      for (let i = startPage; i <= endPage; i++) {
-                        pages.push(
-                          <button
-                            key={i}
-                            onClick={() => handlePageChange(i)}
-                            className={currentPage === i ? "active-page" : ""}
-                          >
-                            {i}
-                          </button>
-                        );
-                      }
-
-                      if (endPage < totalPages - 1)
-                        pages.push(<span key="end-ellipsis">...</span>);
-
-                      pages.push(
-                        <button
-                          key={totalPages}
-                          onClick={() => handlePageChange(totalPages)}
-                          className={currentPage === totalPages ? "active-page" : ""}
-                        >
-                          {totalPages}
-                        </button>
-                      );
-                    } else {
-                      for (let i = 1; i <= totalPages; i++) {
-                        pages.push(
-                          <button
-                            key={i}
-                            onClick={() => handlePageChange(i)}
-                            className={currentPage === i ? "active-page" : ""}
-                          >
-                            {i}
-                          </button>
-                        );
-                      }
-                    }
-
-                    return pages;
-                  })()}
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                    <button
+                      key={page}
+                      onClick={() => handlePageChange(page)}
+                      className={currentPage === page ? "active-page" : ""}
+                    >
+                      {page}
+                    </button>
+                  ))}
 
                   {currentPage < totalPages && (
-                    <button
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      className="btn-with-arrow"
-                    >
+                    <button onClick={() => handlePageChange(currentPage + 1)} className="btn-with-arrow">
                       <IoIosArrowForward className="arrow-icon" />
                     </button>
                   )}
