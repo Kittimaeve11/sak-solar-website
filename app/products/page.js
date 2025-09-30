@@ -13,15 +13,19 @@ import '@/styles/products.css';
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 
+// 🔹 สร้าง slug จาก EN name
+const slugify = (name) =>
+  name?.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') || '';
+
 export default function ProductsPage() {
   const { locale } = useLocale();
   const params = useParams();
 
-  const slug = params?.slug || [];
-  const typeId = slug?.[0] ? Number(slug[0]) : null;
-  const brandSlug = slug?.[1] || null;
+  // ✅ เอาค่าจาก dynamic route
+  const typeSlug = params?.typeID ? decodeURIComponent(params.typeID) : null;
+  const brandSlug = params?.brandID ? decodeURIComponent(params.brandID) : null;
 
-  // States
+  /* -------------------- States -------------------- */
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [brands, setBrands] = useState([]);
@@ -37,7 +41,7 @@ export default function ProductsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
 
-  /* ===================== Helper ===================== */
+  /* -------------------- Helpers -------------------- */
   const getImageUrl = (path) => {
     if (!path) return '/images/no-image.jpg';
     if (path.startsWith('http')) return path;
@@ -50,7 +54,7 @@ export default function ProductsPage() {
 
   const normalizeBrandName = (name) => {
     if (!name) return "";
-    let cleaned = name.trim().toLowerCase();
+    const cleaned = name.trim().toLowerCase();
 
     const mapping = {
       "huawel": "Huawei",
@@ -63,21 +67,30 @@ export default function ProductsPage() {
     return mapping[cleaned] || cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
   };
 
-  /* ===================== โหลด API ===================== */
+  /* -------------------- โหลด API -------------------- */
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        // Header API
+        // โหลด categories
         const resHeader = await fetch(`${baseUrl}/api/productHeaderapi`, {
           headers: { 'X-API-KEY': apiKey }
         });
         const headerData = await resHeader.json();
+        let slugToIdMap = {};
         if (headerData.status && Array.isArray(headerData.result)) {
           setCategories(headerData.result);
+          // สร้าง slug → id map
+          slugToIdMap = headerData.result.reduce((acc, cat) => {
+            acc[slugify(cat.producttypenameEN)] = Number(cat.producttypeID);
+            return acc;
+          }, {});
         }
 
-        // Products API
+        // ✅ match typeSlug → typeId จริง
+        const matchedTypeId = typeSlug ? slugToIdMap[typeSlug] : null;
+
+        // โหลด products
         const resProducts = await fetch(`${baseUrl}/api/productpageapi?offset=0&limit=9999`, {
           headers: { 'X-API-KEY': apiKey }
         });
@@ -106,8 +119,6 @@ export default function ProductsPage() {
               brandName: normalizeBrandName(p.BrandProduct_name),
               brandOrder: p.BrandProduct_order ? Number(p.BrandProduct_order) : 9999,
               product_pin: p.product_pin || "0",
-
-              // ✅ เพิ่ม field เกี่ยวกับโปรโมชั่น
               isPromotion: p.productpro_ispromotion,
               discountPercent: p.productpro_percent,
               promoPrice: p.productpro_discountorice
@@ -118,26 +129,35 @@ export default function ProductsPage() {
 
           setProducts(formatted);
 
-          // ดึงยี่ห้อทั้งหมดจาก product list
+          // รวม brand ทั้งหมด
           const brandMap = new Map();
           formatted.forEach(item => {
-            if (!brandMap.has(item.brandName)) {
-              brandMap.set(item.brandName, {
-                brandName: item.brandName,
+            const normalized = normalizeBrandName(item.brandName);
+            if (!brandMap.has(normalized)) {
+              brandMap.set(normalized, {
+                brandName: normalized,
                 categoryIds: [item.categoryId],
                 order: item.brandOrder
               });
             } else {
-              const exist = brandMap.get(item.brandName);
+              const exist = brandMap.get(normalized);
               if (!exist.categoryIds.includes(item.categoryId)) {
                 exist.categoryIds.push(item.categoryId);
               }
             }
           });
 
-          // เรียงยี่ห้อตาม order
           const sortedBrands = Array.from(brandMap.values()).sort((a, b) => a.order - b.order);
           setBrands(sortedBrands);
+
+          // --- Filter จาก params ---
+          if (matchedTypeId) {
+            setSelectedCategories([matchedTypeId]);
+            setFilteredBrands(sortedBrands.filter(b => b.categoryIds.includes(matchedTypeId)));
+          }
+          if (brandSlug) {
+            setSelectedBrands([normalizeBrandName(brandSlug)]);
+          }
         }
       } catch (err) {
         console.error("API Error", err);
@@ -147,30 +167,17 @@ export default function ProductsPage() {
     };
 
     fetchData();
-  }, []);
+  }, [typeSlug, brandSlug, locale]);
 
-  /* ===================== Filter จาก params ===================== */
-  useEffect(() => {
-    if (categories.length > 0 && brands.length > 0) {
-      if (typeId) {
-        setSelectedCategories([typeId]);
-        let filtered = brands.filter(b => b.categoryIds.includes(typeId));
-        setFilteredBrands(filtered);
-      }
-      if (brandSlug) {
-        setSelectedBrands([normalizeBrandName(brandSlug)]);
-      }
-    }
-  }, [categories, brands, typeId, brandSlug]);
-
-  /* ===================== Filter Logic ===================== */
+  /* -------------------- Filter -------------------- */
   const filteredItems = useMemo(() => {
     return products.filter(item => {
       const inCategory =
         selectedCategories.length === 0 || selectedCategories.includes(item.categoryId);
 
       const inBrand =
-        selectedBrands.length === 0 || selectedBrands.includes(item.brandName);
+        selectedBrands.length === 0 ||
+        selectedBrands.includes(normalizeBrandName(item.brandName));
 
       return inCategory && inBrand;
     });
@@ -180,7 +187,7 @@ export default function ProductsPage() {
   const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
   const currentItems = filteredItems.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
-  /* ===================== Event Handlers ===================== */
+  /* -------------------- Handlers -------------------- */
   const toggleCategory = (categoryId) => {
     setSelectedCategories(prev => {
       let newCategories;
@@ -191,18 +198,15 @@ export default function ProductsPage() {
       }
 
       let filtered = [];
-      if (newCategories.length === 0) {
-        filtered = [];
-      } else {
+      if (newCategories.length > 0) {
         filtered = brands.filter(b => b.categoryIds.some(cid => newCategories.includes(cid)));
       }
 
       setFilteredBrands(filtered);
 
+      // reset brand ที่ไม่อยู่ใน filter
       setSelectedBrands(prevBrands =>
-        prevBrands.filter(bName =>
-          filtered.some(fb => fb.brandName === bName)
-        )
+        prevBrands.filter(bName => filtered.some(fb => fb.brandName === bName))
       );
 
       setCurrentPage(1);
@@ -211,8 +215,11 @@ export default function ProductsPage() {
   };
 
   const toggleBrand = (brandName) => {
+    const normalized = normalizeBrandName(brandName);
     setSelectedBrands(prev =>
-      prev.includes(brandName) ? prev.filter(b => b !== brandName) : [...prev, brandName]
+      prev.includes(normalized)
+        ? prev.filter(b => b !== normalized)
+        : [...prev, normalized]
     );
     setCurrentPage(1);
   };
@@ -228,31 +235,9 @@ export default function ProductsPage() {
     }
   };
 
-  /* ===================== SEO ===================== */
-  useEffect(() => {
-    const loc = typeof locale === 'string' ? locale.toLowerCase() : 'th';
-    const isThai = loc.startsWith('th');
-
-    document.title = isThai
-      ? 'บริการและผลิตภัณฑ์ | บริษัท ศักดิ์สยาม โซลาร์ เอ็นเนอร์ยี่ จำกัด'
-      : 'Products & Services | Sak Siam Solar Energy Co., Ltd.';
-
-    const metaDescription = document.querySelector("meta[name='description']");
-    const content = isThai
-      ? 'บริการและผลิตภัณฑ์ของบริษัท ศักดิ์สยาม โซลาร์ เอ็นเนอร์ยี่ จำกัด ครบวงจรโซลาร์เซลล์'
-      : 'Products & services from Sak Siam Solar Energy Co., Ltd. - Solar panels, inverters, batteries, and full solar solutions';
-    if (metaDescription) {
-      metaDescription.setAttribute('content', content);
-    } else {
-      const meta = document.createElement('meta');
-      meta.name = 'description';
-      meta.content = content;
-      document.head.appendChild(meta);
-    }
-  }, [locale]);
-
-  /* ===================== Render ===================== */
+  /* -------------------- Render -------------------- */
   if (loading) return <p>กำลังโหลด...</p>;
+
   return (
     <main className="products-container">
       {/* Sidebar */}
@@ -322,7 +307,6 @@ export default function ProductsPage() {
           <>
             <div className={`products-grid ${isFading ? 'fade' : ''}`}>
               {currentItems.map((item, index) => {
-                // ✅ คำนวณราคาส่วนลด
                 let finalPrice = null;
                 if (item.isprice === "1" && item.price) {
                   if (item.isPromotion === "1" && item.discountPercent) {
@@ -336,7 +320,7 @@ export default function ProductsPage() {
                 return (
                   <Link
                     key={item.id}
-                    href={`/products/${item.categoryId}/${item.brandName}/${item.id}`}
+                    href={`/products/${item.categoryId}/${slugify(item.brandName)}/${item.id}`}
                     className="product-card fade-in"
                     style={{ animationDelay: `${index * 0.08}s` }}
                   >
@@ -349,10 +333,9 @@ export default function ProductsPage() {
                         unoptimized
                       />
 
-                      {/* ริบบิ้นโปรโมชั่น */}
                       {item.isPromotion === "1" && item.discountPercent && (
                         <div className="product-promo-ribbon">
-                          -{item.discountPercent}%
+                          - {item.discountPercent}
                         </div>
                       )}
                     </div>
@@ -367,14 +350,7 @@ export default function ProductsPage() {
                       )}
 
                       {item.isprice === "0" && item.size && (
-                        <p
-                          style={{
-                            display: "inline-flex",
-                            alignItems: "center",
-                            gap: "2px",
-                            fontWeight: 600,
-                          }}
-                        >
+                        <p style={{ display: "inline-flex", alignItems: "center", gap: "2px", fontWeight: 600 }}>
                           <MdOutlineElectricBolt size={25} color="#ffc300" /> {item.size}
                         </p>
                       )}
@@ -382,35 +358,24 @@ export default function ProductsPage() {
                       {item.isprice === "1" && item.price && (
                         <div style={{ position: "relative", display: "inline-block" }}>
                           <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                            {/* ราคาหลัก (ถ้ามีโปรโมชั่นใช้ finalPrice ถ้าไม่มีก็ใช้ item.price) */}
-                            <p
-                              style={{
-                                display: "inline-flex",
-                                alignItems: "center",
-                                gap: "0px",
-                                fontWeight: 600,
-                                fontSize: "20px",
-                                margin: 0,
-                              }}
-                            >
+                            <p style={{
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "0px",
+                              fontWeight: 600,
+                              fontSize: "20px",
+                              margin: 0,
+                            }}>
                               <TbCurrencyBaht size={25} color="#000000ff" />{" "}
-                              {Number(
-                                item.isPromotion === "1" && item.discountPercent
-                                  ? finalPrice
-                                  : item.price
-                              ).toLocaleString()}{" "}
-                              บาท
+                              {Number(item.isPromotion === "1" && item.discountPercent ? finalPrice : item.price).toLocaleString()} บาท
                             </p>
 
-                            {/* ราคาขีดฆ่า (เฉพาะกรณีมีโปรโมชั่น) */}
                             {item.isPromotion === "1" && item.discountPercent && (
-                              <span
-                                style={{
-                                  fontSize: "14px",
-                                  color: "#888",
-                                  textDecoration: "line-through",
-                                }}
-                              >
+                              <span style={{
+                                fontSize: "14px",
+                                color: "#888",
+                                textDecoration: "line-through",
+                              }}>
                                 {Number(item.price).toLocaleString()} บาท
                               </span>
                             )}
@@ -419,7 +384,6 @@ export default function ProductsPage() {
                       )}
                     </div>
                   </Link>
-
                 );
               })}
             </div>

@@ -11,20 +11,27 @@ import '../../styles/tabmenu.css';
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 
+// ฟังก์ชันแปลงข้อความเป็น slug
+const slugify = (name) =>
+  name
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-') // เว้นวรรค -> -
+    .replace(/[^a-z0-9-]/g, ''); // ลบตัวอักษรพิเศษ
+
 export default function TabMenu() {
   const { messages, locale } = useLocale();
   const pathname = usePathname();
 
-  const [open, setOpen] = useState(false); // main menu toggle
-  const [serviceOpen, setServiceOpen] = useState(false); // products submenu toggle
-  const [activeProductSlug, setActiveProductSlug] = useState(null); // active product type
-  const [isMobile, setIsMobile] = useState(false); // detect mobile
+  const [open, setOpen] = useState(false);
+  const [serviceOpen, setServiceOpen] = useState(false);
+  const [activeProductSlug, setActiveProductSlug] = useState(null);
+  const [isMobile, setIsMobile] = useState(false);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const timeoutRef = useRef(null);
 
-  // ตรวจสอบ active path
   const isActive = (path) =>
     path === '/' ? pathname === '/' : pathname.startsWith(path);
 
@@ -42,18 +49,28 @@ export default function TabMenu() {
 
         const data = await res.json();
         if (data.status && Array.isArray(data.result)) {
-          const formatted = data.result.map((item) => ({
-            slug: item.producttypeID,
-            name: {
-              th: item.producttypenameTH?.trim() || '',
-              en: item.producttypenameEN?.trim() || '',
-            },
-            brands:
-              item.Brand?.map((b) => ({
-                slug: b.productbrandID,
+          const formatted = data.result.map((item) => {
+            const seen = new Set();
+            const uniqueBrands =
+              item.Brand?.filter((b) => {
+                if (seen.has(b.productbrandname)) return false;
+                seen.add(b.productbrandname);
+                return true;
+              }) || [];
+
+            return {
+              slug: slugify(item.producttypenameEN), // ใช้ชื่อ EN เป็น slug
+              name: {
+                th: item.producttypenameTH?.trim() || '',
+                en: item.producttypenameEN?.trim() || '',
+              },
+              brands: uniqueBrands.map((b) => ({
+                slug: slugify(b.productbrandname), // ใช้ชื่อแบรนด์เป็น slug
                 name: b.productbrandname,
-              })) || [],
-          }));
+              })),
+            };
+          });
+
           setProducts(formatted);
         }
       } catch (err) {
@@ -67,12 +84,10 @@ export default function TabMenu() {
       setIsMobile(window.matchMedia('(max-width: 991px)').matches);
     };
 
-    // run once
     fetchProducts();
     checkMobile();
     window.addEventListener('resize', checkMobile);
 
-    // reset state when pathname changes
     setOpen(false);
     setServiceOpen(false);
     setActiveProductSlug(null);
