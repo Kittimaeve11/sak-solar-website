@@ -31,10 +31,9 @@ const getSlidesByWidth = (width) => {
 
 /* ====== Component หลัก ProductCarousel ====== */
 export default function ProductCarousel({ title, items, link }) {
-  const [isDragging, setIsDragging] = useState(false); // กันคลิกระหว่าง drag
-  const [slidesToShow, setSlidesToShow] = useState(4); // จำนวน slides ที่โชว์
+  const [isDragging, setIsDragging] = useState(false);
+  const [slidesToShow, setSlidesToShow] = useState(4);
 
-  /* ====== คำนวณ slidesToShow เมื่อ resize หน้าจอ ====== */
   useEffect(() => {
     const handleResize = () => setSlidesToShow(getSlidesByWidth(window.innerWidth));
     handleResize();
@@ -42,10 +41,9 @@ export default function ProductCarousel({ title, items, link }) {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const loading = !items || items.length === 0; // เช็คว่ายังไม่มีข้อมูล
-  const showSlider = !loading && items.length > slidesToShow; // ถ้ามี item เกิน slidesToShow ค่อยใช้ slider
+  const loading = !items || items.length === 0;
+  const showSlider = !loading && items.length > slidesToShow;
 
-  /* ====== ตั้งค่า react-slick ====== */
   const settings = {
     dots: false,
     infinite: true,
@@ -61,14 +59,25 @@ export default function ProductCarousel({ title, items, link }) {
   };
 
   /* ====== ฟังก์ชันหาชื่อสินค้า ====== */
-  const getProductName = (item) =>
-    item.name ?? item.model ?? item.solarpanel ?? item.title ?? 'ไม่พบข้อมูลชื่อ';
+  const getProductName = (item) => {
+    if (item.producttypeID === "2") {
+      // ✅ ถ้าเป็นแอร์ → ใช้ modelairname
+      return item.modelairname ?? 'ไม่พบข้อมูลชื่อ';
+    }
+    // ✅ ถ้าเป็นสินค้าอื่น → ใช้ modelname
+    return (
+      item.modelname ??
+      item.name ??
+      item.solarpanel ??
+      item.title ??
+      'ไม่พบข้อมูลชื่อ'
+    );
+  };
 
   /* ====== Render การ์ดสินค้า ====== */
   const renderCard = (item) => {
     let finalPrice = null;
 
-    // คำนวณราคาสุดท้าย (ถ้ามีโปรโมชันลดราคา)
     if (item.isprice === '1' && item.price) {
       if (item.productpro_ispromotion === '1' && item.productpro_percent) {
         const discountPercent = parseFloat(item.productpro_percent) || 0;
@@ -97,7 +106,6 @@ export default function ProductCarousel({ title, items, link }) {
               draggable={false}
               priority
             />
-            {/* ริบบิ้นโปรโมชัน */}
             {item.productpro_ispromotion === '1' && item.productpro_percent && (
               <div className="product-promo-ribbon">-{item.productpro_percent}</div>
             )}
@@ -111,7 +119,6 @@ export default function ProductCarousel({ title, items, link }) {
             {getProductName(item)}
           </h3>
 
-          {/* ข้อมูลแบตเตอรี่ */}
           {item.battery && (
             <h6 style={{ marginTop: '0rem' }}>รุ่นแบตเตอรี่ {item.battery} kWh</h6>
           )}
@@ -122,7 +129,6 @@ export default function ProductCarousel({ title, items, link }) {
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '1rem',
                 marginTop: '1rem',
               }}
             >
@@ -134,29 +140,30 @@ export default function ProductCarousel({ title, items, link }) {
                   fontSize: '18px',
                   margin: 0,
                   lineHeight: 1,
+                  gap: '4px', // ✅ ใช้ gap แทน
                 }}
               >
-                <MdOutlineElectricBolt size={25} color="#ffc300" /> {item.size}
+                <MdOutlineElectricBolt size={22} color="#ffc300" />
+                {item.size}
               </p>
             </div>
           )}
 
-          {/* แสดงราคา (ถ้ามีราคา) */}
+          {/* แสดงราคา */}
           {item.isprice === '1' && item.price && (
             <div
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '0',
+                fontSize: '20px',
                 marginTop: '1rem',
                 color: '#000',
-                fontWeight: 700,
+                fontWeight: 600,
+                gap: '4px', // เพิ่ม gap ให้เหมือน kW
               }}
             >
-              <TbCurrencyBaht size={25} style={{ verticalAlign: 'middle' }} />
+              <TbCurrencyBaht size={22} />
               {Number(finalPrice ?? item.price).toLocaleString()} บาท
-
-              {/* ราคาเต็ม (ถ้ามีโปรโมชัน) */}
               {item.productpro_ispromotion === '1' && item.productpro_percent && (
                 <span
                   style={{
@@ -176,10 +183,8 @@ export default function ProductCarousel({ title, items, link }) {
     );
   };
 
-  /* ====== Render UI หลัก ====== */
   return (
     <div className="carouselWrapper">
-      {/* Header + ปุ่มดูทั้งหมด */}
       <div className="carouselHeader">
         <h2 className="carouselTitle">{title}</h2>
         <Link href={link} className="carouselLink no-underline hover:no-underline">
@@ -196,15 +201,12 @@ export default function ProductCarousel({ title, items, link }) {
         </Link>
       </div>
 
-      {/* แสดงสินค้า */}
       <div className="carouselInner" style={{ minHeight: '380px' }}>
         {loading ? (
-          // ตอนโหลด
           <div style={{ textAlign: 'center', padding: '2rem', fontSize: '18px' }}>
             กำลังโหลด...
           </div>
         ) : showSlider ? (
-          // แสดงแบบ slider
           <Slider {...settings}>
             {items.map((item) => (
               <div key={item.product_ID ?? item.id} className="carouselStaticWrapper">
@@ -213,7 +215,6 @@ export default function ProductCarousel({ title, items, link }) {
             ))}
           </Slider>
         ) : (
-          // แสดงแบบ static (ไม่มีการเลื่อน)
           <div className="carouselStaticWrapper">
             {items.map((item, index) => (
               <React.Fragment key={item.product_ID ?? item.id ?? index}>

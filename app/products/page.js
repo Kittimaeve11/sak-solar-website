@@ -13,19 +13,57 @@ import '@/styles/products.css';
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 
-// 🔹 สร้าง slug จาก EN name
+// --- helper: slugify ---
 const slugify = (name) =>
   name?.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') || '';
+
+// --- helper: normalize brand name ---
+const normalizeBrandName = (name) => {
+  if (!name) return "";
+  const cleaned = name.trim().toLowerCase();
+  const mapping = {
+    "huawel": "Huawei",
+    "huawei": "Huawei",
+    "deye": "Deye",
+    "growatt": "Growatt",
+    "sinclair": "Sinclair"
+  };
+  return mapping[cleaned] || cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+};
+
+// --- helper: get image url ---
+const getImageUrl = (path) => {
+  if (!path) return '/images/no-image.jpg';
+  if (path.startsWith('http')) return path;
+  try {
+    return new URL(path, baseUrl).toString();
+  } catch {
+    return '/images/no-image.jpg';
+  }
+};
+
+// --- Skeleton ---
+function ProductSkeleton({ count = 6 }) {
+  return (
+    <div className="products-grid">
+      {Array.from({ length: count }).map((_, i) => (
+        <div key={i} className="product-card skeleton">
+          <div className="skeleton-image"></div>
+          <div className="skeleton-text title"></div>
+          <div className="skeleton-text line"></div>
+          <div className="skeleton-text line short"></div>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export default function ProductsPage() {
   const { locale } = useLocale();
   const params = useParams();
+  const typeParam = params?.typeID ? decodeURIComponent(params.typeID) : null;
+  const brandParam = params?.brandID ? decodeURIComponent(params.brandID) : null;
 
-  // ✅ เอาค่าจาก dynamic route
-  const typeSlug = params?.typeID ? decodeURIComponent(params.typeID) : null;
-  const brandSlug = params?.brandID ? decodeURIComponent(params.brandID) : null;
-
-  /* -------------------- States -------------------- */
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [brands, setBrands] = useState([]);
@@ -34,70 +72,34 @@ export default function ProductsPage() {
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedBrands, setSelectedBrands] = useState([]);
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [isFading, setIsFading] = useState(false);
 
-  // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
 
-  /* -------------------- Helpers -------------------- */
-  const getImageUrl = (path) => {
-    if (!path) return '/images/no-image.jpg';
-    if (path.startsWith('http')) return path;
-    try {
-      return new URL(path, baseUrl).toString();
-    } catch {
-      return '/images/no-image.jpg';
-    }
-  };
-
-  const normalizeBrandName = (name) => {
-    if (!name) return "";
-    const cleaned = name.trim().toLowerCase();
-
-    const mapping = {
-      "huawel": "Huawei",
-      "huawei": "Huawei",
-      "deye": "Deye",
-      "growatt": "Growatt",
-      "sinclair": "Sinclair"
-    };
-
-    return mapping[cleaned] || cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
-  };
-
-  /* -------------------- โหลด API -------------------- */
+  // --- โหลด API แค่ครั้งแรก ---
   useEffect(() => {
+    if (products.length > 0 && categories.length > 0) return; // ถ้ามีแล้วไม่โหลดใหม่
+
     const fetchData = async () => {
-      setLoading(true);
       try {
-        // โหลด categories
-        const resHeader = await fetch(`${baseUrl}/api/productHeaderapi`, {
-          headers: { 'X-API-KEY': apiKey }
-        });
+        setLoading(true);
+
+        const [resHeader, resProducts] = await Promise.all([
+          fetch(`${baseUrl}/api/productHeaderapi`, { headers: { 'X-API-KEY': apiKey } }),
+          fetch(`${baseUrl}/api/productpageapi?offset=0&limit=9999`, { headers: { 'X-API-KEY': apiKey } })
+        ]);
+
         const headerData = await resHeader.json();
-        let slugToIdMap = {};
-        if (headerData.status && Array.isArray(headerData.result)) {
+        const productData = await resProducts.json();
+
+        if (headerData?.status && Array.isArray(headerData.result)) {
           setCategories(headerData.result);
-          // สร้าง slug → id map
-          slugToIdMap = headerData.result.reduce((acc, cat) => {
-            acc[slugify(cat.producttypenameEN)] = Number(cat.producttypeID);
-            return acc;
-          }, {});
         }
 
-        // ✅ match typeSlug → typeId จริง
-        const matchedTypeId = typeSlug ? slugToIdMap[typeSlug] : null;
-
-        // โหลด products
-        const resProducts = await fetch(`${baseUrl}/api/productpageapi?offset=0&limit=9999`, {
-          headers: { 'X-API-KEY': apiKey }
-        });
-        const data = await resProducts.json();
-
-        if (data.status && Array.isArray(data.result?.data)) {
-          const formatted = data.result.data.map(p => {
+        if (productData?.status && Array.isArray(productData.result?.data)) {
+          const formatted = productData.result.data.map(p => {
             let mainImage = "";
             try {
               const gallery = JSON.parse(p.gallery || "[]");
@@ -116,6 +118,7 @@ export default function ProductsPage() {
               battery: p.battery,
               mainImage,
               categoryId: Number(p.protypeID),
+              brandId: Number(p.probrandID),
               brandName: normalizeBrandName(p.BrandProduct_name),
               brandOrder: p.BrandProduct_order ? Number(p.BrandProduct_order) : 9999,
               product_pin: p.product_pin || "0",
@@ -129,13 +132,14 @@ export default function ProductsPage() {
 
           setProducts(formatted);
 
-          // รวม brand ทั้งหมด
+          // --- build brand list ---
           const brandMap = new Map();
           formatted.forEach(item => {
             const normalized = normalizeBrandName(item.brandName);
             if (!brandMap.has(normalized)) {
               brandMap.set(normalized, {
                 brandName: normalized,
+                brandId: item.brandId,
                 categoryIds: [item.categoryId],
                 order: item.brandOrder
               });
@@ -149,15 +153,6 @@ export default function ProductsPage() {
 
           const sortedBrands = Array.from(brandMap.values()).sort((a, b) => a.order - b.order);
           setBrands(sortedBrands);
-
-          // --- Filter จาก params ---
-          if (matchedTypeId) {
-            setSelectedCategories([matchedTypeId]);
-            setFilteredBrands(sortedBrands.filter(b => b.categoryIds.includes(matchedTypeId)));
-          }
-          if (brandSlug) {
-            setSelectedBrands([normalizeBrandName(brandSlug)]);
-          }
         }
       } catch (err) {
         console.error("API Error", err);
@@ -167,35 +162,64 @@ export default function ProductsPage() {
     };
 
     fetchData();
-  }, [typeSlug, brandSlug, locale]);
+  }, [products.length, categories.length]);
 
-  /* -------------------- Filter -------------------- */
+  // --- Sync filter จาก params ---
+  useEffect(() => {
+    if (categories.length === 0 || products.length === 0) return;
+
+    let typeIdMap = {};
+    let brandIdMap = {};
+
+    categories.forEach(cat => {
+      typeIdMap[slugify(cat.producttypenameEN)] = Number(cat.producttypeID);
+      cat.Brand?.forEach(b => {
+        brandIdMap[slugify(b.productbrandname)] = Number(b.productbrandID);
+      });
+    });
+
+    const matchedTypeId = typeParam ? typeIdMap[typeParam] : null;
+    const matchedBrandId = brandParam ? brandIdMap[brandParam] : null;
+
+    if (matchedTypeId) {
+      setSelectedCategories([matchedTypeId]);
+      setFilteredBrands(brands.filter(b => b.categoryIds.includes(matchedTypeId)));
+    } else {
+      setSelectedCategories([]);
+      setFilteredBrands(brands);
+    }
+
+    if (matchedBrandId) {
+      const matchedBrand = brands.find(b => b.brandId === matchedBrandId);
+      if (matchedBrand) {
+        setSelectedBrands([matchedBrand.brandName]);
+      }
+    } else {
+      setSelectedBrands([]);
+    }
+
+    setCurrentPage(1);
+  }, [typeParam, brandParam, locale, categories, products, brands]);
+
+  // --- filter items ---
   const filteredItems = useMemo(() => {
     return products.filter(item => {
-      const inCategory =
-        selectedCategories.length === 0 || selectedCategories.includes(item.categoryId);
-
-      const inBrand =
-        selectedBrands.length === 0 ||
-        selectedBrands.includes(normalizeBrandName(item.brandName));
-
+      const inCategory = selectedCategories.length === 0 || selectedCategories.includes(item.categoryId);
+      const inBrand = selectedBrands.length === 0 || selectedBrands.includes(normalizeBrandName(item.brandName));
       return inCategory && inBrand;
     });
   }, [products, selectedCategories, selectedBrands]);
 
-  // Pagination
+  // --- pagination ---
   const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
   const currentItems = filteredItems.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
-  /* -------------------- Handlers -------------------- */
+  // --- handlers ---
   const toggleCategory = (categoryId) => {
     setSelectedCategories(prev => {
-      let newCategories;
-      if (prev.includes(categoryId)) {
-        newCategories = prev.filter(c => c !== categoryId);
-      } else {
-        newCategories = [...prev, categoryId];
-      }
+      let newCategories = prev.includes(categoryId)
+        ? prev.filter(c => c !== categoryId)
+        : [...prev, categoryId];
 
       let filtered = [];
       if (newCategories.length > 0) {
@@ -203,12 +227,7 @@ export default function ProductsPage() {
       }
 
       setFilteredBrands(filtered);
-
-      // reset brand ที่ไม่อยู่ใน filter
-      setSelectedBrands(prevBrands =>
-        prevBrands.filter(bName => filtered.some(fb => fb.brandName === bName))
-      );
-
+      setSelectedBrands(prevBrands => prevBrands.filter(bName => filtered.some(fb => fb.brandName === bName)));
       setCurrentPage(1);
       return newCategories;
     });
@@ -235,9 +254,7 @@ export default function ProductsPage() {
     }
   };
 
-  /* -------------------- Render -------------------- */
-  if (loading) return <p>กำลังโหลด...</p>;
-
+  // --- render ---
   return (
     <main className="products-container">
       {/* Sidebar */}
@@ -268,7 +285,7 @@ export default function ProductsPage() {
             <h3>ยี่ห้อ</h3>
             <div className="filter-box">
               {filteredBrands.map(b => (
-                <label key={b.brandName} className="checkbox-item">
+                <label key={b.brandId} className="checkbox-item">
                   <input
                     type="checkbox"
                     checked={selectedBrands.includes(b.brandName)}
@@ -301,7 +318,9 @@ export default function ProductsPage() {
       <section className="products-list">
         <h2>{`สินค้าทั้งหมด ${filteredItems.length} รายการ`}</h2>
 
-        {currentItems.length === 0 ? (
+        {loading ? (
+          <ProductSkeleton count={9} />
+        ) : currentItems.length === 0 ? (
           <p className="no-products">ไม่มีสินค้าในตอนนี้</p>
         ) : (
           <>
@@ -319,8 +338,8 @@ export default function ProductsPage() {
 
                 return (
                   <Link
-                    key={item.id}
-                    href={`/products/${item.categoryId}/${slugify(item.brandName)}/${item.id}`}
+                    key={item.num}
+                    href={`/products/${item.categoryId}/${item.brandId}/${item.num}`}
                     className="product-card fade-in"
                     style={{ animationDelay: `${index * 0.08}s` }}
                   >
@@ -361,12 +380,11 @@ export default function ProductsPage() {
                             <p style={{
                               display: "inline-flex",
                               alignItems: "center",
-                              gap: "0px",
                               fontWeight: 600,
                               fontSize: "20px",
                               margin: 0,
                             }}>
-                              <TbCurrencyBaht size={25} color="#000000ff" />{" "}
+                              <TbCurrencyBaht size={25} color="#000" />{" "}
                               {Number(item.isPromotion === "1" && item.discountPercent ? finalPrice : item.price).toLocaleString()} บาท
                             </p>
 

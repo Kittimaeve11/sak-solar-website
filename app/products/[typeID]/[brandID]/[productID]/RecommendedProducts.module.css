@@ -1,0 +1,119 @@
+.recommendedWrapper {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  /* width: 90%; */
+  max-width: 1500px;
+}
+
+.recommendedTitle {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #1e2b4d;
+}
+
+/* ช่องว่างระหว่าง slide */
+.recommendedWrapper .slick-slide {
+  padding: 0 8px;
+  box-sizing: border-box;
+  display: flex !important;
+  justify-content: center; /* การ์ดอยู่กลาง */
+}
+
+/* การ์ดสินค้า */
+.recommendedCard {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  text-decoration: none !important;
+  color: inherit;
+  overflow: hidden;
+  transition: box-shadow 0.2s ease;
+  max-width: 280px;   /*  การ์ดเท่ารูป */
+  width: 100%;
+}
+
+.recommendedCard:hover {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+}
+
+/* รูปภาพ */
+.recommendedImage {
+  position: relative;
+  width: 100%;
+  background: #f9f9f9;
+  overflow: hidden;
+}
+
+/* ข้อมูลสินค้า */
+.productInfo {
+  padding: 0.5rem 0.8rem;
+}
+
+.productInfo h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #243865;
+  margin: 0 0 4px 0;
+}
+
+.productInfo h6 {
+  font-size: 14px;
+  font-weight: 500;
+  margin: 0 0 4px 0;
+  color: #555;
+}
+
+.productInfo p {
+  font-weight: 600;
+  font-size: 15px;
+  margin: 0.3rem 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.oldPrice {
+  text-decoration: line-through;
+  color: #888;
+  font-size: 14px;
+}
+
+/* ป้ายโปรโมชั่น */
+.productPromoRibbon {
+  position: absolute;
+  top: 10px;
+  right: -30px;
+  background: #ee2226;
+  color: #fff;
+  font-weight: 700;
+  padding: 4px 40px;
+  transform: rotate(45deg);
+  font-size: 14px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+  z-index: 2;
+}
+
+/* ลูกศรสไลด์ */
+.arrowPrev,
+.arrowNext {
+  position: absolute;
+  top: 50%; /* ให้อยู่กลางแนวตั้งของ slide */
+  transform: translateY(-50%);
+  z-index: 5;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 50%;
+  width: 40px;     /*  ขนาดวงกลม */
+  height: 40px;    /*  ขนาดวงกลม */
+  display: flex;   /*  ใช้ flex */
+  align-items: center; /* กึ่งกลางแนวตั้ง */
+  justify-content: center; /*  กึ่งกลางแนวนอน */
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.arrowPrev { left: -20px; }
+.arrowNext { right: -20px; }

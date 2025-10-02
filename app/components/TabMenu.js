@@ -11,10 +11,10 @@ import '../../styles/tabmenu.css';
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 
-// ฟังก์ชันแปลงข้อความเป็น slug
+// --- helper: slugify ---
 const slugify = (name) =>
   name
-    .toLowerCase()
+    ?.toLowerCase()
     .trim()
     .replace(/\s+/g, '-') // เว้นวรรค -> -
     .replace(/[^a-z0-9-]/g, ''); // ลบตัวอักษรพิเศษ
@@ -28,7 +28,6 @@ export default function TabMenu() {
   const [activeProductSlug, setActiveProductSlug] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
   const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(false);
 
   const timeoutRef = useRef(null);
 
@@ -37,9 +36,15 @@ export default function TabMenu() {
 
   const isInProductsSection = pathname.startsWith('/products');
 
+  /* ---------------- โหลด API ครั้งแรก ---------------- */
   useEffect(() => {
+    const cached = sessionStorage.getItem("menuProducts");
+    if (cached) {
+      setProducts(JSON.parse(cached));
+      return;
+    }
+
     const fetchProducts = async () => {
-      setLoading(true);
       try {
         const res = await fetch(`${baseUrl}/api/productHeaderapi`, {
           headers: { 'X-API-KEY': apiKey },
@@ -59,46 +64,44 @@ export default function TabMenu() {
               }) || [];
 
             return {
-              slug: slugify(item.producttypenameEN), // ใช้ชื่อ EN เป็น slug
+              slug: slugify(item.producttypenameEN),
               name: {
                 th: item.producttypenameTH?.trim() || '',
                 en: item.producttypenameEN?.trim() || '',
               },
               brands: uniqueBrands.map((b) => ({
-                slug: slugify(b.productbrandname), // ใช้ชื่อแบรนด์เป็น slug
+                slug: slugify(b.productbrandname),
                 name: b.productbrandname,
               })),
             };
           });
 
           setProducts(formatted);
+          sessionStorage.setItem("menuProducts", JSON.stringify(formatted));
         }
       } catch (err) {
         console.error('Error fetching products:', err);
-      } finally {
-        setLoading(false);
       }
     };
 
+    fetchProducts();
+  }, []);
+
+  /* ---------------- handle resize ---------------- */
+  useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.matchMedia('(max-width: 991px)').matches);
     };
 
-    fetchProducts();
     checkMobile();
     window.addEventListener('resize', checkMobile);
 
-    setOpen(false);
-    setServiceOpen(false);
-    setActiveProductSlug(null);
-    clearTimeout(timeoutRef.current);
-
     return () => {
       window.removeEventListener('resize', checkMobile);
-      clearTimeout(timeoutRef.current);
     };
-  }, [pathname]);
+  }, []);
 
+  /* ---------------- mouse hover menu ---------------- */
   const handleMouseEnter = () => {
     if (!isMobile) {
       clearTimeout(timeoutRef.current);
@@ -123,6 +126,7 @@ export default function TabMenu() {
     setOpen(false);
     setServiceOpen(false);
     setActiveProductSlug(null);
+    clearTimeout(timeoutRef.current);
   };
 
   return (
@@ -185,101 +189,85 @@ export default function TabMenu() {
 
             {serviceOpen && (
               <ul className="dropdown-menu level-1">
-                {loading ? (
-                  <li
-                    style={{
-                      padding: '10px',
-                      color: '#ccc',
-                      fontStyle: 'italic',
-                    }}
-                  >
-                    กำลังโหลดข้อมูล...
-                  </li>
-                ) : (
-                  products.map((product) => {
-                    const isCurrent =
-                      pathname === `/products/${product.slug}` ||
-                      pathname.startsWith(`/products/${product.slug}/`);
-                    const isOpen = activeProductSlug === product.slug;
+                {products.map((product) => {
+                  const isCurrent =
+                    pathname === `/products/${product.slug}` ||
+                    pathname.startsWith(`/products/${product.slug}/`);
+                  const isOpen = activeProductSlug === product.slug;
 
-                    return (
-                      <li
-                        key={product.slug}
-                        className={`dropdown-item ${isCurrent ? 'active' : ''}`}
-                        onMouseEnter={() =>
-                          !isMobile && setActiveProductSlug(product.slug)
-                        }
-                        onMouseLeave={() =>
-                          !isMobile && setActiveProductSlug(null)
-                        }
+                  return (
+                    <li
+                      key={product.slug}
+                      className={`dropdown-item ${isCurrent ? 'active' : ''}`}
+                      onMouseEnter={() =>
+                        !isMobile && setActiveProductSlug(product.slug)
+                      }
+                      onMouseLeave={() =>
+                        !isMobile && setActiveProductSlug(null)
+                      }
+                    >
+                      <div
+                        className="dropdown-header"
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                        }}
                       >
-                        <div
-                          className="dropdown-header"
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                          }}
+                        {/* Product link */}
+                        <Link
+                          href={`/products/${product.slug}`}
+                          className={`dropdown-toggle ${
+                            isOpen ? 'hovered' : ''
+                          }`}
+                          onClick={handleLinkClick}
+                          style={{ flexGrow: 1, textDecoration: 'none' }}
                         >
-                          {/* Product link */}
-                          <Link
-                            href={`/products/${product.slug}`}
-                            className={`dropdown-toggle ${
-                              isOpen ? 'hovered' : ''
-                            }`}
-                            onClick={handleLinkClick}
-                            style={{ flexGrow: 1, textDecoration: 'none' }}
+                          {locale === 'th'
+                            ? product.name.th
+                            : product.name.en}
+                        </Link>
+
+                        {/* Brand toggle (only on mobile) */}
+                        {isMobile && product.brands.length > 0 && (
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault();
+                              toggleBrandSubmenu(product.slug);
+                            }}
+                            aria-label="Toggle brand submenu"
+                            aria-expanded={isOpen}
+                            className="dropdown-toggle-button"
                           >
-                            {locale === 'th'
-                              ? product.name.th
-                              : product.name.en}
-                          </Link>
-
-                          {/* Brand toggle (only on mobile) */}
-                          {isMobile && product.brands.length > 0 && (
-                            <button
-                              onClick={(e) => {
-                                e.preventDefault();
-                                toggleBrandSubmenu(product.slug);
-                              }}
-                              aria-label="Toggle brand submenu"
-                              aria-expanded={isOpen}
-                              className="dropdown-toggle-button"
-                            >
-                              {isOpen ? (
-                                <IoIosArrowUp />
-                              ) : (
-                                <IoIosArrowDown />
-                              )}
-                            </button>
-                          )}
-                        </div>
-
-                        {/* Brand submenu */}
-                        {isOpen && product.brands.length > 0 && (
-                          <ul className="brand-submenu">
-                            {product.brands.map((brand, index) => (
-                              <li key={`${product.slug}-${brand.slug}-${index}`}>
-                                <Link
-                                  href={`/products/${product.slug}/${brand.slug}`}
-                                  className={
-                                    pathname ===
-                                    `/products/${product.slug}/${brand.slug}`
-                                      ? 'active'
-                                      : ''
-                                  }
-                                  onClick={handleLinkClick}
-                                >
-                                  {brand.name}
-                                </Link>
-                              </li>
-                            ))}
-                          </ul>
+                            {isOpen ? <IoIosArrowUp /> : <IoIosArrowDown />}
+                          </button>
                         )}
-                      </li>
-                    );
-                  })
-                )}
+                      </div>
+
+                      {/* Brand submenu */}
+                      {isOpen && product.brands.length > 0 && (
+                        <ul className="brand-submenu">
+                          {product.brands.map((brand, index) => (
+                            <li key={`${product.slug}-${brand.slug}-${index}`}>
+                              <Link
+                                href={`/products/${product.slug}/${brand.slug}`}
+                                className={
+                                  pathname ===
+                                  `/products/${product.slug}/${brand.slug}`
+                                    ? 'active'
+                                    : ''
+                                }
+                                onClick={handleLinkClick}
+                              >
+                                {brand.name}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </li>
+                  );
+                })}
               </ul>
             )}
           </li>
