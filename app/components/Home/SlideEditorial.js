@@ -45,7 +45,6 @@ export default function SlideEditorial() {
       .then(data => {
         if (data.status && Array.isArray(data.result)) {
           const formatted = data.result.map(item => {
-            // ✅ parse gallery ให้ถูกต้อง
             let imageUrl = '/images/no-image.jpg';
             try {
               const galleryArr = JSON.parse(item.editoria_gallary);
@@ -64,7 +63,7 @@ export default function SlideEditorial() {
                 month: 'long',
                 year: 'numeric'
               }),
-              content: parseDescription(item.editoria_descriptionTH || ''), // ✅ ป้องกัน undefined
+              content: parseDescription(item.editoria_descriptionTH || ''),
               mainImage: imageUrl
             };
           });
@@ -161,7 +160,6 @@ export default function SlideEditorial() {
               const globalMiddleIndex = currentGroupStart + middleIndexInGroup;
               const isMiddle = index === globalMiddleIndex;
 
-              // ✅ ป้องกัน error ถ้า content เป็น undefined
               const safeContent = item.content || '';
               const snippet = safeContent.length > 100
                 ? safeContent.slice(0, 100) + '...'
@@ -176,16 +174,27 @@ export default function SlideEditorial() {
                     }}
                     style={{ cursor: 'pointer' }}
                   >
-                    <div className="card-imageslide">
+                    {/* ✅ รูปแบบ 16:9 */}
+                    <div
+                      style={{
+                        position: "relative",
+                        width: "100%",
+                        aspectRatio: "16/9",
+                        overflow: "hidden",
+                        borderRadius: "8px",
+                      }}
+                    >
                       <Image
                         src={item.mainImage}
                         alt={item.title}
-                        width={400}
-                        height={200}
-                        style={{ width: '100%', height: 'auto' }}
-                        onErrorCapture={(e) => { e.currentTarget.src = '/images/no-image.jpg'; }}
+                        fill
+                        style={{ objectFit: "cover" }}
+                        onErrorCapture={(e) => {
+                          e.currentTarget.src = '/images/no-image.jpg';
+                        }}
                       />
                     </div>
+
                     <div className="card-contentslide">
                       <h3 className="card-titleslide">{item.title}</h3>
                       <p className="editorial-dateslide">{item.date}</p>

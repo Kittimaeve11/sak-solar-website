@@ -30,7 +30,7 @@ const getSlidesByWidth = (width) => {
 };
 
 /* ====== Component หลัก ProductCarousel ====== */
-export default function ProductCarousel({ title, items, link }) {
+export default function ProductCarousel({ title, items = [], link }) {
   const [isDragging, setIsDragging] = useState(false);
   const [slidesToShow, setSlidesToShow] = useState(4);
 
@@ -41,8 +41,7 @@ export default function ProductCarousel({ title, items, link }) {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const loading = !items || items.length === 0;
-  const showSlider = !loading && items.length > slidesToShow;
+  const showSlider = items.length > slidesToShow;
 
   const settings = {
     dots: false,
@@ -60,11 +59,9 @@ export default function ProductCarousel({ title, items, link }) {
 
   /* ====== ฟังก์ชันหาชื่อสินค้า ====== */
   const getProductName = (item) => {
-    if (item.producttypeID === "2") {
-      // ✅ ถ้าเป็นแอร์ → ใช้ modelairname
+    if (item.producttypeID === '2') {
       return item.modelairname ?? 'ไม่พบข้อมูลชื่อ';
     }
-    // ✅ ถ้าเป็นสินค้าอื่น → ใช้ modelname
     return (
       item.modelname ??
       item.name ??
@@ -123,15 +120,9 @@ export default function ProductCarousel({ title, items, link }) {
             <h6 style={{ marginTop: '0rem' }}>รุ่นแบตเตอรี่ {item.battery} kWh</h6>
           )}
 
-          {/* แสดงขนาด kW (ถ้าไม่มีราคา) */}
+          {/* แสดงขนาด kW */}
           {(item.isprice == 0 || item.isprice === '0') && item.size && (
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                marginTop: '1rem',
-              }}
-            >
+            <div style={{ display: 'flex', alignItems: 'center', marginTop: '1rem' }}>
               <p
                 style={{
                   display: 'flex',
@@ -140,7 +131,7 @@ export default function ProductCarousel({ title, items, link }) {
                   fontSize: '18px',
                   margin: 0,
                   lineHeight: 1,
-                  gap: '4px', // ✅ ใช้ gap แทน
+                  gap: '4px',
                 }}
               >
                 <MdOutlineElectricBolt size={22} color="#ffc300" />
@@ -159,7 +150,7 @@ export default function ProductCarousel({ title, items, link }) {
                 marginTop: '1rem',
                 color: '#000',
                 fontWeight: 600,
-                gap: '4px', // เพิ่ม gap ให้เหมือน kW
+                gap: '4px',
               }}
             >
               <TbCurrencyBaht size={22} />
@@ -202,11 +193,7 @@ export default function ProductCarousel({ title, items, link }) {
       </div>
 
       <div className="carouselInner" style={{ minHeight: '380px' }}>
-        {loading ? (
-          <div style={{ textAlign: 'center', padding: '2rem', fontSize: '18px' }}>
-            กำลังโหลด...
-          </div>
-        ) : showSlider ? (
+        {showSlider ? (
           <Slider {...settings}>
             {items.map((item) => (
               <div key={item.product_ID ?? item.id} className="carouselStaticWrapper">

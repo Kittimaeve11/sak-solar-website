@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import '../../styles/review.css';
 import { useLocale } from '../Context/LocaleContext';
 import Image from 'next/image';
 import { IoPlayCircleOutline } from "react-icons/io5";
+import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io';
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
@@ -53,6 +54,11 @@ export default function ReviewPage() {
   const [brander, setBrander] = useState([]);
   const [loadingData, setLoadingData] = useState(true);
 
+  // ✅ Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(15); // แสดง 15 ข้อมูลต่อหน้า
+  const topRef = useRef(null);
+
   /** ดึงข้อมูล Reviews + Brander */
   const fetchData = useCallback(async () => {
     setLoadingData(true);
@@ -89,8 +95,8 @@ export default function ReviewPage() {
       const branderArray = Array.isArray(branderData?.data)
         ? branderData.data
         : branderData?.data
-          ? [branderData.data]
-          : [];
+        ? [branderData.data]
+        : [];
       setBrander(branderArray);
     } catch (err) {
       console.error(' Fetch error:', err);
@@ -115,8 +121,85 @@ export default function ReviewPage() {
     fetchData();
   }, [fetchData]);
 
+  /** ---------------- Log Action ---------------- */
+  const logReviewAction = async (review) => {
+    const payload = {
+      actionType: "3",
+      actionDetail: `หน้าหลัก รหัสวิดีโอ: ${review.vedio_id}  ชื่อวิดีโอ : ${locale === 'en' ? review.nameEN_Vedio : review.nameTH_Vedio}`,
+      typeUser: "ผู้เยี่ยมชมเว็บไซต์",
+      datatype: "รีวิว",
+      dataID: review.vedio_id,
+      dataname: locale === 'en' ? review.nameEN_Vedio : review.nameTH_Vedio,
+    };
+
+    try {
+      await fetch(`${baseUrl}/api/logAction`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-KEY": apiKey,
+        },
+        body: JSON.stringify(payload),
+      });
+    } catch (err) {
+      console.error("log error:", err);
+    }
+  };
+
+  /** ---------------- Pagination ---------------- */
+  const validReviews = reviews.filter(r => {
+    const videoId = extractVideoId(r?.vedio_link);
+    return !!videoId;
+  });
+
+  const totalPages = Math.ceil(validReviews.length / itemsPerPage) || 1;
+  const paginatedReviews = validReviews.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const handlePageChange = (page) => {
+    if (page < 1 || page > totalPages) return;
+    setCurrentPage(page);
+    topRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const renderPagination = () => {
+    const pages = [];
+
+    if (currentPage > 1) {
+      pages.push(
+        <button key="prev" onClick={() => handlePageChange(currentPage - 1)} className="btn-with-arrow">
+          <IoIosArrowBack className="arrow-icon" />
+        </button>
+      );
+    }
+
+    for (let i = 1; i <= totalPages; i++) {
+      pages.push(
+        <button
+          key={i}
+          onClick={() => handlePageChange(i)}
+          className={i === currentPage ? 'active-page' : ''}
+        >
+          {i}
+        </button>
+      );
+    }
+
+    if (currentPage < totalPages) {
+      pages.push(
+        <button key="next" onClick={() => handlePageChange(currentPage + 1)} className="btn-with-arrow">
+          <IoIosArrowForward className="arrow-icon" />
+        </button>
+      );
+    }
+
+    return pages;
+  };
+
   return (
-    <div className="no-margin">
+    <div ref={topRef} className="no-margin">
       {/* ---------- Banner Section ---------- */}
       {brander.length === 0 || loadingData ? (
         <div className="skeleton-banner"></div>
@@ -137,8 +220,6 @@ export default function ReviewPage() {
               />
             </picture>
           </div>
-
-
         ))
       )}
 
@@ -152,22 +233,21 @@ export default function ReviewPage() {
 
         <div className="video-grid">
           {loadingData ? (
-            Array.from({ length: 6 }).map((_, i) => (
+            Array.from({ length: itemsPerPage }).map((_, i) => (
               <div key={i} className="skeleton-card skeleton fade-in">
                 <div className="skeleton-image skeleton"></div>
                 <div className="skeleton-title skeleton"></div>
                 <div className="skeleton-line skeleton"></div>
               </div>
             ))
-          ) : reviews.length === 0 ? (
+          ) : paginatedReviews.length === 0 ? (
             <p>
               {locale === 'en'
                 ? 'No video reviews available at the moment.'
                 : 'ไม่มีรีวิววิดีโอในขณะนี้'}
             </p>
           ) : (
-            reviews.map((review) => {
-              if (!review?.vedio_link) return null;
+            paginatedReviews.map((review) => {
               const videoId = extractVideoId(review.vedio_link);
               if (!videoId) return null;
 
@@ -185,6 +265,7 @@ export default function ReviewPage() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="video-card fade-in"
+                  onClick={() => logReviewAction(review)} // ✅ log เมื่อกด
                 >
                   <div className="thumbnail-placeholder">
                     <ThumbnailWithFallback videoId={videoId} alt={videoTitle} />
@@ -208,6 +289,13 @@ export default function ReviewPage() {
             })
           )}
         </div>
+
+        {/* ✅ Pagination Controls */}
+        {!loadingData && totalPages > 1 && (
+          <div className="pagination-controls">
+            <div className="page-buttons">{renderPagination()}</div>
+          </div>
+        )}
       </main>
     </div>
   );

@@ -364,72 +364,55 @@
 }
 
 
-@keyframes pulse {
-  0% {
-    background-color: #e0e0e0;
-  }
-
-  50% {
-    background-color: #f0f0f0;
-  }
-
-  100% {
-    background-color: #e0e0e0;
-  }
+.skeletonGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
 }
 
-.carouselSkeletonWrapper {
-  display: flex;
-  gap: 40px;
-  overflow-x: auto;
-  padding: 8px 0;
-  margin-top: 0.5rem;
-}
-
-.carouselCard.skeletonCard {
-  flex: 0 0 330px;
-  /* กำหนดความกว้างของการ์ด */
+.skeletonCard {
+  height: 420px;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  padding: 12px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  height: 480px;
+}
 
+.skeletonImage,
+.skeletonText {
+  background: linear-gradient(90deg, #e0e0e0 25%, #f2f2f2 50%, #e0e0e0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.2s infinite;
+  border-radius: 6px;
 }
 
 .skeletonImage {
   width: 100%;
-  max-width: 330px;
-  height: 330px;
-  /* สูงของรูป */
-  background-color: #e0e0e0;
-  /* สีเทาแทนรูป */
-  border-top: 8px;
+  height: 250px;
 }
 
 .skeletonText {
-  margin-left: 1.5rem;
-  background-color: #e0e0e0;
-  border-radius: 4px;
+  height: 16px;
+  margin-top: 12px;
 }
 
 .skeletonText.title {
-  margin-top: 1rem;
-
-  width: 80%;
+  width: 70%;
   height: 22px;
 }
 
 .skeletonText.subTitle {
-  margin-top: 0.5rem;
-
   width: 50%;
-  height: 18px;
 }
 
 .skeletonText.price {
-  margin-top: 1rem;
-
   width: 40%;
-  height: 24px;
+  height: 20px;
 }
 
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}

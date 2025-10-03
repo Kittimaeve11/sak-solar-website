@@ -289,7 +289,7 @@ export default function EditorialDetailPage() {
 
       {/* -------------------- Recommended Articles -------------------- */}
       <div className={styles.recommendedSection}>
-        {/* <RecommendedArticles typeID={3} currentId={editorial.editoria_id} /> */}
+        <RecommendedArticles typeID={3} currentId={editorial.editoria_id} />
       </div>
     </main>
   );

@@ -1,61 +1,78 @@
 .wrapper {
   width: 100%;
-  display: block;
   margin: 0 auto;
-  padding: 0 1rem; 
+  padding: 0 1rem;
 }
 
 .layout {
-  width: 1500px;
+  max-width: 1500px;
   margin: 0 auto;
-  display: flex;
-  gap: 1rem;
 }
 
-.scrollContainer {
-  display: flex;
-  overflow-x: auto;
-  gap: 2rem;
-  padding: 1rem;
-  margin-bottom: 2rem;
-}
-
-/* ชื่อ section */
 .title {
   font-size: 24px;
   font-weight: bold;
   color: #0c3c78;
-  margin: 0rem;
+  margin: 0 0 1rem 0;
 }
 
-/* Scroll container สำหรับ card */
-.scrollContainer {
+/* Slider wrapper */
+.sliderWrapper {
+  position: relative;
+}
+
+/* ปุ่มเลื่อน */
+.arrowPrev,
+.arrowNext {
+  position: absolute;
+  top: 40%;
+  transform: translateY(-50%);
+  z-index: 10;
+  background: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
   display: flex;
-  overflow-x: auto;
-  gap: 1rem;
-  padding-bottom: 1rem;
-  scroll-behavior: smooth;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  transition: background 0.3s ease;
 }
 
-.scrollContainer::-webkit-scrollbar {
-  height: 8px;
+.arrowPrev:hover,
+.arrowNext:hover {
+  background: #f0f0f0;
 }
 
-.scrollContainer::-webkit-scrollbar-thumb {
-  background-color: rgba(0,0,0,0.2);
-  border-radius: 4px;
+.arrowPrev {
+  left: -15px;
+}
+
+.arrowNext {
+  right: -15px;
+}
+
+/* --------- Spacing ของ slick --------- */
+.sliderWrapper :global(.slick-slide) {
+  padding: 0 0.75rem;   /* เว้นซ้าย-ขวา */
+  box-sizing: border-box;
+}
+
+.sliderWrapper :global(.slick-list) {
+  margin: 0 -0.75rem;   /* ดึงออก เพื่อให้ spacing เท่ากัน */
 }
 
 /* Card */
 .card {
-  flex: 0 0 auto;
-  width: 350px;
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   text-decoration: none;
   color: inherit;
   transition: transform 0.3s ease;
+  margin-bottom: 1rem;   /* ✅ เว้นด้านล่างเท่านั้น */
 }
 
 .card:hover {
@@ -68,12 +85,12 @@
   object-fit: cover;
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
-   transition: filter 0.3s ease;
-}
-.card:hover .cardImage {
-    filter: brightness(0.4);
+  transition: filter 0.3s ease;
 }
 
+.card:hover .cardImage {
+  filter: brightness(0.4);
+}
 
 .cardContent {
   padding: 0.75rem 1rem;
@@ -96,6 +113,7 @@
 .editorial-date {
   color: #888;
   font-size: 14px;
+  margin: 0.25rem 0;
 }
 
 .cardDescription {
@@ -107,11 +125,7 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
-
   text-decoration: none;
-  /* เพิ่ม */
   border-bottom: none;
-  /* เพิ่ม */
   box-shadow: none;
-  /* เพิ่ม */
 }

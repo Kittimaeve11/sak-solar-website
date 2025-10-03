@@ -43,15 +43,15 @@ const getImageUrl = (path) => {
 };
 
 // --- Skeleton ---
-function ProductSkeleton({ count = 6 }) {
+function ProductSkeleton({ count = 8 }) {
   return (
-    <div className="products-grid">
+    <div className="skeletonGrid">
       {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="product-card skeleton">
-          <div className="skeleton-image"></div>
-          <div className="skeleton-text title"></div>
-          <div className="skeleton-text line"></div>
-          <div className="skeleton-text line short"></div>
+        <div key={i} className="skeletonCard">
+          <div className="skeletonImage"></div>
+          <div className="skeletonText title"></div>
+          <div className="skeletonText subTitle"></div>
+          <div className="skeletonText price"></div>
         </div>
       ))}
     </div>
@@ -78,9 +78,9 @@ export default function ProductsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
 
-  // --- โหลด API แค่ครั้งแรก ---
+  // --- โหลด API ---
   useEffect(() => {
-    if (products.length > 0 && categories.length > 0) return; // ถ้ามีแล้วไม่โหลดใหม่
+    if (products.length > 0 && categories.length > 0) return;
 
     const fetchData = async () => {
       try {
@@ -132,7 +132,7 @@ export default function ProductsPage() {
 
           setProducts(formatted);
 
-          // --- build brand list ---
+          // build brand list
           const brandMap = new Map();
           formatted.forEach(item => {
             const normalized = normalizeBrandName(item.brandName);
@@ -319,7 +319,7 @@ export default function ProductsPage() {
         <h2>{`สินค้าทั้งหมด ${filteredItems.length} รายการ`}</h2>
 
         {loading ? (
-          <ProductSkeleton count={9} />
+          <ProductSkeleton count={8} />
         ) : currentItems.length === 0 ? (
           <p className="no-products">ไม่มีสินค้าในตอนนี้</p>
         ) : (

@@ -40,7 +40,7 @@ export default function EditorialListPage() {
       try {
         const [resType, resArticles, resBanner] = await Promise.all([
           fetch(`${baseUrl}/api/edittorTypepageapi`, { headers: { 'X-API-KEY': apiKey } }),
-          fetch(`${baseUrl}/api/edittorpageapi`, { headers: { 'X-API-KEY': apiKey } }),
+          fetch(`${baseUrl}/api/edittorpageapi?limit=1000`, { headers: { 'X-API-KEY': apiKey } }), // ✅ ดึงมาเกินพอ
           fetch(`${baseUrl}/api/branderIDapi/15`, { headers: { 'X-API-KEY': apiKey } }),
         ]);
 
@@ -57,16 +57,15 @@ export default function EditorialListPage() {
         const bannerArray = Array.isArray(bannerData.data) ? bannerData.data : (bannerData.data ? [bannerData.data] : []);
         setBanners(bannerArray);
 
-        setLoading(false);
-        setLoadingBanner(false);
-        setTimeout(() => setShouldAnimate(true), 50);
       } catch (err) {
         console.error('Failed to fetch editorial:', err);
         setArticles([]);
         setTypes([]);
         setBanners([]);
+      } finally {
         setLoading(false);
         setLoadingBanner(false);
+        setTimeout(() => setShouldAnimate(true), 50);
       }
     };
 
@@ -97,33 +96,45 @@ export default function EditorialListPage() {
     const totalNumbers = 5;
     const totalBlocks = totalNumbers + 2;
 
-    if (currentPage > 1) pages.push(
-      <button key="prev" onClick={() => handlePageChange(currentPage - 1)} className="btn-with-arrow">
-        <IoIosArrowBack className="arrow-icon" />
-      </button>
-    );
+    if (currentPage > 1) {
+      pages.push(
+        <button key="prev" onClick={() => handlePageChange(currentPage - 1)} className="btn-with-arrow">
+          <IoIosArrowBack className="arrow-icon" />
+        </button>
+      );
+    }
 
     if (totalPages > totalBlocks) {
       const startPage = Math.max(2, currentPage - 2);
       const endPage = Math.min(totalPages - 1, currentPage + 2);
-      if (1 < startPage) pages.push(<button key={1} onClick={() => handlePageChange(1)} className={currentPage === 1 ? 'active-page' : ''}>1</button>);
+      if (1 < startPage) {
+        pages.push(<button key={1} onClick={() => handlePageChange(1)} className={currentPage === 1 ? 'active-page' : ''}>1</button>);
+      }
       if (startPage > 2) pages.push(<span key="start-ellipsis" className="ellipsis">...</span>);
-      for (let i = startPage; i <= endPage; i++) pages.push(
-        <button key={i} onClick={() => handlePageChange(i)} className={i === currentPage ? 'active-page' : ''}>{i}</button>
-      );
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(
+          <button key={i} onClick={() => handlePageChange(i)} className={i === currentPage ? 'active-page' : ''}>{i}</button>
+        );
+      }
       if (endPage < totalPages - 1) pages.push(<span key="end-ellipsis" className="ellipsis">...</span>);
-      pages.push(<button key={totalPages} onClick={() => handlePageChange(totalPages)} className={currentPage === totalPages ? 'active-page' : ''}>{totalPages}</button>);
-    } else {
-      for (let i = 1; i <= totalPages; i++) pages.push(
-        <button key={i} onClick={() => handlePageChange(i)} className={i === currentPage ? 'active-page' : ''}>{i}</button>
+      pages.push(
+        <button key={totalPages} onClick={() => handlePageChange(totalPages)} className={currentPage === totalPages ? 'active-page' : ''}>{totalPages}</button>
       );
+    } else {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(
+          <button key={i} onClick={() => handlePageChange(i)} className={i === currentPage ? 'active-page' : ''}>{i}</button>
+        );
+      }
     }
 
-    if (currentPage < totalPages) pages.push(
-      <button key="next" onClick={() => handlePageChange(currentPage + 1)} className="btn-with-arrow">
-        <IoIosArrowForward className="arrow-icon" />
-      </button>
-    );
+    if (currentPage < totalPages) {
+      pages.push(
+        <button key="next" onClick={() => handlePageChange(currentPage + 1)} className="btn-with-arrow">
+          <IoIosArrowForward className="arrow-icon" />
+        </button>
+      );
+    }
 
     return pages;
   };
@@ -150,7 +161,6 @@ export default function EditorialListPage() {
       const cleaned = first.replace(/^"+|"+$/g, '').replace(/\\/g, '/').replace(/\/{2,}/g, '/');
       return `${baseUrl}/${cleaned}`;
     } catch {
-      // ถ้า parse ไม่ได้
       return '/images/no-image.jpg';
     }
   };
@@ -250,15 +260,17 @@ export default function EditorialListPage() {
 
               return (
                 <div key={item.editoria_num} className="editorial-card" onClick={() => router.push(`/editorial/${item.editoria_num}`)}>
-                  <Image
-                    src={imgSrc}
-                    alt={title}
-                    width={400}
-                    height={200}
-                    style={{ width: '100%', height: 'auto' }}
-                    className="card-image"
-                    onError={() => setImgError(prev => ({ ...prev, [item.editoria_num]: true }))}
-                  />
+                  {/* ✅ รูป 16:9 */}
+                  <div style={{ position: 'relative', width: '100%', aspectRatio: '16/9', overflow: 'hidden', borderRadius: '8px' }}>
+                    <Image
+                      src={imgSrc}
+                      alt={title}
+                      fill
+                      style={{ objectFit: 'cover' }}
+                      className="card-image"
+                      onError={() => setImgError(prev => ({ ...prev, [item.editoria_num]: true }))}
+                    />
+                  </div>
                   <div className="card-content">
                     <h3 className="card-title">{title}</h3>
                     <p className="editorial-date">

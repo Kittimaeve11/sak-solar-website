@@ -172,7 +172,7 @@ export default function PortfolioPage() {
       } else {
         pages.push(
           <button
-            key={item}
+            key={`page-${item}`}
             className={currentPage === item ? 'active-page' : ''}
             onClick={() => handlePageChange(item)}
           >
@@ -284,7 +284,7 @@ export default function PortfolioPage() {
               ) : (
                 paginatedProjects.map((proj, i) => (
                   <div
-                    key={proj?.id || `proj-${i}`}
+                    key={`${proj?.id || 'proj'}-${i}`}   // ✅ unique key
                     className="portfolio-card"
                     onClick={() => router.push(`/portfolio/${proj?.id}`)}
                   >
@@ -321,12 +321,10 @@ export default function PortfolioPage() {
                       </h3>
                       <ul className="project-details">
                         <li><strong>{locale === 'th' ? 'ขนาดติดตั้ง' : 'Installation Size'}</strong><span>{proj.size}</span></li>
-                        {/* <li><strong>{locale === 'th' ? 'ประเภทผลิตภัณฑ์' : 'Product Type'}</strong><span>{locale === 'th' ? proj.productTypeTH : proj.productTypeEN}</span></li> */}
                         <li>
                           <strong>{locale === 'th' ? 'ประเภทผลิตภัณฑ์' : 'Product Type'}</strong>
                           <span>{proj.productTypeTH}</span>
                         </li>
-
                         <li><strong>{locale === 'th' ? 'จำนวนแผง' : 'Panel Count'}</strong><span>{proj.panelCount} {locale === 'th' ? 'แผง' : 'panels'}</span></li>
                         <li className="date-post">
                           <strong><FaCalendar /></strong>
