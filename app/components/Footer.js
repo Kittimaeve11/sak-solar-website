@@ -3,28 +3,33 @@
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import styles from "../../styles/Footer.module.css";
-import { menuItems as staticMenu } from "../config/footer";
+import styles from "../../styles/Footer.module.css"; // import CSS module สำหรับสไตล์ footer
+import { menuItems as staticMenu } from "../config/footer"; // เมนูพื้นฐานแบบ static เช่น “บริการของเรา”, “เกี่ยวกับเรา”
 
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
-const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API; // base URL ของ API
+const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API; // API key สำหรับเรียก backend
 
 export default function Footer() {
-  const [socials, setSocials] = useState([]);
-  const [policies, setPolicies] = useState([]);
-  const [dynamicProducts, setDynamicProducts] = useState([]);
-  const [contact, setContact] = useState(null);
+  /* =========================
+     State สำหรับเก็บข้อมูล
+  ========================== */
+  const [socials, setSocials] = useState([]); // ข้อมูล Social Media (mock data)
+  const [policies, setPolicies] = useState([]); // ข้อมูลนโยบายจาก policyapi
+  const [dynamicProducts, setDynamicProducts] = useState([]); // เมนูสินค้าจาก API
+  const [contact, setContact] = useState(null); // ข้อมูลติดต่อบริษัท
+  const [loading, setLoading] = useState(true); // ตัวแปรสถานะการโหลดข้อมูล
 
-  const [loading, setLoading] = useState(true);
-
+  /* =========================
+     โหลดข้อมูลจาก API
+  ========================== */
   useEffect(() => {
-    // โหลด socials (mock data local)
+    // โหลดข้อมูล socials จาก mock API ภายในโปรเจกต์
     fetch("/api/data")
       .then((res) => res.json())
       .then((data) => setSocials(data.socials || []))
       .catch(() => setSocials([]));
 
-    // โหลด API พร้อมกัน
+    // โหลดข้อมูล policy, product และ contact พร้อมกัน
     const fetchData = async () => {
       try {
         const [policiesRes, productsRes, contactRes] = await Promise.all([
@@ -39,33 +44,40 @@ export default function Footer() {
           }),
         ]);
 
+        // แปลงผลลัพธ์ทั้งหมดเป็น JSON
         const [policiesData, productsData, contactData] = await Promise.all([
           policiesRes.json(),
           productsRes.json(),
           contactRes.json(),
         ]);
 
-        // Policies
+        // 1. จัดการข้อมูลนโยบาย
         if (policiesData.status && Array.isArray(policiesData.result)) {
           setPolicies(policiesData.result);
         } else {
           setPolicies([]);
         }
 
-        //  Products
+        // 2. จัดการข้อมูลสินค้า (dynamic product)
         if (productsData.status && Array.isArray(productsData.result)) {
           const productMenus = productsData.result.map((item) => ({
             label: item.producttypenameTH.trim(),
             href: `/products/${item.producttypeID}`,
           }));
+
+          // เพิ่มเมนูภายนอกเพิ่มเติม
           const extraMenus = [
-            { label: "สินเชื่อโซล่ารูฟ", href: "https://saksiam.com/service/solarrooftop" },
+            {
+              label: "สินเชื่อโซล่ารูฟ",
+              href: "https://saksiam.com/service/solarrooftop",
+            },
             { label: "ใบรับรองการไฟฟ้า", href: "/file/Inverter.pdf" },
           ];
+
           setDynamicProducts([...productMenus, ...extraMenus]);
         }
 
-        //  Contact
+        // 3. จัดการข้อมูลติดต่อบริษัท
         if (
           contactData.status &&
           Array.isArray(contactData.result) &&
@@ -77,18 +89,21 @@ export default function Footer() {
         }
       } catch (err) {
         console.error("Error fetching footer data:", err);
+        // หากเกิดข้อผิดพลาด จะรีเซ็ตข้อมูลทั้งหมดเป็นค่าว่าง
         setPolicies([]);
         setDynamicProducts([]);
         setContact(null);
       } finally {
-        setLoading(false);
+        setLoading(false); // ปิดสถานะกำลังโหลด
       }
     };
 
     fetchData();
   }, []);
 
-  // Path ไอคอนโซเชียล
+  /* =========================
+     Path รูปไอคอน Social Media
+  ========================== */
   const iconPath = useMemo(
     () => ({
       facebook: "/images/facebook.png",
@@ -100,20 +115,29 @@ export default function Footer() {
     []
   );
 
-  // สองเมนูแรก (dynamic + static)
+  /* =========================
+     รวมเมนู dynamic + static
+     (ใช้สำหรับคอลัมน์ 2 ช่องแรก)
+  ========================== */
   const firstTwoMenus = [
     {
       ...staticMenu[0],
-      items: dynamicProducts.length > 0 ? dynamicProducts : staticMenu[0].items,
+      items:
+        dynamicProducts.length > 0
+          ? dynamicProducts
+          : staticMenu[0].items, // ใช้ dynamic ถ้ามีข้อมูลจาก API ถ้าไม่มีก็ใช้ static
     },
-    staticMenu[1],
+    staticMenu[1], // เมนูที่สองจาก config/footer
   ];
 
+  /* =========================
+     Layout ส่วน Footer
+  ========================== */
   return (
     <div>
       <footer className={styles.footer}>
         <div className={styles.footerContent}>
-          {/* คอลัมน์แรก: บริการของเรา + นโยบาย */}
+          {/* คอลัมน์ที่ 1: บริการของเรา + นโยบาย */}
           <div className={styles.column}>
             <h4>{firstTwoMenus[0].title}</h4>
             <ul>
@@ -146,7 +170,7 @@ export default function Footer() {
             )}
           </div>
 
-          {/* คอลัมน์ที่สอง */}
+          {/* คอลัมน์ที่ 2: เมนูจาก static config */}
           <div className={styles.column}>
             <h4>{firstTwoMenus[1].title}</h4>
             <ul>
@@ -158,7 +182,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* คอลัมน์ที่สาม: ติดต่อเรา + social */}
+          {/* คอลัมน์ที่ 3: ติดต่อเรา + โซเชียลมีเดีย */}
           <div className={styles.column}>
             <h4>ติดต่อเรา</h4>
             {loading ? (
@@ -172,6 +196,8 @@ export default function Footer() {
                   <li>แฟกซ์ : {contact.fax}</li>
                   <li>อีเมล : {contact.email_main}</li>
                 </ul>
+
+                {/* ส่วนแสดงไอคอน Social Media */}
                 <div className={styles.socialIcons}>
                   {Object.entries({
                     facebook: contact.facebook,
@@ -180,7 +206,7 @@ export default function Footer() {
                     youtube: contact.youtube,
                     tiktok: contact.tiktok,
                   })
-                    .filter(([_, url]) => url && url !== "null")
+                    .filter(([_, url]) => url && url !== "null") // แสดงเฉพาะที่มีลิงก์จริง
                     .map(([key, url], i) => (
                       <Link
                         key={key}
@@ -207,19 +233,27 @@ export default function Footer() {
           </div>
         </div>
 
+        {/* พื้นหลังตกแต่งส่วนล่างของ Footer */}
         <div className={styles.footerBottomImage}></div>
       </footer>
 
+      {/* ส่วนล่างสุดของ Footer */}
       <div className={styles.footerBottomWrapper}>
         <div className={styles.footerBottom}>
-          © 2025 Copyright: SAKSIAM SOLAR ENERGY CO., LTD BY SAKSIAM LEASING PUBLIC COMPANY LIMITED. All Rights Reserved.
+          © 2025 Copyright: SAKSIAM SOLAR ENERGY CO., LTD BY SAKSIAM LEASING
+          PUBLIC COMPANY LIMITED. All Rights Reserved.
+
+          {/* กลุ่มโลโก้บริษัทและหน่วยงาน */}
           <div className={styles.logoGroup}>
+            {/* โลโก้ Saksiam Solar */}
             <Image
               src="/images/logo3.8549861c.png"
               alt="โลโก้สีส้ม"
               width={100}
               height={40}
             />
+
+            {/* โลโก้การไฟฟ้า (เปิดไฟล์ PDF เมื่อคลิก) */}
             <Link
               href="/file/Inverter.pdf"
               target="_blank"
@@ -233,6 +267,8 @@ export default function Footer() {
                 height={40}
               />
             </Link>
+
+            {/* โลโก้ กกพ */}
             <Image
               src="/images/ERCNewLogo.png"
               alt="โลโก้กกพ"

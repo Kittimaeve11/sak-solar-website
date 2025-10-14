@@ -1,228 +1,277 @@
-
+/* =========================
+   ⚙️ Cookie Banner (แถบล่าง)
+========================= */
 .banner {
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    background-color: #f9f9f9;
-    border-top: 1px solid #ccc;
-    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
-    padding: 1.5rem 2rem;
-    font-family: "Kanit", sans-serif, Arial, sans-serif;
-    color: #333;
-    z-index: 1200;
-  }
-  
-  .content {
-    max-width: 960px;
-    margin: 0 auto;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-  }
-  
-  .title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin: 0;
-    flex: 1 1 100%;
-  }
-  
-  .description {
-    font-size: 1rem;
-    line-height: 1.5;
-    flex: 1 1 60%;
-    margin: 0;
-  }
-  
-  .link {
-    color: #1a73e8;
-    text-decoration: underline;
-  }
-  
-  .link:hover,
-  .link:focus {
-    color: #155ab6;
-    outline: none;
-  }
-  
-  .actions {
-    display: flex;
-    gap: 1rem;
-    flex: 1 1 35%;
-    justify-content: flex-end;
-  }
-  
-  .btnPrimary {
-    background-color: #0b5ed7;
-    color: white;
-    border: none;
-    padding: 0.5rem 1.5rem;
-    font-weight: 600;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .btnPrimary:hover,
-  .btnPrimary:focus {
-    background-color: #084cbc;
-    outline: none;
-  }
-  
-  .btnSecondary {
-    background-color: transparent;
-    border: 2px solid #0b5ed7;
-    color: #0b5ed7;
-    padding: 0.5rem 1.5rem;
-    font-weight: 600;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, color 0.3s ease;
-  }
-  
-  .btnSecondary:hover,
-  .btnSecondary:focus {
-    background-color: #0b5ed7;
-    color: white;
-    outline: none;
-  }
-  /* เพิ่มส่วนของ modal overlay และ modal box */
-  .modalOverlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
-    background-color: rgba(0, 0, 0, 0.4);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1300;
-    padding: 1rem;
-  }
-  
-  .modal {
-    background: white;
-    max-width: 480px;
-    width: 100%;
-    border-radius: 8px;
-    padding: 2rem;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-    color: #333;
-  }
-  
-  .fieldset {
-    border: none;
-    margin-bottom: 1.25rem;
-  }
-  
-  .checkboxLabel {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 1rem;
-    cursor: pointer;
-    user-select: none;
-    color: #222;
-  }
-  
-  .checkboxLabel input[type="checkbox"] {
-    width: 1.15rem;
-    height: 1.15rem;
-    cursor: pointer;
-  }
-  
-  .actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
-    margin-top: 1rem;
-  }
-  
-  /* ปุ่มเหมือนเดิม */
-  .btnPrimary {
-    background-color: #0b5ed7;
-    color: white;
-    border: none;
-    padding: 0.5rem 1.5rem;
-    font-weight: 600;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .btnPrimary:hover,
-  .btnPrimary:focus {
-    background-color: #084cbc;
-    outline: none;
-  }
-  
-  .btnSecondary {
-    background-color: transparent;
-    border: 2px solid #0b5ed7;
-    color: #0b5ed7;
-    padding: 0.5rem 1.5rem;
-    font-weight: 600;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, color 0.3s ease;
-  }
-  
-  .btnSecondary:hover,
-  .btnSecondary:focus {
-    background-color: #0b5ed7;
-    color: white;
-    outline: none;
-  }
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background-color: #f9f9f9;
+  border-top: 1px solid #ccc;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem 2rem;
+  font-family: "Kanit", sans-serif, Arial, sans-serif;
+  color: #333;
+  z-index: 1200;
+}
+
+.content {
+  max-width: 960px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+  flex: 1 1 100%;
+}
+
+.description {
+  font-size: 1rem;
+  line-height: 1.5;
+  flex: 1 1 60%;
+  margin: 0;
+}
+
+.link {
+  color: #1a73e8;
+  text-decoration: underline;
+}
+
+.link:hover,
+.link:focus {
+  color: #155ab6;
+  outline: none;
+}
+
+.actions {
+  display: flex;
+  gap: 1rem;
+  flex: 1 1 35%;
+  justify-content: flex-end;
+}
+
+/* ปุ่มหลัก */
+.btnPrimary {
+  background-color: #0b5ed7;
+  color: white;
+  border: none;
+  padding: 0.5rem 1.5rem;
+  font-weight: 600;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btnPrimary:hover,
+.btnPrimary:focus {
+  background-color: #084cbc;
+  outline: none;
+}
+
+/* ปุ่มรอง */
+.btnSecondary {
+  background-color: transparent;
+  border: 2px solid #0b5ed7;
+  color: #0b5ed7;
+  padding: 0.5rem 1.5rem;
+  font-weight: 600;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.btnSecondary:hover,
+.btnSecondary:focus {
+  background-color: #0b5ed7;
+  color: white;
+  outline: none;
+}
+
+/* =========================
+   🧩 Modal Overlay & Box
+========================= */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1300;
+  padding: 1rem;
+}
+
+.modal {
+  position: relative;
+  background: white;
+  max-width: 680px; /* ✅ กว้างขึ้น */
+  width: 100%;
+  border-radius: 10px;
+  padding: 2.5rem;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+  color: #333;
+  font-family: "Kanit", sans-serif;
+}
+
+.modal h2 {
+  font-size: 1.35rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.modal p {
+  font-size: 1rem;
+  line-height: 1.7;
+  margin-bottom: 1.75rem;
+  color: #444;
+}
+
+/* ปุ่มปิดมุมขวา */
+.closeBtn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  font-size: 22px;
+  color: #333;
+  cursor: pointer;
+}
+
+/* =========================
+   🍪 Cookie Accordion
+========================= */
+.cookieBox {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  overflow: hidden;
+  background-color: #f5f7fa;
+  transition: all 0.3s ease;
+}
+
+.cookieBox:hover {
+  background-color: #e9eff5;
+}
+
 .cookieRow {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #f5f7fa;
-    padding: 1rem;
-    border-radius: 6px;
-    margin-bottom: 1rem;
-    transition: background-color 0.3s ease;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+/* กล่องด้านซ้าย: ลูกศร + ชื่อคุกกี้ */
+.cookieLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+
+/* ลูกศร (ด้านหน้า) */
+.arrowIcon {
+  color: #333;
+  transition: transform 0.3s ease;
+}
+
+/* หมุนลูกศรตอนเปิด */
+.cookieBox.open .arrowIcon {
+  transform: rotate(180deg);
+}
+
+/* ชื่อคุกกี้ */
+.cookieLabel {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #222;
+}
+
+/* ด้านขวา: toggle ปุ่ม */
+.cookieRight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+/* คำอธิบาย (drop-down content) */
+.cookieDesc {
+  padding: 0.8rem 1rem;
+  border-top: 1px solid #ddd;
+  background-color: #fff;
+  color: #444;
+  line-height: 1.6;
+  font-size: 0.95rem;
+  animation: slideDown 0.25s ease;
+}
+
+/* Animation */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
   }
-  
-  .cookieRow:hover {
-    background-color: #e9eff5;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
-  
-  .cookieLabel {
-    font-size: 1rem;
-    font-weight: 500;
-    color: #222;
-    flex: 1;
-    padding-right: 1rem;
+}
+
+/* =========================
+   🔘 ปุ่มล่างใน Modal (ซ้าย/ขวา)
+========================= */
+.actionsRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  border-top: 1px solid #ddd;
+  padding-top: 1.2rem;
+  margin-top: 2rem;
+  gap: 1rem;
+}
+
+.actionLeft {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.actionRight {
+  margin-left: auto;
+}
+
+/* Responsive: ปุ่มเรียงแนวตั้ง */
+@media (max-width: 600px) {
+  .modal {
+    max-width: 95%;
+    padding: 1.5rem;
   }
-  
-  .cookieToggle {
-    flex-shrink: 0;
+
+  .actionsRow {
+    flex-direction: column;
+    align-items: stretch;
   }
-  
-  /* สำหรับ modal หัวข้อและข้อความ */
-  .modal h2 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
+
+  .actionLeft,
+  .actionRight {
+    width: 100%;
+    justify-content: center;
   }
-  
-  .modal p {
-    font-size: 1rem;
-    line-height: 1.6;
-    margin-bottom: 1.5rem;
-    color: #444;
+
+  .actionRight {
+    margin-left: 0;
   }
-  
-  /* ปุ่มด้านล่างของ modal */
-  .modal .actions {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-    gap: 0.75rem;
-    margin-top: 1.5rem;
-  }
-  
+}

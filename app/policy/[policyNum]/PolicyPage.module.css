@@ -1,0 +1,243 @@
+/* ===== Layout & Font ===== */
+.layoutContainer {
+  max-width: 1200px;
+  margin: 2.5rem auto;
+  padding: 0 1.5rem;
+  font-family: "Kanit", "Prompt", "Sarabun", sans-serif;
+  background: #fff;
+  color: #222;
+  line-height: 1.95;
+  letter-spacing: 0.15px;
+}
+
+/* ===== Title ===== */
+.headtitle {
+  font-size: 2rem;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #243865;
+}
+
+/* ===== เนื้อหาหลังบ้าน (ProseMirror / TipTap) ===== */
+.tiptapContent {
+  font-size: 1.08rem;
+  color: #222;
+  word-break: break-word;
+  text-align: justify;
+  line-height: 1.95;
+}
+
+/* ===== ย่อหน้าและบล็อกทั่วไป ===== */
+.tiptapContent p,
+.tiptapContent div:not(.policy-item):not(blockquote):not(table):not(th):not(td) {
+  margin: 1rem 0;
+  text-indent: 2em;
+  text-align: justify;
+  line-height: 1.95;
+  letter-spacing: 0.15px;
+}
+
+/* ===== ปรับเลขข้อ (มาตรา / ข้อย่อย) ===== */
+.policy-item {
+  display: block;
+  margin: 0.4rem 0;
+  line-height: 1.95;
+  text-align: justify;
+  padding-left: 2.2em;
+  text-indent: -2.2em;
+  letter-spacing: 0.15px;
+  word-spacing: 0.05em;
+  color: #222;
+}
+
+/* ระดับข้อย่อย (เช่น 4.1.1.1) เยื้องเพิ่มตามลำดับ */
+.policy-item[data-level="2"] {
+  padding-left: 3em;
+  text-indent: -3em;
+}
+.policy-item[data-level="3"] {
+  padding-left: 3.6em;
+  text-indent: -3.6em;
+}
+.policy-item[data-level="4"] {
+  padding-left: 4.2em;
+  text-indent: -4.2em;
+}
+
+/* ===== จัดการ <br> ที่มาจากหลังบ้าน ===== */
+.tiptapContent br {
+  display: block;
+  margin: 0.8rem 0;
+  content: "";
+}
+
+/* ===== Heading ===== */
+.tiptapContent h1,
+.tiptapContent h2,
+.tiptapContent h3 {
+  font-weight: 600;
+  color: #111;
+  line-height: 1.6;
+  margin-top: 2.2rem;
+  margin-bottom: 1rem;
+  text-align: left;
+  text-indent: 0;
+}
+
+.tiptapContent h1 {
+  font-size: 1.65rem;
+}
+.tiptapContent h2 {
+  font-size: 1.45rem;
+}
+.tiptapContent h3 {
+  font-size: 1.25rem;
+}
+
+/* paragraph หลัง heading */
+.tiptapContent h1 + p,
+.tiptapContent h2 + p,
+.tiptapContent h3 + p {
+  margin-top: 0.4rem;
+}
+
+/* ===== รายการ (List) ===== */
+.tiptapContent ul,
+.tiptapContent ol {
+  margin: 0;
+  padding-left: 2.5em;
+}
+
+.tiptapContent li {
+  margin: 0.3rem 0;
+  text-indent: 0;
+  text-align: justify;
+  line-height: 1.95;
+}
+
+.tiptapContent li p,
+.tiptapContent li div {
+  margin: 0 !important;
+  padding: 0 !important;
+  text-indent: 0 !important;
+  line-height: 1.95;
+}
+
+/* ===== ตัวเน้น (Bold / Italic) ===== */
+.tiptapContent strong {
+  font-weight: 600;
+}
+.tiptapContent em {
+  font-style: italic;
+}
+
+/* ===== ขีดเส้นใต้ ===== */
+.tiptapContent u {
+  text-decoration: none;
+  border-bottom: 1px solid #000;
+  padding-bottom: 1px;
+  color: #000;
+  font-weight: inherit;
+}
+.tiptapContent u strong,
+.tiptapContent strong u {
+  font-weight: 600;
+  border-bottom: 1px solid #000;
+  color: #000;
+}
+
+/* ===== ลิงก์ ===== */
+.tiptapContent a {
+  color: #000;
+  border-bottom: 1px solid #000;
+  text-decoration: none;
+  padding-bottom: 1px;
+}
+.tiptapContent a:hover {
+  border-bottom-color: #222;
+  opacity: 0.8;
+}
+
+/* ===== Blockquote ===== */
+.tiptapContent blockquote {
+  border-left: 4px solid #000;
+  padding: 0.8rem 1.25rem;
+  margin: 1.8rem 0;
+  background-color: #f8f9ff;
+  font-style: italic;
+  text-indent: 0;
+  color: #444;
+  border-radius: 4px;
+}
+
+/* ===== Table ===== */
+.tiptapContent table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1rem;
+}
+
+.tiptapContent th,
+.tiptapContent td {
+  border: 1px solid #ccc;
+  text-align: left;
+  line-height: 1.8;
+  padding: 0.8rem;
+}
+
+.tiptapContent th {
+  background-color: #f2f4f8;
+  font-weight: 600;
+  color: #222;
+}
+
+/* ===== Loading / Not Found ===== */
+.loading,
+.notfound {
+  text-align: center;
+  margin-top: 4rem;
+  font-size: 1.2rem;
+  color: #555;
+}
+
+/* ===== Skeleton Loading ===== */
+.skeletonHeader {
+  width: 60%;
+  height: 40px;
+  margin: 2.5rem auto;
+  border-radius: 8px;
+  background-color: #e0e0e0;
+  animation: pulse 1.6s infinite ease-in-out;
+}
+
+.skeletonBlock {
+  width: 100%;
+  height: 18px;
+  margin: 1rem 0;
+  border-radius: 4px;
+  background-color: #e0e0e0;
+  animation: pulse 1.6s infinite ease-in-out;
+}
+
+.skeletonBlockShort {
+  width: 70%;
+  height: 18px;
+  margin: 1rem 0 2rem 0;
+  border-radius: 4px;
+  background-color: #e0e0e0;
+  animation: pulse 1.6s infinite ease-in-out;
+}
+
+/* ===== Animation ===== */
+@keyframes pulse {
+  0% {
+    background-color: #e0e0e0;
+  }
+  50% {
+    background-color: #f0f0f0;
+  }
+  100% {
+    background-color: #e0e0e0;
+  }
+}

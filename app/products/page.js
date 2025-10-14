@@ -298,6 +298,7 @@ export default function ProductsPage() {
           </section>
         )}
 
+
         {(selectedCategories.length > 0 || selectedBrands.length > 0) && (
           <button
             className="resetbutton"
@@ -425,6 +426,7 @@ export default function ProductsPage() {
                     </button>
                   ))}
 
+
                   {currentPage < totalPages && (
                     <button onClick={() => handlePageChange(currentPage + 1)} className="btn-with-arrow">
                       <IoIosArrowForward className="arrow-icon" />
@@ -439,3 +441,4 @@ export default function ProductsPage() {
     </main>
   );
 }
+
