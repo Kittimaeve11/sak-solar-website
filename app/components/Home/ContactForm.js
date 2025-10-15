@@ -35,19 +35,29 @@ export default function ContactForm({
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
 
-  /* ✅ เคลียร์ error เมื่อพิมพ์ */
+  /* ✅ เคลียร์ error ให้ตรง key ทุกฟิลด์ */
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+
     setErrors((prev) => {
-      if (!prev[name]) return prev;
       const updated = { ...prev };
-      delete updated[name];
+
+      // ลบ error ที่ตรงกับฟิลด์นั้น ๆ
+      if (name === 'product' && updated.topic) delete updated.topic;
+      if (name === 'package' && updated.package) delete updated.package;
+      if (name === 'usageTime' && updated.usageTime) delete updated.usageTime;
+      if (name === 'fullName' && updated.name) delete updated.name;
+      if (name === 'phone' && updated.phone) delete updated.phone;
+      if (name === 'province' && updated.province) delete updated.province;
+      if (name === 'contactTime' && updated.contactTime)
+        delete updated.contactTime;
+
       return updated;
     });
   };
 
-  /* ✅ ตรวจสอบข้อมูล */
+  /* ✅ ตรวจสอบข้อมูลก่อนส่ง */
   const validate = (data = formData) => {
     const messages = {
       Infovalidate: {
@@ -72,20 +82,20 @@ export default function ContactForm({
       messages
     );
 
-    if (!data.package) infoErrors.package = '*กรุณาเลือกแพ็คเกจ';
+    if (!data.package) infoErrors.package = '*กรุณาเลือกราคาที่ยอมรับได้';
     if (!data.usageTime) infoErrors.usageTime = '*กรุณาระบุช่วงเวลาใช้ไฟ';
     if (!data.province) infoErrors.province = '*กรุณากรอกที่อยู่ของท่าน';
-    if (!data.contactTime) infoErrors.contactTime = '*กรุณาเลือกช่วงเวลาติดต่อกลับ';
+    if (!data.contactTime)
+      infoErrors.contactTime = '*กรุณาเลือกช่วงเวลาติดต่อกลับ';
 
     return infoErrors;
   };
 
-  /* ✅ Submit Form */
+  /* ✅ ส่งข้อมูลฟอร์ม */
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (submitting) return;
 
-    // ✅ รวมค่าที่อยู่ล่าสุดก่อน validate
     let updatedData = { ...formData };
     if (!formData.province && query.trim()) {
       updatedData = { ...formData, province: query.trim() };
@@ -124,7 +134,7 @@ export default function ContactForm({
 
       if (!response.ok) throw new Error('ส่งข้อมูลไม่สำเร็จ');
       const result = await response.json();
-      console.log('📩 ส่งข้อมูลสำเร็จ:', result);
+      console.log(' ส่งข้อมูลสำเร็จ:', result);
 
       await Swal.fire({
         icon: 'success',
@@ -148,7 +158,7 @@ export default function ContactForm({
       setQuery('');
       setSuggestions([]);
     } catch (err) {
-      console.error('❌ ส่งข้อมูลล้มเหลว:', err);
+      console.error('ส่งข้อมูลล้มเหลว:', err);
       await Swal.fire({
         icon: 'error',
         title: 'เกิดข้อผิดพลาดในการส่งข้อมูล',
@@ -160,21 +170,21 @@ export default function ContactForm({
     }
   };
 
-  /* ✅ handleQueryChange (ค้นหาได้ทั้งจังหวัด อำเภอ ตำบล) */
+  /* ✅ handleQueryChange */
   const handleQueryChange = (e) => {
     const text = e.target.value.trim();
     setQuery(text);
     setErrors((prev) => {
-      if (!prev.province) return prev;
       const updated = { ...prev };
-      delete updated.province;
+      if (updated.province) delete updated.province;
       return updated;
     });
+
     if (!text) return setSuggestions([]);
 
     const matched = [];
 
-    // ✅ 1. ค้นจากชื่อตำบล
+    // ค้นหาตำบล
     tambons.forEach((t) => {
       if (t.name_th.includes(text)) {
         const amphure = amphures.find((a) => a.id === t.amphure_id);
@@ -187,7 +197,7 @@ export default function ContactForm({
       }
     });
 
-    // ✅ 2. ค้นจากชื่ออำเภอ
+    // ค้นหาอำเภอ
     amphures.forEach((a) => {
       if (a.name_th.includes(text)) {
         const province = provinces.find((p) => p.id === a.province_id);
@@ -210,7 +220,7 @@ export default function ContactForm({
       }
     });
 
-    // ✅ 3. ค้นจากชื่อจังหวัด
+    // ค้นหาจังหวัด
     provinces.forEach((p) => {
       if (p.name_th.includes(text)) {
         const amphuresInProvince = amphures.filter((a) => a.province_id === p.id);
@@ -232,7 +242,6 @@ export default function ContactForm({
       }
     });
 
-    // ✅ 🔧 กรองรายการซ้ำก่อนแสดงผล
     const uniqueMatched = matched.filter(
       (v, i, a) =>
         a.findIndex(
@@ -248,7 +257,9 @@ export default function ContactForm({
 
   /* ✅ handleSelect */
   const handleSelect = (item) => {
-    const fullText = `${item.subDistrict ? item.subDistrict + ', ' : ''}${item.district ? item.district + ', ' : ''}${item.province}`;
+    const fullText = `${item.subDistrict ? item.subDistrict + ', ' : ''}${
+      item.district ? item.district + ', ' : ''
+    }${item.province}`;
     setQuery(fullText);
     setFormData((prev) => ({
       ...prev,
@@ -259,7 +270,7 @@ export default function ContactForm({
     setSuggestions([]);
   };
 
-  /* ✅ useEffect */
+  /* ✅ useEffect สำหรับ setup */
   useEffect(() => {
     const matchedTambon = tambons.find((t) => t.name_th === formData.subDistrict);
     if (matchedTambon) {
@@ -286,7 +297,7 @@ export default function ContactForm({
       setFormData((prev) => ({ ...prev, product: productFromUrl }));
       setErrors((prev) => {
         const updated = { ...prev };
-        delete updated.product;
+        if (updated.topic) delete updated.topic;
         return updated;
       });
 
@@ -314,7 +325,7 @@ export default function ContactForm({
         </h4>
 
         <form onSubmit={handleSubmit}>
-          {/* ===== สินค้า ===== */}
+          {/* ===== สินค้าหรือบริการ ===== */}
           <div>
             <span className="form-label">สินค้าหรือบริการที่สนใจ :</span>
             <div className={`radio-group ${errors.topic ? 'error-border' : ''}`}>
@@ -346,7 +357,7 @@ export default function ContactForm({
             {errors.topic && <div className="error-text">{errors.topic}</div>}
           </div>
 
-          {/* ===== แพ็คเกจ ===== */}
+          {/* ===== ราคาที่ยอมรับได้ ===== */}
           <div className="form-select-wrapper">
             <label htmlFor="package" className="form-label">
               ราคาที่ยอมรับได้ :
@@ -479,7 +490,6 @@ export default function ContactForm({
                 })}
               </ul>
             )}
-
             {errors.province && <div className="error-text">{errors.province}</div>}
           </div>
 
@@ -510,9 +520,13 @@ export default function ContactForm({
             {errors.contactTime && <div className="error-text">{errors.contactTime}</div>}
           </div>
 
-          {/* ปุ่มส่ง */}
+          {/* ===== ปุ่มส่ง ===== */}
           <div className={styles.row} style={{ display: 'flex', justifyContent: 'center' }}>
-            <button type="submit" className="buttonSecondaryoneorange" disabled={submitting}>
+            <button
+              type="submit"
+              className="buttonSecondaryoneorange"
+              disabled={submitting}
+            >
               {submitting ? 'กำลังส่ง...' : 'ส่งข้อความ'}
             </button>
           </div>

@@ -76,7 +76,7 @@ html {
 .error-page {
   font-family: "SukhumvitTadmai", sans-serif;
   font-weight: 400;
-  color: #243865;
+  color: #0D3973;
 }
 
 
@@ -164,7 +164,7 @@ h6 {
   font-weight: 600;
   text-align: center;
   margin-bottom: 0.5rem;
-  color: #243865;
+  color: #0D3973;
 }
 
 .headtitleone {
@@ -172,7 +172,7 @@ h6 {
   font-weight: 600;
   text-align: center;
   margin-bottom: 0.5rem;
-  color: #F27C1B;
+  color: #E88534;
 }
 
 /* ปรับการตัดคำให้รองรับภาษาไทยและไม่บีบข้อความ */
