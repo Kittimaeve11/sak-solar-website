@@ -2,12 +2,11 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { MdOutlineKeyboardArrowDown } from 'react-icons/md';
+import Swal from 'sweetalert2';
 import styles from '../../Home.module.css';
 import { useSearchParams } from 'next/navigation';
 import { useLocale } from '@/app/Context/LocaleContext';
-// import SliderCaptcha from 'rc-slider-captcha'; // 👉 ถ้ายังไม่ใช้ ให้ปิดไว้ก่อน
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
-const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
+import { validateFieldmoreInfo } from '@/app/Utils/validation';
 
 export default function ContactForm({
   provinces = [],
@@ -34,87 +33,107 @@ export default function ContactForm({
   const [query, setQuery] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [errors, setErrors] = useState({});
-  const [captchaVerified, setCaptchaVerified] = useState(false); // ✅ ไว้ใช้ถ้าเปิด captcha
-  const [submitting, setSubmitting] = useState(false); // ป้องกันกดซ้ำ
-  const [status, setStatus] = useState(null); // success / error
+  const [submitting, setSubmitting] = useState(false);
 
+  /* ✅ เคลียร์ error เมื่อพิมพ์ */
   const handleChange = (e) => {
     const { name, value } = e.target;
-
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-
-    // ✅ ลบ error เฉพาะช่องที่ผู้ใช้พิมพ์
-    setErrors((prevErrors) => {
-      if (!prevErrors[name]) return prevErrors;
-      const updatedErrors = { ...prevErrors };
-      delete updatedErrors[name];
-      return updatedErrors;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => {
+      if (!prev[name]) return prev;
+      const updated = { ...prev };
+      delete updated[name];
+      return updated;
     });
   };
 
-  const validate = () => {
-    const newErrors = {};
-    if (!formData.product) newErrors.product = '*กรุณาระบุสินค้าหรือบริการ';
-    if (!formData.package) newErrors.package = '*กรุณาเลือกแพ็คเกจ';
-    if (!formData.usageTime) newErrors.usageTime = '*กรุณาระบุช่วงเวลาใช้ไฟ';
-    if (!formData.fullName) newErrors.fullName = '*กรุณากรอกชื่อและนามสกุลของท่าน';
-    if (!formData.phone) newErrors.phone = '*กรุณากรอกหมายเลขโทรศัพท์';
-    if (!formData.contactTime) newErrors.contactTime = '*กรุณาเลือกช่วงเวลาติดต่อกลับ';
-    if (!formData.province) newErrors.province = '*กรุณากรอกที่อยู่ของท่าน';
-    return newErrors;
+  /* ✅ ตรวจสอบข้อมูล */
+  const validate = (data = formData) => {
+    const messages = {
+      Infovalidate: {
+        topic: '*กรุณาระบุสินค้าหรือบริการ',
+        fullname: {
+          fullnamenull: '*กรุณากรอกชื่อและนามสกุลของท่าน',
+          name: '*ชื่อไม่ถูกต้อง (ห้ามมีตัวเลขหรืออักขระพิเศษ)',
+        },
+        phone: {
+          phonenull: '*กรุณากรอกหมายเลขโทรศัพท์',
+          phonenumber: '*หมายเลขโทรศัพท์ต้องเป็นตัวเลข 10 หลัก',
+        },
+      },
+    };
+
+    const infoErrors = validateFieldmoreInfo(
+      {
+        topic: data.product,
+        name: data.fullName,
+        phone: data.phone,
+      },
+      messages
+    );
+
+    if (!data.package) infoErrors.package = '*กรุณาเลือกแพ็คเกจ';
+    if (!data.usageTime) infoErrors.usageTime = '*กรุณาระบุช่วงเวลาใช้ไฟ';
+    if (!data.province) infoErrors.province = '*กรุณากรอกที่อยู่ของท่าน';
+    if (!data.contactTime) infoErrors.contactTime = '*กรุณาเลือกช่วงเวลาติดต่อกลับ';
+
+    return infoErrors;
   };
 
+  /* ✅ Submit Form */
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (submitting) return;
 
-    // 👉 ถ้าใช้ captcha ให้เปิดบรรทัดนี้
-    // if (!captchaVerified) {
-    //   alert('กรุณายืนยันตัวตนด้วย captcha ก่อนส่งแบบฟอร์ม');
-    //   return;
-    // }
+    // ✅ รวมค่าที่อยู่ล่าสุดก่อน validate
+    let updatedData = { ...formData };
+    if (!formData.province && query.trim()) {
+      updatedData = { ...formData, province: query.trim() };
+      setFormData(updatedData);
+    }
 
-    const validationErrors = validate();
+    const validationErrors = validate(updatedData);
     setErrors(validationErrors);
-
     if (Object.keys(validationErrors).length > 0) return;
 
     setSubmitting(true);
-    setStatus(null);
 
-    const address = [formData.subDistrict, formData.district, formData.province]
+    const address = [updatedData.subDistrict, updatedData.district, updatedData.province]
       .filter(Boolean)
       .join(', ');
 
     const payload = {
-      producttypeID: formData.product,
-      acceptableprice: formData.package,
-      usagetime: formData.usageTime,
-      fullname: formData.fullName,
-      phonenumber: formData.phone,
+      product: updatedData.product,
+      package: updatedData.package,
+      usageTime: updatedData.usageTime,
+      fullName: updatedData.fullName,
+      phone: updatedData.phone,
+      subDistrict: updatedData.subDistrict,
+      district: updatedData.district,
+      province: updatedData.province,
+      contactTime: updatedData.contactTime,
       address,
-      contedtime: formData.contactTime,
-      solce: "เว็บไซต์",
     };
 
     try {
-      const response = await fetch(`${baseUrl}/api/Inquiriespageapi`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": apiKey,
-        },
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
 
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-
+      if (!response.ok) throw new Error('ส่งข้อมูลไม่สำเร็จ');
       const result = await response.json();
-      console.log("📩 ส่งข้อมูลสำเร็จ:", result);
+      console.log('📩 ส่งข้อมูลสำเร็จ:', result);
 
-      // reset form
+      await Swal.fire({
+        icon: 'success',
+        title: 'ส่งข้อมูลเรียบร้อยแล้ว!',
+        text: 'ขอบคุณที่สนใจโซลาร์เซลล์จากเรา ทีมงานจะติดต่อกลับโดยเร็วที่สุดค่ะ ☀️',
+        showConfirmButton: false,
+        timer: 2500,
+      });
+
       setFormData({
         product: '',
         package: '',
@@ -128,33 +147,34 @@ export default function ContactForm({
       });
       setQuery('');
       setSuggestions([]);
-      setCaptchaVerified(false);
-
-      setStatus('success');
     } catch (err) {
-      console.error("❌ ส่งข้อมูลล้มเหลว:", err);
-      setStatus('error');
+      console.error('❌ ส่งข้อมูลล้มเหลว:', err);
+      await Swal.fire({
+        icon: 'error',
+        title: 'เกิดข้อผิดพลาดในการส่งข้อมูล',
+        text: 'กรุณาลองใหม่อีกครั้ง หรือเช็คการเชื่อมต่ออินเทอร์เน็ตค่ะ',
+        confirmButtonColor: '#f2780c',
+      });
     } finally {
       setSubmitting(false);
     }
   };
 
+  /* ✅ handleQueryChange (ค้นหาได้ทั้งจังหวัด อำเภอ ตำบล) */
   const handleQueryChange = (e) => {
     const text = e.target.value.trim();
     setQuery(text);
-
-    // ✅ clear error province เมื่อพิมพ์ใหม่
-    setErrors((prevErrors) => {
-      if (!prevErrors.province) return prevErrors;
-      const updated = { ...prevErrors };
+    setErrors((prev) => {
+      if (!prev.province) return prev;
+      const updated = { ...prev };
       delete updated.province;
       return updated;
     });
-
     if (!text) return setSuggestions([]);
 
     const matched = [];
 
+    // ✅ 1. ค้นจากชื่อตำบล
     tambons.forEach((t) => {
       if (t.name_th.includes(text)) {
         const amphure = amphures.find((a) => a.id === t.amphure_id);
@@ -167,19 +187,43 @@ export default function ContactForm({
       }
     });
 
+    // ✅ 2. ค้นจากชื่ออำเภอ
     amphures.forEach((a) => {
       if (a.name_th.includes(text)) {
         const province = provinces.find((p) => p.id === a.province_id);
-        matched.push({
-          subDistrict: '',
-          district: a.name_th,
-          province: province?.name_th || '',
-        });
+        const tambonList = tambons.filter((t) => t.amphure_id === a.id);
+        if (tambonList.length > 0) {
+          tambonList.forEach((t) =>
+            matched.push({
+              subDistrict: t.name_th,
+              district: a.name_th,
+              province: province?.name_th || '',
+            })
+          );
+        } else {
+          matched.push({
+            subDistrict: '',
+            district: a.name_th,
+            province: province?.name_th || '',
+          });
+        }
       }
     });
 
+    // ✅ 3. ค้นจากชื่อจังหวัด
     provinces.forEach((p) => {
       if (p.name_th.includes(text)) {
+        const amphuresInProvince = amphures.filter((a) => a.province_id === p.id);
+        amphuresInProvince.forEach((a) => {
+          const tambonsInAmphure = tambons.filter((t) => t.amphure_id === a.id);
+          tambonsInAmphure.forEach((t) => {
+            matched.push({
+              subDistrict: t.name_th,
+              district: a.name_th,
+              province: p.name_th,
+            });
+          });
+        });
         matched.push({
           subDistrict: '',
           district: '',
@@ -188,9 +232,21 @@ export default function ContactForm({
       }
     });
 
-    setSuggestions(matched.slice(0, 10));
+    // ✅ 🔧 กรองรายการซ้ำก่อนแสดงผล
+    const uniqueMatched = matched.filter(
+      (v, i, a) =>
+        a.findIndex(
+          (t) =>
+            t.subDistrict === v.subDistrict &&
+            t.district === v.district &&
+            t.province === v.province
+        ) === i
+    );
+
+    setSuggestions(uniqueMatched.slice(0, 20));
   };
 
+  /* ✅ handleSelect */
   const handleSelect = (item) => {
     const fullText = `${item.subDistrict ? item.subDistrict + ', ' : ''}${item.district ? item.district + ', ' : ''}${item.province}`;
     setQuery(fullText);
@@ -203,8 +259,8 @@ export default function ContactForm({
     setSuggestions([]);
   };
 
+  /* ✅ useEffect */
   useEffect(() => {
-    // auto fill district/province เมื่อเลือก tambon
     const matchedTambon = tambons.find((t) => t.name_th === formData.subDistrict);
     if (matchedTambon) {
       const amphure = amphures.find((a) => a.id === matchedTambon.amphure_id);
@@ -218,7 +274,6 @@ export default function ContactForm({
       }
     }
 
-    // ปิด suggestion เมื่อคลิกนอกกล่อง
     const handleClickOutside = (e) => {
       if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
         setSuggestions([]);
@@ -226,28 +281,20 @@ export default function ContactForm({
     };
     document.addEventListener('mousedown', handleClickOutside);
 
-    // อ่าน query param product
     const productFromUrl = searchParams.get('product');
     if (productFromUrl) {
-      setFormData((prev) => ({
-        ...prev,
-        product: productFromUrl,
-      }));
-      setErrors((prevErrors) => {
-        const newErrors = { ...prevErrors };
-        delete newErrors.product;
-        return newErrors;
+      setFormData((prev) => ({ ...prev, product: productFromUrl }));
+      setErrors((prev) => {
+        const updated = { ...prev };
+        delete updated.product;
+        return updated;
       });
 
       const contactSection = document.getElementById('contact');
-      if (contactSection) {
-        contactSection.scrollIntoView({ behavior: 'smooth' });
-      }
+      if (contactSection) contactSection.scrollIntoView({ behavior: 'smooth' });
     }
 
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [formData.subDistrict, searchParams, tambons, amphures, provinces]);
 
   return (
@@ -259,21 +306,29 @@ export default function ContactForm({
             textAlign: 'center',
             marginTop: -10,
             marginBottom: 20,
-            fontWeight: '600',
+            fontWeight: 600,
             color: '#19489D',
           }}
-        >          หรือต้องการปรึกษาการติดตั้ง เรายินดีให้คำแนะนำ
+        >
+          หรือต้องการปรึกษาการติดตั้ง เรายินดีให้คำแนะนำ
         </h4>
 
         <form onSubmit={handleSubmit}>
-          {/* สินค้า */}
+          {/* ===== สินค้า ===== */}
           <div>
-            <span className="form-label">สินค้าหรือบริการที่สนใจ :</span> 
-            <div className={`radio-group ${errors.product ? 'error-border' : ''}`}>
+            <span className="form-label">สินค้าหรือบริการที่สนใจ :</span>
+            <div className={`radio-group ${errors.topic ? 'error-border' : ''}`}>
               {productOptions.map((product) => {
-                const productName = locale === 'th' ? product.producttypenameTH : product.producttypenameEN;
+                const productName =
+                  locale === 'th'
+                    ? product.producttypenameTH
+                    : product.producttypenameEN;
                 return (
-                  <label key={product.producttypeID} className="form-radio" htmlFor={`product-${product.producttypeID}`}>
+                  <label
+                    key={product.producttypeID}
+                    className="form-radio"
+                    htmlFor={`product-${product.producttypeID}`}
+                  >
                     <input
                       id={`product-${product.producttypeID}`}
                       type="radio"
@@ -288,12 +343,14 @@ export default function ContactForm({
                 );
               })}
             </div>
-            {errors.product && <div className="error-text">{errors.product}</div>}
+            {errors.topic && <div className="error-text">{errors.topic}</div>}
           </div>
 
-          {/* แพ็คเกจ */}
+          {/* ===== แพ็คเกจ ===== */}
           <div className="form-select-wrapper">
-            <label htmlFor="package" className="form-label">ราคาที่ยอมรับได้ :</label> {/* ✅ ถูกต้องแล้ว */}
+            <label htmlFor="package" className="form-label">
+              ราคาที่ยอมรับได้ :
+            </label>
             <div className="custom-select-container" style={{ position: 'relative' }}>
               <select
                 id="package"
@@ -302,20 +359,30 @@ export default function ContactForm({
                 onChange={handleChange}
                 className={`form-select ${formData.package === '' ? 'placeholder' : ''} ${errors.package ? 'input-error' : ''}`}
               >
-                <option value="" disabled hidden>กรุณาเลือกราคาที่ยอมรับได้**</option>
-                <option value="ประหยัด (ต่ำกว่า 100,000 บาท)">ประหยัด (ต่ำกว่า 100,000 บาท)</option>
-                <option value="กลาง (100,000 - 250,000 บาท)">กลาง (100,000 - 250,000 บาท)</option>
-                <option value="Premium (มากกว่า 250,000 บาท)">Premium (มากกว่า 250,000 บาท)</option>
-                <option value="ไม่แน่ใจ ต้องการให้เจ้าหน้าที่แนะนำ">ไม่แน่ใจ ต้องการให้เจ้าหน้าที่แนะนำ</option>
+                <option value="" disabled hidden>
+                  กรุณาเลือกราคาที่ยอมรับได้**
+                </option>
+                <option value="ประหยัด (ต่ำกว่า 100,000 บาท)">
+                  ประหยัด (ต่ำกว่า 100,000 บาท)
+                </option>
+                <option value="กลาง (100,000 - 250,000 บาท)">
+                  กลาง (100,000 - 250,000 บาท)
+                </option>
+                <option value="Premium (มากกว่า 250,000 บาท)">
+                  Premium (มากกว่า 250,000 บาท)
+                </option>
+                <option value="ไม่แน่ใจ ต้องการให้เจ้าหน้าที่แนะนำ">
+                  ไม่แน่ใจ ต้องการให้เจ้าหน้าที่แนะนำ
+                </option>
               </select>
               <MdOutlineKeyboardArrowDown className="select-arrow" />
             </div>
             {errors.package && <div className="error-text">{errors.package}</div>}
           </div>
 
-          {/* ช่วงเวลาใช้ไฟ */}
+          {/* ===== ช่วงเวลาใช้ไฟ ===== */}
           <div>
-            <span className="form-label">ช่วงเวลาที่ใช้ไฟ :</span> {/* ✅ ใช้ span แทน */}
+            <span className="form-label">ช่วงเวลาที่ใช้ไฟ :</span>
             <div className={`radio-group ${errors.usageTime ? 'error-border' : ''}`}>
               <label className="form-radio" htmlFor="usageTimeDay">
                 <input
@@ -345,25 +412,28 @@ export default function ContactForm({
             {errors.usageTime && <div className="error-text">{errors.usageTime}</div>}
           </div>
 
-
-          {/* ชื่อและเบอร์ */}
+          {/* ===== ชื่อและเบอร์โทร ===== */}
           <div>
-            <label htmlFor="fullName" className="form-label">ชื่อจริง-นามสกุลจริง :</label>
+            <label htmlFor="fullName" className="form-label">
+              ชื่อจริง-นามสกุลจริง :
+            </label>
             <input
               id="fullName"
               type="text"
               name="fullName"
               value={formData.fullName}
               onChange={handleChange}
-              className={`form-field ${errors.fullName ? 'input-error' : ''}`}
+              className={`form-field ${errors.name ? 'input-error' : ''}`}
               placeholder="กรุณากรอกชื่อ - นามสกุล ของท่าน**"
               autoComplete="name"
             />
-            {errors.fullName && <div className="error-text">{errors.fullName}</div>}
+            {errors.name && <div className="error-text">{errors.name}</div>}
           </div>
 
           <div>
-            <label htmlFor="contact-phone" className="form-label">หมายเลขโทรศัพท์มือถือ :</label>
+            <label htmlFor="contact-phone" className="form-label">
+              หมายเลขโทรศัพท์มือถือ :
+            </label>
             <input
               id="contact-phone"
               type="tel"
@@ -377,9 +447,11 @@ export default function ContactForm({
             {errors.phone && <div className="error-text">{errors.phone}</div>}
           </div>
 
-          {/* ค้นหาที่อยู่ */}
+          {/* ===== ค้นหาที่อยู่ ===== */}
           <div ref={wrapperRef} style={{ position: 'relative' }}>
-            <label htmlFor="addressQuery" className="form-label">ค้นหาที่อยู่ :</label>
+            <label htmlFor="addressQuery" className="form-label">
+              ค้นหาที่อยู่ :
+            </label>
             <input
               id="addressQuery"
               type="text"
@@ -387,23 +459,35 @@ export default function ContactForm({
               onChange={handleQueryChange}
               className={`form-field ${errors.province ? 'input-error' : ''}`}
               placeholder="เช่น (ตำบล)ท่าอิฐ, (อำเภอ)เมืองอุตรดิตถ์, (จังหวัด)อุตรดิตถ์"
-              autoComplete="address-line1"
             />
             {suggestions.length > 0 && (
-              <ul className="autocomplete-list">
-                {suggestions.map((s, i) => (
-                  <li key={i} onClick={() => handleSelect(s)} style={{ padding: '8px', cursor: 'pointer' }}>
-                    {`${s.subDistrict ? s.subDistrict + ', ' : ''}${s.district ? s.district + ', ' : ''}${s.province}`}
-                  </li>
-                ))}
+              <ul className={styles.autocompleteList}>
+                {suggestions.map((s, i) => {
+                  const fullText = `${s.subDistrict ? s.subDistrict + ', ' : ''}${s.district ? s.district + ', ' : ''}${s.province}`;
+                  const highlighted = fullText.replace(
+                    new RegExp(query, 'gi'),
+                    (match) => `<span class='${styles.highlightText}'>${match}</span>`
+                  );
+                  return (
+                    <li
+                      key={i}
+                      onClick={() => handleSelect(s)}
+                      dangerouslySetInnerHTML={{ __html: highlighted }}
+                      className={styles.autocompleteItem}
+                    />
+                  );
+                })}
               </ul>
             )}
+
             {errors.province && <div className="error-text">{errors.province}</div>}
           </div>
 
-          {/* เวลาติดต่อกลับ */}
+          {/* ===== เวลาติดต่อกลับ ===== */}
           <div className="form-select-wrapper">
-            <label htmlFor="contactTime" className="form-label">ช่วงเวลาที่สะดวกให้ติดต่อกลับ :</label>
+            <label htmlFor="contactTime" className="form-label">
+              ช่วงเวลาที่สะดวกให้ติดต่อกลับ :
+            </label>
             <div className="custom-select-container" style={{ position: 'relative' }}>
               <select
                 id="contactTime"
@@ -412,11 +496,13 @@ export default function ContactForm({
                 onChange={handleChange}
                 className={`form-select ${formData.contactTime === '' ? 'placeholder' : ''} ${errors.contactTime ? 'input-error' : ''}`}
               >
-                <option value="" disabled hidden>กรุณาเลือกช่วงเวลาที่สะดวกให้ติดต่อกลับ**</option>
+                <option value="" disabled hidden>
+                  กรุณาเลือกช่วงเวลาที่สะดวกให้ติดต่อกลับ**
+                </option>
                 <option value="08:30 น. - 12:00 น.">08:30 น. - 12:00 น.</option>
-                <option value="12:00 น. - 13:00 น">12:00 น. - 13:00 น.</option>
+                <option value="12:00 น. - 13:00 น.">12:00 น. - 13:00 น.</option>
                 <option value="13:00 น. - 15:00 น.">13:00 น. - 15:00 น.</option>
-                <option value="late-15:00 น. - 17:30 น.">15:00 น. - 17:30 น.</option>
+                <option value="15:00 น. - 17:30 น.">15:00 น. - 17:30 น.</option>
                 <option value="ทุกช่วงเวลา">ทุกช่วงเวลา</option>
               </select>
               <MdOutlineKeyboardArrowDown className="select-arrow" />
@@ -430,12 +516,7 @@ export default function ContactForm({
               {submitting ? 'กำลังส่ง...' : 'ส่งข้อความ'}
             </button>
           </div>
-
-          {/* Feedback */}
-          {status === 'success' && <p style={{ color: 'green', textAlign: 'center' }}>ส่งข้อมูลเรียบร้อย </p>}
-          {status === 'error' && <p style={{ color: 'red', textAlign: 'center' }}>ส่งข้อมูลล้มเหลว  กรุณาลองใหม่อีกครั้งค่ะ</p>}
         </form>
-
       </div>
     </div>
   );

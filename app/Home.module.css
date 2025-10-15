@@ -102,3 +102,99 @@
     max-width: 670px;
   }
 }
+
+
+/* ================================
+    กล่องรายการ Autocomplete
+   ================================ */
+.autocompleteList {
+  position: absolute; /* วางทับอยู่ใต้ช่อง input */
+  top: 100%; /* ให้อยู่ชิดด้านล่างของ input */
+  left: 0;
+  right: 0;
+  z-index: 99; /* ให้อยู่เหนือ element อื่นๆ */
+  background: #fff; /* พื้นหลังสีขาว */
+  border-radius: 8px; /* ขอบมน */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* เงาเบาๆ */
+  margin-top: 2px; /* ระยะห่างระหว่าง input */
+  padding: 6px 0; /* เว้นช่องด้านใน */
+  list-style: none; /* เอา bullet ออก */
+  max-height: 365px; /* จำกัดความสูง (ประมาณ 10 รายการ) */
+  overflow-y: auto; /* ถ้ามีเกินให้เลื่อนแนวตั้งได้ */
+  animation: fadeInList 0.18s ease-out; /* เอฟเฟกต์ตอนแสดงรายการ */
+  scrollbar-width: thin; /* ทำ scrollbar ให้บาง (Firefox) */
+  scrollbar-color: #ccc transparent; /* สี scrollbar */
+}
+
+/* ================================
+    สไตล์ของ Scrollbar (Chrome/Safari)
+   ================================ */
+.autocompleteList::-webkit-scrollbar {
+  width: 8px; /* ความกว้างของ scrollbar */
+}
+
+.autocompleteList::-webkit-scrollbar-thumb {
+  background-color: #c9c9c9; /* สีแท่ง scrollbar */
+  border-radius: 8px; /* ขอบมน */
+}
+
+.autocompleteList::-webkit-scrollbar-thumb:hover {
+  background-color: #999; /* เปลี่ยนสีเมื่อ hover */
+}
+
+/* ================================
+    รายการแต่ละแถวของ Autocomplete
+   ================================ */
+.autocompleteItem {
+  padding: 10px 16px; /* ระยะห่างของข้อความในแต่ละรายการ */
+  cursor: pointer; /* เปลี่ยนเป็นมือเมื่อเอาเมาส์ชี้ */
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #243865; /* สีตัวอักษรหลัก */
+  display: block;
+  transition: background 0.25s ease, color 0.25s ease; /* ทำให้ hover ลื่น */
+  border-bottom: 1px solid #f5f5f5; /* เส้นแบ่งแต่ละรายการ */
+}
+
+/* เอาเส้นขอบล่างของรายการสุดท้ายออก */
+.autocompleteItem:last-child {
+  border-bottom: none;
+}
+
+/* เมื่อ hover รายการ */
+.autocompleteItem:hover {
+  background: #f7faff; /* พื้นหลังฟ้าอ่อน */
+  color: #19489d; /* เปลี่ยนสีตัวอักษรเป็นฟ้าเข้ม */
+}
+
+/* ================================
+    ข้อความที่ถูก highlight ตรงกับคำค้นหา
+   ================================ */
+.highlightText {
+  font-weight: 600; /* ตัวหนา */
+  color: #367AF5; /* ฟ้าสด (เน้นคำที่ค้นเจอ) */
+}
+
+/* ================================
+    เอฟเฟกต์ตอนแสดงรายการ (Fade-in)
+   ================================ */
+@keyframes fadeInList {
+  from {
+    opacity: 0;
+    transform: translateY(-6px); /* เลื่อนขึ้นเล็กน้อย */
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0); /* คืนตำแหน่งปกติ */
+  }
+}
+
+/* ================================
+    ปรับขนาดตัวอักษรบนหน้าจอมือถือ
+   ================================ */
+@media (max-width: 768px) {
+  .autocompleteItem {
+    font-size: 0.9rem;
+    padding: 9px 12px;
+  }
+}

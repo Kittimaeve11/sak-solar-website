@@ -255,9 +255,6 @@ export default function SolarCalculatorForm() {
             )}
         </h1>
 
-
-
-
         {!results && (
           <form noValidate onSubmit={handleSubmit}>
             <div className={styles.row}>
@@ -566,7 +563,6 @@ export default function SolarCalculatorForm() {
                     </span>
                   </div>
 
-
                   <div className={styles.costRow}>
                     <div className={styles.leftGroup}>
                       <Image
@@ -619,10 +615,7 @@ export default function SolarCalculatorForm() {
                       </div>
                     </li>
                   </ul>
-
-
                 </div>
-
               </div>
             </div>
 
@@ -649,8 +642,6 @@ export default function SolarCalculatorForm() {
                 ปริ้นผลการคำนวณขนาดติดตั้ง
               </button>
             </div>
-
-
 
           </>
         )}
