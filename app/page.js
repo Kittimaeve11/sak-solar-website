@@ -129,26 +129,26 @@ export default function HomePage() {
   return (
     <>
       {/* Banner ด้านบน */}
-      <div className="banner-wrapper">
+      {/* <div className="banner-wrapper">
         <BannerSlider />
-      </div>
+      </div> */}
 
       {/* Headline */}
-      <h5 className="headline" style={{ marginTop: '-0.5px' }}>
+      {/* <h5 className="headline" style={{ marginTop: '-0.5px' }}>
         ติดตั้งโซลาร์เซลล์กับทีมช่างที่ได้มารฐาน <br />
         และได้รับการรับรองจากการไฟฟ้า (PEA)
-      </h5>
+      </h5> */}
 
       {/* Section บริการฟรี */}
-      <FreeServices
+      {/* <FreeServices
         contacts={services}
         locale={locale}
         loading={loadingServices}
         baseUrl={baseUrl}
-      />
+      /> */}
 
       {/* Section Products ตามประเภท */}
-      <div>
+      {/* <div>
         {productTypes.map(ptype => (
           <ProductCarousel
             key={ptype.producttypeID}
@@ -157,10 +157,10 @@ export default function HomePage() {
             link={`/products/${ptype.producttypeID}`}
           />
         ))}
-      </div>
+      </div> */}
 
       {/* ฟอร์มกรอกข้อมูลโซลาร์ */}
-      <SolarFormnew />
+      {/* <SolarFormnew /> */}
 
       {/* ฟอร์มติดต่อ */}
       <div id="contact">
@@ -177,9 +177,9 @@ export default function HomePage() {
       <div style={{ borderBottom: '2.5px solid #e88534c7', width: '80%', margin: '20px auto' }}></div>
 
       {/* Section บทความ/ผลงาน/รีวิว */}
-      <SlideEditorial />
+      {/* <SlideEditorial />
       <SlidePortfolio />
-      <SlideReview />
+      <SlideReview /> */}
 
       {/* Style เฉพาะ banner */}
       <style jsx>{`

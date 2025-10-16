@@ -1,12 +1,13 @@
-'use client';
+'use client'
 
-import React, { useEffect, useRef, useState } from 'react';
-import { MdOutlineKeyboardArrowDown } from 'react-icons/md';
-import Swal from 'sweetalert2';
-import styles from '../../Home.module.css';
-import { useSearchParams } from 'next/navigation';
-import { useLocale } from '@/app/Context/LocaleContext';
-import { validateFieldmoreInfo } from '@/app/Utils/validation';
+import React, { useEffect, useRef, useState } from 'react'
+import { MdOutlineKeyboardArrowDown } from 'react-icons/md'
+import Swal from 'sweetalert2'
+import ReCAPTCHA from 'react-google-recaptcha'
+import styles from '../../Home.module.css'
+import { useSearchParams } from 'next/navigation'
+import { useLocale } from '@/app/Context/LocaleContext'
+import { validateFieldmoreInfo } from '@/app/Utils/validation'
 
 export default function ContactForm({
   provinces = [],
@@ -14,9 +15,9 @@ export default function ContactForm({
   tambons = [],
   productOptions = [],
 }) {
-  const { locale } = useLocale();
-  const searchParams = useSearchParams();
-  const wrapperRef = useRef(null);
+  const { locale } = useLocale()
+  const searchParams = useSearchParams()
+  const wrapperRef = useRef(null)
 
   const [formData, setFormData] = useState({
     product: '',
@@ -28,36 +29,25 @@ export default function ContactForm({
     subDistrict: '',
     province: '',
     contactTime: '',
-  });
+  })
 
-  const [query, setQuery] = useState('');
-  const [suggestions, setSuggestions] = useState([]);
-  const [errors, setErrors] = useState({});
-  const [submitting, setSubmitting] = useState(false);
+  const [query, setQuery] = useState('')
+  const [suggestions, setSuggestions] = useState([])
+  const [errors, setErrors] = useState({})
+  const [submitting, setSubmitting] = useState(false)
+  const [captchaToken, setCaptchaToken] = useState(null)
+  const [showCaptcha, setShowCaptcha] = useState(false)
+  const [loadingProducts, setLoadingProducts] = useState(true) // ✅ โหลดสินค้า
 
-  /* ✅ เคลียร์ error ให้ตรง key ทุกฟิลด์ */
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+  /* ✅ จำลองการโหลดสินค้า */
+  useEffect(() => {
+    if (productOptions && productOptions.length > 0) {
+      const timer = setTimeout(() => setLoadingProducts(false), 600)
+      return () => clearTimeout(timer)
+    }
+  }, [productOptions])
 
-    setErrors((prev) => {
-      const updated = { ...prev };
-
-      // ลบ error ที่ตรงกับฟิลด์นั้น ๆ
-      if (name === 'product' && updated.topic) delete updated.topic;
-      if (name === 'package' && updated.package) delete updated.package;
-      if (name === 'usageTime' && updated.usageTime) delete updated.usageTime;
-      if (name === 'fullName' && updated.name) delete updated.name;
-      if (name === 'phone' && updated.phone) delete updated.phone;
-      if (name === 'province' && updated.province) delete updated.province;
-      if (name === 'contactTime' && updated.contactTime)
-        delete updated.contactTime;
-
-      return updated;
-    });
-  };
-
-  /* ✅ ตรวจสอบข้อมูลก่อนส่ง */
+  /* ✅ ตรวจสอบข้อมูล */
   const validate = (data = formData) => {
     const messages = {
       Infovalidate: {
@@ -71,70 +61,41 @@ export default function ContactForm({
           phonenumber: '*หมายเลขโทรศัพท์ต้องเป็นตัวเลข 10 หลัก',
         },
       },
-    };
-
-    const infoErrors = validateFieldmoreInfo(
-      {
-        topic: data.product,
-        name: data.fullName,
-        phone: data.phone,
-      },
-      messages
-    );
-
-    if (!data.package) infoErrors.package = '*กรุณาเลือกราคาที่ยอมรับได้';
-    if (!data.usageTime) infoErrors.usageTime = '*กรุณาระบุช่วงเวลาใช้ไฟ';
-    if (!data.province) infoErrors.province = '*กรุณากรอกที่อยู่ของท่าน';
-    if (!data.contactTime)
-      infoErrors.contactTime = '*กรุณาเลือกช่วงเวลาติดต่อกลับ';
-
-    return infoErrors;
-  };
-
-  /* ✅ ส่งข้อมูลฟอร์ม */
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (submitting) return;
-
-    let updatedData = { ...formData };
-    if (!formData.province && query.trim()) {
-      updatedData = { ...formData, province: query.trim() };
-      setFormData(updatedData);
     }
 
-    const validationErrors = validate(updatedData);
-    setErrors(validationErrors);
-    if (Object.keys(validationErrors).length > 0) return;
+    const infoErrors = validateFieldmoreInfo(
+      { topic: data.product, name: data.fullName, phone: data.phone },
+      messages
+    )
 
-    setSubmitting(true);
+    if (!data.package) infoErrors.package = '*กรุณาเลือกราคาที่ยอมรับได้'
+    if (!data.usageTime) infoErrors.usageTime = '*กรุณาระบุช่วงเวลาใช้ไฟ'
+    if (!data.province) infoErrors.province = '*กรุณากรอกที่อยู่ของท่าน'
+    if (!data.contactTime) infoErrors.contactTime = '*กรุณาเลือกช่วงเวลาติดต่อกลับ'
+    return infoErrors
+  }
 
-    const address = [updatedData.subDistrict, updatedData.district, updatedData.province]
-      .filter(Boolean)
-      .join(', ');
+  /* ✅ เมื่อ reCAPTCHA ผ่าน → ส่งฟอร์มอัตโนมัติ */
+  const handleCaptchaChange = async (token) => {
+    if (!token) return
+    setCaptchaToken(token)
+    await handleSubmitAfterCaptcha(token)
+  }
 
-    const payload = {
-      product: updatedData.product,
-      package: updatedData.package,
-      usageTime: updatedData.usageTime,
-      fullName: updatedData.fullName,
-      phone: updatedData.phone,
-      subDistrict: updatedData.subDistrict,
-      district: updatedData.district,
-      province: updatedData.province,
-      contactTime: updatedData.contactTime,
-      address,
-    };
+  /* ✅ ฟังก์ชันส่งฟอร์มหลังผ่าน reCAPTCHA */
+  const handleSubmitAfterCaptcha = async (token) => {
+    setSubmitting(true)
+    const payload = { ...formData, captcha: token }
 
     try {
-      const response = await fetch('/api/contact', {
+      const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
-      });
+      })
 
-      if (!response.ok) throw new Error('ส่งข้อมูลไม่สำเร็จ');
-      const result = await response.json();
-      console.log(' ส่งข้อมูลสำเร็จ:', result);
+      const result = await res.json()
+      if (!res.ok || !result.success) throw new Error(result.error || 'ส่งไม่สำเร็จ')
 
       await Swal.fire({
         icon: 'success',
@@ -142,7 +103,7 @@ export default function ContactForm({
         text: 'ขอบคุณที่สนใจโซลาร์เซลล์จากเรา ทีมงานจะติดต่อกลับโดยเร็วที่สุดค่ะ ☀️',
         showConfirmButton: false,
         timer: 2500,
-      });
+      })
 
       setFormData({
         product: '',
@@ -154,159 +115,111 @@ export default function ContactForm({
         subDistrict: '',
         province: '',
         contactTime: '',
-      });
-      setQuery('');
-      setSuggestions([]);
+      })
+      setQuery('')
+      setSuggestions([])
+      setCaptchaToken(null)
+      setShowCaptcha(false)
     } catch (err) {
-      console.error('ส่งข้อมูลล้มเหลว:', err);
-      await Swal.fire({
+      console.error('Error:', err)
+      Swal.fire({
         icon: 'error',
-        title: 'เกิดข้อผิดพลาดในการส่งข้อมูล',
-        text: 'กรุณาลองใหม่อีกครั้ง หรือเช็คการเชื่อมต่ออินเทอร์เน็ตค่ะ',
-        confirmButtonColor: '#f2780c',
-      });
+        title: 'เกิดข้อผิดพลาด',
+        text: 'ไม่สามารถส่งข้อมูลได้ กรุณาลองใหม่อีกครั้งค่ะ',
+      })
     } finally {
-      setSubmitting(false);
+      setSubmitting(false)
     }
-  };
+  }
+
+  /* ✅ handleChange */
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({ ...prev, [name]: value }))
+    setErrors((prev) => {
+      const updated = { ...prev }
+      delete updated[name]
+      return updated
+    })
+  }
+
+  /* ✅ handleSubmit */
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    if (submitting) return
+
+    let updatedData = { ...formData }
+    if (!updatedData.province && query.trim()) {
+      const [subDistrict, district, province] = query.split(',').map((s) => s.trim())
+      updatedData = { ...updatedData, subDistrict, district, province }
+      setFormData(updatedData)
+    }
+
+    const validationErrors = validate(updatedData)
+    setErrors(validationErrors)
+
+    if (Object.keys(validationErrors).length > 0) return
+
+    if (!showCaptcha) {
+      setShowCaptcha(true)
+      return
+    }
+
+    if (captchaToken) {
+      await handleSubmitAfterCaptcha(captchaToken)
+    }
+  }
 
   /* ✅ handleQueryChange */
   const handleQueryChange = (e) => {
-    const text = e.target.value.trim();
-    setQuery(text);
+    const text = e.target.value.trim()
+    setQuery(text)
     setErrors((prev) => {
-      const updated = { ...prev };
-      if (updated.province) delete updated.province;
-      return updated;
-    });
+      const updated = { ...prev }
+      if (updated.province) delete updated.province
+      return updated
+    })
 
-    if (!text) return setSuggestions([]);
+    if (!text) return setSuggestions([])
 
-    const matched = [];
-
-    // ค้นหาตำบล
+    const matched = []
     tambons.forEach((t) => {
       if (t.name_th.includes(text)) {
-        const amphure = amphures.find((a) => a.id === t.amphure_id);
-        const province = provinces.find((p) => p.id === amphure?.province_id);
+        const amphure = amphures.find((a) => a.id === t.amphure_id)
+        const province = provinces.find((p) => p.id === amphure?.province_id)
         matched.push({
           subDistrict: t.name_th,
           district: amphure?.name_th || '',
           province: province?.name_th || '',
-        });
+        })
       }
-    });
-
-    // ค้นหาอำเภอ
-    amphures.forEach((a) => {
-      if (a.name_th.includes(text)) {
-        const province = provinces.find((p) => p.id === a.province_id);
-        const tambonList = tambons.filter((t) => t.amphure_id === a.id);
-        if (tambonList.length > 0) {
-          tambonList.forEach((t) =>
-            matched.push({
-              subDistrict: t.name_th,
-              district: a.name_th,
-              province: province?.name_th || '',
-            })
-          );
-        } else {
-          matched.push({
-            subDistrict: '',
-            district: a.name_th,
-            province: province?.name_th || '',
-          });
-        }
-      }
-    });
-
-    // ค้นหาจังหวัด
-    provinces.forEach((p) => {
-      if (p.name_th.includes(text)) {
-        const amphuresInProvince = amphures.filter((a) => a.province_id === p.id);
-        amphuresInProvince.forEach((a) => {
-          const tambonsInAmphure = tambons.filter((t) => t.amphure_id === a.id);
-          tambonsInAmphure.forEach((t) => {
-            matched.push({
-              subDistrict: t.name_th,
-              district: a.name_th,
-              province: p.name_th,
-            });
-          });
-        });
-        matched.push({
-          subDistrict: '',
-          district: '',
-          province: p.name_th,
-        });
-      }
-    });
-
-    const uniqueMatched = matched.filter(
-      (v, i, a) =>
-        a.findIndex(
-          (t) =>
-            t.subDistrict === v.subDistrict &&
-            t.district === v.district &&
-            t.province === v.province
-        ) === i
-    );
-
-    setSuggestions(uniqueMatched.slice(0, 20));
-  };
+    })
+    setSuggestions(matched.slice(0, 20))
+  }
 
   /* ✅ handleSelect */
   const handleSelect = (item) => {
-    const fullText = `${item.subDistrict ? item.subDistrict + ', ' : ''}${
-      item.district ? item.district + ', ' : ''
-    }${item.province}`;
-    setQuery(fullText);
+    const fullText = `${item.subDistrict ? item.subDistrict + ', ' : ''}${item.district ? item.district + ', ' : ''}${item.province}`
+    setQuery(fullText)
     setFormData((prev) => ({
       ...prev,
       subDistrict: item.subDistrict,
       district: item.district,
       province: item.province,
-    }));
-    setSuggestions([]);
-  };
+    }))
+    setSuggestions([])
+  }
 
-  /* ✅ useEffect สำหรับ setup */
+  /* ปิด Suggestion เมื่อคลิกนอก */
   useEffect(() => {
-    const matchedTambon = tambons.find((t) => t.name_th === formData.subDistrict);
-    if (matchedTambon) {
-      const amphure = amphures.find((a) => a.id === matchedTambon.amphure_id);
-      const province = provinces.find((p) => p.id === amphure?.province_id);
-      if (amphure && province) {
-        setFormData((prev) => ({
-          ...prev,
-          district: amphure.name_th,
-          province: province.name_th,
-        }));
-      }
-    }
-
     const handleClickOutside = (e) => {
       if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
-        setSuggestions([]);
+        setSuggestions([])
       }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-
-    const productFromUrl = searchParams.get('product');
-    if (productFromUrl) {
-      setFormData((prev) => ({ ...prev, product: productFromUrl }));
-      setErrors((prev) => {
-        const updated = { ...prev };
-        if (updated.topic) delete updated.topic;
-        return updated;
-      });
-
-      const contactSection = document.getElementById('contact');
-      if (contactSection) contactSection.scrollIntoView({ behavior: 'smooth' });
     }
-
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [formData.subDistrict, searchParams, tambons, amphures, provinces]);
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   return (
     <div className={styles.containersolar}>
@@ -315,10 +228,10 @@ export default function ContactForm({
         <h4
           style={{
             textAlign: 'center',
-            marginTop: -10,
-            marginBottom: 20,
-            fontWeight: 600,
             color: '#19489D',
+            fontWeight: 600,
+            marginTop: '-10px',
+            marginBottom: '20px',
           }}
         >
           หรือต้องการปรึกษาการติดตั้ง เรายินดีให้คำแนะนำ
@@ -328,32 +241,37 @@ export default function ContactForm({
           {/* ===== สินค้าหรือบริการ ===== */}
           <div>
             <span className="form-label">สินค้าหรือบริการที่สนใจ :</span>
-            <div className={`radio-group ${errors.topic ? 'error-border' : ''}`}>
-              {productOptions.map((product) => {
-                const productName =
-                  locale === 'th'
-                    ? product.producttypenameTH
-                    : product.producttypenameEN;
-                return (
-                  <label
-                    key={product.producttypeID}
-                    className="form-radio"
-                    htmlFor={`product-${product.producttypeID}`}
-                  >
-                    <input
-                      id={`product-${product.producttypeID}`}
-                      type="radio"
-                      name="product"
-                      value={product.producttypeID}
-                      checked={formData.product === product.producttypeID}
-                      onChange={handleChange}
-                      className="radio-input"
-                    />
-                    {productName}
-                  </label>
-                );
-              })}
-            </div>
+
+            {loadingProducts ? (
+              <div style={{ color: '#19489D', padding: '5px 0' }}>กำลังโหลดข้อมูล...</div>
+            ) : (
+              <div className={`radio-group fade-in ${errors.topic ? 'error-border' : ''}`}>
+                {productOptions.map((product) => {
+                  const productName =
+                    locale === 'th'
+                      ? product.producttypenameTH
+                      : product.producttypenameEN
+                  return (
+                    <label
+                      key={product.producttypeID}
+                      className="form-radio"
+                      htmlFor={`product-${product.producttypeID}`}
+                    >
+                      <input
+                        id={`product-${product.producttypeID}`}
+                        type="radio"
+                        name="product"
+                        value={product.producttypeID}
+                        checked={formData.product === product.producttypeID}
+                        onChange={handleChange}
+                        className="radio-input"
+                      />
+                      {productName}
+                    </label>
+                  )
+                })}
+              </div>
+            )}
             {errors.topic && <div className="error-text">{errors.topic}</div>}
           </div>
 
@@ -520,18 +438,31 @@ export default function ContactForm({
             {errors.contactTime && <div className="error-text">{errors.contactTime}</div>}
           </div>
 
-          {/* ===== ปุ่มส่ง ===== */}
-          <div className={styles.row} style={{ display: 'flex', justifyContent: 'center' }}>
-            <button
-              type="submit"
-              className="buttonSecondaryoneorange"
-              disabled={submitting}
+          {/*  แสดง reCAPTCHA เฉพาะเมื่อฟอร์มกรอกครบ */}
+          {showCaptcha && (
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                marginTop: '1rem',
+                opacity: 1,
+                transition: 'opacity 0.3s ease-in-out',
+              }}
             >
+              <ReCAPTCHA
+                sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+                onChange={handleCaptchaChange}
+              />
+            </div>
+          )}
+
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1.5rem' }}>
+            <button type="submit" className="buttonSecondaryoneorange" disabled={submitting}>
               {submitting ? 'กำลังส่ง...' : 'ส่งข้อความ'}
             </button>
           </div>
         </form>
       </div>
     </div>
-  );
+  )
 }
