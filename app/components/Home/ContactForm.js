@@ -9,6 +9,9 @@ import { useSearchParams } from 'next/navigation'
 import { useLocale } from '@/app/Context/LocaleContext'
 import { validateFieldmoreInfo } from '@/app/Utils/validation'
 
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
+const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
+
 export default function ContactForm({
   provinces = [],
   amphures = [],
@@ -37,9 +40,9 @@ export default function ContactForm({
   const [submitting, setSubmitting] = useState(false)
   const [captchaToken, setCaptchaToken] = useState(null)
   const [showCaptcha, setShowCaptcha] = useState(false)
-  const [loadingProducts, setLoadingProducts] = useState(true) // ✅ โหลดสินค้า
+  const [loadingProducts, setLoadingProducts] = useState(true)
 
-  /* ✅ จำลองการโหลดสินค้า */
+  /* ✅ จำลองโหลดสินค้า */
   useEffect(() => {
     if (productOptions && productOptions.length > 0) {
       const timer = setTimeout(() => setLoadingProducts(false), 600)
@@ -75,27 +78,49 @@ export default function ContactForm({
     return infoErrors
   }
 
-  /* ✅ เมื่อ reCAPTCHA ผ่าน → ส่งฟอร์มอัตโนมัติ */
+  /* ✅ เมื่อ reCAPTCHA ผ่าน */
   const handleCaptchaChange = async (token) => {
     if (!token) return
     setCaptchaToken(token)
     await handleSubmitAfterCaptcha(token)
   }
 
-  /* ✅ ฟังก์ชันส่งฟอร์มหลังผ่าน reCAPTCHA */
+  /* ✅ ส่งฟอร์ม */
   const handleSubmitAfterCaptcha = async (token) => {
     setSubmitting(true)
-    const payload = { ...formData, captcha: token }
+
+    // ✅ สร้าง address รวมจากตำบล/อำเภอ/จังหวัด
+    const address = [formData.subDistrict, formData.district, formData.province]
+      .filter(Boolean)
+      .join(', ')
+
+    // ✅ สร้าง payload ใหม่ให้ตรงกับ API ของคุณ
+    const payload = {
+      producttypeID: formData.product,
+      acceptableprice: formData.package,
+      usagetime: formData.usageTime,
+      fullname: formData.fullName,
+      phonenumber: formData.phone,
+      address: address,
+      contedtime: formData.contactTime,
+      solce: 'เว็บไซต์',
+    }
 
     try {
-      const res = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      })
+        const res = await fetch(`${baseUrl}/api/Inquiriespageapi`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-API-KEY": apiKey ,
+          },
+          body: JSON.stringify(payload)
+        });
+    
+
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`)
 
       const result = await res.json()
-      if (!res.ok || !result.success) throw new Error(result.error || 'ส่งไม่สำเร็จ')
+      console.log('📩 ผลลัพธ์จาก API:', result)
 
       await Swal.fire({
         icon: 'success',
@@ -105,6 +130,7 @@ export default function ContactForm({
         timer: 2500,
       })
 
+      // ✅ reset form หลังส่งสำเร็จ
       setFormData({
         product: '',
         package: '',
@@ -115,13 +141,14 @@ export default function ContactForm({
         subDistrict: '',
         province: '',
         contactTime: '',
-      })
+      });
       setQuery('')
       setSuggestions([])
       setCaptchaToken(null)
       setShowCaptcha(false)
+      setErrors({})
     } catch (err) {
-      console.error('Error:', err)
+      console.error('❌ Error sending:', err)
       Swal.fire({
         icon: 'error',
         title: 'เกิดข้อผิดพลาด',
@@ -132,13 +159,19 @@ export default function ContactForm({
     }
   }
 
-  /* ✅ handleChange */
+  /* ✅ handleChange — แก้เฉพาะให้ error ของชื่อ/สินค้า หายเมื่อแก้ไข */
   const handleChange = (e) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
     setErrors((prev) => {
       const updated = { ...prev }
-      delete updated[name]
+      // ✅ ลบเฉพาะช่องที่เกี่ยวข้อง
+      if (name === 'fullName' && updated.name) delete updated.name
+      if (name === 'product' && updated.topic) delete updated.topic
+      if (name === 'package' && updated.package) delete updated.package
+      if (name === 'usageTime' && updated.usageTime) delete updated.usageTime
+      if (name === 'phone' && updated.phone) delete updated.phone
+      if (name === 'contactTime' && updated.contactTime) delete updated.contactTime
       return updated
     })
   }
@@ -157,7 +190,6 @@ export default function ContactForm({
 
     const validationErrors = validate(updatedData)
     setErrors(validationErrors)
-
     if (Object.keys(validationErrors).length > 0) return
 
     if (!showCaptcha) {
@@ -165,12 +197,9 @@ export default function ContactForm({
       return
     }
 
-    if (captchaToken) {
-      await handleSubmitAfterCaptcha(captchaToken)
-    }
+    if (captchaToken) await handleSubmitAfterCaptcha(captchaToken)
   }
 
-  /* ✅ handleQueryChange */
   const handleQueryChange = (e) => {
     const text = e.target.value.trim()
     setQuery(text)
@@ -183,10 +212,16 @@ export default function ContactForm({
     if (!text) return setSuggestions([])
 
     const matched = []
+
+    //  ค้นจากตำบล
     tambons.forEach((t) => {
-      if (t.name_th.includes(text)) {
-        const amphure = amphures.find((a) => a.id === t.amphure_id)
-        const province = provinces.find((p) => p.id === amphure?.province_id)
+      const amphure = amphures.find((a) => a.id === t.amphure_id)
+      const province = provinces.find((p) => p.id === amphure?.province_id)
+      if (
+        t.name_th.includes(text) ||
+        amphure?.name_th.includes(text) ||
+        province?.name_th.includes(text)
+      ) {
         matched.push({
           subDistrict: t.name_th,
           district: amphure?.name_th || '',
@@ -194,10 +229,10 @@ export default function ContactForm({
         })
       }
     })
-    setSuggestions(matched.slice(0, 20))
-  }
 
-  /* ✅ handleSelect */
+    setSuggestions(matched.slice(0, 30)) // เพิ่ม limit ได้ตามต้องการ
+  }
+  /*  handleSelect */
   const handleSelect = (item) => {
     const fullText = `${item.subDistrict ? item.subDistrict + ', ' : ''}${item.district ? item.district + ', ' : ''}${item.province}`
     setQuery(fullText)
@@ -210,7 +245,6 @@ export default function ContactForm({
     setSuggestions([])
   }
 
-  /* ปิด Suggestion เมื่อคลิกนอก */
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
@@ -221,6 +255,7 @@ export default function ContactForm({
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
+  /* ✅ ส่วน UI */
   return (
     <div className={styles.containersolar}>
       <div className={styles.formWrapper} style={{ marginTop: '3rem' }}>
@@ -241,7 +276,6 @@ export default function ContactForm({
           {/* ===== สินค้าหรือบริการ ===== */}
           <div>
             <span className="form-label">สินค้าหรือบริการที่สนใจ :</span>
-
             {loadingProducts ? (
               <div style={{ color: '#19489D', padding: '5px 0' }}>กำลังโหลดข้อมูล...</div>
             ) : (
@@ -341,7 +375,7 @@ export default function ContactForm({
             {errors.usageTime && <div className="error-text">{errors.usageTime}</div>}
           </div>
 
-          {/* ===== ชื่อและเบอร์โทร ===== */}
+          {/* ===== ชื่อจริง - นามสกุลจริง ===== */}
           <div>
             <label htmlFor="fullName" className="form-label">
               ชื่อจริง-นามสกุลจริง :
