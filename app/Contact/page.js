@@ -18,7 +18,7 @@ const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 
 export default function Page() {
-  const { messages, locale } = useLocale(); // ✅ ใช้ locale จาก Context
+  const { messages, locale } = useLocale(); // ใช้ locale จาก Context
   const [contacts, setContacts] = useState([]);
   // const [socials, setSocials] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);

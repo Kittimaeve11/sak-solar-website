@@ -594,7 +594,7 @@ h6 {
 .form-field.error-border,
 .form-select.error-border,
 .form-textarea.error-border {
-  border: 2px solid red !important;
+  border: 1px solid red !important;
 }
 
 

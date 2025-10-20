@@ -7,7 +7,7 @@ export async function POST(request) {
       return new Response(JSON.stringify({ success: false, error: 'ข้อมูลไม่ครบถ้วน' }), { status: 400 })
     }
 
-    // ✅ ตรวจสอบ reCAPTCHA
+    // ตรวจสอบ reCAPTCHA
     if (!data.captcha) {
       return new Response(JSON.stringify({ success: false, error: 'Missing reCAPTCHA token' }), { status: 400 })
     }

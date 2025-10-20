@@ -10,43 +10,53 @@ import { MdOutlineElectricBolt } from 'react-icons/md';
 import { TbCurrencyBaht } from 'react-icons/tb';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
-// ไม่พึ่ง CSS skeleton แล้ว แต่คงไฟล์ไว้ใช้สไตล์อื่นๆ
 import './ProductCarousel.css';
 
+/* =========================================================
+   🔶 โหลด react-slick แบบ dynamic (ไม่รันฝั่ง server)
+   ========================================================= */
 const Slider = dynamic(() => import('react-slick'), { ssr: false });
 
-/** ===== Inline Skeleton (ไม่ง้อ CSS, เห็นทันที) ===== */
-function HardSkeleton({ slides = 4, rows = 2, minHeight = 380 }) {
-  const box = (w='100%', h=16, r=8, m='8px 0') => (
-    <div style={{ width:w, height:h, borderRadius:r, background:'#E6E6E6', margin:m }} />
-  );
+/* =========================================================
+   🔶 Skeleton Loader: ขนาดและระยะเท่าการ์ดจริงทุก pixel
+   ========================================================= */
+function HardSkeleton() {
   return (
-    <div style={{ position:'relative' }}>
-      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:12 }}>
-        {box(220, 28, 6, 0)}
-        <div style={{ display:'inline-flex', alignItems:'center', gap:6, opacity:.6, fontWeight:600 }}>
-          <HiPlusCircle /> ผลิตภัณฑ์ทั้งหมด
+    <div className="carouselWrapper fade-in">
+      {/* Header Skeleton */}
+      <div className="carouselHeader">
+        <div
+          className="skeleton skeleton-title"
+          style={{ width: '220px', height: '28px', borderRadius: '6px' }}
+        />
+        <div className="skeleton-header-link">
+          <HiPlusCircle size={20} />
+          <span>ผลิตภัณฑ์ทั้งหมด</span>
         </div>
       </div>
 
-      <div style={{ minHeight, paddingTop:8 }}>
-        {[...Array(rows)].map((_, r) => (
-          <div key={r} style={{ display:'flex', gap:20, marginBottom:20 }}>
-            {[...Array(slides)].map((_, c) => (
-              <div key={c} style={{ flex:'0 0 330px' }}>
-                {box(330, 330, 12, '0 0 10px 0')}
-                {box(260, 20)}
-                {box('70%', 14)}
-                {box('85%', 14)}
+      {/* Skeleton Card Grid — แสดงเพียง 1 แถว 4 การ์ด */}
+      <div className="skeleton-grid">
+        <div className="skeleton-row">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="skeletonCard">
+              <div className="skeleton skeleton-image" />
+              <div className="skeleton-content">
+                <div className="skeleton skeleton-title" />
+                <div className="skeleton skeleton-line" />
+                <div className="skeleton skeleton-line short" />
               </div>
-            ))}
-          </div>
-        ))}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
 }
 
+/* =========================================================
+   🔶 ปุ่มลูกศรซ้าย/ขวาใน Carousel
+   ========================================================= */
 function Arrow({ onClick, direction }) {
   return (
     <button
@@ -59,39 +69,45 @@ function Arrow({ onClick, direction }) {
   );
 }
 
+/* =========================================================
+   🔶 ฟังก์ชันกำหนดจำนวนสไลด์ตามขนาดหน้าจอ
+   ========================================================= */
 const getSlidesByWidth = (w) => (w < 801 ? 1 : w < 1200 ? 2 : w < 1500 ? 3 : 4);
 
+/* =========================================================
+   🔶 Component หลัก: ProductCarousel
+   ========================================================= */
 export default function ProductCarousel({ title, items, link = '#', loading = false }) {
-  const [isDragging, setIsDragging] = useState(false);
   const [slidesToShow, setSlidesToShow] = useState(4);
   const [hydrated, setHydrated] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const isSSR = typeof window === 'undefined';
 
-  useEffect(() => setHydrated(true), []);
+  /* ---------------------------------------------------------
+     ✅ ตรวจจับขนาดหน้าจอ
+     --------------------------------------------------------- */
   useEffect(() => {
+    setHydrated(true);
     if (typeof window === 'undefined') return;
-    const handle = () => setSlidesToShow(getSlidesByWidth(window.innerWidth));
-    handle();
-    window.addEventListener('resize', handle);
-    return () => window.removeEventListener('resize', handle);
+    const handleResize = () => setSlidesToShow(getSlidesByWidth(window.innerWidth));
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // ===== เงื่อนไขโชว์สเกเลตันแบบฮาร์ด (ไม่ง้อ CSS) =====
+  /* ---------------------------------------------------------
+     ✅ แสดง Skeleton “ทันที” ถ้ายังโหลดอยู่
+     --------------------------------------------------------- */
   const isHardLoading =
-    isSSR ||
-    !hydrated ||
-    loading ||
-    items === undefined ||
-    items === null ||
-    (Array.isArray(items) && items.length === 0 && !hydrated);
-
-  if (isHardLoading) {
-    // สเกเลตันขึ้น "ทันที" จริงๆ
-    return <HardSkeleton slides={slidesToShow} rows={2} />;
-  }
+    isSSR || !hydrated || loading || !items || (Array.isArray(items) && items.length === 0);
+  if (isHardLoading) return <HardSkeleton />;
 
   const showSlider = Array.isArray(items) && items.length > slidesToShow;
 
+  /* ---------------------------------------------------------
+     ✅ ตั้งค่า react-slick
+     --------------------------------------------------------- */
   const settings = {
     dots: false,
     infinite: true,
@@ -102,15 +118,29 @@ export default function ProductCarousel({ title, items, link = '#', loading = fa
     swipeToSlide: true,
     nextArrow: <Arrow direction="right" />,
     prevArrow: <Arrow direction="left" />,
-    beforeChange: () => setIsDragging(true),
-    afterChange: () => setIsDragging(false),
   };
 
+  /* ---------------------------------------------------------
+     ✅ คืนชื่อสินค้า
+     --------------------------------------------------------- */
   const getProductName = (item) => {
     if (item.producttypeID === '2') return item.modelairname ?? 'ไม่พบข้อมูลชื่อ';
     return item.modelname ?? item.name ?? item.solarpanel ?? item.title ?? 'ไม่พบข้อมูลชื่อ';
   };
 
+  /* ---------------------------------------------------------
+     ✅ ตรวจจับการลาก (ป้องกันคลิกผิด)
+     --------------------------------------------------------- */
+  const handleMouseDown = (e) => setDragStart({ x: e.clientX, y: e.clientY });
+  const handleMouseUp = (e) => {
+    const dx = Math.abs(e.clientX - dragStart.x);
+    const dy = Math.abs(e.clientY - dragStart.y);
+    setIsDragging(dx > 5 || dy > 5);
+  };
+
+  /* ---------------------------------------------------------
+     ✅ การ์ดสินค้า
+     --------------------------------------------------------- */
   const renderCard = (item, idx) => {
     let finalPrice = null;
     if (item.isprice === '1' && item.price) {
@@ -122,21 +152,31 @@ export default function ProductCarousel({ title, items, link = '#', loading = fa
       }
     }
 
+    const brandID =
+      item.productbrandID ?? item.probrandID ?? item.brandID ?? item.BrandID ?? '0';
+    const productNum = item.product_num ?? item.product_ID ?? idx;
+
     return (
       <Link
-        key={item.product_ID ?? item.id ?? idx}
-        href={`/products/${item.producttypeID}/${item.productbrandID}/${item.product_ID}`}
+        key={productNum}
+        prefetch={false}
+        href={`/products/${item.producttypeID}/${brandID}/${productNum}`}
         className="carouselCard no-underline hover:no-underline"
-        onClick={(e) => isDragging && e.preventDefault()}
+        onMouseDown={handleMouseDown}
+        onMouseUp={(e) => {
+          handleMouseUp(e);
+          if (isDragging) e.preventDefault();
+        }}
       >
+        {/* 🔸 รูปสินค้า */}
         {item.image && (
-          <div className="product-image-wrapper" style={{ position:'relative' }}>
+          <div className="product-image-wrapper" style={{ position: 'relative' }}>
             <Image
               src={item.image}
               alt={getProductName(item)}
               width={330}
               height={330}
-              style={{ objectFit:'cover' }}
+              style={{ objectFit: 'cover' }}
               draggable={false}
               priority
             />
@@ -146,6 +186,7 @@ export default function ProductCarousel({ title, items, link = '#', loading = fa
           </div>
         )}
 
+        {/* 🔸 รายละเอียดสินค้า */}
         <div className="product-info">
           <h3>
             {item.productbrandName ? `${item.productbrandName} ` : ''}
@@ -155,8 +196,18 @@ export default function ProductCarousel({ title, items, link = '#', loading = fa
           {item.battery && <h6 style={{ marginTop: 0 }}>รุ่นแบตเตอรี่ {item.battery} kWh</h6>}
 
           {(item.isprice == 0 || item.isprice === '0') && item.size && (
-            <div style={{ display:'flex', alignItems:'center', marginTop:'1rem' }}>
-              <p style={{ display:'flex', alignItems:'center', fontWeight:600, fontSize:18, margin:0, lineHeight:1, gap:4 }}>
+            <div style={{ display: 'flex', alignItems: 'center', marginTop: '1rem' }}>
+              <p
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  fontWeight: 600,
+                  fontSize: 18,
+                  margin: 0,
+                  lineHeight: 1,
+                  gap: 4,
+                }}
+              >
                 <MdOutlineElectricBolt size={22} color="#ffc300" />
                 {item.size}
               </p>
@@ -164,11 +215,28 @@ export default function ProductCarousel({ title, items, link = '#', loading = fa
           )}
 
           {item.isprice === '1' && item.price && (
-            <div style={{ display:'flex', alignItems:'center', fontSize:20, marginTop:'1rem', color:'#000', fontWeight:600, gap:4 }}>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                fontSize: 20,
+                marginTop: '1rem',
+                color: '#000',
+                fontWeight: 600,
+                gap: 4,
+              }}
+            >
               <TbCurrencyBaht size={22} />
               {Number(finalPrice ?? item.price).toLocaleString()} บาท
               {item.productpro_ispromotion === '1' && item.productpro_percent && (
-                <span style={{ fontSize:16, color:'#888', textDecoration:'line-through', marginLeft:'0.5rem' }}>
+                <span
+                  style={{
+                    fontSize: 16,
+                    color: '#888',
+                    textDecoration: 'line-through',
+                    marginLeft: '0.5rem',
+                  }}
+                >
                   {Number(item.price).toLocaleString()} บาท
                 </span>
               )}
@@ -179,13 +247,15 @@ export default function ProductCarousel({ title, items, link = '#', loading = fa
     );
   };
 
-  // ===== ของจริง (หลังผ่าน HardSkeleton) =====
+  /* ---------------------------------------------------------
+     ✅ Render Carousel
+     --------------------------------------------------------- */
   return (
-    <div className="carouselWrapper">
+    <div className="carouselWrapper fade-in">
       <div className="carouselHeader">
         <h2 className="carouselTitle">{title}</h2>
         <Link href={link} className="carouselLink no-underline hover:no-underline">
-          <span style={{ display:'inline-flex', alignItems:'center', gap:4, fontWeight:600 }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontWeight: 600 }}>
             <HiPlusCircle /> ผลิตภัณฑ์ทั้งหมด
           </span>
         </Link>
@@ -196,22 +266,20 @@ export default function ProductCarousel({ title, items, link = '#', loading = fa
           showSlider ? (
             <Slider {...settings}>
               {items.map((item, idx) => (
-                <div key={item.product_ID ?? item.id ?? idx} className="carouselStaticWrapper">
+                <div key={item.product_num ?? idx} className="carouselStaticWrapper">
                   {renderCard(item, idx)}
                 </div>
               ))}
             </Slider>
           ) : (
             <div className="carouselStaticWrapper">
-              {items.map((item, index) => (
-                <React.Fragment key={item.product_ID ?? item.id ?? index}>
-                  {renderCard(item, index)}
-                </React.Fragment>
+              {items.map((item, idx) => (
+                <React.Fragment key={item.product_num ?? idx}>{renderCard(item, idx)}</React.Fragment>
               ))}
             </div>
           )
         ) : (
-          <p style={{ textAlign:'center', padding:'2rem' }}>ไม่พบสินค้า</p>
+          <p style={{ textAlign: 'center', padding: '2rem' }}>ไม่พบสินค้า</p>
         )}
       </div>
     </div>
