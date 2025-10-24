@@ -66,9 +66,9 @@
 }
 
 /* =========================================================
-   ภาพด้านบนของการ์ด (มี overlay มืดเวลา hover)
+   ภาพด้านบนของการ์ด (ทำให้มืดเวลา hover)
    ========================================================= */
-.card-image-wrapper {
+.editorial-image-wrapper {
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 10;
@@ -81,24 +81,13 @@
   height: 100%;
   object-fit: cover;
   display: block;
-  transition: transform 0.4s ease;
+  transition: transform 0.4s ease, filter 0.4s ease;
+  z-index: 1;
 }
 
-/* overlay มืดตอน hover */
-.card-image-wrapper::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0);
-  transition: background 0.4s ease;
-}
-
-.editorial-cardslide:hover .card-image-wrapper::after {
-  background: rgba(0, 0, 0, 0.5); /* มืดลง */
-}
-
+/* ให้ภาพมืดลงและซูมเบา ๆ เวลา hover */
 .editorial-cardslide:hover .card-imageslide {
-  transform: scale(1.05); /* ขยายภาพเบา ๆ */
+  filter: brightness(0.4);
 }
 
 /* =========================================================
@@ -285,3 +274,4 @@
     padding: 10px 16px 14px;
   }
 }
+/**/

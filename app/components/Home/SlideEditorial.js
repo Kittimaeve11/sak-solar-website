@@ -39,10 +39,10 @@ function safeDateString(dateString) {
   return isNaN(d.getTime())
     ? '-'
     : d.toLocaleDateString('th-TH', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-      });
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    });
 }
 
 /* =========================================================
@@ -88,8 +88,8 @@ export default function SlideEditorial() {
                 'ไม่มีชื่อเรื่อง',
               content: parseDescription(
                 item.editoria_descriptionTH ||
-                  item.editoria_descriptionEN ||
-                  ''
+                item.editoria_descriptionEN ||
+                ''
               ),
               date: safeDateString(item.editoria_creacteAt),
               image: imageUrl,
@@ -239,6 +239,7 @@ export default function SlideEditorial() {
                         src={item.image}
                         alt={item.title}
                         fill
+                        className="card-imageslide"
                         sizes="(max-width: 768px) 100vw, 33vw"
                         style={{ objectFit: 'cover' }}
                       />

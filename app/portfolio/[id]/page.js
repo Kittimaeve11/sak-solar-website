@@ -14,7 +14,7 @@ const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 
 export default function PortfolioDetailPage({ params }) {
-  const resolvedParams = use(params);  
+  const resolvedParams = use(params);
   const { id } = resolvedParams;
 
   const { messages, locale } = useLocale();
@@ -62,6 +62,7 @@ export default function PortfolioDetailPage({ params }) {
             gallery: gallery.map((img) => `${baseUrl}/${img}`),
             workSteps,
             product_ID: item.product_ID,
+            product_num: item.product_num, // ✅ เพิ่มฟิลด์ product_num จาก portfolio
             productTypeTH: item.TypeProduct_nameTH,
             productTypeEN: item.TypeProduct_nameEN,
           };
@@ -95,9 +96,20 @@ export default function PortfolioDetailPage({ params }) {
           setProducts(productsData);
         }
 
-        // Match product
+        // ✅ Match product — จับคู่แบบหลายเงื่อนไข
         if (projectData && productsData.length > 0 && isMounted) {
-          const matched = productsData.find((p) => p.item.product_ID === projectData.product_ID);
+          const matched =
+            productsData.find(
+              (p) =>
+                String(p.item.product_ID) === String(projectData.product_ID) ||
+                String(p.item.product_num) === String(projectData.product_num)
+            ) ||
+            productsData.find(
+              (p) =>
+                p.item.size?.trim() === projectData.size?.trim() &&
+                (p.item.protypeID === '4' || p.item.protypeID === '1')
+            );
+
           setMatchedProduct(matched || null);
         }
       } catch (err) {
@@ -263,7 +275,7 @@ export default function PortfolioDetailPage({ params }) {
                 {matchedProduct.item.mainImage && (
                   <div style={{ marginBottom: 12, display: 'flex', justifyContent: 'center' }}>
                     <Link
-                      href={`/products/${matchedProduct.item.protypeID}/${matchedProduct.item.probrandID}/${matchedProduct.item.product_ID}`}
+                      href={`/products/${matchedProduct.item.protypeID}/${matchedProduct.item.probrandID}/${matchedProduct.item.product_num}`}
                       className={styles.cardContainer}
                       style={{
                         borderRadius: '6px',

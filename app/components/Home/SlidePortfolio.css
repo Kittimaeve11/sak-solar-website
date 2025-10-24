@@ -14,13 +14,11 @@
     padding-top: 1rem;
 }
 
-
 .portfolio-headerslide {
     display: flex;
     justify-content: flex-end;
     margin-bottom: 16px;
 }
-
 
 /* การ์ด carousel */
 .portfolio-cardslide {
@@ -37,10 +35,6 @@
     color: inherit;
     /* เพิ่ม */
 }
-
-/* .portfolio-card:hover {
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-} */
 
 .portfolioslide-image-wrapper {
     position: relative;
