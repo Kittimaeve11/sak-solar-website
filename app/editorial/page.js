@@ -11,7 +11,7 @@ const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 
 export default function EditorialListPage() {
-  const locale = useLocale(); 
+  const locale = useLocale();
   const [articles, setArticles] = useState([]);
   const [types, setTypes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -21,17 +21,20 @@ export default function EditorialListPage() {
   const [shouldAnimate, setShouldAnimate] = useState(false);
   const [banners, setBanners] = useState([]);
   const [loadingBanner, setLoadingBanner] = useState(true);
-  const [bannerLoaded, setBannerLoaded] = useState({}); 
+  const [bannerLoaded, setBannerLoaded] = useState({});
   const [imgError, setImgError] = useState({});
 
   const router = useRouter();
   const topRef = useRef(null);
 
-  // ---------------- Fetch Articles, Types & Banner ----------------
+  /* =========================================================
+     FETCH DATA
+  ========================================================= */
   useEffect(() => {
-    document.title = locale === 'en' 
-      ? 'Editorials | Sak Siam Solar Energy Co., Ltd.' 
-      : 'บทความ | บริษัท ศักดิ์สยาม โซลาร์ เอ็นเนอร์ยี่ จำกัด';
+    document.title =
+      locale === 'en'
+        ? 'Editorials | Sak Siam Solar Energy Co., Ltd.'
+        : 'บทความ | บริษัท ศักดิ์สยาม โซลาร์ เอ็นเนอร์ยี่ จำกัด';
 
     const fetchAll = async () => {
       setLoading(true);
@@ -40,13 +43,12 @@ export default function EditorialListPage() {
       try {
         const [resType, resArticles, resBanner] = await Promise.all([
           fetch(`${baseUrl}/api/edittorTypepageapi`, { headers: { 'X-API-KEY': apiKey } }),
-          fetch(`${baseUrl}/api/edittorpageapi?limit=1000`, { headers: { 'X-API-KEY': apiKey } }), // ✅ ดึงมาเกินพอ
+          fetch(`${baseUrl}/api/edittorpageapi?limit=1000`, { headers: { 'X-API-KEY': apiKey } }),
           fetch(`${baseUrl}/api/branderIDapi/15`, { headers: { 'X-API-KEY': apiKey } }),
         ]);
 
-        if (!resType.ok) throw new Error(`Type API failed: ${resType.status}`);
-        if (!resArticles.ok) throw new Error(`Main API failed: ${resArticles.status}`);
-        if (!resBanner.ok) throw new Error(`Banner API failed: ${resBanner.status}`);
+        if (!resType.ok || !resArticles.ok || !resBanner.ok)
+          throw new Error('API fetch error');
 
         const typeData = await resType.json();
         const articleData = await resArticles.json();
@@ -54,11 +56,14 @@ export default function EditorialListPage() {
 
         setTypes(typeData.result || []);
         setArticles(Array.isArray(articleData.result?.data) ? articleData.result.data : []);
-        const bannerArray = Array.isArray(bannerData.data) ? bannerData.data : (bannerData.data ? [bannerData.data] : []);
+        const bannerArray = Array.isArray(bannerData.data)
+          ? bannerData.data
+          : bannerData.data
+          ? [bannerData.data]
+          : [];
         setBanners(bannerArray);
-
       } catch (err) {
-        console.error('Failed to fetch editorial:', err);
+        console.error('❌ Failed to fetch editorial:', err);
         setArticles([]);
         setTypes([]);
         setBanners([]);
@@ -72,7 +77,9 @@ export default function EditorialListPage() {
     fetchAll();
   }, [locale]);
 
-  // ---------------- Pagination ----------------
+  /* =========================================================
+     PAGINATION
+  ========================================================= */
   const handlePageChange = (page) => {
     if (page === currentPage) return;
     setShouldAnimate(false);
@@ -81,9 +88,14 @@ export default function EditorialListPage() {
     setTimeout(() => setShouldAnimate(true), 50);
   };
 
-  const filteredArticles = filter === 'ทั้งหมด'
-    ? Array.isArray(articles) ? articles : []
-    : Array.isArray(articles) ? articles.filter((item) => item.editoria_typeID === filter) : [];
+  const filteredArticles =
+    filter === 'ทั้งหมด'
+      ? Array.isArray(articles)
+        ? articles
+        : []
+      : Array.isArray(articles)
+      ? articles.filter((item) => item.editoria_typeID === filter)
+      : [];
 
   const totalPages = Math.ceil(filteredArticles.length / itemsPerPage) || 1;
   const paginatedArticles = filteredArticles.slice(
@@ -91,56 +103,68 @@ export default function EditorialListPage() {
     currentPage * itemsPerPage
   );
 
+  /* =========================================================
+     PAGINATION BUTTONS
+  ========================================================= */
   const renderPagination = () => {
     const pages = [];
     const totalNumbers = 5;
     const totalBlocks = totalNumbers + 2;
 
-    if (currentPage > 1) {
+    if (currentPage > 1)
       pages.push(
         <button key="prev" onClick={() => handlePageChange(currentPage - 1)} className="btn-with-arrow">
           <IoIosArrowBack className="arrow-icon" />
         </button>
       );
-    }
 
     if (totalPages > totalBlocks) {
       const startPage = Math.max(2, currentPage - 2);
       const endPage = Math.min(totalPages - 1, currentPage + 2);
-      if (1 < startPage) {
-        pages.push(<button key={1} onClick={() => handlePageChange(1)} className={currentPage === 1 ? 'active-page' : ''}>1</button>);
-      }
+      if (1 < startPage)
+        pages.push(
+          <button key={1} onClick={() => handlePageChange(1)} className={currentPage === 1 ? 'active-page' : ''}>
+            1
+          </button>
+        );
       if (startPage > 2) pages.push(<span key="start-ellipsis" className="ellipsis">...</span>);
       for (let i = startPage; i <= endPage; i++) {
         pages.push(
-          <button key={i} onClick={() => handlePageChange(i)} className={i === currentPage ? 'active-page' : ''}>{i}</button>
+          <button key={i} onClick={() => handlePageChange(i)} className={i === currentPage ? 'active-page' : ''}>
+            {i}
+          </button>
         );
       }
       if (endPage < totalPages - 1) pages.push(<span key="end-ellipsis" className="ellipsis">...</span>);
       pages.push(
-        <button key={totalPages} onClick={() => handlePageChange(totalPages)} className={currentPage === totalPages ? 'active-page' : ''}>{totalPages}</button>
+        <button key={totalPages} onClick={() => handlePageChange(totalPages)} className={currentPage === totalPages ? 'active-page' : ''}>
+          {totalPages}
+        </button>
       );
     } else {
       for (let i = 1; i <= totalPages; i++) {
         pages.push(
-          <button key={i} onClick={() => handlePageChange(i)} className={i === currentPage ? 'active-page' : ''}>{i}</button>
+          <button key={i} onClick={() => handlePageChange(i)} className={i === currentPage ? 'active-page' : ''}>
+            {i}
+          </button>
         );
       }
     }
 
-    if (currentPage < totalPages) {
+    if (currentPage < totalPages)
       pages.push(
         <button key="next" onClick={() => handlePageChange(currentPage + 1)} className="btn-with-arrow">
           <IoIosArrowForward className="arrow-icon" />
         </button>
       );
-    }
 
     return pages;
   };
 
-  // ---------------- Helper Functions ----------------
-  function parseDescription(str) {
+  /* =========================================================
+     HELPERS
+  ========================================================= */
+  const parseDescription = (str) => {
     if (!str || typeof str !== 'string') return '';
     return str
       .replace(/^"+|"+$/g, '')
@@ -150,7 +174,7 @@ export default function EditorialListPage() {
       .replace(/\\n/g, '')
       .replace(/ style="[^"]*"/g, '')
       .trim();
-  }
+  };
 
   const getImageUrl = (galleryStr) => {
     if (!galleryStr) return '/images/no-image.jpg';
@@ -165,47 +189,35 @@ export default function EditorialListPage() {
     }
   };
 
+  /* =========================================================
+     RENDER PAGE
+  ========================================================= */
   return (
     <div ref={topRef} className="no-margin">
       {/* ---------------- Banner ---------------- */}
-      <div style={{ width: '100%', aspectRatio: '3.22/1', position: 'relative', marginBottom: '1rem' }}>
-        {loadingBanner && <div className="skeleton-banner" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }} />}
-
-        {banners.length > 0 && banners.map(item => {
-          const loaded = bannerLoaded[item.brander_ID] || false;
-          return (
-            <picture key={item.brander_ID} style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0 }}>
-              <source
-                srcSet={`${baseUrl}/${item.brander_pictureMoblie}`}
-                media="(max-width: 768px)"
-              />
-              <Image
-                src={`${baseUrl}/${item.brander_picturePC}`}
-                alt={item.brander_name || 'Editorial Banner'}
-                fill
-                priority
-                style={{
-                  objectFit: 'cover',
-                  opacity: loaded ? 1 : 0,
-                  transition: 'opacity 0.5s ease'
-                }}
-                onLoad={() =>
-                  setBannerLoaded(prev => ({ ...prev, [item.brander_ID]: true }))
-                }
-                unoptimized
-              />
-            </picture>
-          );
-        })}
-
-        {(!loadingBanner && banners.length === 0) && (
-          <Image
-            src="/images/no-image.jpg"
-            alt="Banner fallback"
-            fill
-            priority
-            style={{ objectFit: 'cover' }}
-          />
+      <div className="banner-container">
+        {loadingBanner && <div className="skeleton-banner" />}
+        {banners.length > 0 &&
+          banners.map((item) => {
+            const loaded = bannerLoaded[item.brander_ID] || false;
+            return (
+              <picture key={item.brander_ID}>
+                <source srcSet={`${baseUrl}/${item.brander_pictureMoblie}`} media="(max-width: 768px)" />
+                <Image
+                  src={`${baseUrl}/${item.brander_picturePC}`}
+                  alt={item.brander_name || 'Editorial Banner'}
+                  fill
+                  priority
+                  className="banner-image"
+                  style={{ opacity: loaded ? 1 : 0 }}
+                  onLoad={() => setBannerLoaded((prev) => ({ ...prev, [item.brander_ID]: true }))}
+                  unoptimized
+                />
+              </picture>
+            );
+          })}
+        {!loadingBanner && banners.length === 0 && (
+          <Image src="/images/no-image.jpg" alt="Banner fallback" fill priority className="banner-image" />
         )}
       </div>
 
@@ -214,13 +226,18 @@ export default function EditorialListPage() {
 
         {/* ---------------- Filter ---------------- */}
         <div className="portfolio-filters">
-          <label htmlFor="filter-select" className="filter-label">{locale === 'en' ? 'Select Editorial Type:' : 'เลือกประเภทบทความ :'}</label>
+          <label htmlFor="filter-select" className="filter-label">
+            {locale === 'en' ? 'Select Editorial Type:' : 'เลือกประเภทบทความ :'}
+          </label>
           <div className="filter-row">
             <div className="select-wrapper">
               <select
                 id="filter-select"
                 value={filter}
-                onChange={(e) => { setFilter(e.target.value); setCurrentPage(1); }}
+                onChange={(e) => {
+                  setFilter(e.target.value);
+                  setCurrentPage(1);
+                }}
                 className="filter-dropdown"
               >
                 <option value="ทั้งหมด">{locale === 'en' ? 'All Editorials' : 'บทความทั้งหมด'}</option>
@@ -253,34 +270,32 @@ export default function EditorialListPage() {
             {paginatedArticles.map((item) => {
               const title = locale === 'en' ? item.editoria_titieEN : item.editoria_titieTH;
               const description = locale === 'en' ? item.editoria_descriptionEN : item.editoria_descriptionTH;
-
-              const imgSrc = imgError[item.editoria_num]
-                ? '/images/no-image.jpg'
-                : getImageUrl(item.editoria_gallary);
+              const imgSrc = imgError[item.editoria_num] ? '/images/no-image.jpg' : getImageUrl(item.editoria_gallary);
 
               return (
                 <div key={item.editoria_num} className="editorial-card" onClick={() => router.push(`/editorial/${item.editoria_num}`)}>
-                  {/* ✅ รูป 16:9 */}
-                  <div style={{ position: 'relative', width: '100%', aspectRatio: '16/9', overflow: 'hidden', borderRadius: '8px' }}>
+                  <div className="card-image-wrapper">
                     <Image
                       src={imgSrc}
                       alt={title}
                       fill
-                      style={{ objectFit: 'cover' }}
                       className="card-image"
-                      onError={() => setImgError(prev => ({ ...prev, [item.editoria_num]: true }))}
+                      onError={() => setImgError((prev) => ({ ...prev, [item.editoria_num]: true }))}
                     />
                   </div>
                   <div className="card-content">
                     <h3 className="card-title">{title}</h3>
                     <p className="editorial-date">
-                      {new Date(item.editoria_creacteAt).toLocaleDateString(
-                        locale === 'en' ? "en-EN" : "th-TH",
-                        { day: "numeric", month: "long", year: "numeric" }
-                      )}
+                      {new Date(item.editoria_creacteAt).toLocaleDateString(locale === 'en' ? 'en-EN' : 'th-TH', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric',
+                      })}
                     </p>
                     <p className="card-snippet" dangerouslySetInnerHTML={{ __html: parseDescription(description) }} />
-                    <p className="read-more">{locale === 'en' ? 'Read more' : 'อ่านเพิ่มเติม'} <FaArrowRightLong /></p>
+                    <p className="read-more">
+                      {locale === 'en' ? 'Read more' : 'อ่านเพิ่มเติม'} <FaArrowRightLong />
+                    </p>
                   </div>
                 </div>
               );

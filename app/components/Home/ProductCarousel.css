@@ -124,14 +124,28 @@
   line-height: 1.6;
 }
 
-.carouselCard img {
+/* =========================================================
+   ปรับรูปภาพสินค้าให้แสดงเต็มขอบการ์ด (Fix white gap)
+   ========================================================= */
+.product-image-wrapper {
   width: 330px;
   height: 330px;
-  object-fit: cover;
+  overflow: hidden;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+  position: relative;
+  background-color: #f9f9f9; /* ป้องกันพื้นหลังว่าง */
+}
+
+/* รูปภาพภายในการ์ด */
+.product-image-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* ครอบพื้นที่เต็ม */
+  display: block; /* ตัดช่องว่าง inline */
   border-top-left-radius: 6px;
   border-top-right-radius: 6px;
 }
-
 /* ข้อความภายในการ์ด */
 .carouselCard h3 {
   font-size: 17px;
@@ -215,17 +229,17 @@
    ========================================================= */
 
 /* Layout ของ Skeleton */
-.skeleton-grid {
+.pc-skeleton-grid {
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 100%;
   gap: 1.8rem;
-  margin-top: 1rem;
+  margin-top: 1.5rem;
   box-sizing: border-box;
 }
 
-.skeleton-row {
+.pc-skeleton-row {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -235,73 +249,98 @@
   box-sizing: border-box;
 }
 
-/* การ์ด Skeleton (เท่ากับ .carouselCard) */
-.skeletonCard {
+/* =========================================================
+   การ์ด Skeleton (เท่ากับ .carouselCard)
+   ========================================================= */
+.pc-skeletonCard {
   width: 330px;
   height: auto;
+  margin-bottom: 1rem;
   background-color: #ffffff;
-  border: 1px solid #ebebeb;
+  border: none;
+  /* เอา border ออกเพื่อไม่ให้ทับมุมโค้ง */
   border-radius: 6px;
-  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.04);
   overflow: hidden;
+  /* ให้ขอบรูปถูกตัดตามการ์ดจริง */
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   text-align: left;
   padding-bottom: 1rem;
   box-sizing: border-box;
+  position: relative;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.04);
 }
 
-/* เอฟเฟกต์เคลื่อนไหว */
-.skeleton {
+/* =========================================================
+   เอฟเฟกต์เคลื่อนไหว Skeleton
+   ========================================================= */
+/* .skeleton {
   background: linear-gradient(100deg, #e0e0e0 40%, #f5f5f5 50%, #e0e0e0 60%);
   background-size: 200% 100%;
   animation: shimmer 1.4s infinite linear;
-  border-radius: 6px;
 }
 
 @keyframes shimmer {
   0% {
     background-position: -200% 0;
   }
+
   100% {
     background-position: 200% 0;
   }
-}
+} */
 
-/* รูปภาพ Skeleton (ขนาดเท่าจริง) */
-.skeleton-image {
+/* =========================================================
+   รูปภาพ Skeleton (ขนาดเท่าจริง)
+   ========================================================= */
+.pc-skeleton-image {
   width: 100%;
-  height: 330px;
+  height: 330px !important;
+  display: block;
+  position: relative;
+
+  /* ขอบเฉพาะด้านบนเท่านั้น */
   border-top-left-radius: 6px;
   border-top-right-radius: 6px;
-  margin: 0;
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+
   box-sizing: border-box;
+  background-clip: padding-box;
+  margin-bottom: 0;
+  /* แนบกับข้อความ */
 }
 
-/* ข้อความ Skeleton */
-.skeleton-title {
-  width: 80%;
-  height: 18px;
-  margin: 1rem 1rem 0.5rem 1rem;
-  border-radius: 4px;
-}
 
-.skeleton-line {
+/* =========================================================
+   ข้อความ Skeleton
+   ========================================================= */
+
+.pc-skeleton-title {
   width: 90%;
-  height: 14px;
-  margin: 0 1rem 0.4rem 1rem;
-  border-radius: 4px;
+  height: 20px;
+  border-radius: 6px;
+  margin-top: 1.5rem;
 }
 
-.skeleton-line.short {
-  width: 60%;
-  height: 14px;
-  margin: 0.4rem 1rem 0 1rem;
+.pc-skeleton-line {
+  width: 40%;
+  height: 16px;
+  border-radius: 6px;
+  margin-top: 0.5rem;
 }
 
-/* Header Skeleton */
-.skeleton-header-link {
+.pc-skeleton-line.short {
+  width: 55%;
+  height: 20px;
+  margin-top: 2rem;
+}
+
+/* =========================================================
+   Header Skeleton
+   ========================================================= */
+.pc-skeleton-header-link {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -312,14 +351,16 @@
   user-select: none;
 }
 
-.skeleton-header-link svg {
+.pc-skeleton-header-link svg {
   color: #bcbcbc;
 }
 
-/* เว้นระยะในเนื้อหา Skeleton ให้เท่ากับ .product-info */
-.skeleton-content {
+/* =========================================================
+   เว้นระยะในเนื้อหา Skeleton (จำลอง product-info)
+   ========================================================= */
+.pc-skeleton-content {
   width: 100%;
-  padding: 1rem;
+  padding: 0 1rem 1rem 1rem;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -356,16 +397,16 @@
     gap: 32px !important;
   }
 
-  .skeleton-row {
+  .pc-skeleton-row {
     justify-content: center;
     gap: 32px;
   }
 
-  .skeletonCard {
+  .pc-skeletonCard {
     width: 300px;
   }
 
-  .skeleton-image {
+  .pc-skeleton-image {
     height: 300px;
   }
 }
@@ -388,13 +429,14 @@
 
 /* หน้าจอกว้างไม่เกิน 600px */
 @media (max-width: 600px) {
+
   .carouselCard,
-  .skeletonCard {
+  .pc-skeletonCard {
     width: 280px;
   }
 
   .carouselCard img,
-  .skeleton-image {
+  .pc-skeleton-image {
     height: 280px;
   }
 }
@@ -416,9 +458,13 @@
 
   .carouselHeader {
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
+    justify-content: space-between;
+    align-items: center;
+
+    /* ระยะห่างจากการ์ดด้านล่าง */
+    margin-bottom: 1.5rem;
+    /* ← เพิ่มบรรทัดนี้ */
+    padding: 0 1rem;
   }
 
   .carouselLink {
@@ -453,12 +499,12 @@
   }
 
   .carouselCard,
-  .skeletonCard {
+  .pc-skeletonCard {
     width: 260px !important;
   }
 
   .carouselCard img,
-  .skeleton-image {
+  .pc-skeleton-image {
     height: 260px !important;
   }
 

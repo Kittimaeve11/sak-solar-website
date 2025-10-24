@@ -119,6 +119,7 @@ export default function SlidePortfolio() {
       <div className="skeleton-cardportfolio">
         <div className="skeleton skeleton-imageportfolio"></div>
         <div className="skeleton skeleton-titleportfolio"></div>
+        <div className="skeleton skeleton-titleportfolio"></div>
         <div className="skeleton skeleton-lineportfolio"></div>
         <div className="skeleton skeleton-lineportfolio"></div>
       </div>

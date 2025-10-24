@@ -1,5 +1,4 @@
 'use client';
-// บังคับให้ component นี้รันบนฝั่ง client (จำเป็นใน Next.js 13+ เมื่อใช้ useState/useEffect)
 
 import BannerSlider from './components/BannerSlider'; // สไลด์แบนเนอร์ด้านบน
 import FreeServices from './components/Home/FreeServices'; // ส่วนแสดงบริการฟรี เช่น ให้คำปรึกษา
@@ -29,7 +28,7 @@ export default function HomePage() {
   const [provinces, setProvinces] = useState([]); // ข้อมูลจังหวัดทั้งหมด
   const [amphures, setAmphures] = useState([]); // ข้อมูลอำเภอ
   const [tambons, setTambons] = useState([]); // ข้อมูลตำบล
-  const [loadingProducts, setLoadingProducts] = useState(true); // ✅ เพิ่มสถานะโหลดสินค้า
+  const [loadingProducts, setLoadingProducts] = useState(true); // เพิ่มสถานะโหลดสินค้า
 
   const searchParams = useSearchParams(); // ใช้ดึง query string จาก URL
   const productFromUrl = searchParams.get('product') || ''; // ดึงค่า ?product= จาก URL ถ้ามี
@@ -87,7 +86,7 @@ export default function HomePage() {
                 const nameClean = prod.modelname
                   ? prod.modelname.replace(/เฟส\s*/gi, '').replace(/Phase\s*/gi, '').trim()
                   : prod.solarpanel?.replace(/เฟส\s*/gi, '').replace(/Phase\s*/gi, '').trim() ||
-                    'ไม่พบข้อมูลชื่อสินค้า';
+                  'ไม่พบข้อมูลชื่อสินค้า';
 
                 const wattMatch = prod.solarpanel?.match(/\d+\s*W/i);
                 const displayName = wattMatch ? `${nameClean} (${wattMatch[0]})` : nameClean;
@@ -118,7 +117,7 @@ export default function HomePage() {
         setProductTypes([]);
       } finally {
         setLoadingServices(false);
-        setLoadingProducts(false); // ✅ เมื่อโหลดสินค้าจบ
+        setLoadingProducts(false); // เมื่อโหลดสินค้าจบ
       }
     }
 
@@ -152,15 +151,15 @@ export default function HomePage() {
 
       {/* ส่วนสินค้า (แสดงเป็น Carousel แยกตามประเภท) */}
       <div>
-        {/* ✅ ถ้ายังโหลด API อยู่ → แสดง Skeleton ชั่วคราว */}
+        {/* ถ้ายังโหลด API อยู่ → แสดง Skeleton ชั่วคราว */}
         {loadingProducts && productTypes.length === 0 ? (
           <>
             {[1, 2, 3].map((i) => (
               <ProductCarousel
                 key={`skeleton-${i}`}
                 title="กำลังโหลดสินค้า..."
-                items={[]} // ว่างไว้ให้ skeleton แสดง
-                loading={true} // บังคับ skeleton
+                items={[]}
+                loading={true}
               />
             ))}
           </>

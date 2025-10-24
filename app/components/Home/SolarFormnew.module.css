@@ -1,166 +1,215 @@
-/* พื้นหลังฟอร์ม */
+/* =========================================================
+   พื้นหลังของฟอร์มคำนวณโซลาร์
+   ========================================================= */
 .containersolar {
-  background-color: #FAFBFF;
-  padding-top: 3rem;
-  padding-bottom: 3rem;
-  width: 100%;
-  margin-top: 2rem;
+  background-color: #FAFBFF;     /* สีพื้นหลังอ่อน ฟ้าอมเทา */
+  padding-top: 3rem;             /* ระยะห่างด้านบน */
+  padding-bottom: 3rem;          /* ระยะห่างด้านล่าง */
+  width: 100%;                   /* กว้างเต็มพื้นที่ */
+  margin-top: 2rem;              /* ระยะห่างจากส่วนบนของหน้า */
 }
 
+/* =========================================================
+   กล่องหลักที่ห่อแบบฟอร์มทั้งหมด
+   ========================================================= */
 .formWrapper {
-  margin: 0 auto;
-  font-family: sans-serif;
-  border-radius: 8px;
-  width: 100%;
+  margin: 0 auto;                /* จัดให้อยู่กึ่งกลาง */
+  font-family: sans-serif;       /* ใช้ฟอนต์มาตรฐาน */
+  border-radius: 8px;            /* มุมโค้งมน */
+  width: 100%;                   /* กว้างเต็มพื้นที่ที่มี */
 }
 
+/* =========================================================
+   ขนาดกล่องฟอร์มตอนเริ่มต้น (ก่อนคำนวณ)
+   ========================================================= */
 .formWrapperInitial {
-  max-width: 670px;
+  max-width: 670px;              /* จำกัดความกว้างสูงสุด */
 }
 
+/* =========================================================
+   ขนาดกล่องฟอร์มตอนแสดงผลลัพธ์ (หลังคำนวณ)
+   ========================================================= */
 .formWrapperResult {
-  max-width: 1200px;
+  max-width: 1200px;             /* กว้างขึ้นเพื่อแสดงผลลัพธ์ */
 }
 
+/* =========================================================
+   หัวข้อหลักของส่วนผลลัพธ์ (เช่น “แพ็กเกจที่เราแนะนำ”)
+   ========================================================= */
 .headtitelsolar {
-  color: #264798;
-  text-align: center;
-  margin-top: 1rem;
-  margin-bottom: 2rem;
-  font-weight: 600;
+  color: #264798;                /* สีฟ้าเข้ม */
+  text-align: center;            /* จัดกลาง */
+  margin-top: -1rem;             /* ขยับขึ้นเล็กน้อย */
+  margin-bottom: 2rem;           /* ระยะห่างจากด้านล่าง */
+  font-weight: 600;              /* ตัวหนาปานกลาง */
 }
 
-/* คำแนะนำ */
+/* =========================================================
+   หมายเหตุ / ข้อแนะนำสำหรับผู้ใช้ (ข้อความสีน้ำเงิน)
+   ========================================================= */
 .instructions {
-  margin: 1rem 0;
-  color: #264798;
+  margin: 1rem 0;                /* ระยะห่างด้านบน–ล่าง */
+  color: #264798;                /* สีฟ้าเข้ม */
 }
 
+/* =========================================================
+   หมายเหตุเพิ่มเติมบรรทัดที่ 2 (เว้นขอบซ้ายเล็กน้อย)
+   ========================================================= */
 .instructions1 {
-  margin-top: -0.5rem;
-  margin-left: 3.5rem;
-  margin-bottom: 0.5rem;
-  color: #264798;
+  margin-top: -0.5rem;           /* ขยับขึ้นเล็กน้อย */
+  margin-left: 3.5rem;           /* เว้นจากซ้าย */
+  margin-bottom: 0.5rem;         /* ระยะห่างด้านล่าง */
+  color: #264798;                /* สีฟ้าเข้ม */
 }
 
+/* =========================================================
+   หมายเหตุพิเศษ (ข้อความเน้นสีส้ม)
+   ========================================================= */
 .instructions2 {
-  margin-bottom: 1rem;
-  color: #F2780C;
+  margin-bottom: 1rem;           /* ระยะห่างด้านล่าง */
+  color: #F2780C;                /* สีส้มแบรนด์หลัก */
 }
 
-/* ฟอร์มคำนวณ */
+/* =========================================================
+   ส่วนฟอร์มหลักของระบบคำนวณ
+   ========================================================= */
 .solar-form {
-  max-width: 700px;
-  margin: 0 auto;
-  border-radius: 10px;
+  max-width: 700px;              /* จำกัดความกว้างสูงสุดของฟอร์ม */
+  margin: 0 auto;                /* จัดให้อยู่กึ่งกลาง */
+  border-radius: 10px;           /* มุมโค้งมน */
 }
 
+/* =========================================================
+   กลุ่มปุ่มควบคุม (เช่น ปุ่มคำนวณ / รีเซ็ต)
+   ========================================================= */
 .buttonGroup {
-  display: flex;
-  justify-content: flex-end;
-  /* ชิดขวาทั้งหมด */
-  margin-top: 1.5rem;
+  display: flex;                 /* ใช้ flexbox จัดแนว */
+  justify-content: flex-end;     /* ชิดขวาทั้งหมด */
+  margin-top: 1.5rem;            /* ระยะห่างจากส่วนบน */
 }
-
-
-/* slider */
+/* =========================================================
+   สไลเดอร์เลือกเปอร์เซ็นต์การใช้ไฟฟ้า (กลางวัน / กลางคืน)
+   ========================================================= */
 .rangeControl {
-  -webkit-appearance: none;
-  width: 100%;
-  height: 9px;
-  border-radius: 5px;
-  background: #ffffff;
-  outline: none;
-  border: 1px solid #ccc;
+  -webkit-appearance: none;      /* เอาสไตล์เริ่มต้นของเบราว์เซอร์ออก */
+  width: 100%;                   /* กว้างเต็มบรรทัด */
+  height: 9px;                   /* ความสูงของแถบสไลด์ */
+  border-radius: 5px;            /* มุมโค้งมน */
+  background: #ffffff;           /* พื้นหลังของแถบ */
+  outline: none;                 /* เอาเส้นขอบเวลาโฟกัสออก */
+  border: 1px solid #ccc;        /* เส้นขอบสีเทาอ่อน */
 }
 
+/* =========================================================
+   ปุ่มกลมของสไลเดอร์ (WebKit เช่น Chrome, Safari)
+   ========================================================= */
 .rangeControl::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 20px;
-  height: 20px;
-  background: #F2780C;
-  border-radius: 50%;
-  border: none;
-  cursor: pointer;
+  -webkit-appearance: none;      /* เอาสไตล์เริ่มต้นออก */
+  width: 20px;                   /* ความกว้างของปุ่ม */
+  height: 20px;                  /* ความสูงของปุ่ม */
+  background: #F2780C;           /* สีส้มหลักของแบรนด์ */
+  border-radius: 50%;            /* ทำให้เป็นวงกลม */
+  border: none;                  /* ไม่มีขอบ */
+  cursor: pointer;               /* เปลี่ยนเป็นรูปมือเมื่อชี้ */
 }
 
+/* =========================================================
+   ปุ่มกลมของสไลเดอร์ (Firefox)
+   ========================================================= */
 .rangeControl::-moz-range-thumb {
-  width: 20px;
-  height: 20px;
-  background: #F2780C;
-  border-radius: 50%;
-  border: none;
-  cursor: pointer;
+  width: 20px;                   /* ความกว้างของปุ่ม */
+  height: 20px;                  /* ความสูงของปุ่ม */
+  background: #F2780C;           /* สีส้มหลักของแบรนด์ */
+  border-radius: 50%;            /* ทำให้เป็นวงกลม */
+  border: none;                  /* ไม่มีขอบ */
+  cursor: pointer;               /* เปลี่ยนเป็นรูปมือเมื่อชี้ */
 }
 
+/* =========================================================
+   แถบของสไลเดอร์ (Firefox)
+   ========================================================= */
 .rangeControl::-moz-range-track {
-  height: 6px;
-  background: #f2f2f2;
-  border-radius: 3px;
+  height: 6px;                   /* ความสูงของแถบ */
+  background: #f2f2f2;           /* สีพื้นหลังแถบ */
+  border-radius: 3px;            /* มุมโค้งมน */
 }
 
-/* ช่วงเวลา */
+/* =========================================================
+   ส่วนแสดงเปอร์เซ็นต์การใช้ไฟฟ้า (กลางวัน / กลางคืน)
+   ========================================================= */
 .usageSplit {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.85rem;
-  color: #555;
-  font-weight: 400;
-  margin-bottom: 1.5rem;
+  display: flex;                 /* ใช้ Flexbox จัดเรียงแนวนอน */
+  justify-content: space-between;/* เว้นระยะห่างเท่ากันระหว่างซ้าย–ขวา */
+  font-size: 0.85rem;            /* ขนาดตัวอักษรเล็ก */
+  color: #555;                   /* สีเทาเข้ม */
+  font-weight: 400;              /* น้ำหนักปกติ */
+  margin-bottom: 1.5rem;         /* ระยะห่างจากส่วนล่าง */
 }
 
-/* อนิเมชัน */
+/* =========================================================
+   อนิเมชัน: เลื่อนขึ้นพร้อมค่อย ๆ ปรากฏ (Fade In Up)
+   ========================================================= */
 @keyframes fadeInUp {
   0% {
-    opacity: 0;
-    transform: translateY(20px);
+    opacity: 0;                  /* เริ่มจากโปร่งใส */
+    transform: translateY(20px); /* เลื่อนลงเล็กน้อย */
   }
 
   100% {
-    opacity: 1;
-    transform: translateY(0);
+    opacity: 1;                  /* แสดงเต็มที่ */
+    transform: translateY(0);    /* กลับไปตำแหน่งเดิม */
   }
 }
 
-/* ผลคำนวณ */
-/* แถวบน */
+/* =========================================================
+   ส่วนผลการคำนวณหลัก (Result Grid)
+   ========================================================= */
+
+/* กล่องหลักของผลคำนวณทั้งหมด — รวมแถวบนและล่าง */
 .resultGrid {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+  display: flex;                 /* ใช้ Flexbox จัดเรียงแนวตั้ง */
+  flex-direction: column;        /* วางลูกแนวตั้ง */
+  gap: 1.5rem;                   /* ระยะห่างระหว่างแถว */
 }
 
+/* =========================================================
+   แถวผลคำนวณ (แถวบน / แถวล่าง)
+   ========================================================= */
 .topGrid,
 .bottomGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
+  display: grid;                 /* ใช้ Grid Layout */
+  grid-template-columns: 1fr 1fr; /* แบ่งเป็น 2 คอลัมน์เท่ากัน */
+  gap: 1.5rem;                   /* ระยะห่างระหว่างกล่อง */
 }
 
+/* =========================================================
+   กล่องผลคำนวณทั่วไป (พื้นหลังขาว + เงา)
+   ========================================================= */
 .resultBox {
-  background: #fff;
-  /* border: 2px solid #ddd; */
-  border-radius: 8px;
+  background: #fff;              /* พื้นหลังสีขาว */
+  border-radius: 8px;            /* มุมโค้งมน */
   padding-top: 1rem;
   padding-bottom: 1rem;
   padding-left: 2rem;
   padding-right: 2rem;
-  /* padding: 2rem; */
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1); /* เงาอ่อนๆ */
 }
 
-
+/* =========================================================
+   แถวภายในกล่อง — สำหรับ label กับ value ด้านใน
+   ========================================================= */
 .labelRow {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  justify-content: space-between; /* label ด้านซ้าย / value ด้านขวา */
+  align-items: center;            /* จัดกึ่งกลางแนวตั้ง */
 }
 
-
+/* =========================================================
+   กล่องขนาดระบบที่แนะนำ (ฝั่งซ้ายแถวบน)
+   ========================================================= */
 .resultBoxc {
   display: flex;
-  align-items: center;
-  /* กึ่งกลางแนวดิ่ง */
+  align-items: center;           /* กึ่งกลางแนวดิ่ง */
   padding: 2rem;
   background: #fff;
   border-radius: 8px;
@@ -168,28 +217,35 @@
   height: auto;
 }
 
+/* =========================================================
+   แถวในกล่องขนาดระบบที่แนะนำ
+   ========================================================= */
 .labelRowc {
   display: flex;
-  justify-content: space-between;
-  /* ดัน label ชิดซ้าย, value ชิดขวา */
-  align-items: center;
-  /* กึ่งกลางแนวตั้ง */
+  justify-content: space-between; /* label ซ้าย / ค่า kW ขวา */
+  align-items: center;            /* จัดกลางแนวตั้ง */
   width: 100%;
 }
 
+/* =========================================================
+   ชื่อหัวข้อภายในกล่อง (เช่น “ขนาดระบบที่แนะนำ”)
+   ========================================================= */
 .labelheadc {
   font-size: 36px;
   font-weight: 800;
-  color: #E88534;
+  color: #E88534;                /* สีส้มหลักของแบรนด์ */
   line-height: 1;
 }
 
+/* =========================================================
+   กล่องตัวเลขผลลัพธ์ (เช่น “30 kW”)
+   ========================================================= */
 .valueLargec {
   display: flex;
-  align-items: baseline;
-  /* ให้เลขกับหน่วยชิดกันสวย */
+  align-items: baseline;         /* ให้เลขกับหน่วยอยู่ระดับเดียวกัน */
 }
 
+/* ตัวเลขหลักของขนาดระบบ */
 .recommendedNumberc {
   font-size: 60px;
   font-weight: bold;
@@ -197,6 +253,7 @@
   line-height: 1;
 }
 
+/* หน่วย kW */
 .recommendedUnitc {
   font-size: 30px;
   font-weight: bold;
@@ -205,19 +262,21 @@
   line-height: 1;
 }
 
+/* =========================================================
+   กล่องผลคืนทุน (ฝั่งขวาของแถวบน)
+   ========================================================= */
 .labelhead {
   font-size: 36px;
   color: #E88534;
   font-weight: 800;
-
-  /* margin-bottom: 0.5rem; */
 }
 
 .valueLarge {
   display: flex;
-  align-items: flex-end;
+  align-items: flex-end;         /* ให้หน่วยอยู่ชิดด้านล่างของตัวเลข */
 }
 
+/* ตัวเลขจำนวนปีคืนทุน */
 .recommendedNumber {
   font-size: 50px;
   font-weight: bold;
@@ -225,8 +284,7 @@
   line-height: 1;
 }
 
-
-
+/* หน่วย “ปี” */
 .recommendedUnit {
   font-size: 30px;
   font-weight: bold;
@@ -235,29 +293,30 @@
   line-height: 1;
 }
 
+/* ข้อความอธิบายใต้ตัวเลข (เช่น “ลดค่าไฟอย่างยั่งยืน”) */
 .subtext {
   font-size: 16px;
   color: #666;
   margin-top: 0.2rem;
 }
 
-/* แพ็กเกจที่แนะนำ */
-
+/* =========================================================
+   กล่องแพ็กเกจที่แนะนำ (ฝั่งซ้ายของแถวล่าง)
+   ========================================================= */
 .resultBoxL {
   background: #fff;
-  /* border: 2px solid #ddd; */
   border-radius: 8px;
   padding-top: -1rem;
   padding-bottom: 1rem;
   padding-left: 2rem;
   padding-right: 2rem;
-  /* padding: 2rem; */
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
-
+/* =========================================================
+   หัวข้อ “แพ็กเกจที่เราแนะนำ”
+   ========================================================= */
 .packageTitle {
-  /* padding-top: -2rem; */
   margin-top: 1.5rem;
   margin-bottom: -1rem;
   font-size: 30px;
@@ -266,16 +325,21 @@
   color: #E88534;
 }
 
+/* =========================================================
+   ข้อความแสดงประเภทระบบ (1 เฟส / 3 เฟส)
+   ========================================================= */
 .systemType {
-  color: #264798;
+  color: #264798;                /* สีฟ้าเข้ม */
   text-align: center;
   font-size: 20px;
   font-weight: 600;
-  text-shadow: 0.02m 0 0 currentColor;
+  text-shadow: 0.02m 0 0 currentColor; /* เงาตัวอักษรเบา ๆ */
   margin-top: 10px;
-  /* margin-bottom: 1rem; */
 }
 
+/* =========================================================
+   เวอร์ชัน systemType ที่มีเส้นคั่นซ้าย–ขวา
+   ========================================================= */
 .systemType.with-lines {
   display: flex;
   align-items: center;
@@ -284,192 +348,213 @@
   color: #243865;
 }
 
+/* เส้นคั่นซ้าย–ขวา ของ systemType */
 .systemType.with-lines::before,
 .systemType.with-lines::after {
   content: "";
-  width: 25px;
-  /* ความยาวของเส้น */
-  height: 4px;
-  background-color: #E88534;
-  margin: 0 12px;
-  /* ระยะห่างระหว่างเส้นกับข้อความ */
+  width: 25px;                   /* ความยาวของเส้น */
+  height: 4px;                   /* ความหนาของเส้น */
+  background-color: #E88534;     /* สีส้มแบรนด์หลัก */
+  margin: 0 12px;                /* ระยะห่างระหว่างเส้นกับข้อความ */
 }
 
 
-/* สินค้า */
+/* =========================================================
+   ส่วนแสดงรายการสินค้าแนะนำ (Product List)
+   ========================================================= */
+
+/* กล่องหลักห่อรายการสินค้า — จัดกลางแนวนอน */
 .productListWrapper {
   display: flex;
   justify-content: center;
 }
 
+/* กล่องรวมการ์ดสินค้าแต่ละใบ */
 .productList {
   display: flex;
-  gap: 2rem;
+  gap: 2rem;                    /* ระยะห่างระหว่างการ์ด */
   text-align: center;
   justify-content: center;
 }
 
+/* =========================================================
+   การ์ดสินค้าแต่ละใบ (Product Card)
+   ========================================================= */
 .productCard {
   position: relative;
-  width: 300px;
-  text-align: center;
-  border: 0.5px solid #e0e0e0;
-  border-radius: 8px;
-  box-shadow: 0 3px 16px rgba(0, 0, 0, 0.1);
+  width: 330px;                 /* ความกว้างของการ์ด */
+  text-align: center;           /* จัดข้อความให้อยู่กลาง */
+  border: 0.5px solid #e0e0e0;  /* เส้นขอบบางๆ สีเทา */
+  border-radius: 8px;           /* มุมโค้งมน */
+  box-shadow: 0 3px 16px rgba(0, 0, 0, 0.1); /* เงาอ่อนๆ */
   margin-bottom: 1.8rem;
-  padding-bottom: 1rem;
-  background-color: #fff;
-  overflow: hidden;
+  padding-bottom: 0.5rem;
+  background-color: #fff;       /* พื้นหลังสีขาว */
+  overflow: hidden;             /* ซ่อนส่วนเกิน */
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  cursor: pointer;
-  /* ✅ เพิ่มบรรทัดนี้ */
+  cursor: pointer;              /* เปลี่ยนเป็นรูปมือเมื่อ hover */
 }
 
+/* เอฟเฟกต์เมื่อ hover การ์ด */
 .productCard:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  transform: translateY(-10px); /* ลอยขึ้น */
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); /* เงาชัดขึ้น */
 }
 
-/* 🔥 overlay ปิดทับการ์ด */
+/* =========================================================
+   Overlay ปิดทับการ์ดเมื่อ hover (ข้อความแสดงเพิ่มเติม)
+   ========================================================= */
 .cardOverlay {
   position: absolute;
-  inset: 0;
-  /* top: 0; right: 0; bottom: 0; left: 0; */
-  background-color: rgba(0, 0, 0, 0.651);
+  inset: 0;                     /* ขยายเต็มการ์ด */
+  background-color: rgba(0, 0, 0, 0.651); /* พื้นหลังโปร่งดำ */
   color: #fff;
   font-weight: 600;
   font-size: 16px;
   display: flex;
   justify-content: center;
   align-items: center;
-  opacity: 0;
-  pointer-events: none;
+  opacity: 0;                   /* ซ่อนไว้ก่อน */
+  pointer-events: none;         /* ไม่ให้คลิก */
   transition: opacity 0.3s ease;
 }
 
-/* ✨ แสดง overlay เมื่อ hover */
+/* แสดง overlay เมื่อ hover การ์ด */
 .productCard:hover .cardOverlay {
   opacity: 4;
   pointer-events: auto;
 }
 
-
+/* =========================================================
+   รูปภาพสินค้า (ส่วนบนของการ์ด)
+   ========================================================= */
 .productImage {
-  /* border: 2px solid #ccc; */
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
-  object-fit: cover;
-  /* box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); */
+  object-fit: cover;            /* ครอบเต็มพื้นที่ไม่บิดเบือน */
   max-width: 100%;
   height: auto;
 }
 
+/* =========================================================
+   ตารางข้อมูลสินค้า (รายละเอียดภายในการ์ด)
+   ========================================================= */
 .productTable {
   width: 100%;
   padding: 0 15px;
   border-radius: 8px;
 }
 
+/* ส่วนข้อมูลสินค้า (ชื่อ / รายละเอียด) */
 .productTable .product-info {
   text-align: left;
 }
 
+/* จัดระยะข้อความภายในการ์ด */
 .productTable .product-info h3,
 .productTable .product-info p {
   text-align: left;
-  margin: 0rem 0;
-  /* ปรับ margin ให้เฉพาะบน-ล่าง จะได้ไม่ดันออกด้านข้าง */
+  margin: 0rem 0;              /* เอา margin ซ้ายขวาออก */
 }
 
+/* ชื่อสินค้า */
 .productTable h3 {
   font-size: 20px;
   font-weight: 600;
-  color: #264798;
+  color: #264798;              /* สีฟ้าเข้ม */
 }
 
+/* ค่าแสดงผล (เช่น ราคา, ขนาด) */
 .productTable .value {
   color: #264798;
 }
 
+/* ขนาดระบบ (kW) */
 .product-size {
   font-weight: 600 !important;
   font-size: 18px;
-  color: #ff0000;
+  color: #ff0000;              /* สีแดงเด่น */
 }
 
-
+/* =========================================================
+   หัวข้อผลตอบแทนระบบโซลาร์ (เช่น "ผลตอบแทนระบบโซลาร์")
+   ========================================================= */
 .solarTitle {
-  /* padding-top: -2rem; */
   margin-top: 1rem;
   margin-bottom: 0rem;
   font-size: 30px;
   text-align: center;
   font-weight: 600;
-  color: #E88534;
+  color: #E88534;              /* สีส้มหลัก */
 }
 
+/* =========================================================
+   แถวแสดงค่าไฟ / ผลตอบแทนแต่ละรายการ (Cost Row)
+   ========================================================= */
 .costRow {
   padding: 8px 0;
-  border-bottom: 1px dashed #ccc;
+  border-bottom: 1px dashed #ccc; /* เส้นขีดล่าง */
   display: flex;
-  justify-content: space-between;
-  /* แยกซ้าย-ขวา */
+  justify-content: space-between; /* ซ้าย–ขวา */
   align-items: center;
   margin: 0.5rem 0;
-  /* border-bottom: 1px dashed #cccccccb; */
-
 }
 
+/* กลุ่มฝั่งซ้าย (ไอคอน + ข้อความ) */
 .leftGroup {
   display: flex;
   align-items: center;
-  gap: 1.2rem;
-  /* ระยะห่างระหว่างไอคอนกับข้อความซ้าย */
+  gap: 1.2rem;                 /* ระยะห่างระหว่างไอคอนกับข้อความ */
 }
 
+/* ป้ายชื่อค่า (ฝั่งซ้าย) */
 .costLabel {
   font-size: 20px;
   font-weight: 600;
   color: #E88534;
 }
 
+/* ค่าจำนวนเงิน / หน่วย (ฝั่งขวา) */
 .costValue {
   font-size: 20px;
   font-weight: 600;
   color: #6A6A6A;
 }
 
+/* =========================================================
+   หัวข้อย่อยในส่วนผลตอบแทน (“ผลตอบแทนระบบโซลาร์”)
+   ========================================================= */
 .solardeteil {
-  /* padding-top: -2rem; */
   margin-top: 1.5rem;
   margin-bottom: 0rem;
   font-size: 22px;
-  /* text-align: center; */
   font-weight: 600;
   color: #E88534;
 }
 
-
+/* =========================================================
+   รายการสรุปผลตอบแทน (เช่น "ค่าไฟที่ลดได้ต่อปี")
+   ========================================================= */
 .costList {
   margin-top: 1rem;
-  list-style: none;
+  list-style: none;            /* เอาจุด bullet ดั้งเดิมออก */
   padding: 0;
   font-size: 16px;
 }
 
+/* แถวข้อมูลแต่ละรายการในผลตอบแทน */
 .rowds {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   justify-content: space-between;
   padding: 8px 0;
-  padding-left: 3rem;
-  /*  ย่อหน้าเข้าไปทั้งบรรทัด */
+  padding-left: 3rem;          /* ย่อหน้าเข้ามา */
   position: relative;
   border-bottom: 1px dashed #ccc;
-
 }
 
+/* ขีดสั้นสีส้มด้านหน้าแต่ละรายการ */
 .bullet {
   position: absolute;
   left: 1.5rem;
@@ -481,120 +566,166 @@
   background-color: #E88534;
 }
 
+/* ชื่อรายการ (เช่น "ค่าไฟที่ลดได้ต่อปี") */
 .labelds {
   color: #264798;
   flex: 1;
   white-space: nowrap;
 }
 
+/* ค่าตัวเลขด้านขวา */
 .valueds {
   color: #6A6A6A;
   white-space: nowrap;
   font-weight: 600;
   text-align: right;
-  min-width: 150px;
-  /* ปรับขนาดได้ตามต้องการ */
+  min-width: 150px;            /* ความกว้างขั้นต่ำเพื่อจัดแนวสวย */
 }
 
+/* =========================================================
+   กลุ่มปุ่มด้านล่าง (ปุ่มคำนวณใหม่ / ปริ้นผล)
+   ========================================================= */
 .buttonWrapper {
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-end;   /* ชิดขวา */
   margin-top: 1rem;
-  /* เพิ่มระยะห่างด้านบนถ้าต้องการ */
 }
 
+/* =========================================================
+   หัวข้อหลักของหน้า (เช่น “ระบบคำนวณขนาด Solar Rooftop”)
+   ========================================================= */
 .headtitleonesolar {
   font-size: 2rem;
   font-weight: 600;
   text-align: center;
   margin-bottom: 0.5rem;
-  color: #F27C1B;
+  color: #F27C1B;              /* สีส้มแบรนด์ */
 }
 
+/* ป้องกันการตัดคำของข้อความสำคัญ */
 .keepTogethersolar {
-  white-space: nowrap;
-  /* ห้ามตัดบรรทัดกลางข้อความ */
+  white-space: nowrap;         /* ห้ามขึ้นบรรทัดใหม่ */
 }
 
-
+/* หน่วยที่อยู่ต่อท้ายข้อความ เช่น (ตารางเมตร) */
 .unit {
-  white-space: nowrap; /* ปกติให้อยู่ข้างหลัง */
+  white-space: nowrap;         /* ให้อยู่ต่อท้ายในบรรทัดเดียว */
 }
 
+/* =========================================================
+   ส่วนแสดงเปอร์เซ็นต์กลางวัน / กลางคืน (แบบย่อ)
+   ========================================================= */
 .usageSplit {
   display: flex;
   gap: 20px;
 }
 
+/* กล่องย่อยสำหรับกลางวันและกลางคืน */
 .day, .night {
   display: flex;
   align-items: center;
   gap: 5px;
 }
 
+/* ไอคอนในส่วนกลางวัน/กลางคืน (ซ่อนไว้ค่าเริ่มต้น) */
 .icon {
-  display: none; /* ปกติซ่อนไอคอน */
+  display: none;
 }
 
+  /* =========================================================
+   PROMOTION RIBBON
+   ========================================================= */
+  .product-promo-ribbon {
+    position: absolute;
+    top: 10px;
+    right: -35px;
+    background: #ee2226;
+    color: #fff;
+    font-weight: 700;
+    padding: 5px 45px;
+    text-align: center;
+    transform: rotate(45deg);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+    font-size: 16px;
+}
+
+
+/* =========================================================
+   Responsive Layout — สำหรับหน้าจอขนาดไม่เกิน 1200px
+   ========================================================= */
 @media (max-width: 1200px) {
+  /* ปรับความกว้างของฟอร์มผลลัพธ์ให้แคบลง */
   .formWrapperResult {
     max-width: 900px;
   }
 
+  /* แถวบน/ล่างของผลคำนวณ — เปลี่ยนจาก 2 คอลัมน์เป็น 1 */
   .topGrid,
   .bottomGrid {
-    grid-template-columns: 1fr; /* เรียงลงทีละแถว */
+    grid-template-columns: 1fr; /* เรียงซ้อนลงทีละแถว */
   }
 
+  /* รายการสินค้า — ยังคงแนวนอนแต่ช่องว่างแคบลง */
   .productList {
-    flex-direction: row;
-    /*  ให้เรียงแนวนอนเสมอ */
-    justify-content: center;
-    gap: 1rem;
+    flex-direction: row;         /* เรียงแนวนอน */
+    justify-content: center;     /* จัดกึ่งกลาง */
+    gap: 1rem;                   /* ลดช่องว่างระหว่างการ์ด */
   }
-
-
 }
 
 
+/* =========================================================
+   Responsive Layout — สำหรับหน้าจอขนาดไม่เกิน 764px
+   (มือถือและแท็บเล็ตแนวตั้ง)
+   ========================================================= */
 @media (max-width: 764px) {
 
-  /* ฟอร์มหลัก */
+  /* ---------------------------------------------------------
+     ส่วนฟอร์มหลัก (Solar Calculator)
+     --------------------------------------------------------- */
   .formWrapper {
-    width: 80%;
+    width: 80%;                  /* ให้แคบลงเพื่อเหมาะกับจอมือถือ */
     max-width: 100%;
-    margin: 0 auto;
-    padding: 1rem;
+    margin: 0 auto;              /* จัดกลาง */
+    padding: 1rem;               /* เพิ่มระยะขอบภายใน */
     border-radius: 8px;
     box-sizing: border-box;
   }
 
-  /* คำแนะนำ */
+  /* ---------------------------------------------------------
+     ข้อความคำแนะนำ (ลดขนาดตัวอักษร)
+     --------------------------------------------------------- */
   .instructions,
   .instructions1,
   .instructions2 {
-    font-size: 0.9rem;
-    margin-left: 1rem;
+    font-size: 0.9rem;           /* ตัวเล็กลง */
+    margin-left: 1rem;           /* ขยับให้ห่างซ้ายเล็กน้อย */
   }
 
-  /* input, slider */
+  /* ---------------------------------------------------------
+     ช่องกรอกข้อมูล / สไลเดอร์
+     --------------------------------------------------------- */
   .solar-form {
     max-width: 100%;
   }
 
-
-
-  /* กล่องผลลัพธ์ */
+  /* ---------------------------------------------------------
+     ส่วนผลลัพธ์คำนวณ (Result Boxes)
+     --------------------------------------------------------- */
   .topGrid,
   .bottomGrid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr;  /* เรียงลงทีละกล่อง */
     gap: 1rem;
   }
 
   .resultBox {
-    padding: 1rem 2.5rem;
+    padding: 1rem 2.5rem;        /* ปรับ padding ให้เหมาะกับจอเล็ก */
   }
 
+  /* ---------------------------------------------------------
+     หัวข้อและตัวเลขผลลัพธ์ — ปรับขนาดให้พอดีจอมือถือ
+     --------------------------------------------------------- */
   .labelhead,
   .labelheadc {
     font-size: 1.5rem;
@@ -610,8 +741,9 @@
     font-size: 1.2rem;
   }
 
-
-  /* package title */
+  /* ---------------------------------------------------------
+     หัวข้อแพ็กเกจและประเภทระบบ
+     --------------------------------------------------------- */
   .packageTitle {
     font-size: 25px;
     margin-top: 0.5rem;
@@ -625,14 +757,16 @@
     font-size: 1rem;
   }
 
-  /* product cards */
+  /* ---------------------------------------------------------
+     การ์ดสินค้า (Product Card) — เรียงแนวตั้ง
+     --------------------------------------------------------- */
   .productList {
-    flex-direction: column;
-    gap: 1rem;
+    flex-direction: column;      /* เปลี่ยนเป็นแนวตั้ง */
+    gap: 1rem;                   /* ลดช่องว่างระหว่างการ์ด */
   }
 
   .productCard {
-    width: 100%;
+    width: 100%;                 /* เต็มความกว้างหน้าจอ */
     margin: 0 auto 0;
   }
 
@@ -641,102 +775,140 @@
     height: auto;
   }
 
-  /* ตารางสินค้า */
+  /* ---------------------------------------------------------
+     ตารางภายในการ์ดสินค้า (ชื่อ / ราคา)
+     --------------------------------------------------------- */
   .productTable h3 {
-    font-size: 1rem;
+    font-size: 1rem;             /* ตัวอักษรเล็กลง */
   }
 
-  /* cost section */
+  /* ---------------------------------------------------------
+     ส่วนสรุปต้นทุน / ผลตอบแทน (Cost Section)
+     --------------------------------------------------------- */
   .costLabel,
   .costValue {
-    font-size: 1rem;
+    font-size: 1rem;             /* ลดขนาดข้อความ */
   }
 
   .rowds {
-    padding-left: 3rem;
+    padding-left: 3rem;          /* ย่อหน้าเข้าเท่าเดิม */
     font-size: 0.9rem;
   }
 
   .valueds {
-    min-width: auto;
+    min-width: auto;             /* ปล่อยขนาดอัตโนมัติ */
     font-size: 0.9rem;
   }
 
+  /* ---------------------------------------------------------
+     ส่วนข้อมูลสินค้าเพิ่มเติม
+     --------------------------------------------------------- */
   .product-info {
-    padding: -0.5rem !important;
-    ;
+    padding: -0.5rem !important; /* ลดช่องว่าง (ไม่แนะนำใช้ค่าลบแต่ใช้ได้ในบางกรณี) */
   }
 
+  /* ---------------------------------------------------------
+     ซ่อนองค์ประกอบบางส่วนในมือถือ
+     --------------------------------------------------------- */
   .hideOnMobile {
     display: none;
   }
 }
 
-
+/* =========================================================
+   Responsive Layout — สำหรับหน้าจอขนาดไม่เกิน 560px
+   (เหมาะสำหรับมือถือแนวตั้ง / หน้าจอขนาดกลาง)
+   ========================================================= */
 @media (max-width: 560px) {
+
+  /* ---------------------------------------------------------
+     กลุ่มปุ่ม (เช่น ปุ่ม "คำนวณ", "รีเซ็ต") — เรียงแนวตั้ง
+     --------------------------------------------------------- */
   .buttonGroup {
-    flex-direction: column;
-    align-items: flex-end;
+    flex-direction: column;       /* เปลี่ยนจากแนวนอน → แนวตั้ง */
+    align-items: flex-end;        /* ชิดขวาของ container */
   }
 
+  /* ปรับขนาดปุ่มให้เต็มความกว้าง container */
   .buttonGroup button {
-    width: 100%; /* ให้ปุ่มเต็มความกว้าง */
+    width: 100%; /* ให้ปุ่มยืดเต็มแนวกว้างบนหน้าจอเล็ก */
   }
 
+  /* ---------------------------------------------------------
+     หัวข้อหลักของหน้า (ลดขนาดตัวอักษรลง)
+     --------------------------------------------------------- */
   .headtitleonesolar {
-    font-size: 1.5rem;
+    font-size: 1.5rem; /* ลดขนาด font ให้เหมาะกับจอเล็ก */
   }
 
+  /* ---------------------------------------------------------
+     กล่องปุ่มส่วนล่าง (ปุ่มรีเซ็ต / ปริ้นผลลัพธ์)
+     --------------------------------------------------------- */
   .buttonWrapper {
-    flex-direction: column;
-    justify-content: center;
-    align-items: stretch;
-    gap: 0.75rem;
-    
+    flex-direction: column;       /* เรียงปุ่มลงด้านล่าง */
+    justify-content: center;      /* จัดให้อยู่กึ่งกลางแนวตั้ง */
+    align-items: stretch;         /* ปุ่มขยายเต็มแนวกว้าง */
+    gap: 0.75rem;                 /* ระยะห่างระหว่างปุ่มแต่ละอัน */
   }
 
+  /* ---------------------------------------------------------
+     ตารางสินค้า (Product Table)
+     --------------------------------------------------------- */
   .productTable {
-    width: 100%;
-    padding: 0 2px;
-    border-radius: 8px;
+    width: 100%;                  /* ใช้พื้นที่เต็มหน้าจอ */
+    padding: 0 2px;               /* ลดระยะ padding ซ้าย–ขวา */
+    border-radius: 8px;           /* มุมโค้งมนเหมือนเดิม */
   }
 
+  /* ---------------------------------------------------------
+     การ์ดสินค้า (Product Card)
+     --------------------------------------------------------- */
   .productCard {
-    width: 60%;
-    margin: 0 auto 0;
+    width: 60%;                   /* ลดขนาดให้เหมาะกับจอมือถือ */
+    margin: 0 auto 0;             /* จัดการ์ดให้อยู่ตรงกลาง */
   }
-
-  /* .productTable .product-info h3,
-.productTable .product-info p {
-  text-align: left;
-  margin: 0rem 0;
-} */
-
 }
 
 
+/* =========================================================
+   Responsive Layout — สำหรับหน้าจอขนาดไม่เกิน 450px
+   (มือถือขนาดเล็ก เช่น iPhone SE / Android Mini)
+   ========================================================= */
 @media (max-width: 450px) {
+
+  /* ---------------------------------------------------------
+     หน่วย (Unit) — แยกขึ้นบรรทัดใหม่เพื่อไม่ให้ล้นจอ
+     --------------------------------------------------------- */
   .unit {
-    display: block; /* ขึ้นบรรทัดใหม่ */
-  }
-    .text {
-    display: none;
+    display: block; /* ให้หน่วย (เช่น kW, บาท) ขึ้นบรรทัดใหม่ */
   }
 
+  /* ---------------------------------------------------------
+     ซ่อนข้อความปกติ (เช่น “กลางวัน”, “กลางคืน”)
+     --------------------------------------------------------- */
+  .text {
+    display: none; /* ซ่อนข้อความเพื่อประหยัดพื้นที่บนจอเล็ก */
+  }
+
+  /* ---------------------------------------------------------
+     แสดงไอคอนแทนข้อความ (icon แทน text)
+     --------------------------------------------------------- */
   .icon {
-    display: inline; /* แสดงไอคอนแทนข้อความ */
-    font-size: 18px;
+    display: inline; /* แสดงเฉพาะไอคอน */
+    font-size: 18px; /* ขนาดพอดีไม่ใหญ่เกินไป */
   }
+
+  /* ---------------------------------------------------------
+     พื้นหลังส่วนฟอร์ม (ลดระยะขอบรอบนอก)
+     --------------------------------------------------------- */
   .containersolar {
-  padding: 0.3rem;
+    padding: 0.3rem; /* ลดระยะ padding รอบฟอร์ม */
+  }
+
+  /* ---------------------------------------------------------
+     ฟอร์มเริ่มต้น (Initial Form)
+     --------------------------------------------------------- */
+  .formWrapperInitial {
+    max-width: 320px; 
+  }
 }
-
-.formWrapperInitial {
-  max-width: 320px;
-}
-}
-
-
-
-
-

@@ -1,14 +1,24 @@
+/* =========================================================
+   LAYOUT STRUCTURE
+   ========================================================= */
 .layout-editorial {
   padding: 0 16px 50px 16px;
   max-width: 1200px;
   margin: 0 auto;
 }
+
+/* =========================================================
+   GRID LAYOUT FOR CARDS
+   ========================================================= */
 .editorial-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1.5rem;
 }
 
+/* =========================================================
+   CARD STYLE
+   ========================================================= */
 .editorial-card {
   background: #fff;
   border-radius: 6px;
@@ -18,37 +28,60 @@
   overflow: hidden;
   margin-bottom: 10px;
   text-decoration: none;
-  /* เพิ่ม */
   color: inherit;
-  /* เพิ่ม */
 }
 
 .editorial-card:hover {
   transform: translateY(-4px);
   text-decoration: none;
-  /* เพิ่ม */
 }
 
-.card-image {
-  border-radius: 6px 6px 0 0;
-  display: block;
+/* =========================================================
+   IMAGE WRAPPER
+   ========================================================= */
+.card-image-wrapper {
+  position: relative;
   width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+/* Next.js <span> ที่ wrap รูป */
+.card-image-wrapper span {
+  border-radius: 0 !important;
+  overflow: hidden;
+}
+
+/* รูปภาพภายในการ์ด */
+.card-image {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  border-radius: 0 !important;
+  transition: filter 0.3s ease;
 }
 
 .editorial-card:hover .card-image {
   filter: brightness(0.4);
 }
 
+/* =========================================================
+   CARD CONTENT
+   ========================================================= */
 .card-content {
   padding: 10px 25px 16px 25px;
 }
 
-/* หัวข้อ: จำกัด 1 บรรทัด */
+/* Title: One Line Only */
 .card-title {
   font-size: 18px;
   font-weight: 600;
-  margin-bottom: -0rem;
-
+  margin-bottom: 0;
   display: block;
   width: 100%;
   white-space: nowrap;
@@ -58,7 +91,7 @@
   box-sizing: border-box;
 }
 
-/* เนื้อหา: จำกัด 2 บรรทัด */
+/* Snippet: Two Lines Only */
 .card-snippet {
   color: #555;
   font-size: 15px;
@@ -68,25 +101,24 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
-
   text-decoration: none;
-  /* เพิ่ม */
   border-bottom: none;
-  /* เพิ่ม */
   box-shadow: none;
-  /* เพิ่ม */
 }
 
+/* Date Label */
 .editorial-date {
   color: #888;
   font-size: 14px;
 }
 
+/* =========================================================
+   DETAIL PAGE LAYOUT
+   ========================================================= */
 .editorial-detail {
   max-width: 800px;
   margin: 0 auto;
 }
-
 
 .editorial-detail-title {
   font-size: 1.5rem;
@@ -108,6 +140,9 @@
   line-height: 1.6;
 }
 
+/* =========================================================
+   GALLERY SECTION
+   ========================================================= */
 .gallery {
   margin-top: 2rem;
   display: grid;
@@ -122,7 +157,10 @@
   border-radius: 8px;
   display: block;
 }
-/* เลือกประเภทบทความ : */
+
+/* =========================================================
+   FILTER SECTION
+   ========================================================= */
 .portfolio-filters {
   display: flex;
   flex-direction: column;
@@ -144,16 +182,16 @@
   align-items: center;
 }
 
-
 .filter-label {
-  margin-bottom: 0rem;
-  /* ระยะห่างระหว่าง label กับ dropdown */
+  margin-bottom: 0;
   font-size: 16px;
   font-weight: 500;
   color: #243865;
 }
 
-
+/* =========================================================
+   DROPDOWN STYLES
+   ========================================================= */
 .filter-dropdown {
   width: 300px;
   max-width: 100%;
@@ -181,6 +219,7 @@
   box-shadow: 0 0 0 3px rgba(232, 133, 52, 0.2);
 }
 
+/* Dropdown Arrow Icon */
 .dropdown-icon {
   position: absolute;
   right: 16px;
@@ -191,6 +230,7 @@
   font-size: 16px;
 }
 
+/* Short Dropdown Version */
 .filter-dropdown.short {
   width: 85px;
   max-width: 100%;
@@ -223,29 +263,14 @@
   display: inline-block;
 }
 
-/* .spinner-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 2rem;
-}
-
-.spinner {
-  border: 4px solid rgba(0, 0, 0, 0.1);
-  border-left-color: #0070f3;
-  border-radius: 50%;
-  width: 36px;
-  height: 36px;
-  animation: spin 1s linear infinite;
-} */
-
+/* =========================================================
+   BANNER IMAGE
+   ========================================================= */
 .banner-container {
   position: relative;
   width: 100%;
   aspect-ratio: 3.22 / 1;
-  /* คุมอัตราส่วน */
   min-height: 300px;
-  /* fallback กัน layout shift */
   overflow: hidden;
 }
 
@@ -257,14 +282,9 @@
   transition: opacity 0.6s ease-in-out;
 }
 
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* Pagination controls */
+/* =========================================================
+   PAGINATION CONTROLS
+   ========================================================= */
 .pagination-controls {
   display: flex;
   flex-direction: column;
@@ -273,28 +293,9 @@
   gap: 12px;
 }
 
-/* Skeleton Loading - Pulse effect */
-.skeleton {
-  background-color: #e0e0e0;
-  border-radius: 4px;
-  animation: pulse 1.5s infinite ease-in-out;
-}
-
-@keyframes pulse {
-  0% {
-    background-color: #e0e0e0;
-  }
-
-  50% {
-    background-color: #f0f0f0;
-  }
-
-  100% {
-    background-color: #e0e0e0;
-  }
-}
-
-/* Skeleton Card Container */
+/* =========================================================
+   SKELETON LOADING 
+   ========================================================= */
 .skeleton-card {
   display: flex;
   flex-direction: column;
@@ -303,14 +304,10 @@
   background-color: white;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   height: 100%;
-
   padding-bottom: 24px;
-  /* เพิ่มจาก 16px เป็น 24px */
   margin-bottom: 24px;
-  /* เพิ่ม margin ด้านล่างเผื่อช่องว่าง */
 }
 
-/* Skeleton Image Placeholder (ขนาดเท่ากับ .card-image) */
 .skeleton-image {
   width: 100%;
   height: 200px;
@@ -318,17 +315,15 @@
   border-radius: 6px 6px 0 0;
 }
 
-/* เนื้อหาใน skeleton ให้ตรงกับ padding ของ .card-content */
 .skeleton-title,
-.skeleton-line ,
-.skeleton-data{
+.skeleton-line,
+.skeleton-data {
   margin-left: 25px;
   margin-right: 25px;
   border-radius: 6px;
   background-color: #ddd;
-  /* สีพื้นสว่างกว่าข้อความปกติเล็กน้อย */
 }
-/* ความสูงและความกว้างปรับให้สมดุล */
+
 .skeleton-title {
   height: 22px;
   width: 60%;
@@ -354,7 +349,6 @@
   margin-bottom: 0;
 }
 
-/* Banner Skeleton */
 .skeleton-banner {
   width: 100%;
   aspect-ratio: 3.22 / 1;
@@ -363,35 +357,10 @@
   animation: pulse 1.5s infinite ease-in-out;
 }
 
-
-/* Fade-in animation */
-.fade-in {
-  opacity: 0;
-  transform: translateY(10px);
-  transition: opacity 0.4s ease, transform 0.4s ease;
-}
-
-.fade-in.active {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-@keyframes fadeIn {
-  0% {
-    opacity: 0;
-    transform: translateY(5px);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* มุมมองโทรศัพท์ */
-/* Responsive */
+/* =========================================================
+   RESPONSIVE DESIGN
+   ========================================================= */
 @media (max-width: 768px) {
-
   .portfolio-filters,
   .filter-row {
     width: 100%;
@@ -420,12 +389,7 @@
     min-height: auto;
   }
 
-  .filter-dropdown {
-    width: 100% !important;
-  }
-
   .skeleton-banner {
     aspect-ratio: 1.92 / 1;
-    /* for mobile view */
   }
 }

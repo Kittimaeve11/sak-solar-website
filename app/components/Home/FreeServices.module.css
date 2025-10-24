@@ -1,3 +1,6 @@
+/* =========================================================
+   SECTION: ส่วนพื้นหลังหลักของบริการฟรี
+   ========================================================= */
 .serviceSection {
   position: relative;
   background-image: url('/solar/11.jpg');
@@ -10,22 +13,26 @@
   margin-bottom: 0;
 }
 
+/* ชั้นโปร่งใสซ้อนบนพื้นหลังเพื่อให้ภาพดูจางลง */
 .serviceSection::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: rgba(255, 255, 255, 0.185); /* ทำให้พื้นหลังจาง */
-  backdrop-filter: blur(1.5px); /* เบลอเล็กน้อย */
-  -webkit-backdrop-filter: blur(5px); /* สำหรับ Safari */
+  background: rgba(255, 255, 255, 0.185);
+  backdrop-filter: blur(1.5px);
+  -webkit-backdrop-filter: blur(5px);
   z-index: 1;
 }
 
-
-.serviceSection>* {
+/* ทำให้เนื้อหาทั้งหมดอยู่เหนือพื้นหลังที่เบลอ */
+.serviceSection > * {
   position: relative;
   z-index: 2;
 }
 
+/* =========================================================
+   HEADING: หัวข้อของส่วนบริการฟรี
+   ========================================================= */
 .headingfree {
   text-align: center;
   font-size: clamp(1rem, 3vw, 1.25rem);
@@ -34,7 +41,9 @@
   margin-top: -5px;
 }
 
-/* -------------------- GRID (Desktop) -------------------- */
+/* =========================================================
+   GRID LAYOUT (โหมด Desktop)
+   ========================================================= */
 .gridWrapper {
   display: flex;
   justify-content: center;
@@ -43,7 +52,6 @@
   padding: 0.5rem 0rem;
   max-width: 1500px;
   margin: 0 auto;
-
 }
 
 .gridContainer {
@@ -51,7 +59,6 @@
   flex-wrap: wrap;
   justify-content: center;
   gap: 1rem;
-  /* แทน column-gap / row-gap */
   max-width: 1500px;
   width: 100%;
   margin: 0 auto;
@@ -59,10 +66,13 @@
   margin-top: -1.5rem;
 }
 
-.gridContainer>* {
+.gridContainer > * {
   height: 100%;
 }
 
+/* =========================================================
+   CARD: การ์ดบริการแต่ละใบ
+   ========================================================= */
 .cardfree {
   background-color: #ffffff;
   padding: 1.3rem;
@@ -78,14 +88,16 @@
   width: 100%;
   max-width: 340px;
   margin-top: 0.5rem !important;
-
 }
 
-
+/* เงาเมื่อ hover */
 .cardfree:hover {
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.178);
 }
 
+/* =========================================================
+   ICON: ส่วนของไอคอนบริการ
+   ========================================================= */
 .iconWrapper {
   height: 80px;
   display: flex;
@@ -100,7 +112,9 @@
   object-fit: contain;
 }
 
-/* -------------------- TITLE & TEXT -------------------- */
+/* =========================================================
+   TEXT: ข้อความภายในการ์ด
+   ========================================================= */
 .titlefree {
   color: #264798;
   font-size: 16px;
@@ -125,6 +139,7 @@
   width: 100%;
 }
 
+/* รายการหัวข้อย่อยในแต่ละบริการ */
 .listfree {
   text-align: left;
   width: 100%;
@@ -142,12 +157,15 @@
   color: #505052;
 }
 
+/* สีของ bullet ใน list */
 .textfree::marker {
   color: #E88534;
   font-size: 18px;
 }
 
-/* -------------------- Desktop / Mobile Switch -------------------- */
+/* =========================================================
+   DISPLAY SWITCH: เปลี่ยนโหมด Desktop / Mobile
+   ========================================================= */
 .desktopGrid {
   display: block;
 }
@@ -156,8 +174,9 @@
   display: none;
 }
 
-
-/* -------------------- SLIDER -------------------- */
+/* =========================================================
+   SLIDER: สไลด์การ์ดบริการ (โหมดมือถือ / แท็บเล็ต)
+   ========================================================= */
 .responsiveSlider {
   position: relative;
   max-width: 1100px;
@@ -181,6 +200,7 @@
   justify-content: center;
 }
 
+/* ปรับขนาดของการ์ดภายในสไลด์ */
 .responsiveSlider .cardfree {
   width: 100%;
   max-width: 340px;
@@ -188,6 +208,7 @@
   height: 100%;
 }
 
+/* ปุ่มลูกศรของสไลด์ */
 .responsiveSlider :global(.slick-prev),
 .responsiveSlider :global(.slick-next) {
   width: 40px;
@@ -195,17 +216,18 @@
   z-index: 10;
 }
 
+/* ขนาดของไอคอนลูกศร */
 .responsiveSlider :global(.slick-prev:before),
 .responsiveSlider :global(.slick-next:before) {
   font-size: 30px;
 }
 
-/* dots */
+/* จุดแสดงสถานะสไลด์ (dots) */
 .responsiveSlider :global(.slick-dots) {
   bottom: -3rem;
 }
 
-/*  จุดปกติ */
+/* จุดปกติ (สีจาง) */
 .responsiveSlider :global(.slick-dots li button:before) {
   content: '';
   width: 10px;
@@ -216,12 +238,14 @@
   opacity: 1;
 }
 
-/* จุด active */
+/* จุดที่ active (สว่างกว่า) */
 .responsiveSlider :global(.slick-dots li.slick-active button:before) {
   background: #ffffffb7;
 }
 
-/* -------------------- RESPONSIVE -------------------- */
+/* =========================================================
+   RESPONSIVE: การปรับขนาดตามหน้าจอ
+   ========================================================= */
 @media (max-width: 1490px) {
   .desktopGrid {
     display: none;
@@ -230,21 +254,17 @@
   .responsiveSlider {
     display: block;
   }
-
-
 }
 
 @media (max-width: 1200px) {
   .responsiveSlider {
     max-width: 750px;
-    /* 2 การ์ด */
   }
 }
 
 @media (max-width: 830px) {
   .responsiveSlider {
     max-width: 400px;
-    /* 1 การ์ด */
   }
 }
 
@@ -260,8 +280,8 @@
   }
 
   .cardfree {
-    width: 295px!important;
-    }
+    width: 295px !important;
+  }
 
   .icon {
     width: 75px;
@@ -278,7 +298,9 @@
   }
 }
 
-/* -------------------- Skeleton -------------------- */
+/* =========================================================
+   SKELETON: โครงร่างโหลดข้อมูล
+   ========================================================= */
 .skeletonCard {
   display: flex;
   flex-direction: column;
@@ -288,6 +310,7 @@
   width: 340px;
 }
 
+/* วงกลมจำลองไอคอน */
 .skeletonCircle {
   width: 90px;
   height: 90px;
@@ -296,47 +319,37 @@
   animation: pulse 1.5s infinite ease-in-out;
 }
 
+/* เส้นจำลองข้อความ */
 .skeletonLine {
   border-radius: 4px;
   background-color: #e0e0e0;
   animation: pulse 1.5s infinite ease-in-out;
 }
 
+/* เอฟเฟกต์ pulse สำหรับ skeleton */
 @keyframes pulse {
   0% {
     background-color: #e0e0e0;
   }
-
   50% {
     background-color: #f0f0f0;
   }
-
   100% {
     background-color: #e0e0e0;
   }
 }
 
-.blinkOnce {
-  animation: blinkOnce 0.6s ease-in-out;
-}
+/* =========================================================
+   ANIMATION: เอฟเฟกต์แอนิเมชันทั่วไป
+   ========================================================= */
 
-@keyframes blinkOnce {
 
-  0%,
-  100% {
-    opacity: 1;
-  }
-
-  50% {
-    opacity: 0;
-  }
-}
-
-/* FreeServices.module.css */
+/* ก่อนโหลดให้ซ่อนไว้ */
 .hiddenBeforeLoad {
   opacity: 0;
 }
 
+/* แสดงแบบ fade-in เมื่อโหลดเสร็จ */
 .fadeIn {
   opacity: 0;
   animation: fadeIn 0.8s ease-in forwards;
@@ -345,7 +358,7 @@
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(10px); /* optional: ลื่นขึ้น */
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
