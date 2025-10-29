@@ -132,53 +132,61 @@ export default function Page() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (isSubmitting) return; // ป้องกันกดซ้ำ
+    if (isSubmitting) return;
     if (!validateAll()) return;
 
     setIsSubmitting(true);
 
     const payload = {
-      topic: 1, // fixed value
+      topic: formData.topic,
       fullname: formData.name,
-      email: formData.email,
       phone: formData.phone,
-      message: formData.message, // ต้องสะกดให้ตรงกับ PHP
+      email: formData.email || "",
+      message: formData.message,
     };
+
+    console.log("📨 ส่งข้อมูล:", payload);
 
     try {
       const res = await fetch(`${baseUrl}/api/contactinqpageapi`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': apiKey
+          "Content-Type": "application/json",
+          "X-API-KEY": apiKey,
         },
         body: JSON.stringify(payload),
       });
 
-      if (!res.ok) throw new Error("ส่งข้อมูลไม่สำเร็จ");
+      const text = await res.text();
+      console.log("📥 ตอบกลับจาก API (raw):", text);
 
-      await Swal.fire({
-        icon: 'success',
-        title: 'ส่งข้อมูลเรียบร้อยแล้ว',
-        showConfirmButton: false,
-        timer: 2000,
-      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}: ${text}`);
 
-      // เคลียร์ฟอร์ม
-      setFormData({ topic: "", name: "", phone: "", email: "", message: "" });
-      setTouched({});
-      setErrors({});
+      const data = JSON.parse(text);
+      if (data.status || data.success) {
+        await Swal.fire({
+          icon: "success",
+          title: "ส่งข้อมูลเรียบร้อยแล้ว!",
+          text: "ทีมงานจะติดต่อกลับโดยเร็วที่สุดค่ะ",
+          showConfirmButton: false,
+          timer: 2500,
+        });
+
+        setFormData({ topic: "", name: "", phone: "", email: "", message: "" });
+      } else {
+        throw new Error(data.message || "ไม่สามารถบันทึกข้อมูลได้");
+      }
     } catch (err) {
+      console.error("❌ Error:", err);
       await Swal.fire({
-        icon: 'error',
-        title: 'เกิดข้อผิดพลาดในการส่งข้อความ',
+        icon: "error",
+        title: "เกิดข้อผิดพลาด",
         text: err.message,
       });
     } finally {
       setIsSubmitting(false);
     }
   };
-
 
   // const getIcon = (id) => {
 
