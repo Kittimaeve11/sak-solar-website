@@ -11,35 +11,37 @@ import Link from 'next/link';
 export default function Navbar() {
   const { messages, switchLocale, locale } = useLocale();
   const pathname = usePathname();
+
   const isAboutPage = pathname === '/About';
   const isContactPage = pathname === '/Contact';
 
   return (
     <div className={styles.navWrapper}>
       <nav className={styles.navbar}>
-        {/* โลโก้ */}
+
+        {/* 🔶 โลโก้บริษัท */}
         <div className={styles.leftSection}>
           <div className={styles.logoContainer}>
+            {/* ✅ ใช้ fill + aspect-ratio แทน width/height เพื่อแก้ warning */}
             <Image
               src="/logo/logosolar.png"
-              alt="โลโก้บริษัท"
-              width={450}
-              height={80}
-              style={{ objectFit: 'contain' }}
+              alt="โลโก้บริษัท ศักดิ์สยามโซลาร์"
+              fill
               priority
               unoptimized
               className={styles.logoImage}
+              sizes="(max-width: 768px) 80vw, 450px"
             />
-{/* media (max-width: 600px) */}
           </div>
         </div>
 
-        {/* ภาษา + เมนู */}
+        {/* 🔹 กลุ่มเปลี่ยนภาษา + เมนู */}
         <div className={styles.localeContactGroup}>
 
           {/* ปุ่มเปลี่ยนภาษา */}
           <div className={styles.localeButtons}>
-            <span className={`${styles.localeItem} ${locale === 'th' ? styles.disabled : ''}`}
+            <span
+              className={`${styles.localeItem} ${locale === 'th' ? styles.disabled : ''}`}
               onClick={() => locale !== 'th' && switchLocale('th')}
             >
               TH
@@ -53,7 +55,7 @@ export default function Navbar() {
             </span>
           </div>
 
-          {/* ปุ่มติดต่อเรา */}
+          {/* 🔸 ปุ่มโทรศัพท์ + ลิงก์เมนู */}
           <div className={styles.contactActions}>
             <Link href="tel:1487" className={styles.callLink} title="โทร 1487">
               <FaPhone className={styles.phoneIcon} />
@@ -68,6 +70,7 @@ export default function Navbar() {
                 {messages.backpage}
               </Link>
               <span> | </span>
+
               <Link
                 href="/About/"
                 className={`${styles.contact} ${isAboutPage ? styles.active : ''} font-500`}
@@ -75,6 +78,7 @@ export default function Navbar() {
                 {messages.about}
               </Link>
               <span> | </span>
+
               <Link
                 href="/Contact/"
                 className={`${styles.contact} ${isContactPage ? styles.active : ''} font-500`}

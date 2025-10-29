@@ -151,7 +151,6 @@ export default function HomePage() {
 
       {/* ส่วนสินค้า (แสดงเป็น Carousel แยกตามประเภท) */}
       <div>
-        {/* ถ้ายังโหลด API อยู่ → แสดง Skeleton ชั่วคราว */}
         {loadingProducts && productTypes.length === 0 ? (
           <>
             {[1, 2, 3].map((i) => (
@@ -188,7 +187,7 @@ export default function HomePage() {
           tambons={tambons}
           initialProduct={productFromUrl}
         />
-      </div>
+      </div> 
 
       {/* เส้นคั่นระหว่าง section */}
       <div style={{ borderBottom: '2.5px solid #e88534c7', width: '80%', margin: '20px auto' }}></div>

@@ -7,21 +7,22 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
+// อ่านค่า environment
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 
-function PrevArrow({ style, onClick }) {
+/* ปุ่มเลื่อนซ้าย */
+function PrevArrow({ onClick }) {
   return (
     <div
       style={{
-        ...style,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         position: "absolute",
         top: "50%",
         left: 20,
-        transform: "translate(0, -50%)",
+        transform: "translateY(-50%)",
         zIndex: 10,
         borderRadius: "50%",
         width: 36,
@@ -35,18 +36,18 @@ function PrevArrow({ style, onClick }) {
   );
 }
 
-function NextArrow({ style, onClick }) {
+/* ปุ่มเลื่อนขวา */
+function NextArrow({ onClick }) {
   return (
     <div
       style={{
-        ...style,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         position: "absolute",
         top: "50%",
         right: 20,
-        transform: "translate(0, -50%)",
+        transform: "translateY(-50%)",
         zIndex: 10,
         borderRadius: "50%",
         width: 36,
@@ -60,6 +61,9 @@ function NextArrow({ style, onClick }) {
   );
 }
 
+/* =============================
+   Banner Slider Component
+============================= */
 export default function BannerSlider() {
   const sliderRef = useRef(null);
   const [banners, setBanners] = useState([]);
@@ -69,18 +73,13 @@ export default function BannerSlider() {
   const [loading, setLoading] = useState(true);
   const isDragging = useRef(false);
 
-  // ✅ Detect window size & reset slider index when switch mobile <-> desktop
+  /* ตรวจสอบขนาดหน้าจอ */
   useEffect(() => {
     const checkMobile = () => {
       const mobile = window.innerWidth <= 767;
-      setIsMobile((prev) => {
-        if (prev !== mobile) {
-          localStorage.removeItem("bannerSlideIndex"); // reset index
-          setInitialSlide(0);
-        }
-        return mobile;
-      });
+      setIsMobile(mobile);
     };
+
     checkMobile();
     window.addEventListener("resize", checkMobile);
 
@@ -90,7 +89,7 @@ export default function BannerSlider() {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  // ✅ Fetch banners
+  /* ดึงข้อมูลแบนเนอร์ */
   useEffect(() => {
     let isMounted = true;
     const fetchBanners = async () => {
@@ -110,9 +109,12 @@ export default function BannerSlider() {
       }
     };
     fetchBanners();
-    return () => { isMounted = false; };
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
+  /* ตั้งค่า Slider */
   const settings = {
     dots: banners.length > 1,
     infinite: banners.length > 1,
@@ -120,7 +122,7 @@ export default function BannerSlider() {
     slidesToShow: 1,
     slidesToScroll: 1,
     autoplay: banners.length > 1,
-    autoplaySpeed: 3000,
+    autoplaySpeed: 3500,
     arrows: banners.length > 1,
     prevArrow: <PrevArrow />,
     nextArrow: <NextArrow />,
@@ -131,34 +133,25 @@ export default function BannerSlider() {
     onEdge: () => (isDragging.current = false),
   };
 
+  /* คลิกแบนเนอร์ */
   const handleClick = (e, href) => {
     if (isDragging.current) {
       isDragging.current = false;
       return;
     }
-    const width = e.currentTarget.offsetWidth;
-    const x = e.nativeEvent.offsetX;
-    const percent = x / width;
-
-    if (percent >= 0.1 && percent <= 0.9) {
-      if (href) window.open(href, "_blank");
-    } else if (percent < 0.2) {
-      sliderRef.current?.slickPrev();
-    } else {
-      sliderRef.current?.slickNext();
-    }
+    if (href) window.open(href, "_blank");
   };
 
   return (
     <div className="w-full relative" style={{ lineHeight: 0, fontSize: 0 }}>
-      {/* Skeleton SSR */}
+      {/* Skeleton โหลดครั้งแรก */}
       {(loading || banners.length === 0) && (
         <div className="banner-skeleton">
           <div className="skeleton-overlay" />
         </div>
       )}
 
-      {/* Slider */}
+      {/* แสดง Slider */}
       {!loading && banners.length > 0 && (
         <Slider key={isMobile ? "mobile" : "desktop"} ref={sliderRef} {...settings}>
           {banners.map((banner, index) => {
@@ -175,10 +168,10 @@ export default function BannerSlider() {
                 >
                   <Image
                     src={imgSrc}
-                    alt={banner.brander_name}
+                    alt={banner.brander_name || "banner"}
                     fill
-                    priority={index === initialSlide}  //  เฉพาะภาพแรก
-                    loading={index === initialSlide ? "eager" : "lazy"}
+                    priority={index === 0}                // ✅ แก้ LCP เต็มรูปแบบ
+                    loading={index === 0 ? "eager" : "lazy"}
                     draggable={false}
                     unoptimized
                     style={{
@@ -191,7 +184,6 @@ export default function BannerSlider() {
                     }
                   />
 
-
                   {!isLoaded && <div className="skeleton-overlay" />}
                 </div>
               </div>
@@ -200,30 +192,29 @@ export default function BannerSlider() {
         </Slider>
       )}
 
+      {/* CSS */}
       <style jsx>{`
         .banner-container {
           position: relative;
           width: 100%;
-          height: auto;
+          height: 100%;
         }
 
-        /*  PC ≥ 768px */
         @media (min-width: 768px) {
           .banner-container {
-            aspect-ratio: 3840/1191;
+            aspect-ratio: 3840 / 1191;
           }
         }
 
-        /* Mobile ≤ 767px */
         @media (max-width: 767px) {
           .banner-container {
-            aspect-ratio: 768/1032;
+            aspect-ratio: 768 / 1032;
           }
         }
 
         .banner-skeleton {
           width: 100%;
-          aspect-ratio: 3840/1191;
+          aspect-ratio: 3840 / 1191;
           min-height: 400px;
           position: relative;
           overflow: hidden;
@@ -231,7 +222,7 @@ export default function BannerSlider() {
 
         @media (max-width: 767px) {
           .banner-skeleton {
-            aspect-ratio: 768/1032;
+            aspect-ratio: 768 / 1032;
             min-height: 400px;
           }
         }
@@ -262,9 +253,7 @@ export default function BannerSlider() {
           border: 2px solid transparent;
           transition: background-color 0.3s ease, border-color 0.3s ease;
         }
-        :global(.slick-dots li.slick-active button) {
-          background: rgba(255, 255, 255, 0.89);
-        }
+        :global(.slick-dots li.slick-active button),
         :global(.slick-dots li button:hover) {
           background: rgba(255, 255, 255, 0.89);
         }

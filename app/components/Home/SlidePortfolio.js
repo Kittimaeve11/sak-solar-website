@@ -12,30 +12,48 @@ import { useLocale } from '@/app/Context/LocaleContext';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
+// ตัวแปรเก็บค่าฐาน URL และ API Key จากไฟล์ .env
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 
+/* =========================================================
+   Component หลัก: SlidePortfolio
+   แสดงผลงานในรูปแบบสไลด์ (react-slick)
+   ========================================================= */
 export default function SlidePortfolio() {
+  // State เก็บข้อมูลผลงาน
   const [projects, setProjects] = useState([]);
+  // State สำหรับสถานะโหลดข้อมูล
   const [isLoading, setIsLoading] = useState(true);
+  // State สำหรับ slide ปัจจุบัน
   const [activeSlide, setActiveSlide] = useState(0);
+  // State ป้องกันคลิกระหว่างลากสไลด์
   const [dragging, setDragging] = useState(false);
+
+  // อ้างอิงตัวสไลด์
   const sliderRef = useRef(null);
+  // ใช้เปลี่ยนหน้าแบบ Next.js
   const router = useRouter();
+  // ดึง locale (ภาษา) จาก Context
   const { locale } = useLocale();
 
+  /* =========================================================
+     ดึงข้อมูลผลงานจาก API
+     ========================================================= */
   useEffect(() => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
 
+        // เรียก API พร้อมส่ง header X-API-KEY
         const res = await fetch(`${baseUrl}/api/portfoliomainpageapi`, {
           headers: { 'X-API-KEY': apiKey },
         });
-
         const data = await res.json();
 
+        // ตรวจสอบว่าผลลัพธ์ถูกต้องและเป็น Array
         if (data?.status && Array.isArray(data.result)) {
+          // แปลงข้อมูลให้อยู่ในรูปแบบที่ใช้ใน UI
           const mappedProjects = data.result.map((item) => ({
             id: item.portfolio_id,
             title: item.adddressTH,
@@ -48,6 +66,7 @@ export default function SlidePortfolio() {
               : '/images/placeholder.png',
           }));
 
+          // เพิ่มดีเลย์เพื่อให้เห็นเอฟเฟกต์ skeleton
           setTimeout(() => {
             setProjects(mappedProjects);
             setIsLoading(false);
@@ -64,7 +83,9 @@ export default function SlidePortfolio() {
     fetchData();
   }, []);
 
-  // ฟังก์ชันแปลงวันที่
+  /* =========================================================
+     ฟังก์ชันแปลงวันที่ให้แสดงตามภาษา
+     ========================================================= */
   const formatDate = (dateString) => {
     if (!dateString) return '-';
     const date = new Date(dateString);
@@ -83,7 +104,9 @@ export default function SlidePortfolio() {
     }
   };
 
-  // คำนวนจำนวน group
+  /* =========================================================
+     ตั้งค่าการแบ่งสไลด์ (กลุ่มละ 3 การ์ด)
+     ========================================================= */
   const slidesPerGroup = 3;
   const totalGroups =
     projects.length > 0 ? Math.ceil(projects.length / slidesPerGroup) : 0;
@@ -95,13 +118,16 @@ export default function SlidePortfolio() {
     }
   };
 
+  // จัดการสถานะก่อน-หลังเปลี่ยนสไลด์
   const handleBeforeChange = () => setDragging(true);
   const handleAfterChange = (i) => {
     setActiveSlide(Math.floor(i / slidesPerGroup));
     setTimeout(() => setDragging(false), 50);
   };
 
-  // Custom Dots (ใช้ global CSS)
+  /* =========================================================
+     Custom Dots (แถบเลื่อนด้านล่าง)
+     ========================================================= */
   const CustomDots = () => (
     <div className="custom-dots">
       {Array.from({ length: totalGroups }).map((_, index) => (
@@ -114,6 +140,9 @@ export default function SlidePortfolio() {
     </div>
   );
 
+  /* =========================================================
+     Skeleton Loader (แสดงขณะโหลดข้อมูล)
+     ========================================================= */
   const SkeletonCard = () => (
     <div className="slide-itemportfolio fade-in">
       <div className="skeleton-cardportfolio">
@@ -126,10 +155,15 @@ export default function SlidePortfolio() {
     </div>
   );
 
+  /* =========================================================
+     ส่วนแสดงผลหลักของ Component
+     ========================================================= */
   return (
     <div className="portfolio-wrapperslide">
       <br />
       <h1 className="headtitleone">ผลงานของเรา</h1>
+
+      {/* ปุ่มดูทั้งหมด */}
       <div className="portfolio-headerslide">
         <Link href="/portfolio" className="view-all flex items-center gap-2">
           <HiPlusSm className="icon-view" />
@@ -137,6 +171,7 @@ export default function SlidePortfolio() {
         </Link>
       </div>
 
+      {/* หากกำลังโหลดให้แสดง Skeleton */}
       {isLoading ? (
         <div className="portfolio-loading-grid">
           {[...Array(3)].map((_, i) => (
@@ -145,6 +180,7 @@ export default function SlidePortfolio() {
         </div>
       ) : (
         <>
+          {/* สไลด์ผลงาน */}
           <Slider
             ref={sliderRef}
             dots={false}
@@ -168,18 +204,17 @@ export default function SlidePortfolio() {
               },
             ]}
           >
+            {/* วนลูปแสดงแต่ละการ์ดผลงาน */}
             {projects.map((proj, i) => (
-              <div key={proj?.id || `proj-${i}`} className="slide-item">
+              <div key={proj?.id || `proj-${i}`} className="slide-itemportfolio">
                 <div
                   className="portfolio-cardslide"
                   onClick={() =>
                     !dragging && router.push(`/portfolio/${proj?.id}`)
                   }
                 >
-                  <div
-                    className="portfolioslide-image-wrapper"
-                    style={{ position: 'relative', height: 200 }}
-                  >
+                  {/* ส่วนรูปภาพ */}
+                  <div className="portfolioslide-image-wrapper">
                     <Image
                       src={`${baseUrl}/${proj?.coverImage}` || '/images/placeholder.png'}
                       alt={proj?.title || 'ไม่ระบุ'}
@@ -189,6 +224,8 @@ export default function SlidePortfolio() {
                       quality={75}
                       style={{ objectFit: 'cover' }}
                     />
+
+                    {/* แถบโลโก้บริษัทซ้ายบน */}
                     <div className="portfolio-bannerslide">
                       <Image
                         src="/images/logosak-solar.png"
@@ -203,6 +240,7 @@ export default function SlidePortfolio() {
                     </div>
                   </div>
 
+                  {/* เนื้อหาด้านล่างของการ์ด */}
                   <div className="portfolio-contentslide">
                     <h3
                       className="project-titleslide"
@@ -244,7 +282,7 @@ export default function SlidePortfolio() {
             ))}
           </Slider>
 
-          {/* custom dots */}
+          {/* แถบจุดเลื่อน (Custom Dots) */}
           <CustomDots />
         </>
       )}

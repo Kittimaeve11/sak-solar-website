@@ -1,40 +1,40 @@
 /* ================================
    โครงสร้างหลัก (Layout)
-================================ */
+   ================================ */
 .products-container {
-  display: flex;
-  gap: 20px;
+  display: flex; /* จัดวาง Sidebar และส่วนแสดงสินค้าในแนวนอน */
+  gap: 20px; /* ระยะห่างระหว่าง Sidebar กับส่วนสินค้า */
   padding: 7px;
-  max-width: 1500px;
-  margin: 0 auto;
+  max-width: 1500px; /* กำหนดความกว้างสูงสุด */
+  margin: 1rem auto;
   margin-top: 2rem;
   margin-bottom: 2rem;
   width: 100%;
   box-sizing: border-box;
-  align-items: flex-start;
+  align-items: flex-start; /* จัดให้อยู่ด้านบนสุด */
 }
 
 .products-list {
-  flex: 1; /* เนื้อหาสินค้าขยายเต็มพื้นที่ข้างๆ sidebar */
+  flex: 1; /* ส่วนแสดงสินค้าขยายเต็มพื้นที่ที่เหลือ */
 }
 
 /* ================================
    Sidebar (ตัวกรองสินค้า)
-================================ */
+   ================================ */
 .products-sidebar {
-  width: 250px;
-  background: white;
-  border-radius: 6px;
+  width: 250px; /* ความกว้าง Sidebar */
+  background: white; /* สีพื้นหลัง */
+  border-radius: 6px; /* มุมโค้ง */
   padding: 0;
-  border: 1px solid #ececec;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  overflow-y: auto;
-  position: sticky;
-  top: 2rem; /* ระยะห่างจากด้านบน */
+  border: 1px solid #ececec; /* เส้นขอบบาง */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* เงาเบา */
+  overflow-y: auto; /* แสดงแถบเลื่อนแนวตั้งเมื่อมีเนื้อหาเกิน */
+  position: sticky; /* ให้ Sidebar ติดค้างบนหน้าจอเมื่อเลื่อน */
+  top: 2rem; /* ระยะห่างจากขอบบน */
 }
 
 .sidebar-header {
-  background-color: #E88534;
+  background-color: #E88534; /* สีพื้นหัวข้อ Sidebar */
   color: white;
   padding: 5px;
   font-weight: bold;
@@ -43,7 +43,7 @@
 }
 
 .products-sidebar section {
-  padding: 16px;
+  padding: 16px; /* ระยะห่างด้านในของแต่ละส่วน */
 }
 
 .products-sidebar h3 {
@@ -54,18 +54,18 @@
 
 /* ================================
    Checkbox (ฟิลเตอร์)
-================================ */
+   ================================ */
 .filter-box .checkbox-item {
   display: flex;
   align-items: center;
-  gap: 5px;          /* ระยะห่างระหว่าง checkbox กับข้อความ */
+  gap: 5px; /* ระยะห่างระหว่างช่องเลือกกับข้อความ */
   font-size: 14px;
   margin-bottom: 10px;
   color: #333;
   cursor: pointer;
 }
 
-/* ซ่อน style เดิมของ browser */
+/* ปรับแต่ง Checkbox เองโดยซ่อนสไตล์เดิมของ Browser */
 .checkbox-item input[type="checkbox"] {
   appearance: none;
   -webkit-appearance: none;
@@ -78,13 +78,13 @@
   outline: none;
 }
 
-/* เมื่อถูกเลือก */
+/* เมื่อ Checkbox ถูกเลือก */
 .checkbox-item input[type="checkbox"]:checked {
   background-color: #367AF5;
   border-color: #367AF5;
 }
 
-/* เครื่องหมายติ๊กใน checkbox */
+/* สร้างเครื่องหมายติ๊กใน Checkbox */
 .checkbox-item input[type="checkbox"]:checked::after {
   content: "✓";
   color: white;
@@ -101,20 +101,23 @@
   gap: 8px;
   margin-bottom: 8px;
   cursor: pointer;
-  user-select: none;
+  user-select: none; /* ป้องกันการเลือกข้อความขณะคลิก */
 }
 
 .checkbox-item input[type="checkbox"] {
   cursor: pointer;
 }
 
+/* เส้นแบ่งระหว่างส่วนใน Sidebar */
 .divider {
   border: none;
   border-top: 1px solid #eee;
   margin: 0;
 }
 
-/* ปุ่มรีเซ็ตฟิลเตอร์ */
+/* ================================
+   ปุ่มรีเซ็ตฟิลเตอร์
+   ================================ */
 .resetbutton {
   font-weight: 400;
   padding: 0.6rem 1.8rem;
@@ -126,21 +129,23 @@
   transition: background-color 0.2s ease;
   margin: 1rem 1rem;
   margin-bottom: 1rem !important; /* เพิ่มระยะห่างล่าง */
+  display: block;
+  margin-left: auto; /* จัดปุ่มไปด้านขวา */
 }
 
 .resetbutton:hover {
-  background: #d9742a;
+  background: #d9742a; /* สีเมื่อวางเมาส์ */
 }
 
 /* ================================
    การ์ดสินค้า (Product Card)
-================================ */
+   ================================ */
 .product-card {
   display: block;
   overflow: hidden;
   cursor: pointer;
   text-decoration: none !important;
-  color: inherit; /* ป้องกันลิงก์เป็นสีน้ำเงิน */
+  color: inherit; /* ป้องกันลิงก์กลายเป็นสีน้ำเงิน */
   height: auto;
   width: 285px;
   border: 0.5px solid #e0e0e0;
@@ -148,13 +153,13 @@
 }
 
 .product-card:hover {
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* เงาเมื่อ hover */
   text-decoration: none !important;
 }
 
 /* ================================
    ข้อมูลสินค้า
-================================ */
+   ================================ */
 .product-info {
   padding: 0.5rem 1rem;
   display: flex;
@@ -166,27 +171,28 @@
 
 .product-info h3 {
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 18px;
   color: #243865;
   margin: 0 0 4px 0;
 }
 
+/* รายละเอียดเพิ่มเติม เช่น แบตเตอรี่ */
 .product-info h6 {
-  font-weight: 600;
   font-size: 14px;
   color: #535355;
-  margin: 0;
+  margin-top: -0.4rem;
+  margin-bottom: 0.5rem;
 }
 
 .product-info p,
 .product-price {
   font-weight: 600;
-  font-size: 18px;
+  font-size: 20px;
   margin: 0 0 4px 0;
 }
 
 .product-info .meta {
-  font-size: 0.85rem;
+  font-size: 14px;
   color: #777;
 }
 
@@ -197,18 +203,18 @@
 
 /* ================================
    รูปภาพสินค้า
-================================ */
+   ================================ */
 .product-image-wrapper {
   position: relative;
   width: 100%;
-  aspect-ratio: 4 / 3; /* คงอัตราส่วน 4:3 */
-  height: auto;
-  margin-bottom: 1px;
+  height: 285px;
+  overflow: hidden;
+  border-radius: 8px 8px 0 0;
 }
 
 /* ================================
    ริบบอนโปรโมชั่น
-================================ */
+   ================================ */
 .product-promo-ribbon {
   position: absolute;
   top: 10px;
@@ -218,7 +224,7 @@
   font-weight: 700;
   padding: 5px 45px;
   text-align: center;
-  transform: rotate(45deg);
+  transform: rotate(45deg); /* หมุนแถบเฉียง */
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.384);
   z-index: 10;
   font-size: 16px;
@@ -226,13 +232,13 @@
 
 /* ================================
    Grid แสดงสินค้า
-================================ */
+   ================================ */
 .products-grid {
   display: grid;
-  gap: 1.2rem;
-  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem 1.2rem;
+  grid-template-columns: repeat(4, 1fr); /* 4 คอลัมน์ต่อแถว */
   opacity: 1;
-  transition: opacity 0.3s ease-in-out; /* fade ตอนเปลี่ยนหน้า */
+  transition: opacity 0.3s ease-in-out; /* ทำเอฟเฟกต์เฟดเมื่อเปลี่ยนหน้า */
 }
 
 .products-grid.fade {
@@ -241,26 +247,30 @@
 
 /* ================================
    เอฟเฟกต์แอนิเมชัน
-================================ */
+   ================================ */
 .fade-in {
   opacity: 0;
   animation: fadeIn 0.8s ease-in-out forwards;
 }
 
+/* แอนิเมชันค่อยๆ ปรากฏ */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(15px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 /* ================================
-   ข้อความอื่น ๆ
-================================ */
+   ข้อความอื่น ๆ (ไม่มีสินค้า)
+   ================================ */
 .no-products {
   text-align: center;
   font-style: italic;
   color: #555;
 }
 
+/* ================================
+   โครงสร้าง Skeleton Loading
+   ================================ */
 .skeletonGrid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -277,11 +287,12 @@
   flex-direction: column;
 }
 
+/* โครงสร้างส่วนที่แสดงการโหลด (แถบสีเทาเคลื่อนไหว) */
 .skeletonImage,
 .skeletonText {
   background: linear-gradient(90deg, #e0e0e0 25%, #f2f2f2 50%, #e0e0e0 75%);
   background-size: 200% 100%;
-  animation: shimmer 1.2s infinite;
+  animation: shimmer 1.2s infinite; /* ทำเอฟเฟกต์แสงวิ่ง */
   border-radius: 6px;
 }
 
@@ -309,7 +320,29 @@
   height: 20px;
 }
 
+/* เอฟเฟกต์แสงวิ่งใน Skeleton */
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
+}
+
+/* ================================
+   Responsive สำหรับจอเล็กกว่า 1500px
+   ================================ */
+@media (max-width: 1500px) {
+  .products-container {
+    max-width: 1200px; /* ลดความกว้างสูงสุด */
+    gap: 16px; /* ลดช่องว่างระหว่าง sidebar กับสินค้า */
+    padding: 5px; /* ลด padding รอบนอก */
+  }
+
+  .products-sidebar {
+    width: 230px; /* ปรับ sidebar ให้แคบลง */
+  }
+
+  .products-grid {
+    grid-template-columns: repeat(3, 1fr); /* จาก 4 เหลือ 3 คอลัมน์ */
+    gap: 1.5rem 1rem;
+  }
+
 }

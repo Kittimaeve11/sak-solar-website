@@ -338,14 +338,18 @@ export default function Page() {
                   </div>
 
                   <div className="gridItem companyImageWrapper">
+                    {console.log("Full Image URL:", `${baseUrl.replace(/\/$/, '')}/${item.locationphoto.replace(/^\/+/, '')}`)}
+
                     <Image
-                      src={`${baseUrl}/${item.locationphoto}`}
+                      src={`${baseUrl.replace(/\/$/, '')}/${item.locationphoto.replace(/^\/+/, '')}`}
                       alt="อาคารบริษัท"
-                      className="companyImage"
                       width={800}
                       height={600}
+                      className="companyImage"
                       priority
                     />
+
+
                   </div>
 
                   <div className="gridItem googleMapWrapper">

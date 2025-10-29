@@ -29,44 +29,6 @@
   margin-left: 15px;
 }
 
-/* .thai {
-  font-size: 18px;
-  font-weight: bold;
-}
-
-.eng {
-  font-size: 14px;
-  color: #ccc;
-}
-
-.rightSection {
-  text-align: right;
-  color: black;
-}
-
-.lang {
-  font-size: 14px;
-  margin-bottom: 5px;
-}
-
-.hotline {
-  font-size: 20px;
-  font-weight: bold;
-  color: #0056b3;
-  margin: 5px 0;
-} */
-
-/* 
-.links a {
-  text-decoration: none;
-  color: black;
-  margin: 0 5px;
-}
-
-.links a:hover {
-  text-decoration: underline;
-} */
-
 /*  Yellow Triangle Section (simulate diagonal cut) */
 .navWrapper::after {
   content: "";
@@ -104,21 +66,21 @@
 .logoContainer {
   position: relative;
   width: 450px;
-  height: 100px;
+  aspect-ratio: 450 / 80; 
   display: flex;
   align-items: center;
-  /*  กึ่งกลางแนวตั้งใน logoContainer */
   justify-content: center;
-  /* เฉพาะถ้าคุณต้องการให้รูปภาพอยู่กลาง container */
 }
 
+
 .logoImage {
-  height: 100%;
   width: 100%;
-  padding: 0;
+  height: auto; /* เพิ่มบรรทัดนี้เพื่อป้องกัน Next เตือน */
   object-fit: contain;
   display: block;
+  padding: 0;
 }
+
 
 /* กลุ่มปุ่มภาษา + เกี่ยวกับเรา + ติดต่อเรา */
 .localeContactGroup {
@@ -197,19 +159,6 @@
   width: 0rem;
 }
 
-/* เส้นตรงกลางปุ่มเปลี่ยนภาษา */
-/* .separator {
-  border-left: 1.8px solid #0d3973;
-  height: 16px;
-  margin: 0 8px;
-} */
-/* เส้นตรงกลาง เกี่ยวกับเรา ติดต่อเรา */
-/* .separatorone {
-  border-left: 1.8px solid #ffffff;
-  height: 16px;
-  margin: 0 8px;
-} */
-
 .contactActions {
   display: flex;
   flex-direction: column;
@@ -255,24 +204,6 @@
   border-bottom: 2px solid transparent;
   transition: border-bottom 0.2s ease;
 }
-
-/* .contact:hover {
-  background-image: linear-gradient(120deg, #ffffff, #243765ad, #ffffff);
-  background-size: 200% auto;
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
-  animation: shine 3s linear infinite;
-}
-
-@keyframes shine {
-  0% {
-    background-position: -200% center;
-  }
-  100% {
-    background-position: 200% center;
-  }
-} */
 
 .contact:hover {
   /* background-color: #11377c;*/
@@ -354,16 +285,14 @@
     transition: width 0.3s ease, padding-left 0.3s ease;
   }
 
-  .logoImage {
-    max-height: 80px;
-    /* ไม่เลยเส้นสีส้ม */
-    width: auto;
-    height: auto;
-    max-width: 100%;
-    object-fit: contain;
-    display: block;
-    transition: max-height 0.3s ease, width 0.3s ease;
-  }
+.logoImage {
+  width: 100%;
+  height: auto; /* เพิ่มบรรทัดนี้เพื่อป้องกัน Next เตือน */
+  object-fit: contain;
+  display: block;
+  padding: 0;
+}
+
 
   /* กลุ่มปุ่มและเมนู */
   .localeContactGroup {

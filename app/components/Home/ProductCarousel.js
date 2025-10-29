@@ -12,22 +12,11 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import './ProductCarousel.css';
 
-/* =========================================================
-   โหลด react-slick แบบ dynamic (ไม่รันฝั่ง server)
-   ========================================================= */
 const Slider = dynamic(() => import('react-slick'), { ssr: false });
-
-/* =========================================================
-   ฟังก์ชันกำหนดจำนวนสไลด์ตามขนาดหน้าจอ
-   ========================================================= */
 const getSlidesByWidth = (w) => (w < 801 ? 1 : w < 1200 ? 2 : w < 1500 ? 3 : 4);
 
-/* =========================================================
-   Skeleton Loader: ขนาดและจำนวนตาม responsive จริง
-   ========================================================= */
 function HardSkeleton() {
   const [count, setCount] = useState(4);
-
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const updateCount = () => setCount(getSlidesByWidth(window.innerWidth));
@@ -35,10 +24,8 @@ function HardSkeleton() {
     window.addEventListener('resize', updateCount);
     return () => window.removeEventListener('resize', updateCount);
   }, []);
-
   return (
     <div className="carouselWrapper fade-in">
-      {/* Header Skeleton */}
       <div className="carouselHeader">
         <div
           className="skeleton pc-skeleton-title"
@@ -49,8 +36,6 @@ function HardSkeleton() {
           <span>ผลิตภัณฑ์ทั้งหมด</span>
         </div>
       </div>
-
-      {/* Skeleton Card Grid — ปรับจำนวนการ์ดตามขนาดจอ */}
       <div className="pc-skeleton-grid">
         <div className="pc-skeleton-row">
           {[...Array(count)].map((_, i) => (
@@ -69,9 +54,6 @@ function HardSkeleton() {
   );
 }
 
-/* =========================================================
-   ปุ่มลูกศรซ้าย/ขวาใน Carousel
-   ========================================================= */
 function Arrow({ onClick, direction }) {
   return (
     <button
@@ -84,9 +66,6 @@ function Arrow({ onClick, direction }) {
   );
 }
 
-/* =========================================================
-   Component หลัก: ProductCarousel
-   ========================================================= */
 export default function ProductCarousel({ title, items, link = '#', loading = false }) {
   const [slidesToShow, setSlidesToShow] = useState(4);
   const [hydrated, setHydrated] = useState(false);
@@ -94,9 +73,6 @@ export default function ProductCarousel({ title, items, link = '#', loading = fa
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const isSSR = typeof window === 'undefined';
 
-  /* ---------------------------------------------------------
-     ตรวจจับขนาดหน้าจอ
-     --------------------------------------------------------- */
   useEffect(() => {
     setHydrated(true);
     if (typeof window === 'undefined') return;
@@ -106,18 +82,12 @@ export default function ProductCarousel({ title, items, link = '#', loading = fa
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  /* ---------------------------------------------------------
-     แสดง Skeleton “ทันที” ถ้ายังโหลดอยู่
-     --------------------------------------------------------- */
   const isHardLoading =
     isSSR || !hydrated || loading || !items || (Array.isArray(items) && items.length === 0);
   if (isHardLoading) return <HardSkeleton />;
 
   const showSlider = Array.isArray(items) && items.length > slidesToShow;
 
-  /* ---------------------------------------------------------
-     ตั้งค่า react-slick
-     --------------------------------------------------------- */
   const settings = {
     dots: false,
     infinite: true,
@@ -130,58 +100,46 @@ export default function ProductCarousel({ title, items, link = '#', loading = fa
     prevArrow: <Arrow direction="left" />,
   };
 
-  /* ---------------------------------------------------------
-     คืนชื่อสินค้า
-     --------------------------------------------------------- */
   const getProductName = (item) => {
     if (item.producttypeID === '2') return item.modelairname ?? 'ไม่พบข้อมูลชื่อ';
     return item.modelname ?? item.name ?? item.solarpanel ?? item.title ?? 'ไม่พบข้อมูลชื่อ';
   };
 
-  /* ---------------------------------------------------------
-     ตรวจจับการลาก (ป้องกันคลิกผิด)
-     --------------------------------------------------------- */
   const handleMouseDown = (e) => setDragStart({ x: e.clientX, y: e.clientY });
   const handleMouseUp = (e) => {
     const dx = Math.abs(e.clientX - dragStart.x);
     const dy = Math.abs(e.clientY - dragStart.y);
     setIsDragging(dx > 5 || dy > 5);
   };
-  /* ---------------------------------------------------------
-     ฟังก์ชันบันทึก Log การคลิกสินค้า
-     --------------------------------------------------------- */
+
   const handleLogClick = async (item) => {
     try {
       const logData = {
-        actionType: "1", // 1 = คลิกดู
-        actionDetail: `หน้าหลัก รหัส: ${item.product_ID ?? item.product_num ?? '-'} หมายเลขผลิตภัณฑ์: ${item.modelname ?? item.modelairname ?? item.name ?? '-'}`,
-        typeUser: "ผู้เยี่ยมชมเว็บไซต์",
-        datatype: "ผลิตภัณฑ์",
-        dataID: item.product_ID ?? item.product_num ?? "0",
-        datatypeID: "1",
-        brandtype: item.producttypeID ?? "0",
-        dataname: item.modelname ?? item.modelairname ?? item.name ?? "-",
+        actionType: '1',
+        actionDetail: `หน้าหลัก รหัส: ${item.product_ID ?? item.product_num ?? '-'} หมายเลขผลิตภัณฑ์: ${
+          item.modelname ?? item.modelairname ?? item.name ?? '-'
+        }`,
+        typeUser: 'ผู้เยี่ยมชมเว็บไซต์',
+        datatype: 'ผลิตภัณฑ์',
+        dataID: item.product_ID ?? item.product_num ?? '0',
+        datatypeID: '1',
+        brandtype: item.producttypeID ?? '0',
+        dataname: item.modelname ?? item.modelairname ?? item.name ?? '-',
       };
 
-      console.log(" ส่งข้อมูล log:", logData);
-
-      // เรียก API บันทึก log
       await fetch(`${process.env.NEXT_PUBLIC_BASE_URL_API}/log/saveLog`, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
           Authorization: process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API,
         },
         body: JSON.stringify(logData),
       });
     } catch (err) {
-      console.error(" เกิดข้อผิดพลาดในการบันทึก Log:", err);
+      console.error('เกิดข้อผิดพลาดในการบันทึก Log:', err);
     }
   };
 
-  /* ---------------------------------------------------------
-     การ์ดสินค้า
-     --------------------------------------------------------- */
   const renderCard = (item, idx) => {
     let finalPrice = null;
     if (item.isprice === '1' && item.price) {
@@ -193,8 +151,7 @@ export default function ProductCarousel({ title, items, link = '#', loading = fa
       }
     }
 
-    const brandID =
-      item.productbrandID ?? item.probrandID ?? item.brandID ?? item.BrandID ?? '0';
+    const brandID = item.productbrandID ?? item.probrandID ?? item.brandID ?? item.BrandID ?? '0';
     const productNum = item.product_num ?? item.product_ID ?? idx;
 
     return (
@@ -208,10 +165,8 @@ export default function ProductCarousel({ title, items, link = '#', loading = fa
           handleMouseUp(e);
           if (isDragging) e.preventDefault();
         }}
-        onClick={() => handleLogClick(item)} // เพิ่มตรงนี้
+        onClick={() => handleLogClick(item)}
       >
-
-        {/* รูปสินค้า */}
         {item.image && (
           <div className="product-image-wrapper">
             <Image
@@ -229,31 +184,47 @@ export default function ProductCarousel({ title, items, link = '#', loading = fa
           </div>
         )}
 
-        {/* รายละเอียดสินค้า */}
-        <div className="product-info">
-          <h3>
-            {item.productbrandName ? `${item.productbrandName} ` : ''}
-            {getProductName(item)}
-          </h3>
+        {/* ปรับ layout ด้านล่างให้เรียงแน่นอนและระยะเท่ากันทุกใบ */}
+        <div
+          className="product-info"
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            flexGrow: 1,
+            padding: '1rem',
+            minHeight: '120px', // บังคับให้ทุกใบสูงเท่ากัน
+            boxSizing: 'border-box',
+          }}
+        >
+          <div>
+            <h3 style={{ margin: 0, fontSize: '17px', fontWeight: 600, color: '#2a3e5e' }}>
+              {item.productbrandName ? `${item.productbrandName} ` : ''}
+              {getProductName(item)}
+            </h3>
 
-          {item.battery && <h6 style={{ marginTop: 0 }}>รุ่นแบตเตอรี่ {item.battery} kWh</h6>}
+            {item.battery && (
+              <h6 style={{ margin: '0.5rem 0 0 0', fontWeight: 500, color: '#333' }}>
+                รุ่นแบตเตอรี่ {item.battery} kWh
+              </h6>
+            )}
+          </div>
 
+          {/* ระบบไฟฟ้า (isprice=0) และ ราคา (isprice=1) — ขนาดเท่ากันแน่นอน */}
           {(item.isprice == 0 || item.isprice === '0') && item.size && (
-            <div style={{ display: 'flex', alignItems: 'center', marginTop: '1rem' }}>
-              <p
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  fontWeight: 600,
-                  fontSize: 18,
-                  margin: 0,
-                  lineHeight: 1,
-                  gap: 4,
-                }}
-              >
-                <MdOutlineElectricBolt size={22} color="#ffc300" />
-                {item.size}
-              </p>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                fontWeight: 600,
+                fontSize: 20,
+                marginTop: '0',
+                color: '#000',
+                gap: 2,
+              }}
+            >
+              <MdOutlineElectricBolt size={25} color="#ffc300" />
+              {item.size}
             </div>
           )}
 
@@ -262,19 +233,19 @@ export default function ProductCarousel({ title, items, link = '#', loading = fa
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                fontSize: 20,
-                marginTop: '1rem',
-                color: '#000',
                 fontWeight: 600,
-                gap: 4,
+                fontSize: 20,
+                marginTop: '0',
+                color: '#000',
+                gap: 0,
               }}
             >
-              <TbCurrencyBaht size={22} />
+              <TbCurrencyBaht size={25} />
               {Number(finalPrice ?? item.price).toLocaleString()} บาท
               {item.productpro_ispromotion === '1' && item.productpro_percent && (
                 <span
                   style={{
-                    fontSize: 16,
+                    fontSize: 14,
                     color: '#888',
                     textDecoration: 'line-through',
                     marginLeft: '0.5rem',
@@ -290,9 +261,6 @@ export default function ProductCarousel({ title, items, link = '#', loading = fa
     );
   };
 
-  /* ---------------------------------------------------------
-     Render Carousel
-     --------------------------------------------------------- */
   return (
     <div className="carouselWrapper fade-in">
       <div className="carouselHeader">
@@ -309,7 +277,7 @@ export default function ProductCarousel({ title, items, link = '#', loading = fa
           showSlider ? (
             <Slider {...settings}>
               {items.map((item, idx) => (
-                <div key={item.product_num ?? idx} className="carouselStaticWrapper">
+                <div key={idx} className="slide-itemproduct">
                   {renderCard(item, idx)}
                 </div>
               ))}
@@ -317,7 +285,7 @@ export default function ProductCarousel({ title, items, link = '#', loading = fa
           ) : (
             <div className="carouselStaticWrapper">
               {items.map((item, idx) => (
-                <React.Fragment key={item.product_num ?? idx}>{renderCard(item, idx)}</React.Fragment>
+                <React.Fragment key={idx}>{renderCard(item, idx)}</React.Fragment>
               ))}
             </div>
           )

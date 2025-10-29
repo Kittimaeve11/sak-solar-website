@@ -493,7 +493,7 @@ export default function SolarCalculatorForm() {
               }}
               suppressHydrationWarning
             />
-
+ 
             {/* แสดงผลเปอร์เซ็นต์แบบคู่กลางวัน-กลางคืน */}
             <div className={styles.usageSplit}>
               <span className={styles.day}>
@@ -625,19 +625,52 @@ export default function SolarCalculatorForm() {
                 <div className={styles.resultBox}>
                   <div className={styles.labelRow}>
                     <div className={styles.labelhead}>ระยะเวลาคืนทุน</div>
+
                     <div className={styles.valueLarge}>
-                      <span className={styles.recommendedNumber}>
-                        {results.paybackPeriod}
-                      </span>
-                      <span className={styles.recommendedUnit}> ปี</span>
+                      {(() => {
+                        const payback = parseFloat(results.paybackPeriod);
+
+                        // ตรวจว่าค่าคืนทุนไม่ใช่ NaN และมีค่ามากกว่า 0
+                        if (!isNaN(payback) && payback > 0) {
+                          // ถ้าค่าคืนทุน < 1 ปี → แปลงเป็นเดือน
+                          if (payback < 1) {
+                            const months = Math.round(payback * 12); // แปลงเป็นเดือน
+
+                            // ถ้าเดือนน้อยกว่า 1 → แสดง "-"
+                            if (months <= 0) {
+                              return <span className={styles.recommendedNumber}>-</span>;
+                            }
+
+                            return (
+                              <>
+                                <span className={styles.recommendedNumber}>{months}</span>
+                                <span className={styles.recommendedUnit}> เดือน</span>
+                              </>
+                            );
+                          }
+
+                          // ถ้า ≥ 1 ปี → แสดงปี (ทศนิยม 1 ตำแหน่ง)
+                          return (
+                            <>
+                              <span className={styles.recommendedNumber}>
+                                {payback.toFixed(1)}
+                              </span>
+                              <span className={styles.recommendedUnit}> ปี</span>
+                            </>
+                          );
+                        }
+
+                        // ถ้าไม่มีค่าหรือเป็น 0 → แสดง "-"
+                        return <span className={styles.recommendedNumber}>คุ้มทุนทันที</span>;
+                      })()}
                     </div>
                   </div>
+
                   <p className={styles.subtext}>
                     Solar Rooftop เพื่อลดค่าไฟฟ้าอย่างยั่งยืน
                   </p>
                 </div>
               </div>
-
               {/* ===================== */}
               {/* แถวล่าง: แพ็กเกจ / ผลตอบแทน */}
               {/* ===================== */}
@@ -646,8 +679,11 @@ export default function SolarCalculatorForm() {
                 {/* กล่องซ้าย: แสดงแพ็กเกจสินค้าที่แนะนำ */}
                 {/* -------------------------------------- */}
                 <div className={styles.resultBoxL}>
-                  <h4 className={styles.packageTitle}>แพ็กเกจที่เราแนะนำ</h4>
-                  <p className={`${styles.systemType} ${styles['with-lines']}`}>
+                  <h4 className={`${styles.packageTitle} font-700orange`}>แพ็กเกจที่เราแนะนำ</h4>
+                  <p
+                    className={`${styles.systemType} ${styles['with-lines']}`}
+                    style={{ color: '#264798' }}
+                  >
                     ระบบไฟฟ้า {formValues.systemType === 'single' ? '1 เฟส' : '3 เฟส'}
                   </p>
 
@@ -744,7 +780,7 @@ export default function SolarCalculatorForm() {
                                 body: JSON.stringify(logData),
                               });
                             } catch (err) {
-                              console.error('❌ เกิดข้อผิดพลาดในการบันทึก Log:', err);
+                              console.error('เกิดข้อผิดพลาดในการบันทึก Log:', err);
                             }
                           };
 
@@ -869,16 +905,54 @@ export default function SolarCalculatorForm() {
                       ) : (
                         <div
                           style={{
-                            width: '100%',
-                            textAlign: 'center',
-                            color: '#777',
-                            padding: '2rem 0',
-                            fontSize: '1.1rem',
-                            fontWeight: '500',
+                            display: 'flex',
+                            justifyContent: 'center',  // จัดกลางแนวนอน
+                            alignItems: 'center',      // จัดกลางแนวตั้ง
+                            height: '100%',            // กล่องสูงเท่าพื้นที่ที่ครอบมัน
+                            minHeight: '300px',        // ป้องกันกล่องเตี้ยเกิน
                           }}
                         >
-                          ไม่พบสินค้าที่ตรงกับผลลัพธ์การคำนวณของคุณ
+                          <div
+                            style={{
+                              display: 'flex',
+                              flexDirection: 'column',
+                              alignItems: 'center',
+                              textAlign: 'center',
+                            }}
+                          >
+                            <Image
+                              src="/icons/noporducts.gif"
+                              alt="No Products"
+                              width={180}
+                              height={180}
+                              style={{
+                                display: 'block',
+                                marginBottom: '1rem',
+                              }}
+                            />
+
+                            <div
+                              style={{
+                                color: '#777',
+                                paddingBottom: '1rem',
+                                fontSize: '16px',
+                                fontWeight: '500',
+                                whiteSpace: 'nowrap', // ป้องกันตัดบรรทัด
+                              }}
+                            >
+                              ขออภัย ไม่มีสินค้าที่ตรงกับผลลัพธ์การคำนวณของคุณในขณะนี้
+                            </div>
+
+                            <button
+                              className="buttonPrimaryorange"
+                              onClick={() => (window.location.href = '/products')}
+                              style={{ fontSize: '16px' }}
+                            >
+                              เลือกแพ็กเกจทั้งหมดของเรา
+                            </button>
+                          </div>
                         </div>
+
                       )}
 
                     </div>
@@ -889,13 +963,15 @@ export default function SolarCalculatorForm() {
                 {/* กล่องขวา: แสดงผลตอบแทนระบบโซลาร์ */}
                 {/* -------------------------------------- */}
                 <div className={styles.resultBox}>
-                  <h4 className={styles.solarTitle}>ผลตอบแทนระบบโซลาร์</h4>
+                  <h4 className={`${styles.solarTitle} font-700orange`}>
+                    ผลตอบแทนระบบโซลาร์
+                  </h4>
 
                   {/* ค่าไฟที่ลดต่อเดือน */}
                   <div className={styles.costRow}>
                     <div className={styles.leftGroup}>
                       <Image src="/icons/coin.png" alt="Bill" width={40} height={40} />
-                      <span className={styles.costLabel}>ค่าไฟที่ลดต่อเดือน</span>
+                      <span className={`${styles.costLabel} font-500orange`}>ค่าไฟที่ลดต่อเดือน</span>
                     </div>
                     <span className={styles.costValue}>
                       {results.savingsPerMonth !== undefined
@@ -909,7 +985,7 @@ export default function SolarCalculatorForm() {
                   <div className={styles.costRow}>
                     <div className={styles.leftGroup}>
                       <Image src="/icons/sun1.png" alt="Day" width={40} height={40} />
-                      <span className={styles.costLabel}>ใช้ไฟช่วงกลางวัน</span>
+                      <span className={`${styles.costLabel} font-500orange`}>ใช้ไฟช่วงกลางวัน</span>
                     </div>
                     <span className={styles.costValue}>
                       {results.dayUnits ? Math.floor(results.dayUnits) : 0} kW (
@@ -921,7 +997,7 @@ export default function SolarCalculatorForm() {
                   <div className={styles.costRow}>
                     <div className={styles.leftGroup}>
                       <Image src="/icons/night.png" alt="Night" width={40} height={40} />
-                      <span className={styles.costLabel}>ใช้ไฟช่วงกลางคืน</span>
+                      <span className={`${styles.costLabel} font-500orange`}>ใช้ไฟช่วงกลางคืน</span>
                     </div>
                     <span className={styles.costValue}>
                       {Math.floor(results.nightUnits)} kW (
@@ -931,7 +1007,7 @@ export default function SolarCalculatorForm() {
 
                   {/* รายการสรุปผลเพิ่มเติม (List) */}
                   <ul className={styles.costList}>
-                    <h4 className={styles.solardeteil}>ผลตอบแทนระบบโซลาร์</h4>
+                    <h4 className={`${styles.solardeteil} font-500orange`}>ผลตอบแทนระบบโซลาร์</h4>
 
                     {/* ค่าไฟต่อปี */}
                     <li>
@@ -980,6 +1056,7 @@ export default function SolarCalculatorForm() {
                         <strong className={styles.valueds}>
                           {results.averageDailyUnits?.toFixed(0) || '-'} kW
                         </strong>
+
                       </div>
                     </li>
                   </ul>

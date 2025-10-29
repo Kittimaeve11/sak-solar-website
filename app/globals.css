@@ -27,25 +27,58 @@
 
 
 /* ================================
-   คลาสฟอนต์เพิ่มเติม
+   ฟอนต์ SukhumvitTadmai Custom Classes
    ================================ */
+
+/* น้ำหนักเบา (เทียบ 300) */
 .font-300 {
   font-family: 'SukhumvitTadmai', sans-serif;
-  font-weight: 200;
-  transform: scaleX(1.01);
+  font-weight: 200;             /* ใช้ UltraLight */
+  transform: scaleX(1.02);      /* ขยายแนวนอนเล็กน้อยให้ดูไม่บางเกิน */
   letter-spacing: 0.3px;
 }
 
+/* น้ำหนักกลาง (เทียบ 500) */
 .font-500 {
   font-family: 'SukhumvitTadmai', sans-serif;
-  font-weight: 400;
-  text-shadow: 0 0 0 0.2px black; /* เพิ่มความคมเล็กน้อย */
+  font-weight: 400;             /* ใช้ Text */
+  transform: scaleX(1.01);      /* ขยายเล็กน้อยให้ดูหนาขึ้น */
+  letter-spacing: 0.15px;
 }
 
+/* หนา (เทียบ 700) */
 .font-700 {
   font-family: 'SukhumvitTadmai', sans-serif;
-  font-weight: 600;
-  text-shadow: 0.3px 0 black, -0.3px 0 black; /* ขอบตัวอักษรบาง */
+  font-weight: 800;             /* ใช้ ExtraBold */
+  transform: scaleX(1.01);      /* เพิ่มความหนาเล็กน้อย */
+  letter-spacing: 0.05px;       /* กระชับช่องไฟ */
+}
+
+
+/* ================================
+   ฟอนต์ SukhumvitTadmai หนาโทนส้มสวยคม
+   ================================ */
+.font-300orange {
+  font-family: 'SukhumvitTadmai', sans-serif;
+  font-weight: 200; /* ใช้ UltraLight */
+  color: #E88534;
+  transform: scaleX(1.02); /* ขยายแนวนอนเล็กน้อยให้ไม่บางเกิน */
+  letter-spacing: 0.3px;   /* เพิ่มช่องไฟเล็กน้อยให้อ่านง่าย */
+}
+
+.font-500orange {
+  font-family: 'SukhumvitTadmai', sans-serif;
+  font-weight: 600; /* ใช้ SemiBold */
+  color: #E88534;
+  letter-spacing: 0.15px;
+}
+
+/* หนาเต็ม (ดูเหมือน 700–800) */
+.font-700orange {
+  font-family: 'SukhumvitTadmai', sans-serif;
+  font-weight: 800; /* ใช้ ExtraBold */
+  color: #E88534;
+  transform: scaleX(1.01); /* ขยายเล็กน้อยให้ดูหนาแน่นขึ้น */  letter-spacing: 0.05px;
 }
 
 

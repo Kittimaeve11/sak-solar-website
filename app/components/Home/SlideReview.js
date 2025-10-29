@@ -11,6 +11,7 @@ import { HiPlusSm } from 'react-icons/hi';
 import { IoPlayCircleOutline } from "react-icons/io5";
 import { useLocale } from '@/app/Context/LocaleContext';
 
+// ตัวแปรสำหรับ API Base URL และ Key
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 
@@ -25,7 +26,7 @@ function extractVideoId(url) {
 }
 
 /* =========================================================
-   Thumbnail พร้อม fallback ถ้าภาพโหลดไม่ได้
+   Component แสดง Thumbnail พร้อม fallback
    ========================================================= */
 function ThumbnailWithFallback({ videoId, alt }) {
   const [srcIndex, setSrcIndex] = useState(0);
@@ -56,20 +57,21 @@ function ThumbnailWithFallback({ videoId, alt }) {
    Component หลัก: SlideReview
    ========================================================= */
 export default function SlideReview() {
-  const { locale } = useLocale();
-  const [reviews, setReviews] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [activeSlide, setActiveSlide] = useState(0);
-  const [dragging, setDragging] = useState(false);
-  const sliderRef = useRef(null);
+  const { locale } = useLocale(); // ดึงภาษาปัจจุบัน
+  const [reviews, setReviews] = useState([]); // เก็บข้อมูลรีวิว
+  const [isLoading, setIsLoading] = useState(true); // สถานะโหลด
+  const [activeSlide, setActiveSlide] = useState(0); // index slide ปัจจุบัน
+  const [dragging, setDragging] = useState(false); // ป้องกันคลิกระหว่างลาก
+  const sliderRef = useRef(null); // อ้างอิง slider
 
-  /* ---------------------------------------------------------
-     ดึงข้อมูลจาก API
-     --------------------------------------------------------- */
+  /* =========================================================
+     ดึงข้อมูลรีวิวจาก API
+     ========================================================= */
   useEffect(() => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
+
         const res = await fetch(`${baseUrl}/api/Reviewapi?offset=0&limit=10`, {
           headers: { 'X-API-KEY': apiKey },
         });
@@ -88,9 +90,9 @@ export default function SlideReview() {
     fetchData();
   }, []);
 
-  /* ---------------------------------------------------------
-     คำนวณจำนวน group สำหรับ custom dots
-     --------------------------------------------------------- */
+  /* =========================================================
+     จัดการสไลด์และ custom dots
+     ========================================================= */
   const slidesPerGroup = 3;
   const totalGroups =
     reviews.length > 0 ? Math.ceil(reviews.length / slidesPerGroup) : 0;
@@ -108,9 +110,9 @@ export default function SlideReview() {
     setTimeout(() => setDragging(false), 50);
   };
 
-  /* ---------------------------------------------------------
-     Custom Dots
-     --------------------------------------------------------- */
+  /* =========================================================
+     Custom Dots (แท่งส้ม)
+     ========================================================= */
   const CustomDots = () => (
     <div className="custom-dots">
       {Array.from({ length: totalGroups }).map((_, index) => (
@@ -123,11 +125,11 @@ export default function SlideReview() {
     </div>
   );
 
-  /* ---------------------------------------------------------
-     Skeleton Loading
-     --------------------------------------------------------- */
+  /* =========================================================
+     Skeleton Loading (โครงจำลองขณะโหลด)
+     ========================================================= */
   const SkeletonCard = () => (
-    <div className="slide-item fade-in">
+    <div className="slide-itemreview fade-in">
       <div className="skeleton-card">
         <div className="skeleton skeleton-image"></div>
         <div className="skeleton skeleton-title"></div>
@@ -136,22 +138,24 @@ export default function SlideReview() {
     </div>
   );
 
-  /* ---------------------------------------------------------
-     แสดงผลหลัก
-     --------------------------------------------------------- */
+  /* =========================================================
+     ส่วนแสดงผลหลัก
+     ========================================================= */
   return (
     <div className="review-wrapperslide fade-in">
       <h1 className="headtitleone">
         {locale === 'en' ? 'Customer Reviews' : 'รีวิวจากลูกค้า'}
       </h1>
 
+      {/* ปุ่มดูทั้งหมด */}
       <div className="review-header-linkslide">
-        <Link href="/review" className="view-all">
+        <Link href="/review" className="view-all flex items-center gap-2">
           <HiPlusSm className="icon-view" />
           {locale === 'en' ? 'View All' : 'ดูทั้งหมด'}
         </Link>
       </div>
 
+      {/* แสดง Skeleton ระหว่างโหลด */}
       {isLoading ? (
         <div className="review-loading-grid">
           {[...Array(3)].map((_, i) => (
@@ -160,6 +164,7 @@ export default function SlideReview() {
         </div>
       ) : (
         <>
+          {/* สไลด์รีวิวลูกค้า */}
           <Slider
             ref={sliderRef}
             dots={false}
@@ -202,26 +207,19 @@ export default function SlideReview() {
               });
 
               return (
-                <div key={review.vedio_id || `rev-${i}`} className="slide-item fade-in">
+                <div key={review.vedio_id || `rev-${i}`} className="slide-itemreview fade-in">
                   <div
                     className="video-cardslide"
                     onClick={() => !dragging && window.open(review.vedio_link, '_blank')}
                     style={{ cursor: 'pointer' }}
                   >
-                    <div
-                      className="thumbnail-wrapperslide"
-                      style={{
-                        position: 'relative',
-                        width: '100%',
-                        aspectRatio: '16/9',
-                        overflow: 'hidden',
-                        borderRadius: '12px',
-                      }}
-                    >
+                    {/* ส่วนภาพ Thumbnail */}
+                    <div className="thumbnail-wrapperslide">
                       <ThumbnailWithFallback videoId={videoId} alt={title} />
                       <IoPlayCircleOutline className="play-icon" />
                     </div>
 
+                    {/* เนื้อหาด้านล่าง (ชื่อ + วันที่) */}
                     <div className="infoslide">
                       <h3 className="titleslide">{title}</h3>
                       <p className="dateslide">{formattedDate}</p>
@@ -232,7 +230,7 @@ export default function SlideReview() {
             })}
           </Slider>
 
-          {/* custom dots แบบแท่งส้ม */}
+          {/* จุดเลื่อนด้านล่าง */}
           <CustomDots />
         </>
       )}

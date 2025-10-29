@@ -15,6 +15,36 @@
 }
 
 /* =========================================================
+   SLIDE ITEM REVIEW (รองรับ react-slick)
+   ========================================================= */
+.slide-itemreview {
+  padding: 1rem;
+  margin-bottom: 0.8rem;
+  box-sizing: border-box;
+  box-sizing: border-box;
+  display: flex;
+  align-items: stretch;
+}
+
+/* ปรับ layout ของ slick ให้ทุก slide มีความสูงเท่ากัน */
+.slick-track {
+  display: flex !important;
+  align-items: stretch !important;
+}
+
+.slick-slide {
+  height: auto !important;
+  display: flex !important;
+  align-items: stretch !important;
+}
+
+.slick-slide > div {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+}
+
+/* =========================================================
    VIDEO CARD
    ========================================================= */
 .video-cardslide {
@@ -94,18 +124,6 @@
 /* =========================================================
    SKELETON LOADING (เหมือนของจริง)
    ========================================================= */
-/* .skeleton {
-  background-color: #f2f2f2;
-  animation: pulse 1.4s ease-in-out infinite;
-  border-radius: 6px;
-}
-
-@keyframes pulse {
-  0% { opacity: 1; }
-  50% { opacity: 0.6; }
-  100% { opacity: 1; }
-} */
-
 .skeleton-card {
   display: flex;
   flex-direction: column;
@@ -144,7 +162,9 @@
 }
 
 @keyframes fadeIn {
-  to { opacity: 1; }
+  to {
+    opacity: 1;
+  }
 }
 
 /* =========================================================
@@ -160,9 +180,19 @@
 /* =========================================================
    RESPONSIVE
    ========================================================= */
+@media (max-width: 1024px) {
+  .slide-itemreview {
+    padding: 0 10px;
+  }
+}
+
 @media (max-width: 768px) {
   .review-wrapperslide {
     padding: 0.75rem;
+  }
+
+  .slide-itemreview {
+    padding: 0 8px;
   }
 
   .titleslide {
