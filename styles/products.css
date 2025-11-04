@@ -1,71 +1,86 @@
-/* ================================
-   โครงสร้างหลัก (Layout)
-   ================================ */
+/* =========================================
+   🎯 Layout หลัก: 2 คอลัมน์ (Sidebar + List)
+   ========================================= */
 .products-container {
-  display: flex; /* จัดวาง Sidebar และส่วนแสดงสินค้าในแนวนอน */
-  gap: 20px; /* ระยะห่างระหว่าง Sidebar กับส่วนสินค้า */
-  padding: 7px;
-  max-width: 1500px; /* กำหนดความกว้างสูงสุด */
-  margin: 1rem auto;
-  margin-top: 2rem;
-  margin-bottom: 2rem;
+  display: flex;
+  align-items: flex-start;
   width: 100%;
-  box-sizing: border-box;
-  align-items: flex-start; /* จัดให้อยู่ด้านบนสุด */
+  height: auto; /* ✅ ให้สูงตามเนื้อหา */
+  min-height: unset !important; /* ยกเลิกการบังคับความสูง */
+  border-right: 1px solid #eee;
+  box-shadow: rgba(0, 0, 0, 0.384);
+}
+
+.products-sidebar {
+  flex: 0 0 260px;
+  position: sticky; /* ✅ ล็อก sidebar */
+  top: 0; /* ✅ ติดขอบบนของ viewport */
+  align-self: flex-start;
+  height: fit-content;
+  max-height: 100vh; /* ✅ ไม่เกินความสูงจอ */
+  overflow-y: auto; /* ✅ เลื่อนเฉพาะใน sidebar ถ้ายาวเกินจอ */
+  background: #fff;
+  z-index: 99;
 }
 
 .products-list {
-  flex: 1; /* ส่วนแสดงสินค้าขยายเต็มพื้นที่ที่เหลือ */
+  flex: 1;
+  width: 100%;
+  background: #f5f5f5;
+  padding: 2rem;
+  box-sizing: border-box;
+  height: auto; /* ✅ ให้สูงเท่ากับเนื้อหาจริง */
+  min-height: unset !important;
 }
 
-/* ================================
-   Sidebar (ตัวกรองสินค้า)
-   ================================ */
-.products-sidebar {
-  width: 250px; /* ความกว้าง Sidebar */
-  background: white; /* สีพื้นหลัง */
-  border-radius: 6px; /* มุมโค้ง */
-  padding: 0;
-  border: 1px solid #ececec; /* เส้นขอบบาง */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* เงาเบา */
-  overflow-y: auto; /* แสดงแถบเลื่อนแนวตั้งเมื่อมีเนื้อหาเกิน */
-  position: sticky; /* ให้ Sidebar ติดค้างบนหน้าจอเมื่อเลื่อน */
-  top: 2rem; /* ระยะห่างจากขอบบน */
+.products-sidebar h3:first-of-type {
+  border-bottom: 1px solid #ddd; /* ✅ เส้นสีเทาอ่อน */
+  padding-bottom: 8px;
+  margin-bottom: 12px;
 }
 
+.products-list h2 {
+  margin-top: 0;
+  color: #1e2b4d;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+/* =========================================
+   🧩 Sidebar Filter
+   ========================================= */
 .sidebar-header {
-  background-color: #E88534; /* สีพื้นหัวข้อ Sidebar */
-  color: white;
-  padding: 5px;
+  background-color: #e88534;
+  color: #fff;
+  padding: 10px 14px;
   font-weight: bold;
   font-size: 16px;
   text-align: center;
 }
 
 .products-sidebar section {
-  padding: 16px; /* ระยะห่างด้านในของแต่ละส่วน */
+  padding: 16px;
 }
 
 .products-sidebar h3 {
   font-size: 14px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   color: #1e2b4d;
 }
 
-/* ================================
-   Checkbox (ฟิลเตอร์)
-   ================================ */
-.filter-box .checkbox-item {
+
+
+/* Checkbox filter */
+.checkbox-item {
   display: flex;
   align-items: center;
-  gap: 5px; /* ระยะห่างระหว่างช่องเลือกกับข้อความ */
+  gap: 6px;
   font-size: 14px;
   margin-bottom: 10px;
   color: #333;
   cursor: pointer;
 }
 
-/* ปรับแต่ง Checkbox เองโดยซ่อนสไตล์เดิมของ Browser */
 .checkbox-item input[type="checkbox"] {
   appearance: none;
   -webkit-appearance: none;
@@ -73,93 +88,103 @@
   height: 18px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  position: relative;
   cursor: pointer;
-  outline: none;
+  position: relative;
+  transition: all 0.2s ease;
 }
 
-/* เมื่อ Checkbox ถูกเลือก */
 .checkbox-item input[type="checkbox"]:checked {
-  background-color: #367AF5;
-  border-color: #367AF5;
+  background-color: #367af5;
+  border-color: #367af5;
 }
 
-/* สร้างเครื่องหมายติ๊กใน Checkbox */
 .checkbox-item input[type="checkbox"]:checked::after {
   content: "✓";
-  color: white;
   position: absolute;
-  top: 50%;
+  top: 48%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 14px;
+  color: #fff;
+  font-size: 13px;
 }
 
-.checkbox-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
-  cursor: pointer;
-  user-select: none; /* ป้องกันการเลือกข้อความขณะคลิก */
-}
-
-.checkbox-item input[type="checkbox"] {
-  cursor: pointer;
-}
-
-/* เส้นแบ่งระหว่างส่วนใน Sidebar */
-.divider {
-  border: none;
-  border-top: 1px solid #eee;
-  margin: 0;
-}
-
-/* ================================
-   ปุ่มรีเซ็ตฟิลเตอร์
-   ================================ */
 .resetbutton {
-  font-weight: 400;
-  padding: 0.6rem 1.8rem;
-  background-color: #E88534;
-  color: white;
+  font-weight: 500;
+  padding: 0.6rem 1.6rem;
+  background-color: #e88534;
+  color: #fff;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
   transition: background-color 0.2s ease;
-  margin: 1rem 1rem;
-  margin-bottom: 1rem !important; /* เพิ่มระยะห่างล่าง */
+  margin: 1.2rem auto;
   display: block;
-  margin-left: auto; /* จัดปุ่มไปด้านขวา */
 }
 
 .resetbutton:hover {
-  background: #d9742a; /* สีเมื่อวางเมาส์ */
+  background: #d9742a;
 }
 
-/* ================================
-   การ์ดสินค้า (Product Card)
-   ================================ */
+/* =========================================
+   🛍️ การ์ดสินค้า (ล็อคขนาด)
+   ========================================= */
 .product-card {
   display: block;
   overflow: hidden;
   cursor: pointer;
   text-decoration: none !important;
-  color: inherit; /* ป้องกันลิงก์กลายเป็นสีน้ำเงิน */
-  height: auto;
-  width: 285px;
-  border: 0.5px solid #e0e0e0;
-  border-radius: 8px;
+  color: inherit;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  background-color: #ffffff;
+  width: 300px; /* ✅ ล็อคกว้าง */
+  height: 425px; /* ✅ ล็อคสูง */
+  margin: 0 auto;
+  transition: all 0.25s ease-in-out;
 }
 
 .product-card:hover {
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* เงาเมื่อ hover */
-  text-decoration: none !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
 }
 
-/* ================================
-   ข้อมูลสินค้า
-   ================================ */
+/* =========================================
+   📦 รูปภาพสินค้า
+   ========================================= */
+.product-image-wrapper {
+  position: relative;
+  width: 100%;
+  height: 300px; /* ✅ คงสัดส่วนให้พอดีใน 425px */
+  overflow: hidden;
+  border-radius: 10px 10px 0 0;
+  background: #f9f9f9;
+}
+
+.product-image-wrapper img {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
+
+/* ริบบอนโปรโมชั่น */
+.product-promo-ribbon {
+  position: absolute;
+  top: 10px;
+  right: -35px;
+  background: #ee2226;
+  color: #fff;
+  font-weight: 700;
+  padding: 5px 45px;
+  text-align: center;
+  transform: rotate(45deg);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  font-size: 15px;
+  z-index: 5;
+}
+
+/* =========================================
+   🧾 ข้อมูลสินค้า
+   ========================================= */
 .product-info {
   padding: 0.5rem 1rem;
   display: flex;
@@ -201,148 +226,172 @@
   color: #666;
 }
 
-/* ================================
-   รูปภาพสินค้า
-   ================================ */
-.product-image-wrapper {
-  position: relative;
-  width: 100%;
-  height: 285px;
-  overflow: hidden;
-  border-radius: 8px 8px 0 0;
-}
-
-/* ================================
-   ริบบอนโปรโมชั่น
-   ================================ */
-.product-promo-ribbon {
-  position: absolute;
-  top: 10px;
-  right: -35px;
-  background: #ee2226;
-  color: #fff;
-  font-weight: 700;
-  padding: 5px 45px;
-  text-align: center;
-  transform: rotate(45deg); /* หมุนแถบเฉียง */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.384);
-  z-index: 10;
-  font-size: 16px;
-}
-
-/* ================================
-   Grid แสดงสินค้า
-   ================================ */
+/* =========================================
+   🧱 Grid Layout (ล็อคการ์ดไม่บีบ)
+   ========================================= */
 .products-grid {
   display: grid;
+  grid-template-columns: repeat(auto-fit, 300px); /* ✅ การ์ดขนาดคงที่ */
   gap: 2rem 1.2rem;
-  grid-template-columns: repeat(4, 1fr); /* 4 คอลัมน์ต่อแถว */
-  opacity: 1;
-  transition: opacity 0.3s ease-in-out; /* ทำเอฟเฟกต์เฟดเมื่อเปลี่ยนหน้า */
+  justify-content: center; /* ✅ จัดกลางจอ */
+  align-items: start;
+  width: 100%;
+  height: auto;
+  box-sizing: border-box;
 }
 
-.products-grid.fade {
-  opacity: 0;
+/* =========================================
+   🦴 Skeleton Loading
+   ========================================= */
+.skeletonGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, 300px);
+  gap: 2rem 1.2rem;
+  justify-content: center;
 }
 
-/* ================================
-   เอฟเฟกต์แอนิเมชัน
-   ================================ */
+.skeletonCard {
+  width: 300px;
+  height: 425px;
+  margin-bottom: 1rem;
+  background-color: #ffffff;
+  border: none;
+  /* เอา border ออกเพื่อไม่ให้ทับมุมโค้ง */
+  border-radius: 6px;
+  overflow: hidden;
+  /* ให้ขอบรูปถูกตัดตามการ์ดจริง */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  padding-bottom: 1rem;
+  box-sizing: border-box;
+  position: relative;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.04);
+}
+
+
+.skeletonImage {
+  width: 100%;
+  height: 300px !important;
+  display: block;
+  position: relative;
+
+  /* ขอบเฉพาะด้านบนเท่านั้น */
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+    background-color: #e0e0e0;
+
+
+  box-sizing: border-box;
+  background-clip: padding-box;
+  margin-bottom: 0;
+  /* แนบกับข้อความ */
+}
+.skeletonText {
+  width: 90%;
+  height: 20px;
+  border-radius: 6px;
+  margin-top: 1.5rem;
+  margin-left: 1rem;
+    background-color: #e0e0e0;
+
+}
+
+.skeletonText.title { 
+ width: 90%;
+  height: 20px;
+  border-radius: 6px;
+  margin-top: 1.5rem;
+    margin-left: 1rem;
+
+    background-color: #e0e0e0;
+
+}
+.skeletonText.subTitle {
+  width: 40%;
+  height: 16px;
+  border-radius: 6px;
+  margin-top: 0.5rem;
+    margin-left: 1rem;
+
+    background-color: #e0e0e0;
+
+}
+.skeletonText.price {
+    width: 55%;
+  height: 20px;
+  margin-top: 2rem;
+    background-color: #e0e0e0;
+}
+
+
+/* =========================================
+   ✨ Animation
+   ========================================= */
 .fade-in {
   opacity: 0;
   animation: fadeIn 0.8s ease-in-out forwards;
 }
 
-/* แอนิเมชันค่อยๆ ปรากฏ */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(15px); }
+  from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* ================================
-   ข้อความอื่น ๆ (ไม่มีสินค้า)
-   ================================ */
-.no-products {
-  text-align: center;
-  font-style: italic;
-  color: #555;
-}
-
-/* ================================
-   โครงสร้าง Skeleton Loading
-   ================================ */
-.skeletonGrid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 24px;
-}
-
-.skeletonCard {
-  height: 420px;
-  border-radius: 8px;
-  background: #fff;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-}
-
-/* โครงสร้างส่วนที่แสดงการโหลด (แถบสีเทาเคลื่อนไหว) */
-.skeletonImage,
-.skeletonText {
-  background: linear-gradient(90deg, #e0e0e0 25%, #f2f2f2 50%, #e0e0e0 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.2s infinite; /* ทำเอฟเฟกต์แสงวิ่ง */
-  border-radius: 6px;
-}
-
-.skeletonImage {
-  width: 100%;
-  height: 250px;
-}
-
-.skeletonText {
-  height: 16px;
-  margin-top: 12px;
-}
-
-.skeletonText.title {
-  width: 70%;
-  height: 22px;
-}
-
-.skeletonText.subTitle {
-  width: 50%;
-}
-
-.skeletonText.price {
-  width: 40%;
-  height: 20px;
-}
-
-/* เอฟเฟกต์แสงวิ่งใน Skeleton */
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-/* ================================
-   Responsive สำหรับจอเล็กกว่า 1500px
-   ================================ */
-@media (max-width: 1500px) {
+/* =========================================
+   📱 Responsive Layout
+   ========================================= */
+@media (max-width: 991px) {
   .products-container {
-    max-width: 1200px; /* ลดความกว้างสูงสุด */
-    gap: 16px; /* ลดช่องว่างระหว่าง sidebar กับสินค้า */
-    padding: 5px; /* ลด padding รอบนอก */
+    flex-direction: column;
   }
 
   .products-sidebar {
-    width: 230px; /* ปรับ sidebar ให้แคบลง */
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #eee;
   }
 
-  .products-grid {
-    grid-template-columns: repeat(3, 1fr); /* จาก 4 เหลือ 3 คอลัมน์ */
-    gap: 1.5rem 1rem;
+  .products-list {
+    padding: 1.5rem;
   }
-
 }
+
+@media (max-width: 767px) {
+  .products-grid {
+    grid-template-columns: repeat(auto-fit, 300px);
+    gap: 1.5rem;
+  }
+}
+
+/* ================================
+   FIX: พื้นที่ว่างด้านล่างในหน้าสินค้า
+   ================================ */
+.products-container,
+.products-list {
+  height: auto !important;
+  min-height: unset !important;
+}
+
+.layout-container {
+  padding-bottom: 0 !important; /* ลบ padding ล่าง 50px ออก */
+}
+
+main, section {
+  height: auto !important;
+  min-height: auto !important;
+}
+
+/* ถ้ามี footer อย่าให้ดัน content */
+footer {
+  margin-top: 0 !important;
+}
+
+.divider {
+  border: none;
+  margin: -2rem 0 1.5rem 0;
+}
+

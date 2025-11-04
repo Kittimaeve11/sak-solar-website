@@ -8,14 +8,21 @@ import Image from 'next/image';
 import { IoPlayCircleOutline } from "react-icons/io5";
 import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io';
 
+// ✅ อ่าน environment
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
+
+// ✅ สร้าง cache นอก component
+let reviewCache = {
+  reviews: null,
+  brander: null,
+  timestamp: 0,
+};
 
 /** ---------------- Helper ---------------- */
 function extractVideoId(url) {
   if (!url) return null;
-  const regex =
-    /(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/))([\w-]+)/;
+  const regex = /(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/))([\w-]+)/;
   const match = url.match(regex);
   return match ? match[1] : null;
 }
@@ -56,56 +63,67 @@ export default function ReviewPage() {
 
   // ✅ Pagination states
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(15); // แสดง 15 ข้อมูลต่อหน้า
+  const [itemsPerPage] = useState(15);
   const topRef = useRef(null);
 
-  /** ดึงข้อมูล Reviews + Brander */
+  /** ---------------- Fetch Data ---------------- */
   const fetchData = useCallback(async () => {
     setLoadingData(true);
 
-    if (!baseUrl || !apiKey) {
-      console.error(' Missing baseUrl or apiKey:', { baseUrl, apiKey });
-      setLoadingData(false);
-      return;
-    }
-
     try {
+      // ✅ ใช้ cache ถ้ามีข้อมูลไม่เกิน 10 นาที
+      const cacheAge = Date.now() - reviewCache.timestamp;
+      if (reviewCache.reviews && cacheAge < 1000 * 60 * 10) {
+        setReviews(reviewCache.reviews);
+        setBrander(reviewCache.brander);
+        setLoadingData(false);
+        return;
+      }
+
+      // ✅ โหลดใหม่จาก API
       const [reviewsRes, branderRes] = await Promise.all([
         fetch(`${baseUrl}/api/Reviewapi`, {
-          headers: {
-            'Content-Type': 'application/json',
-            'X-API-KEY': apiKey,
-          },
+          headers: { 'X-API-KEY': apiKey },
         }),
         fetch(`${baseUrl}/api/branderIDapi/11`, {
           headers: { 'X-API-KEY': apiKey },
         }),
       ]);
 
-      if (!reviewsRes.ok)
-        throw new Error(`Error fetching reviews: ${reviewsRes.status}`);
-      if (!branderRes.ok)
-        throw new Error(`Error fetching brander: ${branderRes.status}`);
+      if (!reviewsRes.ok || !branderRes.ok)
+        throw new Error("Fetch failed");
 
-      const reviewsData = await reviewsRes.json();
-      const branderData = await branderRes.json();
+      const [reviewsData, branderData] = await Promise.all([
+        reviewsRes.json(),
+        branderRes.json(),
+      ]);
 
-      setReviews(reviewsData?.result?.data || []);
-
+      const reviewsResult = reviewsData?.result?.data || [];
       const branderArray = Array.isArray(branderData?.data)
         ? branderData.data
         : branderData?.data
         ? [branderData.data]
         : [];
+
+      // ✅ เก็บ cache
+      reviewCache = {
+        reviews: reviewsResult,
+        brander: branderArray,
+        timestamp: Date.now(),
+      };
+
+      setReviews(reviewsResult);
       setBrander(branderArray);
     } catch (err) {
-      console.error(' Fetch error:', err);
+      console.error("Fetch error:", err);
+      setReviews([]);
+      setBrander([]);
     } finally {
       setLoadingData(false);
     }
   }, []);
 
-  /** Set Title + Meta + fetch data */
+  /** ---------------- Title + Meta + Fetch ---------------- */
   useEffect(() => {
     document.title =
       'รีวิวของเรา | บริษัท ศักดิ์สยาม โซลาร์ เอ็นเนอร์ยี่ จำกัด';
@@ -121,19 +139,21 @@ export default function ReviewPage() {
     fetchData();
   }, [fetchData]);
 
-  /** ---------------- Log Action ---------------- */
+  /** ---------------- ✅ Log Action (รีวิว) ---------------- */
   const logReviewAction = async (review) => {
-    const payload = {
-      actionType: "3",
-      actionDetail: `หน้าหลัก รหัสวิดีโอ: ${review.vedio_id}  ชื่อวิดีโอ : ${locale === 'en' ? review.nameEN_Vedio : review.nameTH_Vedio}`,
-      typeUser: "ผู้เยี่ยมชมเว็บไซต์",
-      datatype: "รีวิว",
-      dataID: review.vedio_id,
-      dataname: locale === 'en' ? review.nameEN_Vedio : review.nameTH_Vedio,
-    };
-
     try {
-      await fetch(`${baseUrl}/api/logAction`, {
+      const payload = {
+        actionType: "4",
+        actionDetail: `หน้ารีวิว รหัสวิดีโอ: ${review.vedio_id ?? "0"}  ชื่อวิดีโอ : ${review.nameTH_Vedio ?? "-"}`,
+        typeUser: "ผู้เยี่ยมชมเว็บไซต์",
+        datatype: "รีวิว",
+        dataID: review.vedio_id ?? "0",
+        dataname: review.nameTH_Vedio ?? "-",
+        datatypeID: "0", // ✅ ป้องกัน null
+        brandtype: "0"   // ✅ ป้องกัน null
+      };
+
+      const res = await fetch(`${baseUrl}/api/logWebsitepageapi`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -141,17 +161,19 @@ export default function ReviewPage() {
         },
         body: JSON.stringify(payload),
       });
+
+      if (!res.ok) {
+        console.error("❌ Log API error:", await res.text());
+      } else {
+        console.log("✅ บันทึก Log รีวิวสำเร็จ");
+      }
     } catch (err) {
-      console.error("log error:", err);
+      console.error("💥 Log รีวิว error:", err);
     }
   };
 
   /** ---------------- Pagination ---------------- */
-  const validReviews = reviews.filter(r => {
-    const videoId = extractVideoId(r?.vedio_link);
-    return !!videoId;
-  });
-
+  const validReviews = reviews.filter(r => extractVideoId(r?.vedio_link));
   const totalPages = Math.ceil(validReviews.length / itemsPerPage) || 1;
   const paginatedReviews = validReviews.slice(
     (currentPage - 1) * itemsPerPage,
@@ -166,7 +188,6 @@ export default function ReviewPage() {
 
   const renderPagination = () => {
     const pages = [];
-
     if (currentPage > 1) {
       pages.push(
         <button key="prev" onClick={() => handlePageChange(currentPage - 1)} className="btn-with-arrow">
@@ -194,10 +215,10 @@ export default function ReviewPage() {
         </button>
       );
     }
-
     return pages;
   };
 
+  /** ---------------- Render ---------------- */
   return (
     <div ref={topRef} className="no-margin">
       {/* ---------- Banner Section ---------- */}
@@ -207,14 +228,12 @@ export default function ReviewPage() {
         brander.map((item) => (
           <div className="banner-container fade-in" key={item.brander_ID}>
             <picture>
-              {/* Mobile */}
               <source
-                srcSet={`${baseUrl}/${item.brander_pictureMoblie}`}
+                srcSet={`${baseUrl.replace(/\/$/, '')}/${item.brander_pictureMoblie.replace(/^\//, '')}`}
                 media="(max-width: 768px)"
               />
-              {/* PC */}
               <img
-                src={`${baseUrl}/${item.brander_picturePC}`}
+                src={`${baseUrl.replace(/\/$/, '')}/${item.brander_picturePC.replace(/^\//, '')}`}
                 alt={item.brander_name || 'Banner Image'}
                 className="banner-image"
               />
@@ -224,7 +243,7 @@ export default function ReviewPage() {
       )}
 
       {/* ---------- Main Content ---------- */}
-      <main className="layout-review ">
+      <main className="layout-review">
         <h1 className="headtitle">
           {locale === 'en'
             ? 'Customer Reviews on Our Solar Installations'
@@ -241,10 +260,9 @@ export default function ReviewPage() {
               </div>
             ))
           ) : paginatedReviews.length === 0 ? (
-            <p>
-              {locale === 'en'
-                ? 'No video reviews available at the moment.'
-                : 'ไม่มีรีวิววิดีโอในขณะนี้'}
+            <p>{locale === 'en'
+              ? 'No video reviews available at the moment.'
+              : 'ไม่มีรีวิววิดีโอในขณะนี้'}
             </p>
           ) : (
             paginatedReviews.map((review) => {
@@ -265,7 +283,7 @@ export default function ReviewPage() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="video-card fade-in"
-                  onClick={() => logReviewAction(review)} // ✅ log เมื่อกด
+                  onClick={() => logReviewAction(review)}
                 >
                   <div className="thumbnail-placeholder">
                     <ThumbnailWithFallback videoId={videoId} alt={videoTitle} />
@@ -276,11 +294,7 @@ export default function ReviewPage() {
                     <div className="date">
                       {new Date(review.vedio_creationdate).toLocaleDateString(
                         dateLocale,
-                        {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric',
-                        }
+                        { year: 'numeric', month: 'long', day: 'numeric' }
                       )}
                     </div>
                   </div>

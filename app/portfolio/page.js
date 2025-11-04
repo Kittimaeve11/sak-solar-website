@@ -11,6 +11,14 @@ import { useLocale } from '../Context/LocaleContext';
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 
+// ✅ cache เก็บข้อมูลไว้ใน memory ระหว่างเปลี่ยนหน้า
+let portfolioCache = {
+  projects: null,
+  types: null,
+  brander: null,
+  timestamp: 0,
+};
+
 const formatDate = (dateString, locale = "th") => {
   if (!dateString || dateString === "-") return "-";
   const date = new Date(dateString);
@@ -35,13 +43,52 @@ export default function PortfolioPage() {
   const router = useRouter();
   const topRef = useRef(null);
 
-  useEffect(() => {
-    let scrollUpTimer;
+  /* =========================================================
+     ✅ ฟังก์ชันบันทึก Log “ผลงานการติดตั้ง”
+  ========================================================= */
+  const handleLogPortfolioClick = async (item) => {
+    try {
+      const logData = {
+        actionType: "3",
+        actionDetail: `หน้าผลงาน รหัสผลงานการติดตั้ง: ${item.portfolio_id ?? "0"} หมายเลขผลงานการติดตั้ง : ${item.portfolio_num ?? "0"} ที่อยู่: ${item.titleTH ?? "-"}`,
+        typeUser: "ผู้เยี่ยมชมเว็บไซต์",
+        datatype: "ผลงานการติดตั้ง",
+        dataID: item.portfolio_id ?? "0",
+        datatypeID: item.portfolio_typeID ?? "0",
+        dataname: item.portfolio_num ?? "0",
+        brandtype: "0", // ไม่มีส่งค่า 0
+      };
 
-    // SEO
+      console.log("📤 ส่ง Log ผลงานการติดตั้ง:", logData);
+
+      const res = await fetch(`${baseUrl}/api/logWebsitepageapi`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-KEY": apiKey,
+        },
+        body: JSON.stringify(logData),
+      });
+
+      if (!res.ok) {
+        const errText = await res.text();
+        console.error("❌ Log API error:", errText);
+      } else {
+        console.log("✅ Log: บันทึกผลงานการติดตั้งสำเร็จ");
+      }
+    } catch (err) {
+      console.error("💥 เกิดข้อผิดพลาดในการบันทึก Log:", err);
+    }
+  };
+
+  /* =========================================================
+     ✅ โหลดข้อมูล + ตรวจ responsive
+  ========================================================= */
+  useEffect(() => {
     document.title = locale === 'th'
       ? 'ผลงานของเรา | บริษัท ศักดิ์สยาม โซลาร์ เอ็นเนอร์ยี่ จำกัด'
       : 'Our Portfolio | Sak Siam Solar Energy Co., Ltd.';
+
     const metaDescription = document.querySelector("meta[name='description']");
     const content = locale === 'th' ? 'ผลงานของเรา' : 'Our Portfolio';
     if (metaDescription) {
@@ -62,21 +109,49 @@ export default function PortfolioPage() {
     window.addEventListener('error', handleChunkError);
 
     const fetchAllData = async () => {
-      setIsLoading(true);
       try {
-        // Fetch types
-        const typesRes = await fetch(`${baseUrl}/api/portfoliotypepageapi`, { headers: { 'X-API-KEY': apiKey } });
-        const typesData = await typesRes.json();
-        if (typesData.status && Array.isArray(typesData.result)) setTypes(typesData.result);
+        // ✅ ถ้ามี cache ที่อายุไม่เกิน 10 นาที ใช้ต่อได้เลย
+        const cacheAge = Date.now() - portfolioCache.timestamp;
+        if (portfolioCache.projects && cacheAge < 1000 * 60 * 10) {
+          setProjects(portfolioCache.projects);
+          setTypes(portfolioCache.types);
+          setBrander(portfolioCache.brander);
+          setIsLoading(false);
+          setFadeIn(true);
+          setLoadingBanner(false);
+          return;
+        }
 
-        // Fetch projects
-        const projectsRes = await fetch(`${baseUrl}/api/portfoliopageapi`, { headers: { 'X-API-KEY': apiKey } });
-        const projectsData = await projectsRes.json();
-        if (projectsData.status && projectsData.result?.data) {
-          const mapped = projectsData.result.data.map(item => {
+        // ✅ โหลดข้อมูลใหม่
+        setIsLoading(true);
+        const [typesRes, projectsRes, bannerRes] = await Promise.all([
+          fetch(`${baseUrl}/api/portfoliotypepageapi`, { headers: { 'X-API-KEY': apiKey } }),
+          fetch(`${baseUrl}/api/portfoliopageapi`, { headers: { 'X-API-KEY': apiKey } }),
+          fetch(`${baseUrl}/api/branderIDapi/10`, { headers: { 'X-API-KEY': apiKey } }),
+        ]);
+
+        const [typesData, projectsData, bannerData] = await Promise.all([
+          typesRes.json(),
+          projectsRes.json(),
+          bannerRes.json(),
+        ]);
+
+        const typesList = typesData.status && Array.isArray(typesData.result)
+          ? typesData.result
+          : [];
+
+        const projectList = projectsData.status && projectsData.result?.data
+          ? projectsData.result.data.map(item => {
             let gallery = [];
-            try { gallery = item.portfolio_gallery ? JSON.parse(item.portfolio_gallery) : []; } catch { gallery = []; }
+            try {
+              gallery = item.portfolio_gallery ? JSON.parse(item.portfolio_gallery) : [];
+            } catch {
+              gallery = [];
+            }
             return {
+              portfolio_id: item.portfolio_id || "0",
+              portfolio_num: item.portfolio_num || "0",
+              portfolio_typeID: item.portfolio_typeID || "0",
               id: item.portfolio_num,
               titleTH: item.adddressTH || '-',
               titleEN: item.adddressEN || '-',
@@ -88,22 +163,26 @@ export default function PortfolioPage() {
               coverImage: gallery.length > 0 ? `${baseUrl}/${gallery[0]}` : '/images/placeholder.png',
               type: item.portfolio_typeID,
             };
-          });
-          setProjects(mapped);
-        } else setProjects([]);
+          })
+          : [];
 
-        // Fetch banner
-        const bannerRes = await fetch(`${baseUrl}/api/branderIDapi/10`, { headers: { 'X-API-KEY': apiKey } });
-        const bannerData = await bannerRes.json();
         const branderArray = Array.isArray(bannerData.data)
           ? bannerData.data
           : bannerData.data ? [bannerData.data] : [];
-        setBrander(branderArray);
 
+        // ✅ เก็บ cache
+        portfolioCache = {
+          projects: projectList,
+          types: typesList,
+          brander: branderArray,
+          timestamp: Date.now(),
+        };
+
+        setProjects(projectList);
+        setTypes(typesList);
+        setBrander(branderArray);
       } catch (error) {
         console.error('Error fetching data:', error);
-        setProjects([]);
-        setTypes([]);
       } finally {
         setTimeout(() => {
           setIsLoading(false);
@@ -117,11 +196,10 @@ export default function PortfolioPage() {
 
     return () => {
       window.removeEventListener('error', handleChunkError);
-      if (scrollUpTimer) clearTimeout(scrollUpTimer);
     };
   }, [locale]);
 
-  // Update localStorage & scroll up timer inside a single effect
+  // Update localStorage & scroll
   useEffect(() => {
     localStorage.setItem('portfolioCurrentPage', currentPage.toString());
     if (isScrollingUp) {
@@ -130,9 +208,10 @@ export default function PortfolioPage() {
     }
   }, [currentPage, isScrollingUp]);
 
-  const filteredProjects = filter === 'ทั้งหมด'
-    ? projects
-    : projects.filter((proj) => proj?.type === filter);
+  const filteredProjects =
+    filter === 'ทั้งหมด'
+      ? projects
+      : projects.filter((proj) => proj?.type === filter);
 
   const totalPages = Math.ceil(filteredProjects.length / itemsPerPage);
   const paginatedProjects = filteredProjects.slice(
@@ -242,7 +321,9 @@ export default function PortfolioPage() {
         style={{ minHeight: isLoading ? '100vh' : 'auto' }}
       >
         <div className="portfolio-page">
-          <h1 className="headtitleone">{locale === 'th' ? 'ผลงานการติดตั้งโซลาร์เซลล์' : 'Solar Installation Portfolio'}</h1>
+          <h1 className="headtitleone">
+            {locale === 'th' ? 'ผลงานการติดตั้งโซลาร์เซลล์' : 'Solar Installation Portfolio'}
+          </h1>
 
           <div className="portfolio-filters">
             <label htmlFor="filter-select" className="filter-label">
@@ -259,13 +340,14 @@ export default function PortfolioPage() {
                   }}
                   className="filter-dropdown"
                 >
-                  <option value="ทั้งหมด">{locale === 'th' ? 'ผลงานทั้งหมด' : 'All Portfolios'}</option>
+                  <option value="ทั้งหมด">
+                    {locale === 'th' ? 'ผลงานทั้งหมด' : 'All Portfolios'}
+                  </option>
                   {types.map((type) => (
-                    <option
-                      key={type.portfoliotypeID}
-                      value={type.portfoliotypeID}
-                    >
-                      {locale === 'th' ? type.portfoliotypenameTH : type.portfoliotypenameEN}
+                    <option key={type.portfoliotypeID} value={type.portfoliotypeID}>
+                      {locale === 'th'
+                        ? type.portfoliotypenameTH
+                        : type.portfoliotypenameEN}
                     </option>
                   ))}
                 </select>
@@ -277,64 +359,97 @@ export default function PortfolioPage() {
           <div className={`portfolio-grid ${!isLoading ? 'fade-in' : ''}`}>
             {isLoading
               ? Array.from({ length: itemsPerPage }).map((_, i) => (
-                <SkeletonCard key={`skeleton-${i}`} />
-              ))
+                  <SkeletonCard key={`skeleton-${i}`} />
+                ))
               : paginatedProjects.length === 0 ? (
-                <p className="no-data-text">{locale === 'th' ? 'ไม่พบข้อมูลผลงาน' : 'No projects found'}</p>
-              ) : (
-                paginatedProjects.map((proj, i) => (
-                  <div
-                    key={`${proj?.id || 'proj'}-${i}`}   // ✅ unique key
-                    className="portfolio-card"
-                    onClick={() => router.push(`/portfolio/${proj?.id}`)}
-                  >
-                    <div className="portfolio-image-wrapper">
-                      <Image
-                        src={proj?.coverImage || '/images/placeholder.png'}
-                        alt={locale === 'th' ? proj?.titleTH : proj?.titleEN}
-                        className="portfolio-image"
-                        fill
-                        sizes="(max-width: 768px) 100vw, 33vw"
-                        quality={75}
-                      />
-                      <div className="portfolio-banner">
+                  <p className="no-data-text">
+                    {locale === 'th' ? 'ไม่พบข้อมูลผลงาน' : 'No projects found'}
+                  </p>
+                ) : (
+                  paginatedProjects.map((proj, i) => (
+                    <div
+                      key={`${proj?.id || 'proj'}-${i}`}
+                      className="portfolio-card"
+                      onClick={async () => {
+                        await handleLogPortfolioClick(proj); // ✅ บันทึก Log ก่อน
+                        router.push(`/portfolio/${proj?.id}`); // ✅ แล้วค่อยเปลี่ยนหน้า
+                      }}
+                    >
+                      <div className="portfolio-image-wrapper">
                         <Image
-                          src="/images/logosak-solar.png"
-                          alt="logo"
-                          width={120}
-                          height={40}
-                          className="banner-logo"
+                          src={proj?.coverImage || '/images/placeholder.png'}
+                          alt={locale === 'th' ? proj?.titleTH : proj?.titleEN}
+                          className="portfolio-image"
+                          fill
+                          sizes="(max-width: 768px) 100vw, 33vw"
+                          quality={75}
                         />
-                        <div className="banner-text">{locale === 'th' ? 'ศักดิ์สยาม โซลาร์ เอ็นเนอร์ยี่ จำกัด' : 'Sak Siam Solar Energy Co., Ltd.'}</div>
+                        <div className="portfolio-banner">
+                          <Image
+                            src="/images/logosak-solar.png"
+                            alt="logo"
+                            width={120}
+                            height={40}
+                            className="banner-logo"
+                          />
+                          <div className="banner-text">
+                            {locale === 'th'
+                              ? 'ศักดิ์สยาม โซลาร์ เอ็นเนอร์ยี่ จำกัด'
+                              : 'Sak Siam Solar Energy Co., Ltd.'}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="portfolio-content">
+                        <h3
+                          className="project-title"
+                          style={{
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            wordBreak: 'break-word',
+                          }}
+                        >
+                          {locale === 'th' ? proj.titleTH : proj.titleEN}
+                        </h3>
+                        <ul className="project-details">
+                          <li>
+                            <strong>
+                              {locale === 'th'
+                                ? 'ขนาดติดตั้ง'
+                                : 'Installation Size'}
+                            </strong>
+                            <span>{proj.size}</span>
+                          </li>
+                          <li>
+                            <strong>
+                              {locale === 'th'
+                                ? 'ประเภทผลิตภัณฑ์'
+                                : 'Product Type'}
+                            </strong>
+                            <span>{proj.productTypeTH}</span>
+                          </li>
+                          <li>
+                            <strong>
+                              {locale === 'th'
+                                ? 'จำนวนแผง'
+                                : 'Panel Count'}
+                            </strong>
+                            <span>
+                              {proj.panelCount}{' '}
+                              {locale === 'th' ? 'แผง' : 'panels'}
+                            </span>
+                          </li>
+                          <li className="date-post">
+                            <strong><FaCalendar /></strong>
+                            <span>{formatDate(proj.postDate, locale)}</span>
+                          </li>
+                        </ul>
                       </div>
                     </div>
-                    <div className="portfolio-content">
-                      <h3 className="project-title" style={{
-                        display: '-webkit-box',
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: 'vertical',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        wordBreak: 'break-word',
-                      }}>
-                        {locale === 'th' ? proj.titleTH : proj.titleEN}
-                      </h3>
-                      <ul className="project-details">
-                        <li><strong>{locale === 'th' ? 'ขนาดติดตั้ง' : 'Installation Size'}</strong><span>{proj.size}</span></li>
-                        <li>
-                          <strong>{locale === 'th' ? 'ประเภทผลิตภัณฑ์' : 'Product Type'}</strong>
-                          <span>{proj.productTypeTH}</span>
-                        </li>
-                        <li><strong>{locale === 'th' ? 'จำนวนแผง' : 'Panel Count'}</strong><span>{proj.panelCount} {locale === 'th' ? 'แผง' : 'panels'}</span></li>
-                        <li className="date-post">
-                          <strong><FaCalendar /></strong>
-                          <span>{formatDate(proj.postDate, locale)}</span>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                ))
-              )}
+                  ))
+                )}
           </div>
 
           {!isLoading && totalPages > 1 && (

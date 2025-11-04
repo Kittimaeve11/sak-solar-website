@@ -11,13 +11,12 @@ import { HiPlusSm } from 'react-icons/hi';
 import { IoPlayCircleOutline } from "react-icons/io5";
 import { useLocale } from '@/app/Context/LocaleContext';
 
-// ตัวแปรสำหรับ API Base URL และ Key
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 
 /* =========================================================
-   ฟังก์ชันดึง videoId จาก URL ของ YouTube
-   ========================================================= */
+   🔍 ดึง videoId จาก URL
+========================================================= */
 function extractVideoId(url) {
   if (!url) return null;
   const regex = /(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/))([\w-]+)/;
@@ -26,11 +25,11 @@ function extractVideoId(url) {
 }
 
 /* =========================================================
-   Component แสดง Thumbnail พร้อม fallback
-   ========================================================= */
+   🖼 แสดง Thumbnail พร้อม fallback
+========================================================= */
 function ThumbnailWithFallback({ videoId, alt }) {
   const [srcIndex, setSrcIndex] = useState(0);
-  const thumbnailUrls = [
+  const urls = [
     `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
     `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
     `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`,
@@ -39,97 +38,149 @@ function ThumbnailWithFallback({ videoId, alt }) {
   return (
     <Image
       key={`${videoId}-${srcIndex}`}
-      src={thumbnailUrls[srcIndex]}
+      src={urls[srcIndex]}
       alt={alt}
       width={374}
       height={210}
       className="thumbnailslide"
       style={{ width: '100%', height: 'auto' }}
-      onError={() => {
-        if (srcIndex < thumbnailUrls.length - 1) setSrcIndex(srcIndex + 1);
-      }}
+      onError={() => srcIndex < urls.length - 1 && setSrcIndex(srcIndex + 1)}
       unoptimized
     />
   );
 }
 
 /* =========================================================
-   Component หลัก: SlideReview
-   ========================================================= */
+   🌟 Component หลัก: SlideReview
+========================================================= */
 export default function SlideReview() {
-  const { locale } = useLocale(); // ดึงภาษาปัจจุบัน
-  const [reviews, setReviews] = useState([]); // เก็บข้อมูลรีวิว
-  const [isLoading, setIsLoading] = useState(true); // สถานะโหลด
-  const [activeSlide, setActiveSlide] = useState(0); // index slide ปัจจุบัน
-  const [dragging, setDragging] = useState(false); // ป้องกันคลิกระหว่างลาก
-  const sliderRef = useRef(null); // อ้างอิง slider
+  const { locale } = useLocale();
+  const [reviews, setReviews] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [activeSlide, setActiveSlide] = useState(0);
+  const [dragging, setDragging] = useState(false);
+  const [visibleCards, setVisibleCards] = useState(3);
+  const sliderRef = useRef(null);
+
+/* =========================================================
+   ✅ ฟังก์ชันบันทึก Log “รีวิว” (แก้สมบูรณ์)
+========================================================= */
+const handleLogReviewClick = async (item) => {
+  try {
+    const logData = {
+      actionType: "4",
+      actionDetail: `หน้าหลัก รหัสวิดีโอ: ${item.vedio_id ?? "0"} ชื่อวิดีโอ : ${item.nameTH_Vedio ?? "-"}`,
+      typeUser: "ผู้เยี่ยมชมเว็บไซต์",
+      datatype: "รีวิว",
+      dataID: item.vedio_id ?? "0",
+      dataname: item.nameTH_Vedio ?? "-",
+      datatypeID: "0",  // ✅ ต้องไม่ null
+      brandtype: "0"    // ✅ ต้องไม่ null เช่นกัน
+    };
+
+    console.log("📤 ส่ง Log รีวิว:", logData);
+
+    const res = await fetch(`${baseUrl}/api/logWebsitepageapi`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-API-KEY": apiKey,
+      },
+      body: JSON.stringify(logData),
+    });
+
+    if (!res.ok) {
+      console.error("❌ Log API error:", await res.text());
+    } else {
+      console.log("✅ Log รีวิวบันทึกสำเร็จ");
+    }
+  } catch (err) {
+    console.error("💥 เกิดข้อผิดพลาดตอนส่ง Log รีวิว:", err);
+  }
+};
 
   /* =========================================================
-     ดึงข้อมูลรีวิวจาก API
-     ========================================================= */
+     ✅ รวม useEffect เดียว: ตรวจขนาดจอ + โหลด API + cleanup
+  ========================================================= */
   useEffect(() => {
-    const fetchData = async () => {
+    let isMounted = true;
+
+    const updateVisibleCards = () => {
+      const width = window.innerWidth;
+      if (width < 764) setVisibleCards(1);
+      else if (width < 1120) setVisibleCards(2);
+      else setVisibleCards(3);
+    };
+
+    updateVisibleCards();
+    window.addEventListener('resize', updateVisibleCards);
+
+    async function loadReviews() {
       try {
-        setIsLoading(true);
+        if (window.__REVIEW_CACHE__) {
+          setReviews(window.__REVIEW_CACHE__);
+          setIsLoading(false);
+          return;
+        }
 
         const res = await fetch(`${baseUrl}/api/Reviewapi?offset=0&limit=10`, {
           headers: { 'X-API-KEY': apiKey },
         });
         const data = await res.json();
 
-        if (data.status && data.result?.data && Array.isArray(data.result.data)) {
+        if (isMounted && data.status && Array.isArray(data.result?.data)) {
+          window.__REVIEW_CACHE__ = data.result.data;
           setReviews(data.result.data);
         }
-      } catch (error) {
-        console.error('Failed to fetch reviews:', error);
+      } catch (err) {
+        console.error('❌ Error fetching reviews:', err);
       } finally {
-        setIsLoading(false);
+        if (isMounted) setIsLoading(false);
       }
-    };
+    }
 
-    fetchData();
+    loadReviews();
+
+    return () => {
+      isMounted = false;
+      window.removeEventListener('resize', updateVisibleCards);
+    };
   }, []);
 
   /* =========================================================
-     จัดการสไลด์และ custom dots
-     ========================================================= */
+     ⚙️ Custom dots
+  ========================================================= */
   const slidesPerGroup = 3;
-  const totalGroups =
-    reviews.length > 0 ? Math.ceil(reviews.length / slidesPerGroup) : 0;
+  const totalGroups = Math.ceil(reviews.length / slidesPerGroup);
 
   const handleDotClick = (index) => {
-    if (sliderRef.current) {
-      sliderRef.current.slickGoTo(index * slidesPerGroup);
-      setActiveSlide(index);
-    }
+    sliderRef.current?.slickGoTo(index * slidesPerGroup);
+    setActiveSlide(index);
   };
 
   const handleBeforeChange = () => setDragging(true);
-  const handleAfterChange = (i) => {
-    setActiveSlide(Math.floor(i / slidesPerGroup));
+  const handleAfterChange = (index) => {
+    setActiveSlide(Math.floor(index / slidesPerGroup));
     setTimeout(() => setDragging(false), 50);
   };
 
-  /* =========================================================
-     Custom Dots (แท่งส้ม)
-     ========================================================= */
   const CustomDots = () => (
     <div className="custom-dots">
-      {Array.from({ length: totalGroups }).map((_, index) => (
+      {Array.from({ length: totalGroups }).map((_, i) => (
         <div
-          key={index}
-          className={`dot-bar ${activeSlide === index ? 'active' : ''}`}
-          onClick={() => handleDotClick(index)}
+          key={i}
+          className={`dot-bar ${activeSlide === i ? 'active' : ''}`}
+          onClick={() => handleDotClick(i)}
         />
       ))}
     </div>
   );
 
   /* =========================================================
-     Skeleton Loading (โครงจำลองขณะโหลด)
-     ========================================================= */
+     💀 Skeleton Loading
+  ========================================================= */
   const SkeletonCard = () => (
-    <div className="slide-itemreview fade-in">
+    <div className="skeleton-slide">
       <div className="skeleton-card">
         <div className="skeleton skeleton-image"></div>
         <div className="skeleton skeleton-title"></div>
@@ -139,15 +190,14 @@ export default function SlideReview() {
   );
 
   /* =========================================================
-     ส่วนแสดงผลหลัก
-     ========================================================= */
+     🖥 Render
+  ========================================================= */
   return (
     <div className="review-wrapperslide fade-in">
       <h1 className="headtitleone">
         {locale === 'en' ? 'Customer Reviews' : 'รีวิวจากลูกค้า'}
       </h1>
 
-      {/* ปุ่มดูทั้งหมด */}
       <div className="review-header-linkslide">
         <Link href="/review" className="view-all flex items-center gap-2">
           <HiPlusSm className="icon-view" />
@@ -155,16 +205,14 @@ export default function SlideReview() {
         </Link>
       </div>
 
-      {/* แสดง Skeleton ระหว่างโหลด */}
       {isLoading ? (
-        <div className="review-loading-grid">
-          {[...Array(3)].map((_, i) => (
+        <div className="skeleton-wrapper">
+          {[...Array(visibleCards)].map((_, i) => (
             <SkeletonCard key={i} />
           ))}
         </div>
       ) : (
         <>
-          {/* สไลด์รีวิวลูกค้า */}
           <Slider
             ref={sliderRef}
             dots={false}
@@ -172,65 +220,53 @@ export default function SlideReview() {
             speed={500}
             slidesToShow={3}
             slidesToScroll={1}
-            swipeToSlide
             arrows={false}
-            centerMode={false}
+            swipeToSlide
             beforeChange={handleBeforeChange}
             afterChange={handleAfterChange}
             responsive={[
-              {
-                breakpoint: 1024,
-                settings: { slidesToShow: 2, slidesToScroll: 1, swipeToSlide: true },
-              },
-              {
-                breakpoint: 640,
-                settings: { slidesToShow: 1, slidesToScroll: 1, swipeToSlide: true },
-              },
+              { breakpoint: 1120, settings: { slidesToShow: 2 } },
+              { breakpoint: 764, settings: { slidesToShow: 1 } },
             ]}
           >
-            {reviews.map((review, i) => {
-              const videoId = extractVideoId(review.vedio_link);
-              if (!videoId) return null;
+            {reviews.map((r, i) => {
+              const id = extractVideoId(r.vedio_link);
+              if (!id) return null;
 
               const title =
                 locale === 'en'
-                  ? review.nameEN_Vedio || review.nameTH_Vedio || 'No title'
-                  : review.nameTH_Vedio || review.nameEN_Vedio || 'ไม่มีชื่อเรื่อง';
+                  ? r.nameEN_Vedio || r.nameTH_Vedio || 'No title'
+                  : r.nameTH_Vedio || r.nameEN_Vedio || 'ไม่มีชื่อเรื่อง';
 
-              const dateLocale = locale === 'en' ? 'en-US' : 'th-TH';
-              const formattedDate = new Date(
-                review.vedio_creationdate
-              ).toLocaleDateString(dateLocale, {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-              });
+              const date = new Date(r.vedio_creationdate).toLocaleDateString(
+                locale === 'en' ? 'en-US' : 'th-TH',
+                { year: 'numeric', month: 'long', day: 'numeric' }
+              );
 
               return (
-                <div key={review.vedio_id || `rev-${i}`} className="slide-itemreview fade-in">
+                <div key={r.vedio_id || i} className="slide-itemreview fade-in">
                   <div
                     className="video-cardslide"
-                    onClick={() => !dragging && window.open(review.vedio_link, '_blank')}
-                    style={{ cursor: 'pointer' }}
+                    onClick={async () => {
+                      if (!dragging) {
+                        await handleLogReviewClick(r); // ✅ บันทึก Log ก่อน
+                        window.open(r.vedio_link, '_blank'); // ✅ เปิดวิดีโอ
+                      }
+                    }}
                   >
-                    {/* ส่วนภาพ Thumbnail */}
                     <div className="thumbnail-wrapperslide">
-                      <ThumbnailWithFallback videoId={videoId} alt={title} />
+                      <ThumbnailWithFallback videoId={id} alt={title} />
                       <IoPlayCircleOutline className="play-icon" />
                     </div>
-
-                    {/* เนื้อหาด้านล่าง (ชื่อ + วันที่) */}
                     <div className="infoslide">
                       <h3 className="titleslide">{title}</h3>
-                      <p className="dateslide">{formattedDate}</p>
+                      <p className="dateslide">{date}</p>
                     </div>
                   </div>
                 </div>
               );
             })}
           </Slider>
-
-          {/* จุดเลื่อนด้านล่าง */}
           <CustomDots />
         </>
       )}

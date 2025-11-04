@@ -14,8 +14,8 @@
 .carouselWrapper {
   max-width: 1500px;
   width: 100%;
-  margin: 0 auto;
-  padding: 0rem;
+  margin: 0.5rem auto; /*  เพิ่มระยะห่างบน–ล่างแต่ละหมวด */
+  padding: 0;
   position: relative;
   border-radius: 6px;
   box-sizing: border-box;
@@ -50,9 +50,6 @@
 }
 
 
-
-
-
 /* =========================================================
    HEADER
    ========================================================= */
@@ -60,7 +57,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: -1.5rem;
+  margin-top: 1rem;   /* ✅ เพิ่มระยะด้านบน */
+  margin-bottom: -1rem;  /* ✅ ปรับระยะห่างด้านล่าง */
   padding: 0 1rem;
 }
 
@@ -236,6 +234,36 @@
 }
 
 /* =========================================================
+   PRODUCT PRICE & SIZE DISPLAY
+   ========================================================= */
+
+.product-size-display,
+.product-price-display {
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  font-size: 20px;
+  margin-top: 0;
+  color: #000;
+}
+
+.product-size-display {
+  gap: 2px; /* ระยะห่างระหว่างไอคอนกับข้อความ */
+}
+
+.product-price-display {
+  gap: -3px;
+}
+
+/* ราคาที่ถูกขีดฆ่า (ราคาเดิมก่อนโปรโมชัน) */
+.product-price-old {
+  font-size: 14px;
+  color: #888;
+  text-decoration: line-through;
+  margin-left: 0.5rem;
+}
+
+/* =========================================================
    SKELETON LOADING (Pixel Perfect Match)
    ========================================================= */
 
@@ -284,25 +312,6 @@
 }
 
 /* =========================================================
-   เอฟเฟกต์เคลื่อนไหว Skeleton
-   ========================================================= */
-/* .skeleton {
-  background: linear-gradient(100deg, #e0e0e0 40%, #f5f5f5 50%, #e0e0e0 60%);
-  background-size: 200% 100%;
-  animation: shimmer 1.4s infinite linear;
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-
-  100% {
-    background-position: 200% 0;
-  }
-} */
-
-/* =========================================================
    รูปภาพ Skeleton (ขนาดเท่าจริง)
    ========================================================= */
 .pc-skeleton-image {
@@ -316,6 +325,7 @@
   border-top-right-radius: 6px;
   border-bottom-left-radius: 0 !important;
   border-bottom-right-radius: 0 !important;
+  background-color: #e0e0e0;
 
   box-sizing: border-box;
   background-clip: padding-box;
@@ -333,6 +343,8 @@
   height: 20px;
   border-radius: 6px;
   margin-top: 1.5rem;
+    background-color: #e0e0e0;
+
 }
 
 .pc-skeleton-line {
@@ -340,12 +352,16 @@
   height: 16px;
   border-radius: 6px;
   margin-top: 0.5rem;
+    background-color: #e0e0e0;
+
 }
 
 .pc-skeleton-line.short {
   width: 55%;
   height: 20px;
   margin-top: 2rem;
+    background-color: #e0e0e0;
+
 }
 
 /* =========================================================
@@ -357,13 +373,13 @@
   gap: 6px;
   font-weight: 600;
   font-size: 1rem;
-  color: #bcbcbc;
+  background-color: #e0e0e0;
   opacity: 0.8;
   user-select: none;
 }
 
 .pc-skeleton-header-link svg {
-  color: #bcbcbc;
+  background-color: #e0e0e0;
 }
 
 /* =========================================================
@@ -396,8 +412,9 @@
 
 /* หน้าจอกว้างไม่เกิน 1200px */
 @media (max-width: 1200px) {
-  .carouselWrapper {
+.carouselWrapper {
     max-width: 800px;
+    margin: 2rem auto;
   }
 
   .carouselInner {
@@ -407,6 +424,7 @@
   .carouselStaticWrapper {
     gap: 32px !important;
   }
+
 
   .pc-skeleton-row {
     justify-content: center;
@@ -438,70 +456,60 @@
   }
 }
 
-/* หน้าจอกว้างไม่เกิน 600px */
-@media (max-width: 600px) {
-
-  .carouselCard,
-  .pc-skeletonCard {
-    width: 280px;
-  }
-
-  .carouselCard img,
-  .pc-skeleton-image {
-    height: 280px;
-  }
-}
-
-/* หน้าจอกว้างไม่เกิน 500px */
-@media (max-width: 500px) {
-  .carouselWrapper {
-    max-width: 400px;
-  }
-
-  .carouselInner {
-    max-width: 320px;
-  }
-
-  .carouselArrow {
-    width: 45px;
-    height: 45px;
-  }
-
-  .carouselHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    /* ระยะห่างจากการ์ดด้านล่าง */
-    margin-bottom: 1.5rem;
-    /* ← เพิ่มบรรทัดนี้ */
-    padding: 0 1rem;
+@media (max-width: 530px) {
+ .carouselHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.3rem;
+    margin-top: -2rem;
+    margin-bottom: 1rem;
+    padding: 0 4rem;
   }
 
   .carouselLink {
-    align-self: flex-end;
-    margin-top: -2rem;
-    margin-bottom: 1rem;
+    margin-top: -0.8rem;
+  }
+
+  .carouselWrapper {
+    margin: 2.5rem auto;
   }
 
   .carouselCard {
     width: 300px !important;
   }
 
+  .carouselInner {
+    max-width: 330px;
+  }
+
   .carouselCard img {
+    width: 300px !important;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+  }
+
+  .product-image-wrapper {
     width: 300px !important;
     height: 300px !important;
   }
 }
 
-/* หน้าจอกว้างไม่เกิน 370px */
-@media (max-width: 370px) {
+@media (max-width: 390px) {
+ .carouselHeader {
+    padding: 0 1.5rem;
+  }
+
+  .carouselTitle {
+    font-size: 1.5rem;
+  }
+
   .carouselWrapper {
-    max-width: 390px;
+    max-width: 290px;
+    margin: 2rem auto;
   }
 
   .carouselInner {
-    max-width: 290px;
+    max-width: 280px;
   }
 
   .carouselArrow {
@@ -511,15 +519,61 @@
 
   .carouselCard,
   .pc-skeletonCard {
-    width: 260px !important;
+    width: 250px !important;
   }
 
   .carouselCard img,
   .pc-skeleton-image {
-    height: 260px !important;
+    width: 250px !important;
+    height: 250px !important;
+  }
+
+  .product-image-wrapper {
+    width: 250px !important;
+    height: 250px !important;
   }
 
   .carouselCard h3 {
     font-size: 16px;
   }
+   .product-price-display {
+    display: grid;
+    grid-template-columns: 22px auto;   /* คอลัมน์ 1 = ไอคอน, คอลัมน์ 2 = ข้อความราคา */
+    grid-template-rows: auto auto;      /* แถว 1 = ราคาขีดค่า, แถว 2 = ไอคอน+ราคาใหม่ */
+    align-items: center;
+    column-gap: 6px;
+    row-gap: 4px;
+    margin-top: 0;
+  }
+
+  /* ราคาขีดค่า ให้อยู่บรรทัดบนและกินเต็มความกว้าง */
+  .product-price-old {
+    grid-column: 1 / -1;       /* กินทั้งสองคอลัมน์ */
+    grid-row: 1;               /* แถวแรก */
+    font-size: 14px;
+    color: #888;
+    text-decoration: line-through;
+    margin: 10px 0 -10px 0;                
+    line-height: 1.2;
+  }
+
+  /* ไอคอน ฿ ให้อยู่คอลัมน์ซ้ายแถวล่าง */
+  .product-price-display .price-icon {
+    grid-column: 2;            /* คอลัมน์ 1 */
+    grid-row: 2;               /* แถวสอง */
+    /* ขนาดไอคอนใช้จาก size={25} ได้เลย ถ้าจะเล็กลงเพิ่ม:
+       width: 18px; height: 18px; */
+  }
+
+  /* ราคาใหม่ ให้อยู่คอลัมน์ขวาแถวล่าง */
+  .product-price-new {
+    grid-column: 2;            /* คอลัมน์ 2 */
+    grid-row: 2;               /* แถวสอง */
+    font-size: 20px;
+    font-weight: 700;
+    color: #000;
+    line-height: 1.25;
+    white-space: nowrap;       /* กันตัดบรรทัด */
+  }
 }
+

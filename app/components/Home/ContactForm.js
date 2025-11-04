@@ -98,12 +98,69 @@ export default function ContactForm({
   /* =========================================================
      ฟังก์ชัน reCAPTCHA
      ========================================================= */
-  const handleCaptchaChange = async (token) => {
-    if (!token) return
-    setCaptchaToken(token)
-    await handleSubmitAfterCaptcha(token)
+/* =========================================================
+   ✅ ฟังก์ชัน reCAPTCHA (ส่งอัตโนมัติหลังติ๊ก)
+   ========================================================= */
+const handleCaptchaChange = async (token) => {
+  if (!token) return
+
+  // ✅ เก็บ token และปิด reCAPTCHA ทันที
+  setCaptchaToken(token)
+  setShowCaptcha(false)
+
+  // ✅ ตรวจสอบความถูกต้องของฟอร์มก่อนส่ง
+  const validationErrors = validate(formData)
+  if (Object.keys(validationErrors).length > 0) {
+    setErrors(validationErrors)
+    return
   }
 
+  // ✅ ถ้าข้อมูลครบ ส่งฟอร์มอัตโนมัติเลย
+  await handleSubmitAfterCaptcha(token)
+}
+
+
+/* =========================================================
+   ✅ ฟังก์ชันบันทึก Log การส่งข้อความสนใจ (actionType = 6)
+   ========================================================= */
+const handleLogSubmit = async () => {
+  try {
+    const logData = {
+      actionType: '6', // 6 = การส่งข้อความสนใจ
+      actionDetail: `ส่งแบบฟอร์มสนใจโซลาร์เซลล์ | สินค้า: ${formData.product || 'N/A'} | ราคา: ${
+        formData.package || 'N/A'
+      } | เวลาใช้ไฟ: ${formData.usageTime || 'N/A'} | จังหวัด: ${formData.province || 'N/A'}`,
+      typeUser: 'ผู้เยี่ยมชมเว็บไซต์',
+      datatype: 'แบบฟอร์มติดต่อ',
+      dataID: '0',         // ✅ ส่งค่า "0" เพื่อไม่ให้ null
+      datatypeID: '0',     // ✅ ส่งค่า "0" เพื่อไม่ให้ null
+      brandtype: 'N/A',
+      dataname: 'Contact Form',
+    };
+
+    const res = await fetch(`${baseUrl}/api/logWebsitepageapi`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-KEY': apiKey,
+      },
+      body: JSON.stringify(logData),
+    });
+
+    const text = await res.text();
+    if (!res.ok) {
+      console.error('❌ Log API error:', text);
+    } else {
+      console.log('✅ Log การส่งข้อความสนใจถูกบันทึกเรียบร้อยแล้ว:', text);
+    }
+  } catch (err) {
+    console.error('💥 เกิดข้อผิดพลาดในการบันทึก Log การส่งข้อความสนใจ:', err);
+  }
+};
+
+  /* =========================================================
+     handleSubmitAfterCaptcha
+     ========================================================= */
   const handleSubmitAfterCaptcha = async (token) => {
     setSubmitting(true)
     const address = [formData.subDistrict, formData.district, formData.province].filter(Boolean).join(', ')
@@ -140,6 +197,10 @@ export default function ContactForm({
         timer: 2500,
       })
 
+      // ✅ เรียกบันทึก Log หลังส่งสำเร็จ
+      await handleLogSubmit();
+
+      // ✅ รีเซ็ตฟอร์ม
       setFormData({
         product: '',
         package: '',
@@ -173,13 +234,13 @@ export default function ContactForm({
      ========================================================= */
   const handleNameChange = (e) => {
     const input = e.target.value
-    const filtered = input.replace(/[^ก-๙a-zA-Z\s]/g, '') // ห้ามตัวเลขและอักขระพิเศษ
+    const filtered = input.replace(/[^ก-๙a-zA-Z\s]/g, '')
     setFormData((prev) => ({ ...prev, fullName: filtered }))
   }
 
   const handlePhoneChange = (e) => {
     const input = e.target.value
-    const filtered = input.replace(/[^0-9]/g, '').slice(0, 10) // ตัวเลขเท่านั้น จำกัด 10 ตัว
+    const filtered = input.replace(/[^0-9]/g, '').slice(0, 10)
     setFormData((prev) => ({ ...prev, phone: filtered }))
   }
 
@@ -224,7 +285,17 @@ export default function ContactForm({
       return
     }
 
-    if (captchaToken) await handleSubmitAfterCaptcha(captchaToken)
+    if (!captchaToken) {
+      Swal.fire({
+        icon: "warning",
+        title: "กรุณายืนยัน reCAPTCHA",
+        text: "โปรดติ๊กที่ช่อง 'ฉันไม่ใช่หุ่นยนต์' ก่อนส่งข้อมูล",
+      })
+      return
+    }
+    setShowCaptcha(false)
+
+    await handleSubmitAfterCaptcha(captchaToken)
   }
 
   /* =========================================================
@@ -271,6 +342,7 @@ export default function ContactForm({
     setSuggestions([])
   }
 
+
   /* =========================================================
      ส่วนแสดงผล UI
      ========================================================= */
@@ -298,12 +370,13 @@ export default function ContactForm({
               <div style={{ color: '#19489D', padding: '5px 0' }}>กำลังโหลดข้อมูล...</div>
             ) : (
               <div className={`radio-group fade-in ${errors.topic ? 'error-border' : ''}`}>
-                {productOptions.map((product) => {
-                  const productName = locale === 'th' ? product.producttypenameTH : product.producttypenameEN
+                {productOptions.map((product, idx) => {
+                  const id = `product-${product?.producttypeID ?? idx}`;
+                  const productName = locale === 'th' ? product.producttypenameTH : product.producttypenameEN;
                   return (
-                    <label key={product.producttypeID} className="form-radio" htmlFor={`product-${product.producttypeID}`}>
+                    <label key={id} className="form-radio" htmlFor={id}>
                       <input
-                        id={`product-${product.producttypeID}`}
+                        id={id}
                         type="radio"
                         name="product"
                         value={product.producttypeID}
@@ -313,8 +386,9 @@ export default function ContactForm({
                       />
                       {productName}
                     </label>
-                  )
+                  );
                 })}
+
               </div>
             )}
             {errors.topic && <div className="error-text">{errors.topic}</div>}

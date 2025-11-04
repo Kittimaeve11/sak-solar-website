@@ -15,6 +15,9 @@ import './ProductCarousel.css';
 const Slider = dynamic(() => import('react-slick'), { ssr: false });
 const getSlidesByWidth = (w) => (w < 801 ? 1 : w < 1200 ? 2 : w < 1500 ? 3 : 4);
 
+/* ===============================
+   SKELETON โหลดชั่วคราว
+   =============================== */
 function HardSkeleton() {
   const [count, setCount] = useState(4);
   useEffect(() => {
@@ -54,6 +57,9 @@ function HardSkeleton() {
   );
 }
 
+/* ===============================
+   ลูกศรเลื่อนซ้าย/ขวา
+   =============================== */
 function Arrow({ onClick, direction }) {
   return (
     <button
@@ -66,6 +72,9 @@ function Arrow({ onClick, direction }) {
   );
 }
 
+/* ===============================
+   ส่วนหลัก ProductCarousel
+   =============================== */
 export default function ProductCarousel({ title, items, link = '#', loading = false }) {
   const [slidesToShow, setSlidesToShow] = useState(4);
   const [hydrated, setHydrated] = useState(false);
@@ -112,34 +121,51 @@ export default function ProductCarousel({ title, items, link = '#', loading = fa
     setIsDragging(dx > 5 || dy > 5);
   };
 
-  const handleLogClick = async (item) => {
-    try {
-      const logData = {
-        actionType: '1',
-        actionDetail: `หน้าหลัก รหัส: ${item.product_ID ?? item.product_num ?? '-'} หมายเลขผลิตภัณฑ์: ${
-          item.modelname ?? item.modelairname ?? item.name ?? '-'
-        }`,
-        typeUser: 'ผู้เยี่ยมชมเว็บไซต์',
-        datatype: 'ผลิตภัณฑ์',
-        dataID: item.product_ID ?? item.product_num ?? '0',
-        datatypeID: '1',
-        brandtype: item.producttypeID ?? '0',
-        dataname: item.modelname ?? item.modelairname ?? item.name ?? '-',
-      };
+/* =========================================================
+   ฟังก์ชันบันทึก Log ไป Backend (ตรงตาม productmainpageapi)
+   ========================================================= */
+const handleLogClick = async (item) => {
+  try {
+    // ตรวจดูข้อมูลก่อนส่ง (ใช้ตอน debug)
+    console.log("Log item:", item);
 
-      await fetch(`${process.env.NEXT_PUBLIC_BASE_URL_API}/log/saveLog`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API,
-        },
-        body: JSON.stringify(logData),
-      });
-    } catch (err) {
-      console.error('เกิดข้อผิดพลาดในการบันทึก Log:', err);
+    const logData = {
+      actionType: '1', // 1 = ดูผลิตภัณฑ์
+      actionDetail: `หน้าหลัก รหัส: ${item.product_ID ?? '-'} หมายเลขผลิตภัณฑ์: ${item.product_num ?? '-'}`,
+      typeUser: 'ผู้เยี่ยมชมเว็บไซต์', // ใครทำ
+      datatype: 'ผลิตภัณฑ์', // ประเภทเมนูที่กระทำ
+      dataID: item.product_ID ?? '0', // ไอดีข้อมูล
+      datatypeID: item.producttypeID ?? '0', // ไอดีประเภทข้อมูล (จาก producttypeID)
+      brandtype: item.productbrandID ?? item.probrandID ?? '0', // ไอดียี่ห้อ (ไม่มีใน productmainpageapi → ใช้ '0')
+      dataname: item.product_num ?? '-', // ชื่อข้อมูล (จาก product_num)
+    };
+
+    console.log("LogData ที่จะส่ง:", logData);
+
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL_API}/api/logWebsitepageapi`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-KEY': process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API,
+      },
+      body: JSON.stringify(logData),
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      console.error('Log API error:', err);
+    } else {
+      console.log('Log: บันทึกข้อมูลการดูผลิตภัณฑ์สำเร็จ');
     }
-  };
+  } catch (err) {
+    console.error(' เกิดข้อผิดพลาดในการบันทึก Log:', err);
+  }
+};
 
+
+/* ===============================
+     การ์ดสินค้า
+     =============================== */
   const renderCard = (item, idx) => {
     let finalPrice = null;
     if (item.isprice === '1' && item.price) {
@@ -184,7 +210,6 @@ export default function ProductCarousel({ title, items, link = '#', loading = fa
           </div>
         )}
 
-        {/* ปรับ layout ด้านล่างให้เรียงแน่นอนและระยะเท่ากันทุกใบ */}
         <div
           className="product-info"
           style={{
@@ -193,7 +218,7 @@ export default function ProductCarousel({ title, items, link = '#', loading = fa
             justifyContent: 'space-between',
             flexGrow: 1,
             padding: '1rem',
-            minHeight: '120px', // บังคับให้ทุกใบสูงเท่ากัน
+            minHeight: '120px',
             boxSizing: 'border-box',
           }}
         >
@@ -210,49 +235,19 @@ export default function ProductCarousel({ title, items, link = '#', loading = fa
             )}
           </div>
 
-          {/* ระบบไฟฟ้า (isprice=0) และ ราคา (isprice=1) — ขนาดเท่ากันแน่นอน */}
           {(item.isprice == 0 || item.isprice === '0') && item.size && (
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                fontWeight: 600,
-                fontSize: 20,
-                marginTop: '0',
-                color: '#000',
-                gap: 2,
-              }}
-            >
+            <div className="product-size-display">
               <MdOutlineElectricBolt size={25} color="#ffc300" />
               {item.size}
             </div>
           )}
 
           {item.isprice === '1' && item.price && (
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                fontWeight: 600,
-                fontSize: 20,
-                marginTop: '0',
-                color: '#000',
-                gap: 0,
-              }}
-            >
+            <div className="product-price-display">
               <TbCurrencyBaht size={25} />
               {Number(finalPrice ?? item.price).toLocaleString()} บาท
               {item.productpro_ispromotion === '1' && item.productpro_percent && (
-                <span
-                  style={{
-                    fontSize: 14,
-                    color: '#888',
-                    textDecoration: 'line-through',
-                    marginLeft: '0.5rem',
-                  }}
-                >
-                  {Number(item.price).toLocaleString()} บาท
-                </span>
+                <span className="product-price-old">{Number(item.price).toLocaleString()} บาท</span>
               )}
             </div>
           )}

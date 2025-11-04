@@ -142,7 +142,57 @@ export default function SolarCalculatorForm() {
   const [productsData, setProductsData] = useState([]);
   const [attemptedRoofInput, setAttemptedRoofInput] = useState(false);
 
-  /**
+const handleLogCalculate = async () => {
+  try {
+    const deviceInfo = navigator.userAgent || 'Unknown Device';
+    const userIP = await fetch('https://api.ipify.org?format=json')
+      .then(res => res.json())
+      .then(data => data.ip)
+      .catch(() => 'Unknown IP');
+
+    // ✅ ส่งค่า dataID และ datatypeID = "0" เพื่อไม่เป็น null
+    const logData = {
+      actionType: '5', // 5 = คำนวณ
+      actionDetail: `คำนวณ Solar Rooftop | ค่าไฟ ${formValues.electricityCost || 'N/A'} บาท | ระบบ ${
+        formValues.systemType === 'single'
+          ? '1 เฟส'
+          : formValues.systemType === 'three'
+          ? '3 เฟส'
+          : 'ไม่ระบุ'
+      } | พื้นที่ ${formValues.roofArea || 'N/A'} ตร.ม.`,
+      typeUser: 'ผู้เยี่ยมชมเว็บไซต์',
+      datatype: 'คำนวณ',
+      dataID: '0',        // ✅ บังคับเป็น "0"
+      datatypeID: '0',    // ✅ บังคับเป็น "0"
+      brandtype: 'N/A',
+      dataname: 'Solar Rooftop Calculator',
+      ipAddress: userIP,
+      device: deviceInfo,
+    };
+
+    console.log('📤 ส่ง Log การคำนวณ:', logData);
+
+    const res = await fetch(`${baseUrl}/api/logWebsitepageapi`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-KEY': apiKey,
+      },
+      body: JSON.stringify(logData),
+    });
+
+    const text = await res.text();
+    if (!res.ok) {
+      console.error('❌ Log API error:', text);
+    } else {
+      console.log('✅ Log การคำนวณถูกบันทึกเรียบร้อยแล้ว:', text);
+    }
+  } catch (err) {
+    console.error('💥 เกิดข้อผิดพลาดในการบันทึก Log การคำนวณ:', err);
+  }
+};
+
+/**
    * โหลดข้อมูลสินค้าเมื่อ component mount ครั้งแรก
    */
   useEffect(() => {
@@ -277,6 +327,7 @@ export default function SolarCalculatorForm() {
     const installationCost = 100000;
     const result = calculateSolarSize(electricityCostNum, dayUsage, installationCost);
     setResults(result);
+    handleLogCalculate();
   };
 
   /**

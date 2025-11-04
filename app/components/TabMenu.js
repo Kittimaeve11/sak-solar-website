@@ -190,15 +190,12 @@ export default function TabMenu() {
             {serviceOpen && (
               <ul className="dropdown-menu level-1">
                 {products.map((product) => {
-                  const isCurrent =
-                    pathname === `/products/${product.slug}` ||
-                    pathname.startsWith(`/products/${product.slug}/`);
                   const isOpen = activeProductSlug === product.slug;
 
                   return (
                     <li
                       key={product.slug}
-                      className={`dropdown-item ${isCurrent ? 'active' : ''}`}
+                      className="dropdown-item"
                       onMouseEnter={() =>
                         !isMobile && setActiveProductSlug(product.slug)
                       }
@@ -214,12 +211,10 @@ export default function TabMenu() {
                           justifyContent: 'space-between',
                         }}
                       >
-                        {/* Product link */}
+                        {/* ✅ หมวดหมู่: ส่ง query ?categories= */}
                         <Link
-                          href={`/products/${product.slug}`}
-                          className={`dropdown-toggle ${
-                            isOpen ? 'hovered' : ''
-                          }`}
+                          href={`/products?categories=${product.slug}`}
+                          className={`dropdown-toggle ${isOpen ? 'hovered' : ''}`}
                           onClick={handleLinkClick}
                           style={{ flexGrow: 1, textDecoration: 'none' }}
                         >
@@ -228,7 +223,6 @@ export default function TabMenu() {
                             : product.name.en}
                         </Link>
 
-                        {/* Brand toggle (only on mobile) */}
                         {isMobile && product.brands.length > 0 && (
                           <button
                             onClick={(e) => {
@@ -244,19 +238,13 @@ export default function TabMenu() {
                         )}
                       </div>
 
-                      {/* Brand submenu */}
+                      {/* ✅ ยี่ห้อ: ส่ง query ?categories=...&brands= */}
                       {isOpen && product.brands.length > 0 && (
                         <ul className="brand-submenu">
                           {product.brands.map((brand, index) => (
                             <li key={`${product.slug}-${brand.slug}-${index}`}>
                               <Link
-                                href={`/products/${product.slug}/${brand.slug}`}
-                                className={
-                                  pathname ===
-                                  `/products/${product.slug}/${brand.slug}`
-                                    ? 'active'
-                                    : ''
-                                }
+                                href={`/products?categories=${product.slug}&brands=${brand.slug}`}
                                 onClick={handleLinkClick}
                               >
                                 {brand.name}

@@ -41,20 +41,68 @@ const getImageUrl = (path) => {
 };
 
 // ===== Skeleton Loader =====
-function ProductSkeleton({ count = 8 }) {
+function ProductSkeleton({ count = 20 }) {
   return (
     <div className="skeletonGrid">
       {Array.from({ length: count }).map((_, i) => (
         <div key={i} className="skeletonCard">
-          <div className="skeletonImage"></div>
-          <div className="skeletonText title"></div>
-          <div className="skeletonText subTitle"></div>
-          <div className="skeletonText price"></div>
+          <div className="skeleton skeletonImage"></div>
+          <div className="skeleton skeletonText title"></div>
+          <div className="skeleton skeletonText subTitle"></div>
+          <div className="skeleton skeletonText price"></div>
         </div>
       ))}
     </div>
   );
 }
+
+// ✅ Memory Cache
+let productsCache = {
+  categories: null,
+  products: null,
+  brands: null,
+  timestamp: 0,
+};
+
+/* =========================================================
+   ✅ ฟังก์ชันบันทึก Log ไป Backend
+   ========================================================= */
+const handleLogClick = async (item) => {
+  try {
+    console.log("📦 Log item:", item);
+
+    const logData = {
+      actionType: '1', // 1 = ดูผลิตภัณฑ์
+      actionDetail: `หน้าผลิตภัณฑ์ รหัส: ${item.id ?? '-'} หมายเลขผลิตภัณฑ์: ${item.num ?? '-'}`,
+      typeUser: 'ผู้เยี่ยมชมเว็บไซต์',
+      datatype: 'ผลิตภัณฑ์',
+      dataID: item.id ?? '0',
+      datatypeID: item.categoryId ?? '0',
+      brandtype: item.brandId ?? '0',
+      dataname: item.num ?? '-',
+    };
+
+    console.log("📤 LogData ที่จะส่ง:", logData);
+
+    const res = await fetch(`${baseUrl}/api/logWebsitepageapi`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-KEY': apiKey,
+      },
+      body: JSON.stringify(logData),
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      console.error('❌ Log API error:', err);
+    } else {
+      console.log('✅ Log: บันทึกข้อมูลการดูผลิตภัณฑ์สำเร็จ');
+    }
+  } catch (err) {
+    console.error('💥 เกิดข้อผิดพลาดในการบันทึก Log:', err);
+  }
+};
 
 // ===== Main Component =====
 export default function ProductsPage() {
@@ -66,84 +114,151 @@ export default function ProductsPage() {
   const [categories, setCategories] = useState([]);
   const [brands, setBrands] = useState([]);
   const [filteredBrands, setFilteredBrands] = useState([]);
-
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedBrands, setSelectedBrands] = useState([]);
-
   const [loading, setLoading] = useState(true);
   const [isFading, setIsFading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
 
-  // ===== โหลด API =====
+  // ✅ โหลดข้อมูลจาก API
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setLoading(true);
+        let categoriesData = [];
+        let productsData = [];
+        let brandsData = [];
 
-        const [resHeader, resProducts] = await Promise.all([
-          fetch(`${baseUrl}/api/productHeaderapi`, { headers: { 'X-API-KEY': apiKey } }),
-          fetch(`${baseUrl}/api/productpageapi?offset=0&limit=9999`, { headers: { 'X-API-KEY': apiKey } })
-        ]);
+        const cacheAge = Date.now() - productsCache.timestamp;
+        const useCache =
+          productsCache.products &&
+          productsCache.categories &&
+          productsCache.brands &&
+          cacheAge < 1000 * 60 * 15;
 
-        const headerData = await resHeader.json();
-        const productData = await resProducts.json();
+        if (useCache) {
+          categoriesData = productsCache.categories;
+          productsData = productsCache.products;
+          brandsData = productsCache.brands;
+        } else {
+          setLoading(true);
+          const [resHeader, resProducts] = await Promise.all([
+            fetch(`${baseUrl}/api/productHeaderapi`, {
+              headers: { "X-API-KEY": apiKey },
+            }),
+            fetch(`${baseUrl}/api/productpageapi?offset=0&limit=9999`, {
+              headers: { "X-API-KEY": apiKey },
+            }),
+          ]);
 
-        if (headerData?.status && Array.isArray(headerData.result)) {
-          setCategories(headerData.result);
+          const headerData = await resHeader.json();
+          const productData = await resProducts.json();
+
+          if (headerData?.status && Array.isArray(headerData.result)) {
+            categoriesData = headerData.result;
+          }
+
+          if (productData?.status && Array.isArray(productData.result?.data)) {
+            const formatted = productData.result.data.map((p) => {
+              let mainImage = "";
+              try {
+                const gallery = JSON.parse(p.gallery || "[]");
+                mainImage = gallery[0] || "";
+              } catch {
+                mainImage = "";
+              }
+
+              return {
+                id: p.product_ID,
+                num: p.product_num,
+                model: p.modelname,
+                modelair: p.modelairname,
+                solarpanel: p.solarpanel,
+                size: p.installationsize,
+                price: parseFloat(p.price) || null,
+                isprice: p.isprice,
+                battery: p.battery,
+                mainImage,
+                categoryId: Number(p.protypeID),
+                brandId: Number(p.probrandID),
+                brandName: normalizeBrandName(p.BrandProduct_name),
+                brandOrder: p.BrandProduct_order
+                  ? Number(p.BrandProduct_order)
+                  : 9999,
+                isPromotion: p.productpro_ispromotion,
+                discountPercent: p.productpro_percent,
+              };
+            });
+
+            productsData = formatted;
+
+            const brandMap = new Map();
+            formatted.forEach((item) => {
+              const normalized = normalizeBrandName(item.brandName);
+              if (!brandMap.has(normalized)) {
+                brandMap.set(normalized, {
+                  brandName: normalized,
+                  brandId: item.brandId,
+                  categoryIds: [item.categoryId],
+                  order: item.brandOrder,
+                });
+              } else {
+                const exist = brandMap.get(normalized);
+                if (!exist.categoryIds.includes(item.categoryId)) {
+                  exist.categoryIds.push(item.categoryId);
+                }
+              }
+            });
+
+            brandsData = Array.from(brandMap.values()).sort(
+              (a, b) => a.order - b.order
+            );
+          }
+
+          productsCache = {
+            categories: categoriesData,
+            products: productsData,
+            brands: brandsData,
+            timestamp: Date.now(),
+          };
         }
 
-        if (productData?.status && Array.isArray(productData.result?.data)) {
-          const formatted = productData.result.data.map(p => {
-            let mainImage = "";
-            try {
-              const gallery = JSON.parse(p.gallery || "[]");
-              mainImage = gallery[0] || "";
-            } catch { mainImage = ""; }
+        setCategories(categoriesData);
+        setProducts(productsData);
+        setBrands(brandsData);
 
-            return {
-              id: p.product_ID,
-              num: p.product_num,
-              model: p.modelname,
-              modelair: p.modelairname,
-              solarpanel: p.solarpanel,
-              size: p.installationsize,
-              price: parseFloat(p.price) || null,
-              isprice: p.isprice,
-              battery: p.battery,
-              mainImage,
-              categoryId: Number(p.protypeID),
-              brandId: Number(p.probrandID),
-              brandName: normalizeBrandName(p.BrandProduct_name),
-              brandOrder: p.BrandProduct_order ? Number(p.BrandProduct_order) : 9999,
-              isPromotion: p.productpro_ispromotion,
-              discountPercent: p.productpro_percent,
-            };
-          });
+        const catParam = searchParams.get("categories");
+        const brandParam = searchParams.get("brands");
 
-          setProducts(formatted);
+        if (categoriesData.length > 0 && brandsData.length > 0) {
+          let selectedCat = [];
+          let selectedBrand = [];
 
-          // รวม brand ทั้งหมด
-          const brandMap = new Map();
-          formatted.forEach(item => {
-            const normalized = normalizeBrandName(item.brandName);
-            if (!brandMap.has(normalized)) {
-              brandMap.set(normalized, {
-                brandName: normalized,
-                brandId: item.brandId,
-                categoryIds: [item.categoryId],
-                order: item.brandOrder
-              });
-            } else {
-              const exist = brandMap.get(normalized);
-              if (!exist.categoryIds.includes(item.categoryId)) {
-                exist.categoryIds.push(item.categoryId);
-              }
-            }
-          });
+          if (catParam) {
+            const catSlugs = catParam.split(",");
+            selectedCat = categoriesData
+              .filter((c) => catSlugs.includes(slugify(c.producttypenameEN)))
+              .map((c) => Number(c.producttypeID));
+          }
 
-          const sortedBrands = Array.from(brandMap.values()).sort((a, b) => a.order - b.order);
-          setBrands(sortedBrands);
+          if (brandParam) {
+            const brandSlugs = brandParam.split(",");
+            selectedBrand = brandsData
+              .filter((b) => brandSlugs.includes(slugify(b.brandName)))
+              .map((b) => b.brandName);
+          }
+
+          setSelectedCategories(selectedCat);
+          setSelectedBrands(selectedBrand);
+
+          const filtered =
+            selectedCat.length > 0
+              ? brandsData.filter((b) =>
+                  selectedCat.some((id) => b.categoryIds.includes(id))
+                )
+              : brandsData;
+
+          setFilteredBrands(filtered);
         }
       } catch (err) {
         console.error("API Error", err);
@@ -153,101 +268,76 @@ export default function ProductsPage() {
     };
 
     fetchData();
-  }, []);
+  }, [searchParams]);
 
-  // ===== อ่านค่า filter จาก URL =====
-  useEffect(() => {
-    const catParam = searchParams.get('categories');
-    const brandParam = searchParams.get('brands');
-
-    if (categories.length > 0 && brands.length > 0) {
-      if (catParam) {
-        const catSlugs = catParam.split(',');
-        const matched = categories
-          .filter(c => catSlugs.includes(slugify(c.producttypenameEN)))
-          .map(c => Number(c.producttypeID));
-        setSelectedCategories(matched);
-        setFilteredBrands(brands.filter(b => matched.some(id => b.categoryIds.includes(id))));
-      } else {
-        setSelectedCategories([]);
-        setFilteredBrands(brands);
-      }
-
-      if (brandParam) {
-        const brandSlugs = brandParam.split(',');
-        const matched = brands
-          .filter(b => brandSlugs.includes(slugify(b.brandName)))
-          .map(b => b.brandName);
-        setSelectedBrands(matched);
-      } else {
-        setSelectedBrands([]);
-      }
-    }
-  }, [searchParams, categories, brands]);
-
-  // ===== อัปเดต URL เมื่อเลือก filter =====
+  // ===== อัปเดต URL =====
   const updateUrl = (newCategories, newBrands) => {
     const params = new URLSearchParams();
 
     if (newCategories.length > 0) {
       const catSlugs = newCategories
-        .map(id => {
-          const cat = categories.find(c => Number(c.producttypeID) === id);
+        .map((id) => {
+          const cat = categories.find((c) => Number(c.producttypeID) === id);
           return cat ? slugify(cat.producttypenameEN) : null;
         })
         .filter(Boolean);
-      params.set('categories', catSlugs.join(','));
+      params.set("categories", catSlugs.join(","));
     }
 
     if (newBrands.length > 0) {
-      const brandSlugs = newBrands.map(b => slugify(b));
-      params.set('brands', brandSlugs.join(','));
+      const brandSlugs = newBrands.map((b) => slugify(b));
+      params.set("brands", brandSlugs.join(","));
     }
 
     const query = params.toString();
-    router.replace(`/products${query ? `?${query}` : ''}`, { shallow: true });
+    router.replace(`/products${query ? `?${query}` : ""}`, { shallow: true });
   };
 
-  // ===== Handler: toggle category =====
+  // ===== Toggle Category =====
   const toggleCategory = (categoryId) => {
     const newCategories = selectedCategories.includes(categoryId)
-      ? selectedCategories.filter(id => id !== categoryId)
+      ? selectedCategories.filter((id) => id !== categoryId)
       : [...selectedCategories, categoryId];
 
     setSelectedCategories(newCategories);
-    const filtered = brands.filter(b => newCategories.some(id => b.categoryIds.includes(id)));
+    const filtered = brands.filter((b) =>
+      newCategories.some((id) => b.categoryIds.includes(id))
+    );
     setFilteredBrands(filtered);
     setCurrentPage(1);
-
     updateUrl(newCategories, selectedBrands);
   };
 
-  // ===== Handler: toggle brand =====
+  // ===== Toggle Brand =====
   const toggleBrand = (brandName) => {
     const normalized = normalizeBrandName(brandName);
     const newBrands = selectedBrands.includes(normalized)
-      ? selectedBrands.filter(b => b !== normalized)
+      ? selectedBrands.filter((b) => b !== normalized)
       : [...selectedBrands, normalized];
 
     setSelectedBrands(newBrands);
     setCurrentPage(1);
-
     updateUrl(selectedCategories, newBrands);
   };
 
-  // ===== ฟิลเตอร์ข้อมูล =====
+  // ===== Filter Products =====
   const filteredItems = useMemo(() => {
-    return products.filter(item => {
+    return products.filter((item) => {
       const inCategory =
-        selectedCategories.length === 0 || selectedCategories.includes(item.categoryId);
+        selectedCategories.length === 0 ||
+        selectedCategories.includes(item.categoryId);
       const inBrand =
-        selectedBrands.length === 0 || selectedBrands.includes(normalizeBrandName(item.brandName));
+        selectedBrands.length === 0 ||
+        selectedBrands.includes(normalizeBrandName(item.brandName));
       return inCategory && inBrand;
     });
   }, [products, selectedCategories, selectedBrands]);
 
   const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
-  const currentItems = filteredItems.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const currentItems = filteredItems.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   const handlePageChange = (page) => {
     if (page !== currentPage) {
@@ -262,32 +352,38 @@ export default function ProductsPage() {
 
   // ===== Render =====
   return (
-    <main className="products-container">
+    <main className="products-container page-fullwidth">
       {/* Sidebar */}
       <aside className="products-sidebar">
         <div className="sidebar-header">คัดกรองสินค้า</div>
 
         <section>
-          <h3>หมวดหมู่สินค้า</h3>
+          <h3 className="font-500orange">หมวดหมู่สินค้า</h3>
           <div className="filter-box">
-            {categories.map(cat => (
-              <label key={cat.producttypeID} className="checkbox-item">
-                <input
-                  type="checkbox"
-                  checked={selectedCategories.includes(Number(cat.producttypeID))}
-                  onChange={() => toggleCategory(Number(cat.producttypeID))}
-                />
-                {locale === 'en' ? cat.producttypenameEN : cat.producttypenameTH}
-              </label>
-            ))}
+            {loading ? (
+              <p className="fade-in" style={{ color: "#888", fontSize: "14px" }}>
+                กำลังโหลดหมวดหมู่สินค้า...
+              </p>
+            ) : (
+              categories.map(cat => (
+                <label key={cat.producttypeID} className="checkbox-item">
+                  <input
+                    type="checkbox"
+                    checked={selectedCategories.includes(Number(cat.producttypeID))}
+                    onChange={() => toggleCategory(Number(cat.producttypeID))}
+                  />
+                  {locale === 'en' ? cat.producttypenameEN : cat.producttypenameTH}
+                </label>
+              ))
+            )}
           </div>
         </section>
 
-        {selectedCategories.length > 0 && (
+        {selectedCategories.length > 0 && !loading && (
           <>
             <hr className="divider" />
             <section>
-              <h3>ยี่ห้อ</h3>
+              <h3 className="font-500orange">ยี่ห้อ</h3>
               <div className="filter-box">
                 {filteredBrands.map(b => (
                   <label key={b.brandId} className="checkbox-item">
@@ -304,7 +400,7 @@ export default function ProductsPage() {
           </>
         )}
 
-        {(selectedCategories.length > 0 || selectedBrands.length > 0) && (
+        {(selectedCategories.length > 0 || selectedBrands.length > 0) && !loading && (
           <button
             className="resetbutton"
             onClick={() => {
@@ -322,10 +418,14 @@ export default function ProductsPage() {
 
       {/* Products */}
       <section className="products-list">
-        <h2>{`สินค้าทั้งหมด ${filteredItems.length} รายการ`}</h2>
+        <h2>
+          {loading
+            ? "กำลังโหลดข้อมูลสินค้า..."
+            : `สินค้าทั้งหมด ${filteredItems.length} รายการ`}
+        </h2>
 
         {loading ? (
-          <ProductSkeleton count={8} />
+          <ProductSkeleton count={20} />
         ) : currentItems.length === 0 ? (
           <p className="no-products">ไม่มีสินค้าในตอนนี้</p>
         ) : (
@@ -343,13 +443,14 @@ export default function ProductsPage() {
                     href={`/products/${item.categoryId}/${item.brandId}/${item.num}`}
                     className="product-card fade-in"
                     style={{ animationDelay: `${index * 0.05}s` }}
+                    onClick={() => handleLogClick(item)} // ✅ เพิ่มบันทึก Log ตรงนี้
                   >
                     <div className="product-image-wrapper" style={{ position: "relative" }}>
                       <Image
                         src={getImageUrl(item.mainImage)}
                         alt={item.model || item.solarpanel}
-                        width={285}
-                        height={285}
+                        width={300}
+                        height={300}
                         unoptimized
                       />
                       {item.isPromotion === "1" && item.discountPercent && (
@@ -369,6 +470,7 @@ export default function ProductsPage() {
                             fontWeight: 600,
                             fontSize: 20,
                             marginTop: '0',
+                            marginBottom: '-0.5rem',
                             color: '#000',
                             gap: 2,
                           }}
@@ -390,10 +492,8 @@ export default function ProductsPage() {
                             gap: 0,
                           }}
                         >
-
                           <TbCurrencyBaht size={25} color="#000" />{" "}
                           {Number(finalPrice).toLocaleString()} บาท
-
                           {discount > 0 && (
                             <span
                               style={{
@@ -445,4 +545,4 @@ export default function ProductsPage() {
       </section>
     </main>
   );
-}
+} 

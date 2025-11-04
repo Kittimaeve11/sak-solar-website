@@ -15,8 +15,45 @@ const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 
 /* =========================================================
-   🧩 ฟังก์ชันล้างข้อความจาก description
+   ✅ ฟังก์ชันส่ง Log ไป Backend (แก้ brandtype = '0')
    ========================================================= */
+const handleLogClick = async (item) => {
+  try {
+    console.log("📰 Log item:", item);
+
+    const logData = {
+      actionType: '2', // 2 = ดูบทความ
+      actionDetail: `หน้าหลัก รหัสบทความ: ${item.editoria_id ?? '-'} หมายเลขบทความ: ${item.editoria_num ?? '-'} ชื่อบทความ: ${item.editoria_titieTH ?? '-'}`,
+      typeUser: 'ผู้เยี่ยมชมเว็บไซต์',
+      datatype: 'บทความ',
+      dataID: item.editoria_id ?? '0',
+      datatypeID: item.editoria_typeID ?? '0',
+      brandtype: '0', // ✅ เพิ่มฟิลด์นี้กัน error null
+      dataname: item.editoria_titieTH ?? '-',
+    };
+
+    console.log("📤 LogData ที่จะส่ง:", logData);
+
+    const res = await fetch(`${baseUrl}/api/logWebsitepageapi`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-KEY': apiKey,
+      },
+      body: JSON.stringify(logData),
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      console.error('❌ Log API error:', err);
+    } else {
+      console.log('✅ Log: บันทึกข้อมูลบทความสำเร็จ');
+    }
+  } catch (err) {
+    console.error('💥 เกิดข้อผิดพลาดในการบันทึก Log:', err);
+  }
+};
+
 function parseDescription(str) {
   if (!str || typeof str !== 'string') return '';
   return str
@@ -30,24 +67,18 @@ function parseDescription(str) {
     .trim();
 }
 
-/* =========================================================
-   🗓 ฟังก์ชันจัดการวันที่
-   ========================================================= */
 function safeDateString(dateString) {
   if (!dateString) return '-';
   const d = new Date(dateString);
   return isNaN(d.getTime())
     ? '-'
     : d.toLocaleDateString('th-TH', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-    });
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      });
 }
 
-/* =========================================================
-   📰 Component หลัก: SlideEditorial
-   ========================================================= */
 export default function SlideEditorial() {
   const [editorials, setEditorials] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -56,13 +87,17 @@ export default function SlideEditorial() {
   const sliderRef = useRef(null);
   const router = useRouter();
 
-  /* ---------------------------------------------------------
-     📡 ดึงข้อมูลจาก API
-     --------------------------------------------------------- */
   useEffect(() => {
-    const fetchData = async () => {
+    let isMounted = true;
+
+    async function loadEditorialOnce() {
+      if (window.__EDITORIAL_CACHE__) {
+        setEditorials(window.__EDITORIAL_CACHE__);
+        setIsLoading(false);
+        return;
+      }
+
       try {
-        setIsLoading(true);
         const res = await fetch(`${baseUrl}/api/edittormainpageapi`, {
           headers: { 'X-API-KEY': apiKey },
         });
@@ -76,11 +111,10 @@ export default function SlideEditorial() {
               if (Array.isArray(galleryArr) && galleryArr.length > 0) {
                 imageUrl = `${baseUrl}/${galleryArr[0]}`;
               }
-            } catch {
-              console.warn('Invalid gallery format:', item.editoria_gallary);
-            }
+            } catch {}
 
             return {
+              ...item, // เก็บค่าจริงทั้งหมดไว้ใช้ใน Log
               id: item.editoria_num || item.editoria_id,
               title:
                 item.editoria_titieTH ||
@@ -88,8 +122,8 @@ export default function SlideEditorial() {
                 'ไม่มีชื่อเรื่อง',
               content: parseDescription(
                 item.editoria_descriptionTH ||
-                item.editoria_descriptionEN ||
-                ''
+                  item.editoria_descriptionEN ||
+                  ''
               ),
               date: safeDateString(item.editoria_creacteAt),
               image: imageUrl,
@@ -98,21 +132,22 @@ export default function SlideEditorial() {
           });
 
           formatted.sort((a, b) => b.pin - a.pin);
+          window.__EDITORIAL_CACHE__ = formatted;
           setEditorials(formatted);
         }
       } catch (error) {
         console.error('❌ Failed to fetch editorial:', error);
       } finally {
-        setIsLoading(false);
+        if (isMounted) setIsLoading(false);
       }
-    };
+    }
 
-    fetchData();
+    loadEditorialOnce();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  /* ---------------------------------------------------------
-     📊 จัดการ custom dots
-     --------------------------------------------------------- */
   const slidesPerGroup = 3;
   const totalGroups =
     editorials.length > 0 ? Math.ceil(editorials.length / slidesPerGroup) : 0;
@@ -130,11 +165,8 @@ export default function SlideEditorial() {
     setTimeout(() => setDragging(false), 50);
   };
 
-  /* ---------------------------------------------------------
-     ⚙️ Custom Dots Component
-     --------------------------------------------------------- */
   const CustomDots = () => (
-    <div className="custom-dots">
+    <div className="custom-dots fade-in">
       {Array.from({ length: totalGroups }).map((_, index) => (
         <div
           key={index}
@@ -145,26 +177,20 @@ export default function SlideEditorial() {
     </div>
   );
 
-  /* ---------------------------------------------------------
-     🩶 Skeleton Loader (layout เท่าการ์ดจริงทุก pixel)
-     --------------------------------------------------------- */
   const SkeletonCard = () => (
     <div className="skeleton-slide-itemeditorial fade-in">
       <div className="skeleton-cardsilde-editorial">
-        <div className="skeleton-imagesilde-editorial" />
+        <div className="skeleton skeleton-imagesilde-editorial" />
         <div className="skeleton-content-editorial">
-          <div className="skeleton-titlesilde-editorial" />
-          <div className="skeleton-datesilde-editorial" />
-          <div className="skeleton-textsilde-editorial" />
-          <div className="skeleton-textsilde-editorial" />
+          <div className="skeleton skeleton-titlesilde-editorial" />
+          <div className="skeleton skeleton-datesilde-editorial" />
+          <div className="skeleton skeleton-textsilde-editorial" />
+          <div className="skeleton skeleton-textsilde-editorial" />
         </div>
       </div>
     </div>
   );
 
-  /* ---------------------------------------------------------
-     🖼 แสดงผลหลัก
-     --------------------------------------------------------- */
   return (
     <div className="editorial-wrapperslide fade-in">
       <h1 className="headtitleone">บทความ</h1>
@@ -176,7 +202,6 @@ export default function SlideEditorial() {
         </Link>
       </div>
 
-      {/* ======= Skeleton Loading ======= */}
       {isLoading ? (
         <div className="editorial-loading-wrapper">
           <div className="editorial-loading-grid">
@@ -199,22 +224,8 @@ export default function SlideEditorial() {
             beforeChange={handleBeforeChange}
             afterChange={handleAfterChange}
             responsive={[
-              {
-                breakpoint: 1024,
-                settings: {
-                  slidesToShow: 2,
-                  slidesToScroll: 1,
-                  swipeToSlide: true,
-                },
-              },
-              {
-                breakpoint: 640,
-                settings: {
-                  slidesToShow: 1,
-                  slidesToScroll: 1,
-                  swipeToSlide: true,
-                },
-              },
+              { breakpoint: 1120, settings: { slidesToShow: 2 } },
+              { breakpoint: 764, settings: { slidesToShow: 1 } },
             ]}
           >
             {editorials.map((item, i) => {
@@ -227,21 +238,19 @@ export default function SlideEditorial() {
                 <div key={item.id || `ed-${i}`} className="slide-itemeditorial fade-in">
                   <div
                     className="editorial-cardslide"
-                    onClick={() =>
-                      !dragging && router.push(`/editorial/${item.id}`)
-                    }
+                    onClick={async () => {
+                      if (dragging) return;
+                      await handleLogClick(item); // ✅ บันทึก Log ก่อนเปลี่ยนหน้า
+                      router.push(`/editorial/${item.id}`);
+                    }}
                   >
-                    <div
-                      className="editorial-image-wrapper"
-                      style={{ position: 'relative', height: 200 }}
-                    >
+                    <div className="editorial-image-wrapper">
                       <Image
                         src={item.image}
                         alt={item.title}
                         fill
                         className="card-imageslide"
                         sizes="(max-width: 768px) 100vw, 33vw"
-                        style={{ objectFit: 'cover' }}
                       />
                     </div>
 

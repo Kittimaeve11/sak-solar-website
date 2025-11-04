@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Slider from "react-slick";
 import { useLocale } from "@/app/Context/LocaleContext";
@@ -14,7 +14,47 @@ import "slick-carousel/slick/slick-theme.css";
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 
-// --------------------- ฟังก์ชันดึง URL รูป ---------------------
+/* =========================================================
+   ✅ ฟังก์ชันบันทึก Log
+   ========================================================= */
+const handleLogClick = async (article) => {
+  try {
+    const logData = {
+      actionType: "2", // 2 = ดูบทความ
+      actionDetail: `หน้าบทความแนะนำ รหัสบทความ: ${article.editoria_id ?? "-"} หมายเลขบทความ: ${article.editoria_num ?? "-"} ชื่อบทความ: ${article.editoria_titieTH ?? "-"}`,
+      typeUser: "ผู้เยี่ยมชมเว็บไซต์",
+      datatype: "บทความ",
+      dataID: article.editoria_id ?? "0",
+      datatypeID: article.editoria_typeID ?? "0",
+      brandtype: "0", // ✅ ป้องกัน NULL error
+      dataname: article.editoria_titieTH ?? "-",
+    };
+
+    console.log("📤 ส่ง Log (Recommended):", logData);
+
+    const res = await fetch(`${baseUrl}/api/logWebsitepageapi`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-API-KEY": apiKey,
+      },
+      body: JSON.stringify(logData),
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      console.error("❌ Log API error:", err);
+    } else {
+      console.log("✅ Log: บันทึกบทความแนะนำสำเร็จ");
+    }
+  } catch (err) {
+    console.error("💥 เกิดข้อผิดพลาดในการบันทึก Log:", err);
+  }
+};
+
+/* =========================================================
+   ฟังก์ชันช่วยดึงรูปและ clean HTML
+   ========================================================= */
 function getImageUrl(galleryStr) {
   if (!galleryStr) return "/images/no-image.jpg";
   try {
@@ -28,7 +68,6 @@ function getImageUrl(galleryStr) {
   }
 }
 
-// --------------------- ฟังก์ชัน clean HTML ---------------------
 function cleanHTML(str) {
   if (!str) return "";
   return str
@@ -53,11 +92,14 @@ const NextArrow = ({ onClick }) => (
   </button>
 );
 
-// --------------------- Component ---------------------
+/* =========================================================
+   ✅ Component หลัก
+   ========================================================= */
 export default function RecommendedArticles({ typeID, currentId }) {
   const { locale } = useLocale();
   const [articles, setArticles] = useState([]);
   const [imgError, setImgError] = useState({});
+  const router = useRouter();
 
   useEffect(() => {
     async function fetchRecommended() {
@@ -84,7 +126,7 @@ export default function RecommendedArticles({ typeID, currentId }) {
   // slider config
   const settings = {
     dots: false,
-    infinite: articles.length > 4, // เลื่อนได้ถ้ามากกว่า 4
+    infinite: articles.length > 4,
     speed: 500,
     slidesToShow: 4,
     slidesToScroll: 1,
@@ -120,8 +162,6 @@ export default function RecommendedArticles({ typeID, currentId }) {
                     article.editoria_descriptionEN;
 
               const description = cleanHTML(rawDescription);
-
-              // ✅ ถ้ายาวเกิน 120 ตัวอักษร ค่อยตัด + "..."
               const previewText =
                 description.length > 120
                   ? description.slice(0, 120) + "..."
@@ -132,10 +172,15 @@ export default function RecommendedArticles({ typeID, currentId }) {
                 : getImageUrl(article.editoria_gallary);
 
               return (
-                <Link
+                <div
                   key={article.editoria_id}
-                  href={`/editorial/${article.editoria_num}`}
                   className={styles.card}
+                  onClick={async () => {
+                    await handleLogClick(article); // ✅ บันทึก Log ก่อนเปลี่ยนหน้า
+                    setTimeout(() => {
+                      router.push(`/editorial/${article.editoria_num}`);
+                    }, 300); // ✅ delay เล็กน้อยเพื่อให้ Log ส่งก่อน redirect
+                  }}
                 >
                   {/* ✅ รูปแบบ 16:9 */}
                   <div
@@ -180,7 +225,7 @@ export default function RecommendedArticles({ typeID, currentId }) {
                       <FaArrowRightLong />
                     </p>
                   </div>
-                </Link>
+                </div>
               );
             })}
           </Slider>

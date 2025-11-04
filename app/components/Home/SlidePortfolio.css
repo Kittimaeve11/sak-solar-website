@@ -1,7 +1,6 @@
 /* =========================================================
-   Layout หลักของหน้า Portfolio (Grid Slide)
+   Layout หลักของหน้า Portfolio (Grid + Slide)
    ========================================================= */
-
 .portfolio-gridslide {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -24,11 +23,9 @@
 /* =========================================================
    Slide Item (ใช้ได้ทั้ง react-slick และ grid)
    ========================================================= */
-
 .slide-itemportfolio {
   padding: 1rem;
   margin-bottom: 0.8rem;
-  box-sizing: border-box;
   box-sizing: border-box;
   display: flex;
   align-items: stretch;
@@ -45,16 +42,24 @@
   align-items: stretch !important;
 }
 
-.slick-slide > div {
+.slick-slide>div {
   display: flex;
   align-items: stretch;
   width: 100%;
 }
 
+/* ✅ โหมด Skeleton — ปิด flex พิเศษของ react-slick เพื่อไม่ให้บีบ */
+.slide-itemportfolio.skeleton-mode {
+  padding: 0;
+  margin-bottom: 0;
+  display: block !important;
+  align-items: unset !important;
+  box-sizing: border-box;
+}
+
 /* =========================================================
    Card ของแต่ละผลงาน
    ========================================================= */
-
 .portfolio-cardslide {
   background: #fff;
   border-radius: 6px;
@@ -80,11 +85,10 @@
 /* =========================================================
    ส่วนรูปภาพของการ์ด
    ========================================================= */
-
 .portfolioslide-image-wrapper {
   position: relative;
   width: 100%;
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 16 / 9;
   overflow: hidden;
   border-radius: 6px 6px 0 0;
   flex-shrink: 0;
@@ -105,9 +109,8 @@
 }
 
 /* =========================================================
-   แถบ Banner ด้านบนซ้าย (โลโก้หรือชื่อแบรนด์)
+   แถบ Banner ด้านบนซ้าย (โลโก้บริษัท)
    ========================================================= */
-
 .portfolio-bannerslide {
   position: absolute;
   top: 12px;
@@ -140,7 +143,6 @@
 /* =========================================================
    เนื้อหาด้านล่างของการ์ด
    ========================================================= */
-
 .portfolio-contentslide {
   padding: 16px 20px 20px;
   display: flex;
@@ -187,115 +189,147 @@
   margin-top: 8px;
 }
 
-/* =========================================================
-   Responsive สำหรับอุปกรณ์ต่าง ๆ
-   ========================================================= */
-
-@media (max-width: 1024px) {
-  .portfolio-gridslide {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-  }
-
-  .slide-itemportfolio {
-    padding: 10px;
-  }
-
-  .project-titleslide {
-    font-size: 17px;
-  }
-}
-
-@media (max-width: 768px) {
-  .portfolio-gridslide {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
-
-  .slide-itemportfolio {
-    padding: 8px;
-  }
-
-  .portfolioslide-image-wrapper {
-    aspect-ratio: 16 / 9;
-  }
-
-  .project-titleslide {
-    font-size: 16px;
-  }
-
-  .portfolio-contentslide {
-    padding: 14px 16px 16px;
-  }
-}
 
 /* =========================================================
-   Skeleton Loading (เอฟเฟกต์โหลดข้อมูล)
+   Skeleton Loading (แบบซ้ายยาว–ขวาเล็ก)
    ========================================================= */
-
-.skeleton {
-  background-color: #e0e0e0;
-  border-radius: 4px;
-  animation: pulse 1.5s infinite ease-in-out;
-}
-
-@keyframes pulse {
-  0% { background-color: #e0e0e0; }
-  50% { background-color: #f5f5f5; }
-  100% { background-color: #e0e0e0; }
-}
-
 .skeleton-cardportfolio {
+  position: relative;
   display: flex;
   flex-direction: column;
-  border-radius: 6px;
   overflow: hidden;
-  background-color: white;
+  background: #fff;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   height: 100%;
+  min-height: 360px;
 }
 
+/* ส่วนรูปภาพด้านบน */
 .skeleton-imageportfolio {
+  position: relative;
   width: 100%;
-  aspect-ratio: 16 / 10;
+  padding-top: 56.25%;
   background-color: #e0e0e0;
+  border-radius: 8px 8px 0 0;
+}
+
+/* แถบ Banner จำลอง */
+.skeleton-bannerportfolio {
+  width: 60%;
+  position: absolute;
+  top: 15px;
+  left: 0;
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.92);
+  padding: 4px 10px;
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+}
+
+.skeleton-logo {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  background-color: #d8d8d8;
+  margin-right: 6px;
+}
+
+.skeleton-bannertext {
+  flex: 1;
+  height: 12px;
+  border-radius: 4px;
+  background-color: #e0e0e0;
+}
+
+/* ส่วนเนื้อหาล่าง */
+.skeleton-contentportfolio {
+  padding: 16px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .skeleton-titleportfolio {
   height: 20px;
-  margin: 16px 16px 8px 16px;
-  width: 70%;
-}
-
-.skeleton-lineportfolio {
-  height: 16px;
-  margin: 6px 16px;
   width: 90%;
-  display: block;
+  margin-bottom: 1rem;
+  background-color: #e0e0e0;
+  border-radius: 4px;
 }
 
-.fade-in {
-  opacity: 0;
-  animation: fadeIn 0.8s ease-in forwards;
+/* บรรทัดซ้าย–ขวา */
+.skeleton-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
 }
 
-@keyframes fadeIn {
-  to { opacity: 1; }
+.skeleton-line-left {
+  height: 18px;
+  margin: 0 0 6px 0;
+  width: 60%;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+}
+
+.skeleton-line-right {
+  height: 18px;
+  width: 25%;
+  margin: 0 0 6px 0;
+
+  background-color: #e0e0e0;
+  border-radius: 4px;
+}
+
+/* แถวเต็มบรรทัดสุดท้าย */
+.skeleton-line-full {
+  height: 16px;
+  width: 30%;
+  margin-top: 1rem;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+}
+
+/* ปิด hover */
+.skeleton-mode,
+.no-hover {
+  pointer-events: none !important;
+  cursor: default !important;
+  transform: none !important;
+  box-shadow: none !important;
 }
 
 /* =========================================================
    Grid สำหรับ Skeleton Loading
    ========================================================= */
-
 .portfolio-loading-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 24px;
   padding: 0 16px;
 }
 
-@media (max-width: 768px) {
-  .skeleton-banner {
-    aspect-ratio: 1.92 / 1;
+@media (max-width: 1120px) {
+  .portfolio-loading-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
+}
+
+@media (max-width: 768px) {
+  .portfolio-loading-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ปรับ grid skeleton ให้ตรงกับ slidesToShow */
+.portfolio-loading-grid.grid-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+.portfolio-loading-grid.grid-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+.portfolio-loading-grid.grid-1 {
+  grid-template-columns: 1fr;
 }

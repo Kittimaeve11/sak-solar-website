@@ -13,6 +13,46 @@ import styles from './RecommendedProducts.module.css';
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 
+/* =========================================================
+   ✅ ฟังก์ชันบันทึก Log ไป Backend (logWebsitepageapi)
+   ========================================================= */
+const handleLogClick = async (item) => {
+    try {
+        console.log("📦 Log item:", item);
+
+        const logData = {
+            actionType: '1', // 1 = ดูผลิตภัณฑ์
+            actionDetail: `สินค้าแนะนำ รหัส: ${item.product_ID ?? '-'} หมายเลขผลิตภัณฑ์: ${item.product_num ?? '-'}`,
+            typeUser: 'ผู้เยี่ยมชมเว็บไซต์',
+            datatype: 'ผลิตภัณฑ์',
+            dataID: item.product_ID ?? '0',
+            datatypeID: item.protypeID ?? '0',
+            brandtype: item.probrandID ?? '0',
+            dataname: item.product_num ?? '-',
+        };
+
+        console.log("📤 LogData ที่จะส่ง:", logData);
+
+        const res = await fetch(`${baseUrl}/api/logWebsitepageapi`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-API-KEY': apiKey,
+            },
+            body: JSON.stringify(logData),
+        });
+
+        if (!res.ok) {
+            const err = await res.text();
+            console.error('❌ Log API error:', err);
+        } else {
+            console.log('✅ Log: บันทึกข้อมูลการดูผลิตภัณฑ์สำเร็จ');
+        }
+    } catch (err) {
+        console.error('💥 เกิดข้อผิดพลาดในการบันทึก Log:', err);
+    }
+};
+
 // custom arrows
 const PrevArrow = ({ onClick }) => (
     <button className={styles.arrowPrev} onClick={onClick}><IoIosArrowBack /></button>
@@ -39,7 +79,7 @@ const getImageUrl = (gallery) => {
 
 export default function RecommendedProducts({ brandId, productId }) {
     const [items, setItems] = useState([]);
-    const isDragging = useRef(false); //  ตรวจว่าลากหรือคลิก
+    const isDragging = useRef(false); // ตรวจว่าลากหรือคลิก
 
     useEffect(() => {
         if (!brandId || !productId) return;
@@ -70,15 +110,15 @@ export default function RecommendedProducts({ brandId, productId }) {
         arrows: true,
         swipe: true,
         draggable: true,
-        swipeToSlide: true,     // ให้เลื่อนไปการ์ดที่ pointer ถึง
-        touchThreshold: 10,     // ตอบสนองไวขึ้น
+        swipeToSlide: true,
+        touchThreshold: 10,
         nextArrow: <NextArrow />,
         prevArrow: <PrevArrow />,
         beforeChange: () => {
-            isDragging.current = true; // เริ่ม drag
+            isDragging.current = true;
         },
         afterChange: () => {
-            setTimeout(() => { isDragging.current = false; }, 50); // reset หลังเลื่อนเสร็จ
+            setTimeout(() => { isDragging.current = false; }, 50);
         },
         responsive: [
             { breakpoint: 1024, settings: { slidesToShow: 2 } },
@@ -115,10 +155,13 @@ export default function RecommendedProducts({ brandId, productId }) {
                                 href={`/products/${item.protypeID}/${item.probrandID}/${item.product_num}`}
                                 className={`${styles.recommendedCard} fade-in`}
                                 style={{ animationDelay: `${idx * 0.08}s` }}
-                                onClick={(e) => {
+                                onClick={async (e) => {
                                     if (isDragging.current) {
-                                        e.preventDefault(); //  block click ถ้า drag
+                                        e.preventDefault(); // block click ถ้า drag
+                                        return;
                                     }
+                                    // ✅ เรียก Log เมื่อคลิก
+                                    await handleLogClick(item);
                                 }}
                             >
                                 <div className={styles.recommendedImage}>
@@ -148,9 +191,9 @@ export default function RecommendedProducts({ brandId, productId }) {
                                             style={{
                                                 display: "inline-flex",
                                                 alignItems: "center",
-                                                gap: "4px",        // ระยะห่างระหว่างไอคอนกับข้อความ
+                                                gap: "4px",
                                                 fontWeight: 600,
-                                                fontSize: "20px",  // ขนาดตัวหนังสือ
+                                                fontSize: "20px",
                                                 margin: 0,
                                             }}
                                         >
@@ -158,7 +201,6 @@ export default function RecommendedProducts({ brandId, productId }) {
                                             {item.installationsize}
                                         </p>
                                     )}
-
 
                                     {item.isprice === "1" && item.price && (
                                         <div style={{ position: "relative", display: "inline-block" }}>
@@ -170,7 +212,7 @@ export default function RecommendedProducts({ brandId, productId }) {
                                                         fontWeight: 600,
                                                         fontSize: "20px",
                                                         margin: 0,
-                                                        gap: "1px", // คุมระยะห่างระหว่างไอคอนกับตัวเลข
+                                                        gap: "1px",
                                                     }}
                                                 >
                                                     <TbCurrencyBaht size={22} color="#000" />
@@ -196,7 +238,6 @@ export default function RecommendedProducts({ brandId, productId }) {
                                             </div>
                                         </div>
                                     )}
-
                                 </div>
                             </Link>
                         </div>

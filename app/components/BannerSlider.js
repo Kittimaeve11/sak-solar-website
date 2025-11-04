@@ -11,6 +11,12 @@ import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 
+// ✅ เพิ่ม cache เก็บข้อมูลใน memory ระหว่าง navigation
+let bannerCache = {
+  data: null,
+  timestamp: 0, // เวลาเก็บ cache ล่าสุด
+};
+
 /* ปุ่มเลื่อนซ้าย */
 function PrevArrow({ onClick }) {
   return (
@@ -76,8 +82,7 @@ export default function BannerSlider() {
   /* ตรวจสอบขนาดหน้าจอ */
   useEffect(() => {
     const checkMobile = () => {
-      const mobile = window.innerWidth <= 767;
-      setIsMobile(mobile);
+      setIsMobile(window.innerWidth <= 767);
     };
 
     checkMobile();
@@ -89,18 +94,37 @@ export default function BannerSlider() {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  /* ดึงข้อมูลแบนเนอร์ */
+  /* ดึงข้อมูลแบนเนอร์ (ใช้ cache ป้องกันโหลดซ้ำ) */
   useEffect(() => {
     let isMounted = true;
+
     const fetchBanners = async () => {
       try {
+        // ✅ ถ้ามี cache และอายุไม่เกิน 10 นาที ใช้ข้อมูลเดิมเลย
+        const cacheAge = Date.now() - bannerCache.timestamp;
+        if (bannerCache.data && cacheAge < 1000 * 60 * 10) {
+          if (isMounted) {
+            setBanners(bannerCache.data);
+            setLoading(false);
+          }
+          return;
+        }
+
+        // ✅ โหลดใหม่จาก API
+        setLoading(true);
         const res = await fetch(`${baseUrl}/api/branderhomeapi`, {
           headers: { "X-API-KEY": apiKey },
           cache: "no-store",
         });
         const data = await res.json();
+
         if (isMounted && data.status && data.result) {
           setBanners(data.result);
+          // ✅ เก็บ cache
+          bannerCache = {
+            data: data.result,
+            timestamp: Date.now(),
+          };
         }
       } catch (err) {
         console.error("Error fetching banners:", err);
@@ -108,6 +132,7 @@ export default function BannerSlider() {
         if (isMounted) setLoading(false);
       }
     };
+
     fetchBanners();
     return () => {
       isMounted = false;
@@ -170,7 +195,7 @@ export default function BannerSlider() {
                     src={imgSrc}
                     alt={banner.brander_name || "banner"}
                     fill
-                    priority={index === 0}                // ✅ แก้ LCP เต็มรูปแบบ
+                    priority={index === 0} // ✅ ปรับปรุง LCP
                     loading={index === 0 ? "eager" : "lazy"}
                     draggable={false}
                     unoptimized

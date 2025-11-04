@@ -1,34 +1,55 @@
 'use client';
-import React from 'react';
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocale } from '../Context/LocaleContext';
 import { FaLine } from "react-icons/fa6";
 import { AiFillTikTok } from "react-icons/ai";
 import { FaFacebookSquare, FaYoutube, FaInstagramSquare } from "react-icons/fa";
 import { IoChevronBackOutline } from "react-icons/io5";
-import '@/styles//contact.css';
+import '@/styles/contact.css';
 import Link from "next/link";
 import 'react-toastify/dist/ReactToastify.css';
 import Image from 'next/image';
-import { validateFieldmoreInfo } from '../Utils/validation'
+import { validateFieldmoreInfo } from '../Utils/validation';
 import Swal from 'sweetalert2';
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
+import ReCAPTCHA from 'react-google-recaptcha';
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 
+// ✅ Memory cache
+let contactCache = {
+  contacts: null,
+  brander: null,
+  topics: null,
+  timestamp: 0,
+};
+
 export default function Page() {
-  const { messages, locale } = useLocale(); // ใช้ locale จาก Context
+  const { messages, locale } = useLocale();
   const [contacts, setContacts] = useState([]);
-  // const [socials, setSocials] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
   const [topics, setTopics] = useState([]);
   const [brander, setBrander] = useState([]);
+  const [captchaToken, setCaptchaToken] = useState(null);
+  const [showCaptcha, setShowCaptcha] = useState(false);
+  const [formData, setFormData] = useState({
+    topic: '',
+    name: '',
+    phone: '',
+    email: '',
+    message: ''
+  });
+  const [touched, setTouched] = useState({});
+  const [errors, setErrors] = useState({});
+
   console.log("Brander:", brander);
 
+  /* =========================================================
+     ✅ โหลดข้อมูล contacts / brander / topics
+     ========================================================= */
   useEffect(() => {
-    // เปลี่ยน title และ meta description
     document.title = 'ติดต่อเรา | บริษัท ศักดิ์สยาม โซลาร์ เอ็นเนอร์ยี่ จำกัด';
     const metaDescription = document.querySelector("meta[name='description']");
     if (metaDescription) {
@@ -40,30 +61,54 @@ export default function Page() {
       document.head.appendChild(meta);
     }
 
-    // ฟังก์ชัน async ดึงข้อมูลทั้งหมด
     const fetchAllData = async () => {
       try {
-        // ดึง contacts, brander และ topics พร้อมกัน
+        const cacheAge = Date.now() - contactCache.timestamp;
+        if (
+          contactCache.contacts &&
+          contactCache.brander &&
+          contactCache.topics &&
+          cacheAge < 1000 * 60 * 10
+        ) {
+          console.log("🟢 ใช้ข้อมูลจาก cache");
+          setContacts(contactCache.contacts);
+          setBrander(contactCache.brander);
+          setTopics(contactCache.topics);
+          setLoading(false);
+          return;
+        }
+
+        console.log("🔵 โหลดข้อมูลจาก API");
+        setLoading(true);
         const [contactsRes, branderRes, topicsRes] = await Promise.all([
-          fetch(`${baseUrl}/api/contactapi`, { headers: { 'X-API-KEY': `${apiKey}` } }),
-          fetch(`${baseUrl}/api/branderIDapi/8`, { headers: { 'X-API-KEY': `${apiKey}` } }),
-          fetch(`${baseUrl}/api/topicsapi`, { headers: { 'X-API-KEY': `${apiKey}` } }),
+          fetch(`${baseUrl}/api/contactapi`, { headers: { 'X-API-KEY': apiKey } }),
+          fetch(`${baseUrl}/api/branderIDapi/8`, { headers: { 'X-API-KEY': apiKey } }),
+          fetch(`${baseUrl}/api/topicsapi`, { headers: { 'X-API-KEY': apiKey } }),
         ]);
 
-        // แปลง response เป็น JSON
         const [contactsData, branderData, topicsData] = await Promise.all([
           contactsRes.json(),
           branderRes.json(),
           topicsRes.json(),
         ]);
 
-        setContacts(contactsData.result || []);
-        setBrander(branderData.data ? [branderData.data] : []);
-        if (topicsData.status && Array.isArray(topicsData.result)) {
-          setTopics(topicsData.result);
-        } else {
-          console.error("No topic data");
-        }
+        const contactsList = contactsData.result || [];
+        const branderList = branderData.data ? [branderData.data] : [];
+        const topicsList =
+          topicsData.status && Array.isArray(topicsData.result)
+            ? topicsData.result
+            : [];
+
+        setContacts(contactsList);
+        setBrander(branderList);
+        setTopics(topicsList);
+
+        contactCache = {
+          contacts: contactsList,
+          brander: branderList,
+          topics: topicsList,
+          timestamp: Date.now(),
+        };
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
@@ -74,33 +119,45 @@ export default function Page() {
     fetchAllData();
   }, []);
 
+  /* =========================================================
+     ✅ ฟังก์ชันบันทึก Log การส่งข้อความสอบถามเพิ่มเติม (actionType = 7)
+     ========================================================= */
+  const handleLogContactSubmit = async () => {
+    try {
+      const logData = {
+        actionType: '7',
+        actionDetail: `ส่งแบบฟอร์มสอบถามเพิ่มเติม | หัวข้อ: ${formData.topic || 'N/A'} | ชื่อ: ${
+          formData.name || 'N/A'
+        } | เบอร์โทร: ${formData.phone || 'N/A'} | อีเมล: ${
+          formData.email || 'ไม่มี'
+        } | ข้อความ: ${formData.message || 'ไม่มีข้อความ'}`,
+        typeUser: 'ผู้เยี่ยมชมเว็บไซต์',
+        datatype: 'สอบถามเพิ่มเติม',
+        dataID: '0',
+        datatypeID: '0',
+        brandtype: 'N/A',
+        dataname: 'Contact Page Form',
+      };
 
-  // useEffect(() => {
-  //   const fetchContacts = async () => {
-  //     try {
-  //       const res = await fetch('/api/data');
-  //       const data = await res.json();
-  //       setContacts(data.contacts || []);
-  //       setSocials(data.socials || []);
-  //     } catch (error) {
-  //       console.error('Error fetching contacts:', error);
-  //     }
-  //   };
+      fetch(`${baseUrl}/api/logWebsitepageapi`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-KEY': apiKey,
+        },
+        body: JSON.stringify(logData),
+      })
+        .then(res => res.text())
+        .then(text => console.log('✅ Log contact saved:', text))
+        .catch(err => console.warn('⚠️ log failed:', err.message));
+    } catch (err) {
+      console.warn('⚠️ unexpected log error:', err.message);
+    }
+  };
 
-  //   fetchContacts();
-  // }, []);
-
-  const [formData, setFormData] = useState({
-    topic: '',
-    name: '',
-    phone: '',
-    email: '',
-    message: ''
-  });
-
-  const [touched, setTouched] = useState({});
-  const [errors, setErrors] = useState({});
-
+  /* =========================================================
+     ✅ Validate & Handle Input
+     ========================================================= */
   const getClassName = (value, base) =>
     value.trim() === "" ? `${base} placeholder-gray` : `${base} input-filled`;
 
@@ -108,13 +165,9 @@ export default function Page() {
     const { name, value } = e.target;
     let newValue = value;
 
-    if (name === "name") {
-      newValue = value.replace(/[^\u0E01-\u0E4F\u0E5A-\u0E7Fa-zA-Z\s]/g, '');
-    } else if (name === "phone") {
-      newValue = value.replace(/\D/g, '').slice(0, 10);
-    } else if (name === "email") {
-      newValue = value.replace(/[^\x00-\x7F]/g, '');
-    }
+    if (name === "name") newValue = value.replace(/[^\u0E01-\u0E4Fa-zA-Z\s]/g, '');
+    else if (name === "phone") newValue = value.replace(/\D/g, '').slice(0, 10);
+    else if (name === "email") newValue = value.replace(/[^\x00-\x7F]/g, '');
 
     setFormData(prev => ({ ...prev, [name]: newValue }));
     setErrors(prev => ({ ...prev, [name]: '' }));
@@ -130,13 +183,20 @@ export default function Page() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (isSubmitting) return;
-    if (!validateAll()) return;
+  /* =========================================================
+     ✅ reCAPTCHA Handler
+     ========================================================= */
+  const handleCaptchaChange = async (token) => {
+    if (!token) return;
+    setCaptchaToken(token);
+    await handleSubmitAfterCaptcha(token);
+  };
 
+  /* =========================================================
+     ✅ ส่งข้อมูลจริงหลังผ่าน reCAPTCHA
+     ========================================================= */
+  const handleSubmitAfterCaptcha = async (token) => {
     setIsSubmitting(true);
-
     const payload = {
       topic: formData.topic,
       fullname: formData.name,
@@ -144,8 +204,6 @@ export default function Page() {
       email: formData.email || "",
       message: formData.message,
     };
-
-    console.log("📨 ส่งข้อมูล:", payload);
 
     try {
       const res = await fetch(`${baseUrl}/api/contactinqpageapi`, {
@@ -157,12 +215,7 @@ export default function Page() {
         body: JSON.stringify(payload),
       });
 
-      const text = await res.text();
-      console.log("📥 ตอบกลับจาก API (raw):", text);
-
-      if (!res.ok) throw new Error(`HTTP ${res.status}: ${text}`);
-
-      const data = JSON.parse(text);
+      const data = await res.json();
       if (data.status || data.success) {
         await Swal.fire({
           icon: "success",
@@ -172,31 +225,44 @@ export default function Page() {
           timer: 2500,
         });
 
+        // ✅ บันทึก Log หลังส่งสำเร็จ
+        handleLogContactSubmit();
+
+        // ✅ รีเซ็ตฟอร์ม
         setFormData({ topic: "", name: "", phone: "", email: "", message: "" });
+        setCaptchaToken(null);
+        setShowCaptcha(false);
       } else {
-        throw new Error(data.message || "ไม่สามารถบันทึกข้อมูลได้");
+        Swal.fire({ icon: "error", title: "ไม่สามารถส่งข้อมูลได้" });
       }
     } catch (err) {
-      console.error("❌ Error:", err);
-      await Swal.fire({
-        icon: "error",
-        title: "เกิดข้อผิดพลาด",
-        text: err.message,
-      });
+      Swal.fire({ icon: "error", title: "เกิดข้อผิดพลาด", text: err.message });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // const getIcon = (id) => {
+  /* =========================================================
+     ✅ เมื่อผู้ใช้กดปุ่ม "ส่งข้อความ"
+     ========================================================= */
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (isSubmitting) return;
+    if (!validateAll()) return;
 
-  //   switch (id) {
-  //     case 1: return <Image src="/images/building.png" alt="Building" style={{ width: 28, height: 28 }} />;
-  //     case 2: return <Image src="/images/phone.png" alt="Phone" style={{ width: 25, height: 25 }} />;
-  //     case 3: return <Image src="/images/mail.png" alt="Email" style={{ width: 28, height: 28 }} />;
-  //     default: return null;
-  //   }
-  // };
+    if (!showCaptcha) {
+      setShowCaptcha(true);
+      return;
+    }
+
+    if (captchaToken) {
+      await handleSubmitAfterCaptcha(captchaToken);
+    }
+  };
+
+  /* =========================================================
+     ✅ ไอคอนโซเชียล
+     ========================================================= */
   const socialIconMap = {
     facebook: <FaFacebookSquare style={{ color: "#1877f2", fontSize: 36 }} />,
     line: <FaLine style={{ color: "#00c300", fontSize: 35 }} />,
@@ -205,13 +271,15 @@ export default function Page() {
     tiktok: <AiFillTikTok style={{ color: "#101010", fontSize: 36 }} />,
   };
 
+  /* =========================================================
+     ✅ ไอคอนที่อยู่ / เบอร์ / อีเมล
+     ========================================================= */
   const getIcon = [
     <Image key="building" src="/images/icons/building.png" alt="Building" width={28} height={28} />,
     <Image key="phone" src="/images/icons/phone.png" alt="Phone" width={25} height={25} />,
-    <Image key="fax" src="/images/icons/fax.png" alt="Email" width={28} height={28} />,
-    <Image key="mail" src="/images/icons/mail.png" alt="Email" width={28} height={28} />,
-    <Image key="work" src="/images/icons/working-hours.png" alt="Email" width={28} height={28} />,
-
+    <Image key="fax" src="/images/icons/fax.png" alt="Fax" width={28} height={28} />,
+    <Image key="mail" src="/images/icons/mail.png" alt="Mail" width={28} height={28} />,
+    <Image key="work" src="/images/icons/working-hours.png" alt="Work Hours" width={28} height={28} />,
   ];
 
 
@@ -515,26 +583,51 @@ export default function Page() {
             </div>
           </div>
 
-          <div className="form-submit" style={{ display: 'flex', justifyContent: 'center', gap: '24px' }}>
-            <button type="submit" className="buttonPrimaryorange">
+          {/* reCAPTCHA */}
+          {showCaptcha && (
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1rem' }}>
+              <ReCAPTCHA
+                sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+                onChange={handleCaptchaChange}
+              />
+            </div>
+          )}
 
-
-              {messages.send}
+          {/* ปุ่มส่งฟอร์มและย้อนกลับ */}
+          <div
+            className="form-submit"
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              gap: '24px',
+              marginTop: '1.5rem',
+            }}
+          >
+            {/* ปุ่มส่ง */}
+            <button
+              type="submit"
+              className="buttonPrimaryorange"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'กำลังส่ง...' : 'ส่งข้อความ'}
             </button>
+
+            {/* ปุ่มย้อนกลับ */}
             <Link href="/" passHref>
               <button type="button" className="buttonPrimary">
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5em' }}>
-                  <IoChevronBackOutline style={{ fontSize: '1.2rem' }} />
-                  {messages.back}
+                  {/* <IoChevronBackOutline style={{ fontSize: '1.2rem' }} /> */}
+                  กลับสู่หน้าหลัก
                 </div>
               </button>
             </Link>
           </div>
+
         </form>
 
       </main>
 
-
-    </div >
+    </div>
   );
 }
