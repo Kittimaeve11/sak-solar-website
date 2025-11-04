@@ -19,37 +19,47 @@ const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 /* =========================================================
    ✅ ฟังก์ชันบันทึก Log ผลงานการติดตั้ง
 ========================================================= */
+// ฟังก์ชัน handleLogPortfolioClick ใช้สำหรับบันทึก Log เมื่อผู้ใช้คลิกดูผลงานการติดตั้ง
 const handleLogPortfolioClick = async (item) => {
   try {
+    // เตรียมข้อมูล Log ที่จะส่งไปยัง API
     const logData = {
-      actionType: "3",
+      actionType: "3", // รหัสประเภทการกระทำ (3 = คลิกผลงานการติดตั้ง)
       actionDetail: `หน้าหลัก รหัสผลงานการติดตั้ง: ${item.id ?? "0"} หมายเลขผลงานการติดตั้ง : ${item.num ?? "0"} ที่อยู่: ${item.title ?? "-"}`,
-      typeUser: "ผู้เยี่ยมชมเว็บไซต์",
-      datatype: "ผลงานการติดตั้ง",
-      dataID: item.id ?? "0",
-      datatypeID: item.portfolio_typeID ?? "0",
-      dataname: item.num ?? "0",
-      brandtype: "0",
+      // รายละเอียดเหตุการณ์ เช่น ID, หมายเลข, ชื่อ/ที่อยู่ผลงาน
+
+      typeUser: "ผู้เยี่ยมชมเว็บไซต์", // ประเภทผู้ใช้
+      datatype: "ผลงานการติดตั้ง", // ประเภทข้อมูล (ระบุว่าเป็นข้อมูลผลงาน)
+      dataID: item.id ?? "0", // รหัสข้อมูลหลัก (ID ของผลงาน)
+      datatypeID: item.portfolio_typeID ?? "0", // ประเภทผลงาน (type ID)
+      dataname: item.num ?? "0", // หมายเลขผลงาน ใช้เป็นชื่ออ้างอิง
+      brandtype: "0", // ป้องกันค่า null ที่อาจทำให้ API error
     };
 
-    console.log("📤 ส่ง Log ผลงาน:", logData);
+    // แสดงข้อมูล Log ที่จะถูกส่งออกใน console (สำหรับ debug)
+    console.log("ส่ง Log ผลงาน:", logData);
 
+    // เรียก API เพื่อบันทึก Log
     const res = await fetch(`${baseUrl}/api/logWebsitepageapi`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
-        "X-API-KEY": apiKey,
+        "Content-Type": "application/json", // ส่งข้อมูลเป็น JSON
+        "X-API-KEY": apiKey, // ส่ง API Key เพื่อยืนยันสิทธิ์
       },
-      body: JSON.stringify(logData),
+      body: JSON.stringify(logData), // แปลงข้อมูล Log เป็น JSON ก่อนส่ง
     });
 
+    // ตรวจสอบผลการส่งข้อมูล
     if (!res.ok) {
-      console.error("❌ ส่ง Log ล้มเหลว:", await res.text());
+      // ถ้าไม่สำเร็จ ให้แสดง error ที่ได้จาก API
+      console.error("ส่ง Log ล้มเหลว:", await res.text());
     } else {
-      console.log("✅ บันทึก Log เรียบร้อย");
+      // ถ้าสำเร็จ แสดงข้อความใน console
+      console.log("บันทึก Log เรียบร้อย");
     }
   } catch (err) {
-    console.error("💥 เกิดข้อผิดพลาดตอนส่ง Log:", err);
+    // ถ้าเกิดข้อผิดพลาดอื่น ๆ (เช่น network error)
+    console.error("เกิดข้อผิดพลาดตอนส่ง Log:", err);
   }
 };
 

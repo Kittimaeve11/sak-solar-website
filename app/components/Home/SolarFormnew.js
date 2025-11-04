@@ -142,17 +142,21 @@ export default function SolarCalculatorForm() {
   const [productsData, setProductsData] = useState([]);
   const [attemptedRoofInput, setAttemptedRoofInput] = useState(false);
 
+// ฟังก์ชัน handleLogCalculate ใช้สำหรับบันทึก Log เมื่อผู้ใช้ทำการคำนวณระบบ Solar Rooftop
 const handleLogCalculate = async () => {
   try {
+    // ดึงข้อมูลอุปกรณ์ของผู้ใช้ เช่น เบราว์เซอร์ หรือระบบปฏิบัติการ
     const deviceInfo = navigator.userAgent || 'Unknown Device';
+
+    // ดึง IP ของผู้ใช้จาก API ภายนอก (ipify.org)
     const userIP = await fetch('https://api.ipify.org?format=json')
       .then(res => res.json())
       .then(data => data.ip)
-      .catch(() => 'Unknown IP');
+      .catch(() => 'Unknown IP'); // หากดึง IP ไม่ได้ให้ใช้ค่าเริ่มต้น
 
-    // ✅ ส่งค่า dataID และ datatypeID = "0" เพื่อไม่เป็น null
+    // เตรียมข้อมูล Log ที่จะส่งไปยัง API
     const logData = {
-      actionType: '5', // 5 = คำนวณ
+      actionType: '5', // รหัสประเภทการกระทำ (5 = การคำนวณ)
       actionDetail: `คำนวณ Solar Rooftop | ค่าไฟ ${formValues.electricityCost || 'N/A'} บาท | ระบบ ${
         formValues.systemType === 'single'
           ? '1 เฟส'
@@ -160,35 +164,45 @@ const handleLogCalculate = async () => {
           ? '3 เฟส'
           : 'ไม่ระบุ'
       } | พื้นที่ ${formValues.roofArea || 'N/A'} ตร.ม.`,
-      typeUser: 'ผู้เยี่ยมชมเว็บไซต์',
-      datatype: 'คำนวณ',
-      dataID: '0',        // ✅ บังคับเป็น "0"
-      datatypeID: '0',    // ✅ บังคับเป็น "0"
-      brandtype: 'N/A',
-      dataname: 'Solar Rooftop Calculator',
-      ipAddress: userIP,
-      device: deviceInfo,
+      // รายละเอียดการคำนวณ เช่น ค่าไฟ ประเภทระบบ และพื้นที่
+
+      typeUser: 'ผู้เยี่ยมชมเว็บไซต์', // ประเภทผู้ใช้
+      datatype: 'คำนวณ', // ประเภทข้อมูลที่บันทึก
+      dataID: '0',        // บังคับให้เป็น "0" เพื่อป้องกันค่า null
+      datatypeID: '0',    // บังคับให้เป็น "0" เพื่อป้องกันค่า null
+      brandtype: 'N/A',   // ข้อมูลแบรนด์ (ไม่ระบุ)
+      dataname: 'Solar Rooftop Calculator', // ชื่อของฟังก์ชันหรือหน้าที่บันทึก Log
+      ipAddress: userIP,  // IP ของผู้ใช้
+      device: deviceInfo, // ข้อมูลอุปกรณ์ของผู้ใช้
     };
 
-    console.log('📤 ส่ง Log การคำนวณ:', logData);
+    // แสดงข้อมูล Log ที่จะส่งออกใน console (สำหรับตรวจสอบ)
+    console.log('ส่ง Log การคำนวณ:', logData);
 
+    // เรียก API เพื่อบันทึก Log
     const res = await fetch(`${baseUrl}/api/logWebsitepageapi`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'X-API-KEY': apiKey,
+        'Content-Type': 'application/json', // ระบุชนิดข้อมูลที่ส่งเป็น JSON
+        'X-API-KEY': apiKey, // ใส่ API Key เพื่อยืนยันสิทธิ์
       },
-      body: JSON.stringify(logData),
+      body: JSON.stringify(logData), // แปลงข้อมูล Log เป็น JSON ก่อนส่ง
     });
 
+    // อ่านผลลัพธ์จาก API
     const text = await res.text();
+
+    // ตรวจสอบผลการส่งข้อมูล
     if (!res.ok) {
-      console.error('❌ Log API error:', text);
+      // ถ้า API ตอบกลับไม่สำเร็จ ให้แสดงข้อความ error
+      console.error('Log API error:', text);
     } else {
-      console.log('✅ Log การคำนวณถูกบันทึกเรียบร้อยแล้ว:', text);
+      // ถ้า API ตอบกลับสำเร็จ แสดงข้อความใน console
+      console.log('Log การคำนวณถูกบันทึกเรียบร้อยแล้ว:', text);
     }
   } catch (err) {
-    console.error('💥 เกิดข้อผิดพลาดในการบันทึก Log การคำนวณ:', err);
+    // กรณีเกิดข้อผิดพลาด เช่น network error หรือการ fetch ล้มเหลว
+    console.error('เกิดข้อผิดพลาดในการบันทึก Log การคำนวณ:', err);
   }
 };
 

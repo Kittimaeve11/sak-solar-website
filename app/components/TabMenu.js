@@ -211,43 +211,47 @@ export default function TabMenu() {
                           justifyContent: 'space-between',
                         }}
                       >
-                        {/* ✅ หมวดหมู่: ส่ง query ?categories= */}
+                        {/*  หมวดหมู่: เมื่อผู้ใช้คลิกหมวดหมู่ จะส่ง query ?categories=... ไปยังหน้า products */}
                         <Link
-                          href={`/products?categories=${product.slug}`}
-                          className={`dropdown-toggle ${isOpen ? 'hovered' : ''}`}
-                          onClick={handleLinkClick}
-                          style={{ flexGrow: 1, textDecoration: 'none' }}
+                          href={`/products?categories=${product.slug}`} //  กำหนดลิงก์ไปยังหน้าสินค้าตาม slug ของหมวดหมู่
+                          className={`dropdown-toggle ${isOpen ? 'hovered' : ''}`} //  เพิ่มคลาสเมื่อเมนูเปิด เพื่อเปลี่ยนสไตล์
+                          onClick={handleLinkClick} //  ฟังก์ชันที่จัดการเหตุการณ์เมื่อคลิกลิงก์ (เช่น ปิดเมนู dropdown)
+                          style={{ flexGrow: 1, textDecoration: 'none' }} //  ทำให้ลิงก์ขยายเต็มพื้นที่และตัดเส้นใต้ข้อความ
                         >
+                          {/*  แสดงชื่อหมวดหมู่: สลับภาษาไทย/อังกฤษ ตาม locale ปัจจุบัน */}
                           {locale === 'th'
-                            ? product.name.th
-                            : product.name.en}
+                            ? product.name.th  
+                            : product.name.en} 
                         </Link>
 
+                        {/*  ปุ่มลูกศรเปิด/ปิดเมนูยี่ห้อ (เฉพาะบนมือถือเท่านั้น) */}
                         {isMobile && product.brands.length > 0 && (
                           <button
                             onClick={(e) => {
-                              e.preventDefault();
-                              toggleBrandSubmenu(product.slug);
+                              e.preventDefault(); //  ป้องกันการรีเฟรชหน้าเมื่อคลิก
+                              toggleBrandSubmenu(product.slug); //  เปิด/ปิดเมนูย่อยของยี่ห้อในหมวดหมู่นี้
                             }}
-                            aria-label="Toggle brand submenu"
-                            aria-expanded={isOpen}
-                            className="dropdown-toggle-button"
+                            aria-label="Toggle brand submenu" //  เพิ่มคำอธิบายเพื่อช่วยการเข้าถึง (Accessibility)
+                            aria-expanded={isOpen} //  ระบุสถานะเปิด/ปิดของเมนู
+                            className="dropdown-toggle-button" //  ใช้คลาสสำหรับสไตล์ปุ่มลูกศร
                           >
+                            {/*  สลับไอคอนขึ้น/ลงตามสถานะเปิดเมนู */}
                             {isOpen ? <IoIosArrowUp /> : <IoIosArrowDown />}
                           </button>
                         )}
                       </div>
 
-                      {/* ✅ ยี่ห้อ: ส่ง query ?categories=...&brands= */}
+                      {/*  เมนูย่อยแสดง “ยี่ห้อสินค้า” (brand submenu) เมื่อเปิดอยู่ */}
                       {isOpen && product.brands.length > 0 && (
                         <ul className="brand-submenu">
                           {product.brands.map((brand, index) => (
                             <li key={`${product.slug}-${brand.slug}-${index}`}>
+                              {/*  เมื่อคลิกยี่ห้อ จะส่ง query ทั้งหมวดหมู่และยี่ห้อไปยังหน้า /products */}
                               <Link
-                                href={`/products?categories=${product.slug}&brands=${brand.slug}`}
-                                onClick={handleLinkClick}
+                                href={`/products?categories=${product.slug}&brands=${brand.slug}`} //  ตัวอย่าง: /products?categories=solar-rooftop&brands=huawei
+                                onClick={handleLinkClick} // ปิด dropdown หลังจากคลิก
                               >
-                                {brand.name}
+                                {brand.name} {/*  แสดงชื่อยี่ห้อ */}
                               </Link>
                             </li>
                           ))}

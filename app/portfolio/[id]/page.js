@@ -376,9 +376,10 @@ export default function PortfolioDetailPage({ params }) {
             />
             <h3 style={{ marginBottom: '-1.5rem', marginTop: '-0.2rem', fontWeight: '600' }}>{t.contactTitle}</h3>
             <h5 style={{ marginBottom: '0rem' }}>{t.contactSubtitle}</h5>
-            <Link href={`/?product=`}>
+            <Link href={`/?product=${matchedProduct?.item?.protypeID || ''}`}>
               <button className={styles.contactButton}>{t.contactButton}</button>
             </Link>
+
           </div>
         </div>
       </div>

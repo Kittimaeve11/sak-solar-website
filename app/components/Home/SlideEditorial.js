@@ -19,38 +19,46 @@ const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
    ========================================================= */
 const handleLogClick = async (item) => {
   try {
-    console.log("📰 Log item:", item);
+    // แสดงข้อมูล item ที่ถูกคลิกใน console เพื่อใช้ตรวจสอบ
+    console.log("Log item:", item);
 
+    // สร้างข้อมูล log สำหรับบันทึกเหตุการณ์การคลิกบทความ
     const logData = {
-      actionType: '2', // 2 = ดูบทความ
-      actionDetail: `หน้าหลัก รหัสบทความ: ${item.editoria_id ?? '-'} หมายเลขบทความ: ${item.editoria_num ?? '-'} ชื่อบทความ: ${item.editoria_titieTH ?? '-'}`,
-      typeUser: 'ผู้เยี่ยมชมเว็บไซต์',
-      datatype: 'บทความ',
-      dataID: item.editoria_id ?? '0',
-      datatypeID: item.editoria_typeID ?? '0',
-      brandtype: '0', // ✅ เพิ่มฟิลด์นี้กัน error null
-      dataname: item.editoria_titieTH ?? '-',
+      actionType: '2', // รหัสประเภทการกระทำ (2 = การคลิกบทความ)
+      actionDetail: `หน้าหลัก รหัสบทความ: ${item.editoria_id ?? '-'} หมายเลขบทความ: ${item.editoria_num ?? '-'} ชื่อบทความ: ${item.editoria_titieTH ?? '-'}`, // รายละเอียดเหตุการณ์
+      typeUser: 'ผู้เยี่ยมชมเว็บไซต์', // ประเภทผู้ใช้
+      datatype: 'บทความ', // ประเภทข้อมูลที่มีการกระทำ
+      dataID: item.editoria_id ?? '0', // ID ของบทความ
+      datatypeID: item.editoria_typeID ?? '0', // ประเภทของบทความ (type ID)
+      brandtype: '0', // กำหนดค่าเริ่มต้นเป็น "0" เพื่อป้องกันค่า null
+      dataname: item.editoria_titieTH ?? '-', // ชื่อบทความ
     };
 
-    console.log("📤 LogData ที่จะส่ง:", logData);
+    // แสดงข้อมูล logData ที่จะส่งให้ API
+    console.log("LogData ที่จะส่ง:", logData);
 
+    // ส่งข้อมูล log ไปยัง API สำหรับบันทึกเหตุการณ์
     const res = await fetch(`${baseUrl}/api/logWebsitepageapi`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'X-API-KEY': apiKey,
+        'Content-Type': 'application/json', // กำหนดให้ส่งข้อมูลเป็น JSON
+        'X-API-KEY': apiKey, // ใส่ API Key เพื่อยืนยันสิทธิ์การเข้าถึง API
       },
-      body: JSON.stringify(logData),
+      body: JSON.stringify(logData), // แปลงข้อมูล log เป็น JSON ก่อนส่ง
     });
 
+    // ตรวจสอบผลลัพธ์การส่งข้อมูล
     if (!res.ok) {
+      // ถ้าเกิดข้อผิดพลาดจาก API ให้แสดงข้อความ error ใน console
       const err = await res.text();
-      console.error('❌ Log API error:', err);
+      console.error('Log API error:', err);
     } else {
-      console.log('✅ Log: บันทึกข้อมูลบทความสำเร็จ');
+      // แสดงผลใน console เมื่อบันทึกสำเร็จ
+      console.log('Log: บันทึกข้อมูลบทความสำเร็จ');
     }
   } catch (err) {
-    console.error('💥 เกิดข้อผิดพลาดในการบันทึก Log:', err);
+    // กรณีเกิดข้อผิดพลาดอื่น ๆ ระหว่างกระบวนการ (เช่น network error)
+    console.error('เกิดข้อผิดพลาดในการบันทึก Log:', err);
   }
 };
 

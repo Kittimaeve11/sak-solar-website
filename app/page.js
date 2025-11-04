@@ -1,16 +1,18 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import { useEffect, useState } from 'react';
+import { useLocale } from './Context/LocaleContext';
+import { useSearchParams } from 'next/navigation';
+
+// ✅ Components
 import FreeServices from './components/Home/FreeServices';
 import SolarFormnew from './components/Home/SolarFormnew';
 import ContactForm from './components/Home/ContactForm';
 import ProductCarousel from './components/Home/ProductCarousel';
-import { useLocale } from './Context/LocaleContext';
-import { useEffect, useState } from 'react';
 import SlidePortfolio from './components/Home/SlidePortfolio';
 import SlideEditorial from './components/Home/SlideEditorial';
 import SlideReview from './components/Home/SlideReview';
-import { useSearchParams } from 'next/navigation';
 
 // ✅ โหลด BannerSlider แบบไม่ SSR
 const BannerSlider = dynamic(() => import('./components/BannerSlider'), {
@@ -33,7 +35,7 @@ const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 export default function HomePage() {
   const { locale } = useLocale();
   const searchParams = useSearchParams();
-  const productFromUrl = searchParams.get('product') || '';
+  const productFromUrl = searchParams?.get('product') || '';
 
   const [services, setServices] = useState([]);
   const [loadingServices, setLoadingServices] = useState(true);
@@ -43,27 +45,43 @@ export default function HomePage() {
   const [tambons, setTambons] = useState([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
 
+  // ✅ โหลดข้อมูลทั้งหมด
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    const cacheText = sessionStorage.getItem('HOME_CACHE');
-    if (cacheText) {
-      try {
-        const c = JSON.parse(cacheText);
-        console.log('💾 ใช้ข้อมูลจาก cache');
-        setServices(c.services || []);
-        setProductTypes(c.productTypes || []);
-        setProvinces(c.provinces || []);
-        setAmphures(c.amphures || []);
-        setTambons(c.tambons || []);
-        setLoadingServices(false);
-        setLoadingProducts(false);
-        return;
-      } catch (e) {
-        console.warn('⚠️ Cache เสียหาย ลบออก');
-        sessionStorage.removeItem('HOME_CACHE');
-      }
-    }
+// ดึงข้อมูล cache จาก sessionStorage โดยใช้ key ชื่อว่า 'HOME_CACHE'
+const cacheText = sessionStorage.getItem('HOME_CACHE');
+
+// ตรวจสอบว่ามีข้อมูล cache อยู่หรือไม่
+if (cacheText) {
+  try {
+    // แปลงข้อความ JSON ที่เก็บไว้ใน sessionStorage ให้กลับมาเป็น object
+    const c = JSON.parse(cacheText);
+
+    // แสดงข้อความใน console เพื่อบอกว่ากำลังใช้ข้อมูลจาก cache (ไม่ต้องโหลดจาก API)
+    console.log('ใช้ข้อมูลจาก cache');
+
+    // ตั้งค่าข้อมูลใน state จาก cache ที่มีอยู่
+    // เพื่อให้หน้าเว็บแสดงข้อมูลทันทีโดยไม่ต้องรอโหลดจาก API
+    setServices(c.services || []);         // ตั้งค่าข้อมูลบริการ (FreeServices)
+    setProductTypes(c.productTypes || []); // ตั้งค่าข้อมูลสินค้า
+    setProvinces(c.provinces || []);       // ตั้งค่าข้อมูลจังหวัด
+    setAmphures(c.amphures || []);         // ตั้งค่าข้อมูลอำเภอ
+    setTambons(c.tambons || []);           // ตั้งค่าข้อมูลตำบล
+
+    // อัปเดตสถานะการโหลดให้เสร็จสมบูรณ์
+    setLoadingServices(false);
+    setLoadingProducts(false);
+
+    // ออกจากฟังก์ชันทันที (ไม่ต้องไปโหลดข้อมูลจาก API ด้านล่าง)
+    return;
+  } catch {
+    // หากเกิดข้อผิดพลาดระหว่างแปลงข้อมูล (เช่น cache เสียหาย)
+    // ให้ลบ cache ทิ้งและแสดงข้อความแจ้งเตือนใน console
+    console.warn('Cache เสียหาย ลบออก');
+    sessionStorage.removeItem('HOME_CACHE');
+  }
+}
 
     async function loadData() {
       try {
@@ -94,15 +112,17 @@ export default function HomePage() {
           .map((h) => {
             const ptype = products.find((p) => p.producttypeID === h.producttypeID);
             if (!ptype) return null;
+
             const items =
               ptype.Products?.map((prod) => {
-                const nameClean = prod.modelname
-                  ? prod.modelname.replace(/เฟส\s*/gi, '').replace(/Phase\s*/gi, '').trim()
-                  : prod.solarpanel?.replace(/เฟส\s*/gi, '').replace(/Phase\s*/gi, '').trim() ||
-                    'ไม่พบข้อมูลชื่อสินค้า';
+                const nameClean =
+                  prod.modelname?.replace(/เฟส\s*/gi, '').replace(/Phase\s*/gi, '').trim() ||
+                  prod.solarpanel?.replace(/เฟส\s*/gi, '').replace(/Phase\s*/gi, '').trim() ||
+                  'ไม่พบข้อมูลชื่อสินค้า';
                 const wattMatch = prod.solarpanel?.match(/\d+\s*W/i);
                 const displayName = wattMatch ? `${nameClean} (${wattMatch[0]})` : nameClean;
                 const brandObj = h.Brand?.find((b) => b.productbrandID === prod.productbrandID);
+
                 return {
                   ...prod,
                   name: displayName,
@@ -115,6 +135,7 @@ export default function HomePage() {
                   productbrandName: brandObj?.productbrandname || '',
                 };
               }) || [];
+
             return { ...ptype, items };
           })
           .filter(Boolean);
@@ -145,7 +166,11 @@ export default function HomePage() {
 
     if (productFromUrl) {
       const el = document.getElementById('contact');
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
+      if (el) {
+        setTimeout(() => {
+          el.scrollIntoView({ behavior: 'smooth' });
+        }, 300);
+      }
     }
   }, [productFromUrl]);
 
@@ -190,8 +215,8 @@ export default function HomePage() {
       <SolarFormnew />
 
       {/* ✅ Contact Section */}
-      <div id="contact"> 
-         <ContactForm
+      <div id="contact">
+        <ContactForm
           productOptions={productTypes}
           provinces={provinces}
           amphures={amphures}
@@ -206,7 +231,7 @@ export default function HomePage() {
           width: '80%',
           margin: '20px auto',
         }}
-      ></div> 
+      ></div>
 
       {/* ✅ Editorial / Portfolio / Review */}
       <SlideEditorial />
@@ -217,10 +242,9 @@ export default function HomePage() {
         .banner-wrapperhome {
           position: relative;
           width: 100%;
-          height: auto; /* ไม่ fix ด้วย aspect-ratio เพื่อให้ responsive */
+          height: auto;
         }
-
-        .banner-wrapperhome  :global(img) {
+        .banner-wrapperhome :global(img) {
           width: 100%;
           height: auto;
           object-fit: cover;

@@ -270,55 +270,89 @@ export default function ProductsPage() {
     fetchData();
   }, [searchParams]);
 
-  // ===== อัปเดต URL =====
-  const updateUrl = (newCategories, newBrands) => {
-    const params = new URLSearchParams();
+// ===== อัปเดต URL =====
+const updateUrl = (newCategories, newBrands) => {
+  const params = new URLSearchParams(); 
+  // สร้าง object สำหรับจัดการ query string ของ URL เช่น ?categories=...&brands=...
 
-    if (newCategories.length > 0) {
-      const catSlugs = newCategories
-        .map((id) => {
-          const cat = categories.find((c) => Number(c.producttypeID) === id);
-          return cat ? slugify(cat.producttypenameEN) : null;
-        })
-        .filter(Boolean);
-      params.set("categories", catSlugs.join(","));
-    }
+  // กรณีมีการเลือก "หมวดหมู่สินค้า"
+  if (newCategories.length > 0) {
+    const catSlugs = newCategories
+      .map((id) => {
+        // หา category object จาก id ที่เลือก
+        const cat = categories.find((c) => Number(c.producttypeID) === id);
+        // คืนค่า slug (ชื่อหมวดหมู่แบบ URL-friendly เช่น "solar-rooftop")
+        return cat ? slugify(cat.producttypenameEN) : null;
+      })
+      .filter(Boolean); // ลบค่าที่เป็น null ออก
+    params.set("categories", catSlugs.join(",")); 
+    // ใส่ค่า categories ลงใน query string เช่น ?categories=solar-rooftop,deye
+  }
 
-    if (newBrands.length > 0) {
-      const brandSlugs = newBrands.map((b) => slugify(b));
-      params.set("brands", brandSlugs.join(","));
-    }
+  // กรณีมีการเลือก "ยี่ห้อสินค้า"
+  if (newBrands.length > 0) {
+    const brandSlugs = newBrands.map((b) => slugify(b)); 
+    // แปลงชื่อแบรนด์ให้เป็น slug เช่น "Huawei" → "huawei"
+    params.set("brands", brandSlugs.join(",")); 
+    // ใส่ค่า brands ลงใน query string เช่น ?brands=huawei,growatt
+  }
 
-    const query = params.toString();
-    router.replace(`/products${query ? `?${query}` : ""}`, { shallow: true });
-  };
+  // รวม query ทั้งหมดเข้าด้วยกัน
+  const query = params.toString(); 
+  // ตัวอย่างผลลัพธ์: "categories=solar-rooftop&brands=huawei"
 
-  // ===== Toggle Category =====
-  const toggleCategory = (categoryId) => {
-    const newCategories = selectedCategories.includes(categoryId)
-      ? selectedCategories.filter((id) => id !== categoryId)
-      : [...selectedCategories, categoryId];
+  // อัปเดต URL ในเบราว์เซอร์โดยไม่ reload หน้า
+  router.replace(`/products${query ? `?${query}` : ""}`, { shallow: true });
+  // ถ้าไม่มี query จะได้เป็น /products
+  // ถ้ามี query จะได้เป็น /products?categories=...&brands=...
+  // shallow:true หมายถึงเปลี่ยน URL โดยไม่รีเฟรช component ทั้งหน้า
+};
 
-    setSelectedCategories(newCategories);
-    const filtered = brands.filter((b) =>
-      newCategories.some((id) => b.categoryIds.includes(id))
-    );
-    setFilteredBrands(filtered);
-    setCurrentPage(1);
-    updateUrl(newCategories, selectedBrands);
-  };
 
-  // ===== Toggle Brand =====
-  const toggleBrand = (brandName) => {
-    const normalized = normalizeBrandName(brandName);
-    const newBrands = selectedBrands.includes(normalized)
-      ? selectedBrands.filter((b) => b !== normalized)
-      : [...selectedBrands, normalized];
+// ===== Toggle Category =====
+const toggleCategory = (categoryId) => {
+  // ตรวจสอบว่าผู้ใช้คลิก category เดิม (เพื่อต้องการเอาออก) หรือใหม่ (เพื่อเพิ่ม)
+  const newCategories = selectedCategories.includes(categoryId)
+    ? selectedCategories.filter((id) => id !== categoryId) // ถ้ามีอยู่แล้ว ให้ลบออก
+    : [...selectedCategories, categoryId]; // ถ้ายังไม่มี ให้เพิ่มเข้าไป
 
-    setSelectedBrands(newBrands);
-    setCurrentPage(1);
-    updateUrl(selectedCategories, newBrands);
-  };
+  // อัปเดต state ของหมวดหมู่ที่เลือก
+  setSelectedCategories(newCategories);
+
+  // กรองยี่ห้อที่อยู่ในหมวดหมู่ที่เลือกเท่านั้น
+  const filtered = brands.filter((b) =>
+    newCategories.some((id) => b.categoryIds.includes(id))
+  );
+  setFilteredBrands(filtered); // แสดงเฉพาะแบรนด์ที่สัมพันธ์กับหมวดหมู่ที่เลือก
+
+  // รีเซ็ตหน้าปัจจุบันของ pagination กลับไปหน้าแรก
+  setCurrentPage(1);
+
+  // อัปเดต URL ให้สะท้อนกับหมวดหมู่ที่เลือก
+  updateUrl(newCategories, selectedBrands);
+};
+
+
+// ===== Toggle Brand =====
+const toggleBrand = (brandName) => {
+  const normalized = normalizeBrandName(brandName); 
+  // แปลงชื่อแบรนด์ให้อยู่ในรูปแบบมาตรฐาน เช่น "huawel" → "Huawei"
+
+  // ตรวจสอบว่าผู้ใช้คลิกเลือกยี่ห้อเดิมหรือใหม่
+  const newBrands = selectedBrands.includes(normalized)
+    ? selectedBrands.filter((b) => b !== normalized) // ถ้ามีอยู่แล้ว ให้เอาออก
+    : [...selectedBrands, normalized]; // ถ้ายังไม่มี ให้เพิ่มเข้าไป
+
+  // อัปเดต state ของแบรนด์ที่เลือก
+  setSelectedBrands(newBrands);
+
+  // รีเซ็ต pagination กลับไปหน้าแรก
+  setCurrentPage(1);
+
+  // อัปเดต URL ให้สะท้อนกับแบรนด์ที่เลือก
+  updateUrl(selectedCategories, newBrands);
+};
+
 
   // ===== Filter Products =====
   const filteredItems = useMemo(() => {

@@ -45,24 +45,46 @@ export default function ContactForm({
   const [captchaToken, setCaptchaToken] = useState(null)
   const [showCaptcha, setShowCaptcha] = useState(false)
   const [loadingProducts, setLoadingProducts] = useState(true)
-
   /* =========================================================
-     โหลดข้อมูลและจัดการคลิกนอก dropdown
+     ✅ โหลดข้อมูล + ตรวจจับ product จาก URL แล้วติ๊กอัตโนมัติ + scroll มาที่ฟอร์ม
      ========================================================= */
   useEffect(() => {
+    let timer;
+
+    // ✅ โหลด productOptions เสร็จ → ปิดสถานะโหลด
     if (productOptions && productOptions.length > 0) {
-      const timer = setTimeout(() => setLoadingProducts(false), 600)
-      return () => clearTimeout(timer)
+      timer = setTimeout(() => setLoadingProducts(false), 600);
     }
 
+    // ✅ อ่าน query string จาก URL
+    const productParam = searchParams.get('product'); // อ่านแค่ค่าที่ต้องใช้
+    if (productParam) {
+      setFormData((prev) => ({ ...prev, product: productParam }));
+
+      // ✅ scroll ไปยังฟอร์ม
+      setTimeout(() => {
+        document.querySelector(`.${styles.formWrapper}`)?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      }, 300);
+    }
+
+    // ✅ คลิกนอก dropdown → ปิด autocomplete
     const handleClickOutside = (e) => {
       if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
-        setSuggestions([])
+        setSuggestions([]);
       }
-    }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [productOptions])
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+
+    // ✅ cleanup function
+    return () => {
+      if (timer) clearTimeout(timer);
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  // ✅ ใช้เฉพาะค่าที่ไม่เปลี่ยน reference
+  }, [productOptions, searchParams?.toString()]);
 
   /* =========================================================
      ฟังก์ชันตรวจสอบข้อมูลฟอร์มก่อนส่ง
@@ -132,8 +154,8 @@ const handleLogSubmit = async () => {
       } | เวลาใช้ไฟ: ${formData.usageTime || 'N/A'} | จังหวัด: ${formData.province || 'N/A'}`,
       typeUser: 'ผู้เยี่ยมชมเว็บไซต์',
       datatype: 'แบบฟอร์มติดต่อ',
-      dataID: '0',         // ✅ ส่งค่า "0" เพื่อไม่ให้ null
-      datatypeID: '0',     // ✅ ส่งค่า "0" เพื่อไม่ให้ null
+      dataID: '0',         // ส่งค่า "0" เพื่อไม่ให้ null
+      datatypeID: '0',     // ส่งค่า "0" เพื่อไม่ให้ null
       brandtype: 'N/A',
       dataname: 'Contact Form',
     };
@@ -149,85 +171,102 @@ const handleLogSubmit = async () => {
 
     const text = await res.text();
     if (!res.ok) {
-      console.error('❌ Log API error:', text);
+      console.error('Log API error:', text);
     } else {
-      console.log('✅ Log การส่งข้อความสนใจถูกบันทึกเรียบร้อยแล้ว:', text);
+      console.log(' Log การส่งข้อความสนใจถูกบันทึกเรียบร้อยแล้ว:', text);
     }
   } catch (err) {
-    console.error('💥 เกิดข้อผิดพลาดในการบันทึก Log การส่งข้อความสนใจ:', err);
+    console.error('เกิดข้อผิดพลาดในการบันทึก Log การส่งข้อความสนใจ:', err);
   }
 };
 
-  /* =========================================================
-     handleSubmitAfterCaptcha
-     ========================================================= */
-  const handleSubmitAfterCaptcha = async (token) => {
-    setSubmitting(true)
-    const address = [formData.subDistrict, formData.district, formData.province].filter(Boolean).join(', ')
-    const payload = {
-      producttypeID: formData.product,
-      acceptableprice: formData.package,
-      usagetime: formData.usageTime,
-      fullname: formData.fullName,
-      phonenumber: formData.phone,
-      address,
-      contedtime: formData.contactTime,
-      solce: 'เว็บไซต์',
-    }
+/* =========================================================
+   ฟังก์ชัน handleSubmitAfterCaptcha
+   ใช้สำหรับส่งข้อมูลฟอร์มไปยัง API หลังจากผ่านการยืนยัน reCAPTCHA สำเร็จ
+   ========================================================= */
+const handleSubmitAfterCaptcha = async (token) => {
+  // ตั้งค่าสถานะว่ากำลังส่งข้อมูล (ป้องกันการกดปุ่มซ้ำ)
+  setSubmitting(true)
 
-    try {
-      const res = await fetch(`${baseUrl}/api/Inquiriespageapi`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-API-KEY': apiKey,
-        },
-        body: JSON.stringify(payload),
-      })
+  // รวมค่าที่อยู่จากตำบล อำเภอ จังหวัด ให้เป็นข้อความเดียว
+  const address = [formData.subDistrict, formData.district, formData.province]
+    .filter(Boolean)
+    .join(', ')
 
-      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`)
-      const result = await res.json()
-      console.log('ผลลัพธ์จาก API:', result)
-
-      await Swal.fire({
-        icon: 'success',
-        title: 'ส่งข้อมูลเรียบร้อยแล้ว!',
-        text: 'ขอบคุณที่สนใจโซลาร์เซลล์จากเรา ทีมงานจะติดต่อกลับโดยเร็วที่สุดค่ะ',
-        showConfirmButton: false,
-        timer: 2500,
-      })
-
-      // ✅ เรียกบันทึก Log หลังส่งสำเร็จ
-      await handleLogSubmit();
-
-      // ✅ รีเซ็ตฟอร์ม
-      setFormData({
-        product: '',
-        package: '',
-        usageTime: '',
-        fullName: '',
-        phone: '',
-        district: '',
-        subDistrict: '',
-        province: '',
-        contactTime: '',
-      })
-      setQuery('')
-      setSuggestions([])
-      setCaptchaToken(null)
-      setShowCaptcha(false)
-      setErrors({})
-    } catch (err) {
-      console.error('Error sending:', err)
-      Swal.fire({
-        icon: 'error',
-        title: 'เกิดข้อผิดพลาด',
-        text: 'ไม่สามารถส่งข้อมูลได้ กรุณาลองใหม่อีกครั้งค่ะ',
-      })
-    } finally {
-      setSubmitting(false)
-    }
+  // สร้าง payload สำหรับส่งไปยัง API
+  const payload = {
+    producttypeID: formData.product,     // รหัสประเภทสินค้า
+    acceptableprice: formData.package,   // ราคาที่ผู้ใช้ยอมรับได้
+    usagetime: formData.usageTime,       // ช่วงเวลาที่ใช้ไฟ
+    fullname: formData.fullName,         // ชื่อเต็มของผู้ติดต่อ
+    phonenumber: formData.phone,         // หมายเลขโทรศัพท์
+    address,                             // ที่อยู่รวม (ตำบล, อำเภอ, จังหวัด)
+    contedtime: formData.contactTime,    // ช่วงเวลาที่สะดวกให้ติดต่อกลับ
+    solce: 'เว็บไซต์',                   // แหล่งที่มาของการติดต่อ
   }
+
+  try {
+    // เรียก API เพื่อบันทึกข้อมูลการติดต่อ
+    const res = await fetch(`${baseUrl}/api/Inquiriespageapi`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json', // ส่งข้อมูลในรูปแบบ JSON
+        'X-API-KEY': apiKey,                // ใส่ API Key เพื่อยืนยันสิทธิ์
+      },
+      body: JSON.stringify(payload),         // แปลง payload เป็น JSON ก่อนส่ง
+    })
+
+    // ตรวจสอบว่า API ตอบกลับปกติหรือไม่
+    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`)
+
+    // แปลงผลลัพธ์จาก API เป็น JSON แล้วเก็บไว้ใน result
+    const result = await res.json()
+    console.log('ผลลัพธ์จาก API:', result)
+
+    // แสดงข้อความแจ้งเตือนเมื่อส่งข้อมูลสำเร็จ
+    await Swal.fire({
+      icon: 'success',
+      title: 'ส่งข้อมูลเรียบร้อยแล้ว!',
+      text: 'ขอบคุณที่สนใจโซลาร์เซลล์จากเรา ทีมงานจะติดต่อกลับโดยเร็วที่สุดค่ะ',
+      showConfirmButton: false,
+      timer: 2500,
+    })
+
+    // เรียกฟังก์ชันบันทึก Log หลังจากส่งข้อมูลสำเร็จ
+    await handleLogSubmit()
+
+    // รีเซ็ตค่าทั้งหมดในฟอร์มกลับเป็นค่าเริ่มต้น
+    setFormData({
+      product: '',
+      package: '',
+      usageTime: '',
+      fullName: '',
+      phone: '',
+      district: '',
+      subDistrict: '',
+      province: '',
+      contactTime: '',
+    })
+
+    // ล้างค่าที่เกี่ยวข้องกับการค้นหาที่อยู่และการยืนยัน captcha
+    setQuery('')
+    setSuggestions([])
+    setCaptchaToken(null)
+    setShowCaptcha(false)
+    setErrors({})
+  } catch (err) {
+    // หากเกิดข้อผิดพลาดระหว่างการส่งข้อมูลให้แสดงข้อความแจ้งเตือน
+    console.error('Error sending:', err)
+    Swal.fire({
+      icon: 'error',
+      title: 'เกิดข้อผิดพลาด',
+      text: 'ไม่สามารถส่งข้อมูลได้ กรุณาลองใหม่อีกครั้งค่ะ',
+    })
+  } finally {
+    // ปิดสถานะการส่งข้อมูลไม่ว่าผลจะสำเร็จหรือไม่
+    setSubmitting(false)
+  }
+}
 
   /* =========================================================
      🧩 ฟังก์ชันพิเศษ: จำกัดตัวอักษรที่อนุญาตในชื่อและเบอร์
@@ -298,37 +337,56 @@ const handleLogSubmit = async () => {
     await handleSubmitAfterCaptcha(captchaToken)
   }
 
-  /* =========================================================
-     handleQueryChange & handleSelect
-     ========================================================= */
-  const handleQueryChange = (e) => {
-    const text = e.target.value.trim()
-    setQuery(text)
-    setErrors((prev) => {
-      const updated = { ...prev }
-      if (updated.province) delete updated.province
-      return updated
-    })
+/* =========================================================
+   handleQueryChange & handleSelect
+   ฟังก์ชันนี้ทำหน้าที่จัดการเมื่อผู้ใช้ "พิมพ์ข้อความค้นหา" ในช่องค้นหาที่อยู่
+   ========================================================= */
+const handleQueryChange = (e) => {
+  const text = e.target.value.trim(); 
+  // ดึงค่าที่ผู้ใช้พิมพ์จากช่อง input และตัดช่องว่างหัว-ท้ายออก
 
-    if (!text) return setSuggestions([])
-    const matched = []
-    tambons.forEach((t) => {
-      const amphure = amphures.find((a) => a.id === t.amphure_id)
-      const province = provinces.find((p) => p.id === amphure?.province_id)
-      if (
-        t.name_th.includes(text) ||
-        amphure?.name_th.includes(text) ||
-        province?.name_th.includes(text)
-      ) {
-        matched.push({
-          subDistrict: t.name_th,
-          district: amphure?.name_th || '',
-          province: province?.name_th || '',
-        })
-      }
-    })
-    setSuggestions(matched.slice(0, 30))
-  }
+  setQuery(text); 
+  // บันทึกค่าข้อความค้นหาปัจจุบันลงใน state `query`
+
+  setErrors((prev) => {
+    const updated = { ...prev };
+    if (updated.province) delete updated.province;
+    // ถ้ามี error ของจังหวัดอยู่ ให้ลบออก (เพราะผู้ใช้เริ่มพิมพ์ใหม่)
+    return updated;
+  });
+
+  if (!text) return setSuggestions([]);
+  // ถ้าผู้ใช้ลบข้อความจนว่าง ให้เคลียร์รายการแนะนำ (suggestions) ออก
+
+  const matched = [];
+  // สร้างอาเรย์เก็บผลลัพธ์ที่ตรงกับการค้นหา
+
+  // วนลูปผ่านทุกตำบล (tambons) เพื่อหาว่าตำบลใด อำเภอใด หรือจังหวัดใด ตรงกับข้อความที่พิมพ์
+  tambons.forEach((t) => {
+    const amphure = amphures.find((a) => a.id === t.amphure_id);
+    // หาอำเภอที่ตำบลนี้อยู่ โดยใช้ amphure_id
+
+    const province = provinces.find((p) => p.id === amphure?.province_id);
+    //  หา “จังหวัด” ที่อำเภอนี้อยู่ โดยใช้ province_id
+
+    // ✅ตรวจสอบว่าข้อความที่พิมพ์ ตรงกับชื่อของตำบล / อำเภอ / จังหวัดหรือไม่
+    if (
+      t.name_th.includes(text) ||
+      amphure?.name_th.includes(text) ||
+      province?.name_th.includes(text)
+    ) {
+      matched.push({
+        subDistrict: t.name_th,          // ชื่อตำบล
+        district: amphure?.name_th || '', // ชื่ออำเภอ (ถ้ามี)
+        province: province?.name_th || '', // ชื่อจังหวัด (ถ้ามี)
+      });
+    }
+  });
+
+  setSuggestions(matched.slice(0, 30));
+  // เก็บผลลัพธ์ที่ตรงไว้ใน state `suggestions`
+  // จำกัดผลลัพธ์แสดงสูงสุด 30 รายการ เพื่อไม่ให้ยาวเกินไป
+};
 
   const handleSelect = (item) => {
     const fullText = `${item.subDistrict ? item.subDistrict + ', ' : ''}${item.district ? item.district + ', ' : ''}${item.province}`

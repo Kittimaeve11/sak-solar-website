@@ -23,64 +23,32 @@ export default function FAQPage() {
   const answerRefs = useRef([]);
   const { locale } = useLocale();
 
+  // ✅ โหลดข้อมูล FAQ และ Banner จาก API
   useEffect(() => {
-    const loc = typeof locale === 'string' ? locale.toLowerCase() : 'th';
-    const isThai = loc.startsWith('th');
-
-    // ---------- SEO ----------
-    document.title = isThai
-      ? 'คำถามที่พบบ่อย | บริษัท ศักดิ์สยาม โซลาร์ เอ็นเนอร์ยี่ จำกัด'
-      : 'FAQ | Sak Siam Solar Energy Co., Ltd.';
-
-    const metaDescription = document.querySelector("meta[name='description']");
-    const content = isThai ? 'คำถามที่พบบ่อย' : 'Frequently Asked Questions';
-    if (metaDescription) {
-      metaDescription.setAttribute('content', content);
-    } else {
-      const meta = document.createElement('meta');
-      meta.name = 'description';
-      meta.content = content;
-      document.head.appendChild(meta);
-    }
-
-    /* =========================================================
-       ✅ โหลดข้อมูลเพียงครั้งเดียว (ใช้ cache)
-       ========================================================= */
     const fetchData = async () => {
-      // --- FAQ ---
-      if (window.__FAQ_CACHE__) {
-        console.log('♻️ ใช้ข้อมูล FAQ จาก cache');
-        setFaqs(window.__FAQ_CACHE__);
-        setLoadingFaq(false);
-        setFadeInFaq(true);
-      } else {
-        console.log('🌞 โหลด FAQ จาก API...');
-        try {
+      try {
+        // ---- FAQ ----
+        if (window.__FAQ_CACHE__) {
+          setFaqs(window.__FAQ_CACHE__);
+          setLoadingFaq(false);
+          setFadeInFaq(true);
+        } else {
           setLoadingFaq(true);
           const resFaq = await fetch(`${baseUrl}/api/FQAapi`, {
             headers: { 'X-API-KEY': apiKey },
           });
           const dataFaq = await resFaq.json();
           const faqResult = dataFaq.status && dataFaq.result ? dataFaq.result : [];
-          window.__FAQ_CACHE__ = faqResult; // ✅ เก็บใน cache
+          window.__FAQ_CACHE__ = faqResult;
           setFaqs(faqResult);
-        } catch {
-          setFaqs([]);
-        } finally {
-          setLoadingFaq(false);
-          setFadeInFaq(true);
         }
-      }
 
-      // --- Banner ---
-      if (window.__BANNER_FAQ_CACHE__) {
-        console.log('♻️ ใช้ข้อมูล Banner จาก cache');
-        setBanners(window.__BANNER_FAQ_CACHE__);
-        setLoadingBanner(false);
-        setFadeInBanner(true);
-      } else {
-        console.log('🌞 โหลด Banner จาก API...');
-        try {
+        // ---- Banner ----
+        if (window.__BANNER_FAQ_CACHE__) {
+          setBanners(window.__BANNER_FAQ_CACHE__);
+          setLoadingBanner(false);
+          setFadeInBanner(true);
+        } else {
           setLoadingBanner(true);
           const resBanner = await fetch(`${baseUrl}/api/branderIDapi/1`, {
             headers: { 'X-API-KEY': apiKey },
@@ -89,16 +57,18 @@ export default function FAQPage() {
           const arr = Array.isArray(dataBanner.data)
             ? dataBanner.data
             : dataBanner.data
-              ? [dataBanner.data]
-              : [];
-          window.__BANNER_FAQ_CACHE__ = arr; // ✅ เก็บใน cache
+            ? [dataBanner.data]
+            : [];
+          window.__BANNER_FAQ_CACHE__ = arr;
           setBanners(arr);
-        } catch {
-          setBanners([]);
-        } finally {
-          setLoadingBanner(false);
-          setTimeout(() => setFadeInBanner(true), 50);
         }
+      } catch (err) {
+        console.error('❌ Error fetching FAQ/Banner:', err);
+      } finally {
+        setLoadingFaq(false);
+        setLoadingBanner(false);
+        setFadeInFaq(true);
+        setTimeout(() => setFadeInBanner(true), 50);
       }
     };
 
@@ -107,7 +77,7 @@ export default function FAQPage() {
 
   const toggle = (index) => setOpenIndex((prev) => (prev === index ? null : index));
 
-  // เปิด/ปิดคำตอบแบบ dynamic
+  // ✅ เปิด/ปิดคำตอบแบบ animation
   useEffect(() => {
     answerRefs.current.forEach((el, i) => {
       if (!el) return;
@@ -143,12 +113,9 @@ export default function FAQPage() {
     </div>
   );
 
-  /* =========================================================
-     🖼 ส่วนแสดงผล
-     ========================================================= */
   return (
     <div className="no-margin">
-      {/* Banner */}
+      {/* 🖼 Banner */}
       {loadingBanner ? (
         <div className="skeleton-banner"></div>
       ) : (
@@ -176,7 +143,7 @@ export default function FAQPage() {
         ))
       )}
 
-      {/* FAQ */}
+      {/* 📋 FAQ */}
       <main className={`layout-faq ${fadeInFaq ? 'fade-in' : ''}`}>
         <h1 className="headtitle">คำถามที่พบบ่อยเกี่ยวกับโซลาร์เซลล์</h1>
 
