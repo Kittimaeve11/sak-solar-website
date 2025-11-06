@@ -15,7 +15,7 @@ const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 
 /* =========================================================
-   🔍 ดึง videoId จาก URL
+   ดึง videoId จาก URL
 ========================================================= */
 function extractVideoId(url) {
   if (!url) return null;
@@ -25,7 +25,7 @@ function extractVideoId(url) {
 }
 
 /* =========================================================
-   🖼 แสดง Thumbnail พร้อม fallback
+   แสดง Thumbnail พร้อม fallback
 ========================================================= */
 function ThumbnailWithFallback({ videoId, alt }) {
   const [srcIndex, setSrcIndex] = useState(0);
@@ -51,7 +51,7 @@ function ThumbnailWithFallback({ videoId, alt }) {
 }
 
 /* =========================================================
-   🌟 Component หลัก: SlideReview
+   Component หลัก: SlideReview
 ========================================================= */
 export default function SlideReview() {
   const { locale } = useLocale();
@@ -63,7 +63,7 @@ export default function SlideReview() {
   const sliderRef = useRef(null);
 
 /* =========================================================
-   ✅ ฟังก์ชันบันทึก Log “รีวิว” (แก้สมบูรณ์)
+   ฟังก์ชันบันทึก Log “รีวิว” (แก้สมบูรณ์)
 ========================================================= */
 // ฟังก์ชัน handleLogReviewClick ใช้สำหรับบันทึก Log เมื่อผู้ใช้คลิกดูวิดีโอรีวิว
 const handleLogReviewClick = async (item) => {
@@ -111,7 +111,7 @@ const handleLogReviewClick = async (item) => {
 
 
   /* =========================================================
-     ✅ รวม useEffect เดียว: ตรวจขนาดจอ + โหลด API + cleanup
+     รวม useEffect เดียว: ตรวจขนาดจอ + โหลด API + cleanup
   ========================================================= */
   useEffect(() => {
     let isMounted = true;
@@ -260,8 +260,8 @@ const handleLogReviewClick = async (item) => {
                     className="video-cardslide"
                     onClick={async () => {
                       if (!dragging) {
-                        await handleLogReviewClick(r); // ✅ บันทึก Log ก่อน
-                        window.open(r.vedio_link, '_blank'); // ✅ เปิดวิดีโอ
+                        await handleLogReviewClick(r); // บันทึก Log ก่อน
+                        window.open(r.vedio_link, '_blank'); // เปิดวิดีโอ
                       }
                     }}
                   >

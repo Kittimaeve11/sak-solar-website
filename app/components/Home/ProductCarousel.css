@@ -364,23 +364,28 @@
 
 }
 
-/* =========================================================
-   Header Skeleton
-   ========================================================= */
+/* ========================================
+   Skeleton Header Link (ไม่มีพื้นหลัง)
+   ======================================== */
 .pc-skeleton-header-link {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   font-weight: 600;
   font-size: 1rem;
-  background-color: #e0e0e0;
-  opacity: 0.8;
+  color: #e0e0e0;           /* สีเทาอ่อน */
+  background: none;
+  opacity: 1;                /* ให้ชัดขึ้น */
   user-select: none;
+  padding: 0;
+  border: none;
+  box-shadow: none;
 }
 
 .pc-skeleton-header-link svg {
-  background-color: #e0e0e0;
+  color: #e0e0e0 
 }
+
 
 /* =========================================================
    เว้นระยะในเนื้อหา Skeleton (จำลอง product-info)
