@@ -12,7 +12,7 @@ const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 
 /* =========================================================
-   ✅ ฟังก์ชันบันทึก Log ไป Backend
+   ฟังก์ชันบันทึก Log ไป Backend
    ========================================================= */
 const handleLogClick = async (item) => {
   try {

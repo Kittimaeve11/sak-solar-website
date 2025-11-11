@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { useLocale } from './Context/LocaleContext';
 import { useSearchParams } from 'next/navigation';
 
-// ✅ Components
+//  Components
 import FreeServices from './components/Home/FreeServices';
 import SolarFormnew from './components/Home/SolarFormnew';
 import ContactForm from './components/Home/ContactForm';
@@ -14,7 +14,7 @@ import SlidePortfolio from './components/Home/SlidePortfolio';
 import SlideEditorial from './components/Home/SlideEditorial';
 import SlideReview from './components/Home/SlideReview';
 
-// ✅ โหลด BannerSlider แบบไม่ SSR
+//  โหลด BannerSlider แบบไม่ SSR
 const BannerSlider = dynamic(() => import('./components/BannerSlider'), {
   ssr: false,
   loading: () => (
@@ -45,7 +45,7 @@ export default function HomePage() {
   const [tambons, setTambons] = useState([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
 
-  // ✅ โหลดข้อมูลทั้งหมด
+  //  โหลดข้อมูลทั้งหมด
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
@@ -176,7 +176,7 @@ if (cacheText) {
 
   return (
     <>
-      {/* ✅ Banner Section */}
+      {/*  Banner Section */}
       <div className="banner-wrapperhome">
         <BannerSlider />
       </div>
@@ -186,10 +186,10 @@ if (cacheText) {
         และได้รับการรับรองจากการไฟฟ้า (PEA)
       </h5>
 
-      {/* ✅ Free Services */}
+      {/*  Free Services */}
       <FreeServices contacts={services} locale={locale} loading={loadingServices} baseUrl={baseUrl} />
 
-      {/* ✅ Product Section */}
+      {/*  Product Section */}
       <div>
         {loadingProducts && productTypes.length === 0
           ? [1, 2, 3].map((i) => (
@@ -211,10 +211,10 @@ if (cacheText) {
             ))}
       </div>
 
-      {/* ✅ Solar Form */}
+      {/*  Solar Form */}
       <SolarFormnew />
 
-      {/* ✅ Contact Section */}
+      {/*  Contact Section */}
       <div id="contact">
         <ContactForm
           productOptions={productTypes}
@@ -233,7 +233,7 @@ if (cacheText) {
         }}
       ></div>
 
-      {/* ✅ Editorial / Portfolio / Review */}
+      {/*  Editorial / Portfolio / Review */}
       <SlideEditorial />
       <SlidePortfolio />
       <SlideReview />

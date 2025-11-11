@@ -70,7 +70,7 @@ export const metadata = {
 };
 
 // ================================
-// ✅ Layout หลักของเว็บ (Server Component)
+// Layout หลักของเว็บ (Server Component)
 // ================================
 export default function RootLayout({ children }) {
   return (

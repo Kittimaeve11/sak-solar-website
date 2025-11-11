@@ -75,7 +75,7 @@ export default function FreeServices({ contacts = [], locale, loading, baseUrl }
       <div className={styles.serviceSection} aria-busy>
         <h1 className="headtitle">ข้อมูลบริการฟรี</h1>
         <h4
-          className={styles.fadeIn}
+          className="fade-in"
           style={{
             textAlign: 'center',
             marginTop: -10,
@@ -160,7 +160,7 @@ export default function FreeServices({ contacts = [], locale, loading, baseUrl }
     return (
       <div
         key={item.service_ID || `service-${index}`}
-        className={`${styles.cardfree} ${loaded ? styles.fadeIn : styles.hiddenBeforeLoad}`}
+        className={`${styles.cardfree} ${loaded ? 'fade-in' : styles.hiddenBeforeLoad}`}
       >
         {/* ส่วนไอคอน */}
         <div className={styles.iconWrapper}>

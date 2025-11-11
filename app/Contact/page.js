@@ -17,7 +17,7 @@ import ReCAPTCHA from 'react-google-recaptcha';
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 
-// ✅ Memory cache
+//  Memory cache
 let contactCache = {
   contacts: null,
   brander: null,
@@ -47,7 +47,7 @@ export default function Page() {
   console.log("Brander:", brander);
 
   /* =========================================================
-     ✅ โหลดข้อมูล contacts / brander / topics
+      โหลดข้อมูล contacts / brander / topics
      ========================================================= */
   useEffect(() => {
     document.title = 'ติดต่อเรา | บริษัท ศักดิ์สยาม โซลาร์ เอ็นเนอร์ยี่ จำกัด';
@@ -70,7 +70,7 @@ export default function Page() {
           contactCache.topics &&
           cacheAge < 1000 * 60 * 10
         ) {
-          console.log("🟢 ใช้ข้อมูลจาก cache");
+          console.log("ใช้ข้อมูลจาก cache");
           setContacts(contactCache.contacts);
           setBrander(contactCache.brander);
           setTopics(contactCache.topics);
@@ -78,7 +78,7 @@ export default function Page() {
           return;
         }
 
-        console.log("🔵 โหลดข้อมูลจาก API");
+        console.log("โหลดข้อมูลจาก API");
         setLoading(true);
         const [contactsRes, branderRes, topicsRes] = await Promise.all([
           fetch(`${baseUrl}/api/contactapi`, { headers: { 'X-API-KEY': apiKey } }),
@@ -120,7 +120,7 @@ export default function Page() {
   }, []);
 
   /* =========================================================
-     ✅ ฟังก์ชันบันทึก Log การส่งข้อความสอบถามเพิ่มเติม (actionType = 7)
+      ฟังก์ชันบันทึก Log การส่งข้อความสอบถามเพิ่มเติม (actionType = 7)
      ========================================================= */
 // ฟังก์ชัน handleLogContactSubmit ใช้สำหรับบันทึก Log เมื่อผู้ใช้ส่งฟอร์ม "สอบถามเพิ่มเติม"
 const handleLogContactSubmit = async () => {
@@ -164,7 +164,7 @@ const handleLogContactSubmit = async () => {
   }
 };
   /* =========================================================
-     ✅ Validate & Handle Input
+      Validate & Handle Input
      ========================================================= */
   const getClassName = (value, base) =>
     value.trim() === "" ? `${base} placeholder-gray` : `${base} input-filled`;
@@ -192,7 +192,7 @@ const handleLogContactSubmit = async () => {
   };
 
   /* =========================================================
-     ✅ reCAPTCHA Handler
+      reCAPTCHA Handler
      ========================================================= */
   const handleCaptchaChange = async (token) => {
     if (!token) return;
@@ -201,7 +201,7 @@ const handleLogContactSubmit = async () => {
   };
 
   /* =========================================================
-     ✅ ส่งข้อมูลจริงหลังผ่าน reCAPTCHA
+      ส่งข้อมูลจริงหลังผ่าน reCAPTCHA
      ========================================================= */
   const handleSubmitAfterCaptcha = async (token) => {
     setIsSubmitting(true);
@@ -233,10 +233,10 @@ const handleLogContactSubmit = async () => {
           timer: 2500,
         });
 
-        // ✅ บันทึก Log หลังส่งสำเร็จ
+        //  บันทึก Log หลังส่งสำเร็จ
         handleLogContactSubmit();
 
-        // ✅ รีเซ็ตฟอร์ม
+        //  รีเซ็ตฟอร์ม
         setFormData({ topic: "", name: "", phone: "", email: "", message: "" });
         setCaptchaToken(null);
         setShowCaptcha(false);
@@ -251,7 +251,7 @@ const handleLogContactSubmit = async () => {
   };
 
   /* =========================================================
-     ✅ เมื่อผู้ใช้กดปุ่ม "ส่งข้อความ"
+      เมื่อผู้ใช้กดปุ่ม "ส่งข้อความ"
      ========================================================= */
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -269,7 +269,7 @@ const handleLogContactSubmit = async () => {
   };
 
   /* =========================================================
-     ✅ ไอคอนโซเชียล
+      ไอคอนโซเชียล
      ========================================================= */
   const socialIconMap = {
     facebook: <FaFacebookSquare style={{ color: "#1877f2", fontSize: 36 }} />,
@@ -280,7 +280,7 @@ const handleLogContactSubmit = async () => {
   };
 
   /* =========================================================
-     ✅ ไอคอนที่อยู่ / เบอร์ / อีเมล
+      ไอคอนที่อยู่ / เบอร์ / อีเมล
      ========================================================= */
   const getIcon = [
     <Image key="building" src="/images/icons/building.png" alt="Building" width={28} height={28} />,
