@@ -9,8 +9,8 @@
   background-repeat: no-repeat;
   padding-top: 1rem;
   padding-bottom: 4rem;
-  z-index: 0;
   margin-bottom: 0;
+  z-index: 0;
 }
 
 /* ชั้นโปร่งใสซ้อนบนพื้นหลังเพื่อให้ภาพดูจางลง */
@@ -75,19 +75,19 @@
    ========================================================= */
 .cardfree {
   background-color: #ffffff;
-  padding: 1.3rem;
-  border-radius: 8px;
   border: 1px solid #ebebeb;
-  transition: all 0.3s ease;
+  border-radius: 8px;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
   flex: 0 0 auto;
-  box-sizing: border-box;
-  width: 100%;
-  max-width: 340px;
+  padding: 1.3rem;
   margin-top: 0.5rem !important;
+  max-width: 340px;
+  width: 100%;
+  transition: all 0.3s ease;
 }
 
 /* เงาเมื่อ hover */
@@ -164,7 +164,7 @@
 }
 
 /* =========================================================
-   DISPLAY SWITCH: เปลี่ยนโหมด Desktop / Mobile
+   DISPLAY SWITCH: Desktop / Mobile
    ========================================================= */
 .desktopGrid {
   display: block;
@@ -175,7 +175,7 @@
 }
 
 /* =========================================================
-   SLIDER: สไลด์การ์ดบริการ (โหมดมือถือ / แท็บเล็ต)
+   SLIDER: โหมดมือถือ / แท็บเล็ต
    ========================================================= */
 .responsiveSlider {
   position: relative;
@@ -244,7 +244,7 @@
 }
 
 /* =========================================================
-   RESPONSIVE: การปรับขนาดตามหน้าจอ
+   RESPONSIVE: ปรับขนาดตามหน้าจอ
    ========================================================= */
 @media (max-width: 1490px) {
   .desktopGrid {
@@ -301,13 +301,28 @@
 /* =========================================================
    SKELETON: โครงร่างโหลดข้อมูล
    ========================================================= */
+.skeletonGrid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 1.5rem;
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 1.5rem 0;
+}
+
 .skeletonCard {
+  flex: 0 1 340px;
+  height: 390px;
+  background: #ffffff;
+  border-radius: 8px;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  height: 390px;
-  width: 340px;
+  justify-content: center;  
+  align-items: center;      
+  padding: 1.5rem;
 }
 
 /* วงกลมจำลองไอคอน */
@@ -316,36 +331,60 @@
   height: 90px;
   border-radius: 50%;
   background-color: #e0e0e0;
-  animation: pulse 1.5s infinite ease-in-out;
 }
 
 /* เส้นจำลองข้อความ */
 .skeletonLine {
+  width: 70%;
+  height: 18px;
   border-radius: 4px;
   background-color: #e0e0e0;
-  animation: pulse 1.5s infinite ease-in-out;
+  margin: 1rem 0;
 }
 
-/* เอฟเฟกต์ pulse สำหรับ skeleton */
-@keyframes pulse {
-  0% {
-    background-color: #e0e0e0;
-  }
-  50% {
-    background-color: #f0f0f0;
-  }
-  100% {
-    background-color: #e0e0e0;
-  }
+.skeletonmessage {
+  width: 100%;
+  height: 16px;
+  border-radius: 4px;
+  background-color: #e0e0e0;  
+  margin: 1rem 0 1.5rem 0;
+}
+
+.skeletonmessagedetails {
+  width: 85%;
+  height: 16px;
+  border-radius: 4px;
+  background-color: #e0e0e0;  
+  margin-bottom: 0.8rem;
 }
 
 /* =========================================================
-   ANIMATION: เอฟเฟกต์แอนิเมชันทั่วไป
+   SKELETON RESPONSIVE RULES
    ========================================================= */
-
-
-/* ก่อนโหลดให้ซ่อนไว้ */
-.hiddenBeforeLoad {
-  opacity: 0;
+/* ≥1490px → 8 การ์ด (4x2 แถว) */
+@media (min-width: 1490px) {
+  .skeletonGrid > :nth-child(n+9) {
+    display: none;
+  }
 }
 
+/* 1123–1489px → 3 การ์ด */
+@media (max-width: 1489px) and (min-width: 1123px) {
+  .skeletonGrid > :nth-child(n+4) {
+    display: none;
+  }
+}
+
+/* 781–1122px → 2 การ์ด */
+@media (max-width: 1122px) and (min-width: 831px) {
+  .skeletonGrid > :nth-child(n+3) {
+    display: none;
+  }
+}
+
+/* ≤830px → 1 การ์ด */
+@media (max-width: 830px) {
+  .skeletonGrid > :nth-child(n+2) {
+    display: none;
+  }
+}

@@ -15,7 +15,7 @@ const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 
 /* =========================================================
-   ✅ ฟังก์ชันส่ง Log ไป Backend (แก้ brandtype = '0')
+    ฟังก์ชันส่ง Log ไป Backend (แก้ brandtype = '0')
    ========================================================= */
 const handleLogClick = async (item) => {
   try {
@@ -174,7 +174,7 @@ export default function SlideEditorial() {
   };
 
   const CustomDots = () => (
-    <div className="custom-dots fade-in">
+    <div className="custom-dots">
       {Array.from({ length: totalGroups }).map((_, index) => (
         <div
           key={index}
@@ -248,7 +248,7 @@ export default function SlideEditorial() {
                     className="editorial-cardslide"
                     onClick={async () => {
                       if (dragging) return;
-                      await handleLogClick(item); // ✅ บันทึก Log ก่อนเปลี่ยนหน้า
+                      await handleLogClick(item); //  บันทึก Log ก่อนเปลี่ยนหน้า
                       router.push(`/editorial/${item.id}`);
                     }}
                   >

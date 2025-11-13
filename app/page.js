@@ -13,21 +13,22 @@ import ProductCarousel from './components/Home/ProductCarousel';
 import SlidePortfolio from './components/Home/SlidePortfolio';
 import SlideEditorial from './components/Home/SlideEditorial';
 import SlideReview from './components/Home/SlideReview';
+import BannerSlider from './components/BannerSlider';
 
 //  โหลด BannerSlider แบบไม่ SSR
-const BannerSlider = dynamic(() => import('./components/BannerSlider'), {
-  ssr: false,
-  loading: () => (
-    <div
-      style={{
-        width: '100%',
-        aspectRatio: '3840/1191',
-        minHeight: '400px',
-        background: '#e0e0e0',
-      }}
-    />
-  ),
-});
+// const BannerSlider = dynamic(() => import('./components/BannerSlider'), {
+//   ssr: false,
+//   loading: () => (
+//     <div
+//       style={{
+//         width: '100%',
+//         aspectRatio: '3840/1191',
+//         minHeight: '400px',
+//         background: '#e0e0e0',
+//       }}
+//     />
+//   ),
+// });
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
@@ -177,9 +178,9 @@ if (cacheText) {
   return (
     <>
       {/*  Banner Section */}
-      <div className="banner-wrapperhome">
+      {/* <div className="banner-wrapperhome"> */}
         <BannerSlider />
-      </div>
+      {/* </div> */}
 
       <h5 className="headline" style={{ marginTop: '-0.5px' }}>
         ติดตั้งโซลาร์เซลล์กับทีมช่างที่ได้มาตรฐาน <br />
@@ -238,7 +239,7 @@ if (cacheText) {
       <SlidePortfolio />
       <SlideReview />
 
-      <style jsx>{`
+      {/* <style jsx>{`
         .banner-wrapperhome {
           position: relative;
           width: 100%;
@@ -250,7 +251,7 @@ if (cacheText) {
           object-fit: cover;
           display: block;
         }
-      `}</style>
+      `}</style> */}
     </>
   );
 }

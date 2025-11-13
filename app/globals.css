@@ -854,6 +854,16 @@ h6 {
   }
 }
 
+/* ก่อนโหลดให้ซ่อนไว้ */
+.hiddenBeforeLoad {
+opacity: 0;
+  visibility: hidden;         /* ซ่อนสายตา */
+  pointer-events: none;       /* ป้องกันคลิก */
+  position: relative;         /* จองพื้นที่ไว้แน่นอน */
+  transition: opacity 0.8s ease, visibility 0.8s ease;
+}
+
+
 /* =========================================================
    SKELETON LOADING 
    ========================================================= */
@@ -867,4 +877,44 @@ h6 {
   0% { opacity: 1; }
   50% { opacity: 0.6; }
   100% { opacity: 1; }
+}
+
+/* ====== โหมดไว้อาลัย (ขาวดำทั้งเว็บ) ====== */
+/* html {
+  filter: grayscale(100%) !important;
+  background-color: #111 !important;
+  color: #eee !important;
+} */
+
+/* ปรับให้ภาพ วิดีโอ ไอคอน ก็กลายเป็นขาวดำ */
+/* img, video, svg, iframe {
+  filter: grayscale(100%) !important;
+} */
+
+/* ถ้าต้องการให้บางส่วนมีสี เช่น โลโก้ ให้ใส่ class="allow-color" */
+/* .allow-color {
+  filter: none !important;
+} */
+
+/* ปรับพื้นหลัง + ตัวอักษร */
+/* body {
+  background-color: #111 !important;
+  color: #eee !important;
+} */
+
+/* ปุ่ม ฟอร์ม และองค์ประกอบทั่วไป */
+/* button, input, select, textarea {
+  background-color: #1a1a1a !important;
+  color: #eee !important;
+  border: 1px solid #333 !important;
+} */
+
+
+html[data-theme-mode="grayscale"] {
+  filter: grayscale(100%);
+  transition: filter 0.3s ease-in-out;
+}
+
+html[data-theme-mode="normal"] {
+  filter: none;
 }

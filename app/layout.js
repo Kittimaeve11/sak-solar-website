@@ -12,8 +12,10 @@ import ToastProvider from './components/ToastProvider';
 import CookieBanner from './components/CookieBanner';
 import GoogleAnalytics from './components/GoogleAnalytics';
 
+import ThemeModeWrapper from './components/ThemeModeWrapper';
+
 // ================================
-// ✅ ฟอนต์หลักของเว็บไซต์
+// ฟอนต์หลักของเว็บไซต์
 // ================================
 const sukhumvitTadmai = localFont({
   src: [
@@ -27,72 +29,59 @@ const sukhumvitTadmai = localFont({
 });
 
 // ================================
-// Metadata ทั่วไปของเว็บไซต์ (Global SEO)
+// โหลดโหมดธีมจาก API แบบ SSR (แก้กระพริบ)
 // ================================
-export const metadata = {
-  title: {
-    default: 'Saksiame Solar | ศักดิ์สยามโซลาร์ - พลังงานแสงอาทิตย์ครบวงจร',
-    template: '%s | Saksiame Solar',
-  },
-  description:
-    'เว็บไซต์ Saksiame Solar พลังงานแสงอาทิตย์ครบวงจร สำหรับบ้าน อาคาร และธุรกิจ พร้อมบริการติดตั้งโซลาร์เซลล์ โซลาร์รูฟท็อป โซลาร์แอร์ และสินเชื่อโซลาร์รูฟท็อป.',
-  authors: [{ name: 'SAK Siam Solar Energy', url: 'https://saksiamsolar.co.th' }],
-  creator: 'Saksiame Solar',
-  publisher: 'Saksiame Solar',
-  metadataBase: new URL('https://saksiamsolar.co.th'),
-  openGraph: {
-    title: 'Saksiame Solar | ศักดิ์สยามโซลาร์',
-    description:
-      'บริการติดตั้งโซลาร์เซลล์ครบวงจร พร้อมคำปรึกษาฟรี ทีมช่างมาตรฐานการไฟฟ้า PEA โซลาร์รูฟท็อป โซลาร์แอร์ และสินเชื่อพลังงานแสงอาทิตย์.',
-    url: 'https://saksiamsolar.co.th',
-    siteName: 'Saksiame Solar',
-    locale: 'th_TH',
-    type: 'website',
-    images: [
-      {
-        url: 'https://saksiamsolar.co.th/og-home.jpg',
-        width: 1200,
-        height: 630,
-        alt: 'Saksiame Solar ศักดิ์สยามโซลาร์',
-      },
-    ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Saksiame Solar | พลังงานแสงอาทิตย์ครบวงจร',
-    description:
-      'ติดตั้งโซลาร์เซลล์ โซลาร์รูฟท็อป โซลาร์แอร์ พร้อมสินเชื่อพลังงานสะอาดและคำปรึกษาฟรี',
-    images: ['https://saksiamsolar.co.th/og-home.jpg'],
-  },
-  icons: {
-    icon: '/Logosaksolar.ico',
-  },
-};
+async function getThemeFromAPI() {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
+    const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
+
+    const res = await fetch(`${baseUrl}/api/website/theme-mode`, {
+      headers: { 'X-API-KEY': apiKey },
+      cache: 'no-store',
+    });
+
+    const data = await res.json();
+    return data.mode || 'normal';
+  } catch (e) {
+    return 'normal';
+  }
+}
 
 // ================================
 // Layout หลักของเว็บ (Server Component)
 // ================================
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+  // 🔥 โหลดโหมดล่วงหน้าแบบ SSR
+  const themeMode = await getThemeFromAPI();
+
   return (
-    <html lang="th" className={sukhumvitTadmai.variable} suppressHydrationWarning>
+    <html
+      lang="th"
+      className={sukhumvitTadmai.variable}
+      data-theme-mode={themeMode}  // ⭐ แสดงโหมดตั้งแต่ HTML เฟรมแรก
+      suppressHydrationWarning
+    >
       <head>
-        {/* ✅ Meta พื้นฐานที่ควรมีในทุกหน้า */}
         <meta name="author" content="SAK Siam Solar Energy" />
         <meta name="robots" content="index, follow" />
         <meta name="theme-color" content="#ffffff" />
       </head>
 
-      <body className={`${sukhumvitTadmai.variable} font-sukhumvit`} suppressHydrationWarning>
+      <body
+        className={`${sukhumvitTadmai.variable} font-sukhumvit`}
+        suppressHydrationWarning
+      >
+        {/** ⭐ ให้ ThemeModeWrapper อัปเดตค่า Live ฝั่ง Client */}
+        <ThemeModeWrapper initialMode={themeMode} />
+
         <LocaleProvider>
-          {/* ✅ ส่วนหัว */}
           <GoogleAnalytics GA_MEASUREMENT_ID="G-GRQS76P3XV" />
           <Navbar />
           <TabMenu />
 
-          {/* ✅ เนื้อหาหลัก */}
           <main style={{ minHeight: '100vh' }}>{children}</main>
 
-          {/* ✅ ส่วนท้าย */}
           <ToastProvider />
           <FloatingButtons />
           <BackToTopButton />
