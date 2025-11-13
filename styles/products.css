@@ -1,11 +1,11 @@
 /* =========================================
-   🎯 Layout หลัก: 2 คอลัมน์ (Sidebar + List)
+   Layout หลัก: 2 คอลัมน์ (Sidebar + List)
    ========================================= */
 .products-container {
   display: flex;
   align-items: flex-start;
   width: 100%;
-  height: auto; /* ✅ ให้สูงตามเนื้อหา */
+  height: auto; /*  ให้สูงตามเนื้อหา */
   min-height: unset !important; /* ยกเลิกการบังคับความสูง */
   border-right: 1px solid #eee;
   box-shadow: rgba(0, 0, 0, 0.384);
@@ -13,12 +13,12 @@
 
 .products-sidebar {
   flex: 0 0 260px;
-  position: sticky; /* ✅ ล็อก sidebar */
-  top: 0; /* ✅ ติดขอบบนของ viewport */
+  position: sticky; /*  ล็อก sidebar */
+  top: 0; /*  ติดขอบบนของ viewport */
   align-self: flex-start;
   height: fit-content;
-  max-height: 100vh; /* ✅ ไม่เกินความสูงจอ */
-  overflow-y: auto; /* ✅ เลื่อนเฉพาะใน sidebar ถ้ายาวเกินจอ */
+  max-height: 100vh; /*  ไม่เกินความสูงจอ */
+  overflow-y: auto; /*  เลื่อนเฉพาะใน sidebar ถ้ายาวเกินจอ */
   background: #fff;
   z-index: 99;
 }
@@ -29,12 +29,12 @@
   background: #f5f5f5;
   padding: 2rem;
   box-sizing: border-box;
-  height: auto; /* ✅ ให้สูงเท่ากับเนื้อหาจริง */
+  height: auto; /*  ให้สูงเท่ากับเนื้อหาจริง */
   min-height: unset !important;
 }
 
 .products-sidebar h3:first-of-type {
-  border-bottom: 1px solid #ddd; /* ✅ เส้นสีเทาอ่อน */
+  border-bottom: 1px solid #ddd; /*  เส้นสีเทาอ่อน */
   padding-bottom: 8px;
   margin-bottom: 12px;
 }
@@ -47,7 +47,7 @@
 }
 
 /* =========================================
-   🧩 Sidebar Filter
+   Sidebar Filter
    ========================================= */
 .sidebar-header {
   background-color: #e88534;
@@ -117,16 +117,21 @@
   border-radius: 6px;
   cursor: pointer;
   transition: background-color 0.2s ease;
-  margin: 1.2rem auto;
+
   display: block;
+  margin-left: auto;
+  margin-right: 15px;   /* ⭐ ถอยออกจากขอบขวา */
+  margin-top: 1.2rem;
 }
+
+
 
 .resetbutton:hover {
   background: #d9742a;
 }
 
 /* =========================================
-   🛍️ การ์ดสินค้า (ล็อคขนาด)
+   การ์ดสินค้า (ล็อคขนาด)
    ========================================= */
 .product-card {
   display: block;
@@ -137,8 +142,8 @@
   border: 1px solid #e0e0e0;
   border-radius: 10px;
   background-color: #ffffff;
-  width: 300px; /* ✅ ล็อคกว้าง */
-  height: 425px; /* ✅ ล็อคสูง */
+  width: 300px; /*  ล็อคกว้าง */
+  height: 425px; /*  ล็อคสูง */
   margin: 0 auto;
   transition: all 0.25s ease-in-out;
 }
@@ -149,12 +154,12 @@
 }
 
 /* =========================================
-   📦 รูปภาพสินค้า
+   รูปภาพสินค้า
    ========================================= */
 .product-image-wrapper {
   position: relative;
   width: 100%;
-  height: 300px; /* ✅ คงสัดส่วนให้พอดีใน 425px */
+  height: 300px; /* คงขนาด wrapper */
   overflow: hidden;
   border-radius: 10px 10px 0 0;
   background: #f9f9f9;
@@ -162,9 +167,8 @@
 
 .product-image-wrapper img {
   object-fit: cover;
-  width: 100%;
-  height: 100%;
 }
+
 
 /* ริบบอนโปรโมชั่น */
 .product-promo-ribbon {
@@ -183,7 +187,7 @@
 }
 
 /* =========================================
-   🧾 ข้อมูลสินค้า
+   ข้อมูลสินค้า
    ========================================= */
 .product-info {
   padding: 0.5rem 1rem;
@@ -227,13 +231,13 @@
 }
 
 /* =========================================
-   🧱 Grid Layout (ล็อคการ์ดไม่บีบ)
+   Grid Layout (ล็อคการ์ดไม่บีบ)
    ========================================= */
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, 300px); /* ✅ การ์ดขนาดคงที่ */
+  grid-template-columns: repeat(auto-fit, 300px); /*  การ์ดขนาดคงที่ */
   gap: 2rem 1.2rem;
-  justify-content: center; /* ✅ จัดกลางจอ */
+  justify-content: center; /*  จัดกลางจอ */
   align-items: start;
   width: 100%;
   height: auto;
@@ -241,7 +245,7 @@
 }
 
 /* =========================================
-   🦴 Skeleton Loading
+   Skeleton Loading
    ========================================= */
 .skeletonGrid {
   display: grid;
@@ -331,7 +335,7 @@
 /* =========================================
    ✨ Animation
    ========================================= */
-.fade-in {
+.fade-inproduck {
   opacity: 0;
   animation: fadeIn 0.8s ease-in-out forwards;
 }
@@ -342,7 +346,7 @@
 }
 
 /* =========================================
-   📱 Responsive Layout
+   Responsive Layout
    ========================================= */
 @media (max-width: 991px) {
   .products-container {
@@ -394,4 +398,5 @@ footer {
   border: none;
   margin: -2rem 0 1.5rem 0;
 }
+
 

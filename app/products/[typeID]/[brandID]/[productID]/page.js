@@ -227,14 +227,16 @@ export default function ProductDetailPage() {
                 {product.gallery.map((img, idx) => (
                   <div key={idx} style={{ width: '100%', position: 'relative' }}>
                     <Image
-                      src={getImageUrl(img)}
-                      alt={`Image ${idx + 1}`}
-                      width={600}
-                      height={600}
-                      style={{ objectFit: 'contain', width: '100%', height: 'auto', cursor: 'pointer' }}
+                      src={getImageUrl(product.gallery?.[0])}
+                      alt="Main"
+                      width={500}
+                      height={500}
+                      style={{ objectFit: 'contain', width: '100%', height: 'auto', marginBottom: '1rem', cursor: 'pointer' }}
                       unoptimized
-                      onClick={() => { setSelectedImage(idx); setLightboxOpen(true); }}
+                      priority  //
+                      onClick={() => { setSelectedImage(0); setLightboxOpen(true); }}
                     />
+
                   </div>
                 ))}
               </Slider>

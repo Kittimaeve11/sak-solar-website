@@ -40,6 +40,33 @@ const getImageUrl = (path) => {
   }
 };
 
+/* =========================================================
+   Log Click
+========================================================= */
+const handleLogClick = async (item) => {
+  try {
+    const logData = {
+      actionType: '1',
+      actionDetail: `หน้าผลิตภัณฑ์ รหัส: ${item.id ?? '-'} หมายเลขผลิตภัณฑ์: ${item.num ?? '-'}`,
+      typeUser: 'ผู้เยี่ยมชมเว็บไซต์',
+      datatype: 'ผลิตภัณฑ์',
+      dataID: item.id ?? '0',
+      datatypeID: item.categoryId ?? '0',
+      brandtype: item.brandId ?? '0',
+      dataname: item.num ?? '-',
+    };
+
+    await fetch(`${baseUrl}/api/logWebsitepageapi`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-KEY': apiKey,
+      },
+      body: JSON.stringify(logData),
+    });
+  } catch (err) {}
+};
+
 // ===== Skeleton Loader =====
 function ProductSkeleton({ count = 20 }) {
   return (
@@ -56,7 +83,7 @@ function ProductSkeleton({ count = 20 }) {
   );
 }
 
-// ✅ Memory Cache
+// ===== Memory Cache =====
 let productsCache = {
   categories: null,
   products: null,
@@ -64,47 +91,6 @@ let productsCache = {
   timestamp: 0,
 };
 
-/* =========================================================
-   ✅ ฟังก์ชันบันทึก Log ไป Backend
-   ========================================================= */
-const handleLogClick = async (item) => {
-  try {
-    console.log("📦 Log item:", item);
-
-    const logData = {
-      actionType: '1', // 1 = ดูผลิตภัณฑ์
-      actionDetail: `หน้าผลิตภัณฑ์ รหัส: ${item.id ?? '-'} หมายเลขผลิตภัณฑ์: ${item.num ?? '-'}`,
-      typeUser: 'ผู้เยี่ยมชมเว็บไซต์',
-      datatype: 'ผลิตภัณฑ์',
-      dataID: item.id ?? '0',
-      datatypeID: item.categoryId ?? '0',
-      brandtype: item.brandId ?? '0',
-      dataname: item.num ?? '-',
-    };
-
-    console.log("📤 LogData ที่จะส่ง:", logData);
-
-    const res = await fetch(`${baseUrl}/api/logWebsitepageapi`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-API-KEY': apiKey,
-      },
-      body: JSON.stringify(logData),
-    });
-
-    if (!res.ok) {
-      const err = await res.text();
-      console.error('❌ Log API error:', err);
-    } else {
-      console.log('✅ Log: บันทึกข้อมูลการดูผลิตภัณฑ์สำเร็จ');
-    }
-  } catch (err) {
-    console.error('💥 เกิดข้อผิดพลาดในการบันทึก Log:', err);
-  }
-};
-
-// ===== Main Component =====
 export default function ProductsPage() {
   const { locale } = useLocale();
   const router = useRouter();
@@ -121,7 +107,9 @@ export default function ProductsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
 
-  // ✅ โหลดข้อมูลจาก API
+  /* =========================================================
+      โหลดข้อมูล
+  ========================================================= */
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -142,6 +130,7 @@ export default function ProductsPage() {
           brandsData = productsCache.brands;
         } else {
           setLoading(true);
+
           const [resHeader, resProducts] = await Promise.all([
             fetch(`${baseUrl}/api/productHeaderapi`, {
               headers: { "X-API-KEY": apiKey },
@@ -254,8 +243,8 @@ export default function ProductsPage() {
           const filtered =
             selectedCat.length > 0
               ? brandsData.filter((b) =>
-                  selectedCat.some((id) => b.categoryIds.includes(id))
-                )
+                selectedCat.some((id) => b.categoryIds.includes(id))
+              )
               : brandsData;
 
           setFilteredBrands(filtered);
@@ -270,91 +259,71 @@ export default function ProductsPage() {
     fetchData();
   }, [searchParams]);
 
-// ===== อัปเดต URL =====
-const updateUrl = (newCategories, newBrands) => {
-  const params = new URLSearchParams(); 
-  // สร้าง object สำหรับจัดการ query string ของ URL เช่น ?categories=...&brands=...
+  /* =========================================================
+      อัปเดต URL Query
+  ========================================================= */
+  const updateUrl = (newCategories, newBrands) => {
+    const params = new URLSearchParams();
 
-  // กรณีมีการเลือก "หมวดหมู่สินค้า"
-  if (newCategories.length > 0) {
-    const catSlugs = newCategories
-      .map((id) => {
-        // หา category object จาก id ที่เลือก
-        const cat = categories.find((c) => Number(c.producttypeID) === id);
-        // คืนค่า slug (ชื่อหมวดหมู่แบบ URL-friendly เช่น "solar-rooftop")
-        return cat ? slugify(cat.producttypenameEN) : null;
-      })
-      .filter(Boolean); // ลบค่าที่เป็น null ออก
-    params.set("categories", catSlugs.join(",")); 
-    // ใส่ค่า categories ลงใน query string เช่น ?categories=solar-rooftop,deye
-  }
+    if (newCategories.length > 0) {
+      const catSlugs = newCategories
+        .map((id) => {
+          const c = categories.find((x) => Number(x.producttypeID) === id);
+          return c ? slugify(c.producttypenameEN) : null;
+        })
+        .filter(Boolean);
 
-  // กรณีมีการเลือก "ยี่ห้อสินค้า"
-  if (newBrands.length > 0) {
-    const brandSlugs = newBrands.map((b) => slugify(b)); 
-    // แปลงชื่อแบรนด์ให้เป็น slug เช่น "Huawei" → "huawei"
-    params.set("brands", brandSlugs.join(",")); 
-    // ใส่ค่า brands ลงใน query string เช่น ?brands=huawei,growatt
-  }
+      params.set("categories", catSlugs.join(","));
+    }
 
-  // รวม query ทั้งหมดเข้าด้วยกัน
-  const query = params.toString(); 
-  // ตัวอย่างผลลัพธ์: "categories=solar-rooftop&brands=huawei"
+    if (newBrands.length > 0) {
+      const brandSlugs = newBrands.map((b) => slugify(b));
+      params.set("brands", brandSlugs.join(","));
+    }
 
-  // อัปเดต URL ในเบราว์เซอร์โดยไม่ reload หน้า
-  router.replace(`/products${query ? `?${query}` : ""}`, { shallow: true });
-  // ถ้าไม่มี query จะได้เป็น /products
-  // ถ้ามี query จะได้เป็น /products?categories=...&brands=...
-  // shallow:true หมายถึงเปลี่ยน URL โดยไม่รีเฟรช component ทั้งหน้า
-};
+    const query = params.toString();
 
+    router.replace(`/products${query ? `?${query}` : ""}`, { shallow: true });
+  };
 
-// ===== Toggle Category =====
-const toggleCategory = (categoryId) => {
-  // ตรวจสอบว่าผู้ใช้คลิก category เดิม (เพื่อต้องการเอาออก) หรือใหม่ (เพื่อเพิ่ม)
-  const newCategories = selectedCategories.includes(categoryId)
-    ? selectedCategories.filter((id) => id !== categoryId) // ถ้ามีอยู่แล้ว ให้ลบออก
-    : [...selectedCategories, categoryId]; // ถ้ายังไม่มี ให้เพิ่มเข้าไป
+  /* =========================================================
+      Toggle Category
+  ========================================================= */
+  const toggleCategory = (categoryId) => {
+    const newCategories = selectedCategories.includes(categoryId)
+      ? selectedCategories.filter((id) => id !== categoryId)
+      : [...selectedCategories, categoryId];
 
-  // อัปเดต state ของหมวดหมู่ที่เลือก
-  setSelectedCategories(newCategories);
+    setSelectedCategories(newCategories);
 
-  // กรองยี่ห้อที่อยู่ในหมวดหมู่ที่เลือกเท่านั้น
-  const filtered = brands.filter((b) =>
-    newCategories.some((id) => b.categoryIds.includes(id))
-  );
-  setFilteredBrands(filtered); // แสดงเฉพาะแบรนด์ที่สัมพันธ์กับหมวดหมู่ที่เลือก
+    const filtered = brands.filter((b) =>
+      newCategories.some((id) => b.categoryIds.includes(id))
+    );
+    setFilteredBrands(filtered);
 
-  // รีเซ็ตหน้าปัจจุบันของ pagination กลับไปหน้าแรก
-  setCurrentPage(1);
+    setCurrentPage(1);
 
-  // อัปเดต URL ให้สะท้อนกับหมวดหมู่ที่เลือก
-  updateUrl(newCategories, selectedBrands);
-};
+    updateUrl(newCategories, selectedBrands);
+  };
 
+  /* =========================================================
+      Toggle Brand
+  ========================================================= */
+  const toggleBrand = (brandName) => {
+    const normalized = normalizeBrandName(brandName);
 
-// ===== Toggle Brand =====
-const toggleBrand = (brandName) => {
-  const normalized = normalizeBrandName(brandName); 
-  // แปลงชื่อแบรนด์ให้อยู่ในรูปแบบมาตรฐาน เช่น "huawel" → "Huawei"
+    const newBrands = selectedBrands.includes(normalized)
+      ? selectedBrands.filter((b) => b !== normalized)
+      : [...selectedBrands, normalized];
 
-  // ตรวจสอบว่าผู้ใช้คลิกเลือกยี่ห้อเดิมหรือใหม่
-  const newBrands = selectedBrands.includes(normalized)
-    ? selectedBrands.filter((b) => b !== normalized) // ถ้ามีอยู่แล้ว ให้เอาออก
-    : [...selectedBrands, normalized]; // ถ้ายังไม่มี ให้เพิ่มเข้าไป
+    setSelectedBrands(newBrands);
+    setCurrentPage(1);
+    updateUrl(selectedCategories, newBrands);
+  };
 
-  // อัปเดต state ของแบรนด์ที่เลือก
-  setSelectedBrands(newBrands);
-
-  // รีเซ็ต pagination กลับไปหน้าแรก
-  setCurrentPage(1);
-
-  // อัปเดต URL ให้สะท้อนกับแบรนด์ที่เลือก
-  updateUrl(selectedCategories, newBrands);
-};
-
-
-  // ===== Filter Products =====
+  /* =========================================================
+      Filter Items
+  ========================================================= */
   const filteredItems = useMemo(() => {
     return products.filter((item) => {
       const inCategory =
@@ -363,6 +332,7 @@ const toggleBrand = (brandName) => {
       const inBrand =
         selectedBrands.length === 0 ||
         selectedBrands.includes(normalizeBrandName(item.brandName));
+
       return inCategory && inBrand;
     });
   }, [products, selectedCategories, selectedBrands]);
@@ -384,7 +354,9 @@ const toggleBrand = (brandName) => {
     }
   };
 
-  // ===== Render =====
+  /* =========================================================
+      Render
+  ========================================================= */
   return (
     <main className="products-container page-fullwidth">
       {/* Sidebar */}
@@ -416,6 +388,7 @@ const toggleBrand = (brandName) => {
         {selectedCategories.length > 0 && !loading && (
           <>
             <hr className="divider" />
+
             <section>
               <h3 className="font-500orange">ยี่ห้อ</h3>
               <div className="filter-box">
@@ -467,26 +440,35 @@ const toggleBrand = (brandName) => {
             <div className={`products-grid ${isFading ? 'fade' : ''}`}>
               {currentItems.map((item, index) => {
                 const discount = item.isPromotion === "1" ? parseFloat(item.discountPercent) : 0;
-                const finalPrice = discount > 0
-                  ? item.price - (item.price * discount / 100)
-                  : item.price;
+                const finalPrice =
+                  discount > 0
+                    ? item.price - (item.price * discount / 100)
+                    : item.price;
+
+                const typeSlug = slugify(
+                  categories.find(c => Number(c.producttypeID) === item.categoryId)
+                    ?.producttypenameEN || ""
+                );
+
+                const brandSlug = slugify(item.brandName);
 
                 return (
                   <Link
                     key={item.num}
-                    href={`/products/${item.categoryId}/${item.brandId}/${item.num}`}
+                    href={`/products/${typeSlug}/${brandSlug}/${item.num}`}
                     className="product-card fade-in"
-                    style={{ animationDelay: `${index * 0.05}s` }}
-                    onClick={() => handleLogClick(item)} // ✅ เพิ่มบันทึก Log ตรงนี้
+                    onClick={() => handleLogClick(item)}   // <──⭐ แก้แล้ว ใช้แค่ log
                   >
-                    <div className="product-image-wrapper" style={{ position: "relative" }}>
+                    <div className="product-image-wrapper">
                       <Image
                         src={getImageUrl(item.mainImage)}
                         alt={item.model || item.solarpanel}
-                        width={300}
-                        height={300}
+                        fill
                         unoptimized
+                        priority={index === 0}
+                        style={{ objectFit: "cover" }}
                       />
+
                       {item.isPromotion === "1" && item.discountPercent && (
                         <div className="product-promo-ribbon">- {item.discountPercent}</div>
                       )}
@@ -494,7 +476,10 @@ const toggleBrand = (brandName) => {
 
                     <div className="product-info">
                       <h3>{item.modelair || item.model || item.solarpanel}</h3>
-                      {item.battery && <h6>รุ่นแบตเตอรี่ {item.battery} kWh</h6>}
+
+                      {item.battery && (
+                        <h6>รุ่นแบตเตอรี่ {item.battery} kWh</h6>
+                      )}
 
                       {item.isprice === "0" && item.size && (
                         <div
@@ -503,8 +488,6 @@ const toggleBrand = (brandName) => {
                             alignItems: 'center',
                             fontWeight: 600,
                             fontSize: 20,
-                            marginTop: '0',
-                            marginBottom: '-0.5rem',
                             color: '#000',
                             gap: 2,
                           }}
@@ -521,20 +504,20 @@ const toggleBrand = (brandName) => {
                             alignItems: 'center',
                             fontWeight: 600,
                             fontSize: 20,
-                            marginTop: '0',
                             color: '#000',
-                            gap: 0,
+                            gap: 4,
                           }}
                         >
-                          <TbCurrencyBaht size={25} color="#000" />{" "}
+                          <TbCurrencyBaht size={25} color="#000" />
                           {Number(finalPrice).toLocaleString()} บาท
+
                           {discount > 0 && (
                             <span
                               style={{
                                 fontSize: 14,
                                 color: '#888',
                                 textDecoration: 'line-through',
-                                marginLeft: '0.5rem',
+                                marginLeft: 4,
                               }}
                             >
                               {Number(item.price).toLocaleString()} บาท
@@ -553,10 +536,14 @@ const toggleBrand = (brandName) => {
               <div className="pagination-controls" style={{ marginTop: '1.5rem' }}>
                 <div className="page-buttons">
                   {currentPage > 1 && (
-                    <button onClick={() => handlePageChange(currentPage - 1)} className="btn-with-arrow">
+                    <button
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      className="btn-with-arrow"
+                    >
                       <IoIosArrowBack className="arrow-icon" />
                     </button>
                   )}
+
                   {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
                     <button
                       key={page}
@@ -566,8 +553,12 @@ const toggleBrand = (brandName) => {
                       {page}
                     </button>
                   ))}
+
                   {currentPage < totalPages && (
-                    <button onClick={() => handlePageChange(currentPage + 1)} className="btn-with-arrow">
+                    <button
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      className="btn-with-arrow"
+                    >
                       <IoIosArrowForward className="arrow-icon" />
                     </button>
                   )}
@@ -579,4 +570,4 @@ const toggleBrand = (brandName) => {
       </section>
     </main>
   );
-} 
+}
