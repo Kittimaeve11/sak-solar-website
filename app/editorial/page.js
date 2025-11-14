@@ -1,4 +1,5 @@
 'use client';
+
 import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -7,29 +8,24 @@ import { IoIosArrowBack, IoIosArrowForward, IoIosArrowDown } from 'react-icons/i
 import { FaArrowRightLong } from "react-icons/fa6";
 import { useLocale } from '../Context/LocaleContext';
 
-// อ่านค่าจาก .env
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 
-/* =========================================================
-   ฟังก์ชันบันทึก Log ไป Backend
-   ========================================================= */
+/* ---------------- Log ---------------- */
 const handleLogClick = async (item) => {
   try {
     const logData = {
-      actionType: '2', // 2 = ดูบทความ
-      actionDetail: `หน้าบทความ รหัสบทความ: ${item.editoria_id ?? '-'} หมายเลขบทความ: ${item.editoria_num ?? '-'} ชื่อบทความ: ${item.editoria_titieTH ?? '-'}`,
+      actionType: '2',
+      actionDetail: `หน้าบทความ รหัสบทความ: ${item.editoria_id ?? '-'} หมายเลข: ${item.editoria_num ?? '-'} ชื่อบทความ: ${item.editoria_titieTH ?? '-'}`,
       typeUser: 'ผู้เยี่ยมชมเว็บไซต์',
       datatype: 'บทความ',
       dataID: item.editoria_id ?? '0',
       datatypeID: item.editoria_typeID ?? '0',
-      brandtype: '0', // ✅ ป้องกัน error null
+      brandtype: '0',
       dataname: item.editoria_titieTH ?? '-',
     };
 
-    console.log("📤 ส่ง Log:", logData);
-
-    const res = await fetch(`${baseUrl}/api/logWebsitepageapi`, {
+    await fetch(`${baseUrl}/api/logWebsitepageapi`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -37,20 +33,12 @@ const handleLogClick = async (item) => {
       },
       body: JSON.stringify(logData),
     });
-
-    if (!res.ok) {
-      const err = await res.text();
-      console.error('❌ Log API error:', err);
-    } else {
-      console.log('✅ Log: บันทึกการดูบทความสำเร็จ');
-    }
   } catch (err) {
-    console.error('💥 เกิดข้อผิดพลาดในการบันทึก Log:', err);
+    console.error('Log error:', err);
   }
 };
 
-
-// ✅ เก็บ cache ในหน่วยความจำ
+/* ---------------- Cache ---------------- */
 let editorialCache = {
   articles: null,
   types: null,
@@ -62,125 +50,107 @@ export default function EditorialListPage() {
   const locale = useLocale();
   const [articles, setArticles] = useState([]);
   const [types, setTypes] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(15);
-  const [filter, setFilter] = useState('ทั้งหมด');
-  const [shouldAnimate, setShouldAnimate] = useState(false);
   const [banners, setBanners] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [loadingBanner, setLoadingBanner] = useState(true);
-  const [bannerLoaded, setBannerLoaded] = useState({});
-  const [imgError, setImgError] = useState({});
 
-  const router = useRouter();
+  const [shouldAnimate, setShouldAnimate] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 15;
+
+  const [filter, setFilter] = useState('ทั้งหมด');
   const topRef = useRef(null);
+  const router = useRouter();
 
   /* =========================================================
-     FETCH DATA (with cache)
+     USEEFFECT เดียว (SEO + Fetch + Device)
   ========================================================= */
   useEffect(() => {
+    /* SEO */
     document.title =
       locale === 'en'
         ? 'Editorials | Sak Siam Solar Energy Co., Ltd.'
         : 'บทความ | บริษัท ศักดิ์สยาม โซลาร์ เอ็นเนอร์ยี่ จำกัด';
 
-    const fetchAll = async () => {
+    /* ตรวจมือถือ */
+    const updateDevice = () => setIsMobile(window.innerWidth <= 768);
+    updateDevice();
+    window.addEventListener('resize', updateDevice);
+
+    /* โหลดข้อมูล */
+    const load = async () => {
       try {
-        // ✅ ถ้ามี cache และไม่เกิน 10 นาที ใช้ cache เลย
         const cacheAge = Date.now() - editorialCache.timestamp;
         if (
           editorialCache.articles &&
           editorialCache.types &&
           editorialCache.banners &&
-          cacheAge < 1000 * 60 * 10
+          cacheAge < 10 * 60 * 1000
         ) {
           setArticles(editorialCache.articles);
           setTypes(editorialCache.types);
           setBanners(editorialCache.banners);
-          setLoading(false);
-          setLoadingBanner(false);
-          setTimeout(() => setShouldAnimate(true), 50);
-          return;
-        }
+        } else {
+          setLoading(true);
+          setLoadingBanner(true);
 
-        // ✅ โหลดใหม่จาก API
-        setLoading(true);
-        setLoadingBanner(true);
+          const [resType, resArticle, resBanner] = await Promise.all([
+            fetch(`${baseUrl}/api/edittorTypepageapi`, { headers: { 'X-API-KEY': apiKey } }),
+            fetch(`${baseUrl}/api/edittorpageapi?limit=1000`, { headers: { 'X-API-KEY': apiKey } }),
+            fetch(`${baseUrl}/api/branderIDapi/15`, { headers: { 'X-API-KEY': apiKey } }),
+          ]);
 
-        const [resType, resArticles, resBanner] = await Promise.all([
-          fetch(`${baseUrl}/api/edittorTypepageapi`, {
-            headers: { 'X-API-KEY': apiKey },
-          }),
-          fetch(`${baseUrl}/api/edittorpageapi?limit=1000`, {
-            headers: { 'X-API-KEY': apiKey },
-          }),
-          fetch(`${baseUrl}/api/branderIDapi/15`, {
-            headers: { 'X-API-KEY': apiKey },
-          }),
-        ]);
+          const typeJson = await resType.json();
+          const articleJson = await resArticle.json();
+          const bannerJson = await resBanner.json();
 
-        if (!resType.ok || !resArticles.ok || !resBanner.ok)
-          throw new Error('API fetch error');
-
-        const typeData = await resType.json();
-        const articleData = await resArticles.json();
-        const bannerData = await resBanner.json();
-
-        const typeList = Array.isArray(typeData.result) ? typeData.result : [];
-        const articleList = Array.isArray(articleData.result?.data)
-          ? articleData.result.data
-          : [];
-        const bannerArray = Array.isArray(bannerData.data)
-          ? bannerData.data
-          : bannerData.data
-            ? [bannerData.data]
+          const typeList = typeJson?.result ?? [];
+          const articleList = articleJson?.result?.data ?? [];
+          const bannerList = Array.isArray(bannerJson?.data)
+            ? bannerJson.data
+            : bannerJson.data
+            ? [bannerJson.data]
             : [];
 
-        // ✅ เก็บลง cache
-        editorialCache = {
-          articles: articleList,
-          types: typeList,
-          banners: bannerArray,
-          timestamp: Date.now(),
-        };
+          editorialCache = {
+            articles: articleList,
+            types: typeList,
+            banners: bannerList,
+            timestamp: Date.now(),
+          };
 
-        setArticles(articleList);
-        setTypes(typeList);
-        setBanners(bannerArray);
+          setArticles(articleList);
+          setTypes(typeList);
+          setBanners(bannerList);
+        }
       } catch (err) {
-        console.error('❌ Failed to fetch editorial:', err);
+        console.error('Editorial Load Error:', err);
         setArticles([]);
         setTypes([]);
         setBanners([]);
       } finally {
         setLoading(false);
         setLoadingBanner(false);
+
+        /* Trigger fade-in */
         setTimeout(() => setShouldAnimate(true), 50);
       }
     };
 
-    fetchAll();
+    load();
+
+    return () => window.removeEventListener('resize', updateDevice);
   }, [locale]);
 
   /* =========================================================
      PAGINATION
   ========================================================= */
-  const handlePageChange = (page) => {
-    if (page === currentPage) return;
-    setShouldAnimate(false);
-    topRef.current?.scrollIntoView({ behavior: 'auto' });
-    setCurrentPage(page);
-    setTimeout(() => setShouldAnimate(true), 50);
-  };
-
   const filteredArticles =
     filter === 'ทั้งหมด'
-      ? Array.isArray(articles)
-        ? articles
-        : []
-      : Array.isArray(articles)
-        ? articles.filter((item) => item.editoria_typeID === filter)
-        : [];
+      ? articles
+      : articles.filter((a) => a.editoria_typeID === filter);
 
   const totalPages = Math.ceil(filteredArticles.length / itemsPerPage) || 1;
   const paginatedArticles = filteredArticles.slice(
@@ -188,93 +158,6 @@ export default function EditorialListPage() {
     currentPage * itemsPerPage
   );
 
-  /* =========================================================
-     PAGINATION BUTTONS
-  ========================================================= */
-  const renderPagination = () => {
-    const pages = [];
-    const totalNumbers = 5;
-    const totalBlocks = totalNumbers + 2;
-
-    if (currentPage > 1)
-      pages.push(
-        <button
-          key="prev"
-          onClick={() => handlePageChange(currentPage - 1)}
-          className="btn-with-arrow"
-        >
-          <IoIosArrowBack className="arrow-icon" />
-        </button>
-      );
-
-    if (totalPages > totalBlocks) {
-      const startPage = Math.max(2, currentPage - 2);
-      const endPage = Math.min(totalPages - 1, currentPage + 2);
-      if (1 < startPage)
-        pages.push(
-          <button
-            key={1}
-            onClick={() => handlePageChange(1)}
-            className={currentPage === 1 ? 'active-page' : ''}
-          >
-            1
-          </button>
-        );
-      if (startPage > 2)
-        pages.push(<span key="start-ellipsis" className="ellipsis">...</span>);
-      for (let i = startPage; i <= endPage; i++) {
-        pages.push(
-          <button
-            key={i}
-            onClick={() => handlePageChange(i)}
-            className={i === currentPage ? 'active-page' : ''}
-          >
-            {i}
-          </button>
-        );
-      }
-      if (endPage < totalPages - 1)
-        pages.push(<span key="end-ellipsis" className="ellipsis">...</span>);
-      pages.push(
-        <button
-          key={totalPages}
-          onClick={() => handlePageChange(totalPages)}
-          className={currentPage === totalPages ? 'active-page' : ''}
-        >
-          {totalPages}
-        </button>
-      );
-    } else {
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(
-          <button
-            key={i}
-            onClick={() => handlePageChange(i)}
-            className={i === currentPage ? 'active-page' : ''}
-          >
-            {i}
-          </button>
-        );
-      }
-    }
-
-    if (currentPage < totalPages)
-      pages.push(
-        <button
-          key="next"
-          onClick={() => handlePageChange(currentPage + 1)}
-          className="btn-with-arrow"
-        >
-          <IoIosArrowForward className="arrow-icon" />
-        </button>
-      );
-
-    return pages;
-  };
-
-  /* =========================================================
-     HELPERS
-  ========================================================= */
   const parseDescription = (str) => {
     if (!str || typeof str !== 'string') return '';
     return str
@@ -290,14 +173,12 @@ export default function EditorialListPage() {
   const getImageUrl = (galleryStr) => {
     if (!galleryStr) return '/images/no-image.jpg';
     try {
-      const parsed = JSON.parse(galleryStr);
-      const first = Array.isArray(parsed) && parsed.length > 0 ? parsed[0] : null;
+      const arr = JSON.parse(galleryStr);
+      const first = arr?.[0];
       if (!first) return '/images/no-image.jpg';
-      const cleaned = first
-        .replace(/^"+|"+$/g, '')
-        .replace(/\\/g, '/')
-        .replace(/\/{2,}/g, '/');
-      return `${baseUrl.replace(/\/$/, '')}/${cleaned.replace(/^\//, '')}`;
+
+      const cleaned = first.replace(/\\/g, '/').replace(/\/{2,}/g, '/');
+      return `${baseUrl}/${cleaned.replace(/^\//, '')}`;
     } catch {
       return '/images/no-image.jpg';
     }
@@ -308,62 +189,44 @@ export default function EditorialListPage() {
   ========================================================= */
   return (
     <div ref={topRef} className="no-margin">
-      {/* ---------------- Banner ---------------- */}
-      <div className="banner-container">
-        {loadingBanner && <div className="skeleton-banner" />}
-        {banners.length > 0 &&
-          banners.map((item) => {
-            const loaded = bannerLoaded[item.brander_ID] || false;
-            return (
-              <picture key={item.brander_ID}>
-                <source
-                  srcSet={`${baseUrl.replace(/\/$/, '')}/${item.brander_pictureMoblie.replace(/^\//, '')}`}
-                  media="(max-width: 768px)"
-                />
-                <Image
-                  src={`${baseUrl.replace(/\/$/, '')}/${item.brander_picturePC.replace(/^\//, '')}`}
-                  alt={item.brander_name || 'Editorial Banner'}
-                  fill
-                  priority
-                  className="banner-image"
-                  style={{ opacity: loaded ? 1 : 0 }}
-                  onLoad={() =>
-                    setBannerLoaded((prev) => ({
-                      ...prev,
-                      [item.brander_ID]: true,
-                    }))
-                  }
-                  unoptimized
-                />
-              </picture>
-            );
-          })}
-        {!loadingBanner && banners.length === 0 && (
-          <Image
-            src="/images/no-image.jpg"
-            alt="Banner fallback"
-            fill
-            priority
-            className="banner-image"
-          />
-        )}
-      </div>
 
-      {/* ---------------- Main Content ---------------- */}
+      {/* ⭐⭐⭐ BANNER (เหมือน FAQ 100%) ⭐⭐⭐ */}
+      {loadingBanner ? (
+        <div className="skeleton skeleton-banner fade-in"></div>
+      ) : (
+        banners.map((b) => {
+          const imgSrc = isMobile
+            ? `${baseUrl}/${b.brander_pictureMoblie}`
+            : `${baseUrl}/${b.brander_picturePC}`;
+
+          return (
+            <div key={b.brander_ID} className="banner-container fade-in">
+              <Image
+                src={imgSrc}
+                alt={b.brander_name}
+                fill
+                priority
+                unoptimized
+                sizes="100vw"
+                className="banner-image"
+              />
+            </div>
+          );
+        })
+      )}
+
+      {/* ⭐⭐⭐ CONTENT ⭐⭐⭐ */}
       <main className="layout-editorial">
         <h1 className="headtitle">{locale === 'en' ? 'Editorials' : 'บทความ'}</h1>
 
-        {/* ---------------- Filter ---------------- */}
+        {/* Filter */}
         <div className="portfolio-filters">
-          <label htmlFor="filter-select" className="filter-label">
-            {locale === 'en'
-              ? 'Select Editorial Type:'
-              : 'เลือกประเภทบทความ :'}
+          <label className="filter-label">
+            {locale === 'en' ? 'Select Editorial Type:' : 'เลือกประเภทบทความ :'}
           </label>
           <div className="filter-row">
             <div className="select-wrapper">
               <select
-                id="filter-select"
                 value={filter}
                 onChange={(e) => {
                   setFilter(e.target.value);
@@ -372,10 +235,9 @@ export default function EditorialListPage() {
                 className="filter-dropdown"
               >
                 <option value="ทั้งหมด">
-                  {locale === 'en'
-                    ? 'All Editorials'
-                    : 'บทความทั้งหมด'}
+                  {locale === 'en' ? 'All Editorials' : 'บทความทั้งหมด'}
                 </option>
+
                 {types.map((t) => (
                   <option key={t.TypeEditoria_id} value={t.TypeEditoria_id}>
                     {locale === 'en'
@@ -389,95 +251,107 @@ export default function EditorialListPage() {
           </div>
         </div>
 
-        {/* ---------------- Main Grid ---------------- */}
+        {/* Grid */}
         {loading ? (
           <div className="editorial-grid">
             {Array.from({ length: itemsPerPage }).map((_, idx) => (
               <div className="skeleton-card" key={idx}>
-                <div className="skeleton skeleton-image" />
-                <div className="skeleton skeleton-title" />
-                <div className="skeleton skeleton-data" />
-                <span className="skeleton skeleton-line" />
-                <span className="skeleton skeleton-line" />
+                <div className="skeleton skeleton-image"></div>
+                <div className="skeleton skeleton-title"></div>
+                <div className="skeleton skeleton-data"></div>
+                <div className="skeleton skeleton-line"></div>
+                <div className="skeleton skeleton-line"></div>
               </div>
             ))}
           </div>
         ) : (
-          <main
-            className={`editorial-grid fade-in${shouldAnimate ? ' active' : ''
-              }`}
-            key={`page-${currentPage}`}
-          >
+          <div className={`editorial-grid fade-in ${shouldAnimate ? 'active' : ''}`}>
             {paginatedArticles.map((item) => {
-              const title =
-                locale === 'en'
-                  ? item.editoria_titieEN
-                  : item.editoria_titieTH;
-              const description =
-                locale === 'en'
-                  ? item.editoria_descriptionEN
-                  : item.editoria_descriptionTH;
-              const imgSrc = imgError[item.editoria_num]
-                ? '/images/no-image.jpg'
-                : getImageUrl(item.editoria_gallary);
+              const title = locale === 'en' ? item.editoria_titieEN : item.editoria_titieTH;
+              const description = locale === 'en'
+                ? item.editoria_descriptionEN
+                : item.editoria_descriptionTH;
 
               return (
                 <div
                   key={item.editoria_num}
                   className="editorial-card"
                   onClick={async () => {
-                    await handleLogClick(item); // ✅ Log ก่อน redirect
-                    setTimeout(() => {
-                      router.push(`/editorial/${item.editoria_num}`);
-                    }, 300);
+                    await handleLogClick(item);
+                    setTimeout(() => router.push(`/editorial/${item.editoria_num}`), 300);
                   }}
                 >
                   <div className="card-image-wrapper">
                     <Image
-                      src={imgSrc}
+                      src={getImageUrl(item.editoria_gallary)}
                       alt={title}
                       fill
                       className="card-image"
-                      onError={() =>
-                        setImgError((prev) => ({
-                          ...prev,
-                          [item.editoria_num]: true,
-                        }))
-                      }
+                      unoptimized
                     />
                   </div>
+
                   <div className="card-content">
                     <h3 className="card-title">{title}</h3>
                     <p className="editorial-date">
                       {new Date(item.editoria_creacteAt).toLocaleDateString(
-                        locale === 'en' ? 'en-EN' : 'th-TH',
+                        locale === 'en' ? 'en-US' : 'th-TH',
                         { day: 'numeric', month: 'long', year: 'numeric' }
                       )}
                     </p>
                     <p
                       className="card-snippet"
-                      dangerouslySetInnerHTML={{
-                        __html: parseDescription(description),
-                      }}
-                    />
+                      dangerouslySetInnerHTML={{ __html: parseDescription(description) }}
+                    ></p>
+
                     <p className="read-more">
                       {locale === 'en' ? 'Read more' : 'อ่านเพิ่มเติม'}{' '}
                       <FaArrowRightLong />
                     </p>
                   </div>
                 </div>
-
               );
             })}
-          </main>
-        )}
-
-        {/* ---------------- Pagination ---------------- */}
-        {!loading && totalPages > 1 && (
-          <div className="pagination-controls">
-            <div className="page-buttons">{renderPagination()}</div>
           </div>
         )}
+
+        {/* Pagination */}
+        {!loading && totalPages > 1 && (
+          <div className="pagination-controls">
+            <div className="page-buttons">
+
+              {currentPage > 1 && (
+                <button
+                  className="btn-with-arrow"
+                  onClick={() => setCurrentPage(currentPage - 1)}
+                >
+                  <IoIosArrowBack />
+                </button>
+              )}
+
+              {Array.from({ length: totalPages }).map((_, i) => (
+                <button
+                  key={i}
+                  className={currentPage === i + 1 ? 'active-page' : ''}
+                  onClick={() => setCurrentPage(i + 1)}
+                >
+                  {i + 1}
+                </button>
+              ))}
+
+              {currentPage < totalPages && (
+                <button
+                  className="btn-with-arrow"
+                  onClick={() => setCurrentPage(currentPage + 1)}
+                >
+                  <IoIosArrowForward />
+                </button>
+              )}
+
+            </div>
+          </div>
+        )}
+
       </main>
     </div>
   );

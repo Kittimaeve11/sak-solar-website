@@ -83,55 +83,9 @@
   color: #555;
 }
 
-/* =============================
-   Banner
-============================= */
-.banner-container {
-  width: 100%;
-  max-width: 100%;
-  overflow: hidden;
-  margin: 0 auto;
-  line-height: 0; /* กันช่องว่างใต้รูป */
-}
-
-.banner-image {
-  width: 100%;
-  height: auto;
-  max-height: 100vh;   /* ไม่ให้สูงเกินหน้าจอ */
-  object-fit: cover;   /* ครอบพอดี กว้าง=100% */
-  display: block;
-}
 
 
-/* บังคับสัดส่วนตามไฟล์จริง */
-@media (max-width: 768px) {
-  .banner-container {
-    aspect-ratio: 768 / 400; /* Mobile = 1.92:1 */
-    min-height: 200px;       /* ป้องกัน collapse */
-  }
-}
 
-@media (min-width: 769px) {
-  .banner-container {
-    aspect-ratio: 3840 / 1191; /* PC = 3.22:1 */
-    min-height: 300px;         /* กัน collapse */
-  }
-}
-
-/* =============================
-   Skeleton Loading
-============================= */
-.skeleton {
-  background-color: #e0e0e0;
-  border-radius: 4px;
-  animation: pulse 1.5s infinite ease-in-out;
-}
-
-@keyframes pulse {
-  0%   { background-color: #e0e0e0; }
-  50%  { background-color: #f0f0f0; }
-  100% { background-color: #e0e0e0; }
-}
 
 .skeleton-card {
   display: flex;
@@ -160,17 +114,6 @@
   display: block;
 }
 
-/* =============================
-   Fade-in
-============================= */
-.fade-in {
-  opacity: 0;
-  animation: fadeIn 0.8s ease-in forwards;
-}
-
-@keyframes fadeIn {
-  to { opacity: 1; }
-}
 
 /* =============================
    Responsive
@@ -189,19 +132,3 @@
   .date           { font-size: 13px; }
 }
 
-/* =============================
-   Skeleton Banner
-============================= */
-.skeleton-banner {
-  width: 100%;
-  aspect-ratio: 3840 / 1191; /* PC */
-  background-color: #e0e0e0;
-  border-radius: 4px;
-  animation: pulse 1.5s infinite ease-in-out;
-}
-
-@media (max-width: 768px) {
-  .skeleton-banner {
-    aspect-ratio: 768 / 400; /* Mobile */
-  }
-}

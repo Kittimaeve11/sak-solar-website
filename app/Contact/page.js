@@ -122,47 +122,45 @@ export default function Page() {
   /* =========================================================
       ฟังก์ชันบันทึก Log การส่งข้อความสอบถามเพิ่มเติม (actionType = 7)
      ========================================================= */
-// ฟังก์ชัน handleLogContactSubmit ใช้สำหรับบันทึก Log เมื่อผู้ใช้ส่งฟอร์ม "สอบถามเพิ่มเติม"
-const handleLogContactSubmit = async () => {
-  try {
-    // สร้างข้อมูล Log ที่จะส่งไปยัง API
-    const logData = {
-      actionType: '7', // รหัสประเภทการกระทำ (7 = ส่งฟอร์มสอบถามเพิ่มเติม)
-      actionDetail: `ส่งแบบฟอร์มสอบถามเพิ่มเติม | หัวข้อ: ${formData.topic || 'N/A'} | ชื่อ: ${
-        formData.name || 'N/A'
-      } | เบอร์โทร: ${formData.phone || 'N/A'} | อีเมล: ${
-        formData.email || 'ไม่มี'
-      } | ข้อความ: ${formData.message || 'ไม่มีข้อความ'}`,
-      // รายละเอียดข้อมูลที่ผู้ใช้กรอก เช่น หัวข้อ ชื่อ เบอร์โทร อีเมล และข้อความ
+  // ฟังก์ชัน handleLogContactSubmit ใช้สำหรับบันทึก Log เมื่อผู้ใช้ส่งฟอร์ม "สอบถามเพิ่มเติม"
+  const handleLogContactSubmit = async () => {
+    try {
+      // สร้างข้อมูล Log ที่จะส่งไปยัง API
+      const logData = {
+        actionType: '7', // รหัสประเภทการกระทำ (7 = ส่งฟอร์มสอบถามเพิ่มเติม)
+        actionDetail: `ส่งแบบฟอร์มสอบถามเพิ่มเติม | หัวข้อ: ${formData.topic || 'N/A'} | ชื่อ: ${formData.name || 'N/A'
+          } | เบอร์โทร: ${formData.phone || 'N/A'} | อีเมล: ${formData.email || 'ไม่มี'
+          } | ข้อความ: ${formData.message || 'ไม่มีข้อความ'}`,
+        // รายละเอียดข้อมูลที่ผู้ใช้กรอก เช่น หัวข้อ ชื่อ เบอร์โทร อีเมล และข้อความ
 
-      typeUser: 'ผู้เยี่ยมชมเว็บไซต์', // ประเภทผู้ใช้
-      datatype: 'สอบถามเพิ่มเติม', // ประเภทของข้อมูล Log
-      dataID: '0', // กำหนดเป็น "0" เพื่อป้องกันค่า null
-      datatypeID: '0', // กำหนดเป็น "0" เพื่อป้องกันค่า null
-      brandtype: 'N/A', // ไม่มีการระบุแบรนด์
-      dataname: 'Contact Page Form', // ชื่อของฟอร์มที่บันทึก Log
-    };
+        typeUser: 'ผู้เยี่ยมชมเว็บไซต์', // ประเภทผู้ใช้
+        datatype: 'สอบถามเพิ่มเติม', // ประเภทของข้อมูล Log
+        dataID: '0', // กำหนดเป็น "0" เพื่อป้องกันค่า null
+        datatypeID: '0', // กำหนดเป็น "0" เพื่อป้องกันค่า null
+        brandtype: 'N/A', // ไม่มีการระบุแบรนด์
+        dataname: 'Contact Page Form', // ชื่อของฟอร์มที่บันทึก Log
+      };
 
-    // เรียก API เพื่อส่งข้อมูล Log ไปบันทึก
-    fetch(`${baseUrl}/api/logWebsitepageapi`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json', // ระบุชนิดข้อมูลเป็น JSON
-        'X-API-KEY': apiKey, // ใส่ API Key สำหรับการเข้าถึง API
-      },
-      body: JSON.stringify(logData), // แปลงข้อมูล logData เป็น JSON ก่อนส่ง
-    })
-      // อ่านค่าตอบกลับจาก API เป็นข้อความ
-      .then(res => res.text())
-      // แสดงข้อความใน console ว่าบันทึก Log สำเร็จ
-      .then(text => console.log('Log contact saved:', text))
-      // กรณีเกิดข้อผิดพลาดในการส่ง Log
-      .catch(err => console.warn('log failed:', err.message));
-  } catch (err) {
-    // กรณีเกิดข้อผิดพลาดในฟังก์ชันโดยรวม
-    console.warn('unexpected log error:', err.message);
-  }
-};
+      // เรียก API เพื่อส่งข้อมูล Log ไปบันทึก
+      fetch(`${baseUrl}/api/logWebsitepageapi`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json', // ระบุชนิดข้อมูลเป็น JSON
+          'X-API-KEY': apiKey, // ใส่ API Key สำหรับการเข้าถึง API
+        },
+        body: JSON.stringify(logData), // แปลงข้อมูล logData เป็น JSON ก่อนส่ง
+      })
+        // อ่านค่าตอบกลับจาก API เป็นข้อความ
+        .then(res => res.text())
+        // แสดงข้อความใน console ว่าบันทึก Log สำเร็จ
+        .then(text => console.log('Log contact saved:', text))
+        // กรณีเกิดข้อผิดพลาดในการส่ง Log
+        .catch(err => console.warn('log failed:', err.message));
+    } catch (err) {
+      // กรณีเกิดข้อผิดพลาดในฟังก์ชันโดยรวม
+      console.warn('unexpected log error:', err.message);
+    }
+  };
   /* =========================================================
       Validate & Handle Input
      ========================================================= */
@@ -313,26 +311,32 @@ const handleLogContactSubmit = async () => {
         }}
       /> */}
       {/* Skeleton Banner */}
+      {/* ================= Banner ================= */}
       {loading ? (
-        <div className="skeleton-banner"></div>
+        <div className="skeleton skeleton-banner fade-in"></div>
       ) : (
-        brander.map((item) => (
-          <div className="banner-container fade-in" key={item.brander_ID}>
-            <picture>
-              <source srcSet={`${baseUrl}/${item.brander_pictureMoblie}`} media="(max-width: 768px)" />
+        brander.map((b) => {
+          const imgSrc = window.innerWidth <= 768
+            ? `${baseUrl}/${b.brander_pictureMoblie}`
+            : `${baseUrl}/${b.brander_picturePC}`;
+
+          return (
+            <div key={b.brander_ID} className="banner-container fade-in">
               <Image
-                src={`${baseUrl}/${item.brander_picturePC}`}
-                alt="Contact Banner"
-                width={1530}
-                height={800}
+                src={imgSrc}
+                alt={b.brander_name}
+                fill
                 className="banner-image"
+                unoptimized
+                priority
+                sizes="100vw"
               />
-            </picture>
-          </div>
-        ))
+            </div>
+          );
+        })
       )}
 
-      <main className="layout-container">
+      <main className="layout-containercontact">
         <h1 className="headtitle">{messages.contact}</h1>
         {loading ? (
           <div className="contactGrid">
@@ -427,11 +431,13 @@ const handleLogContactSubmit = async () => {
                     <Image
                       src={`${baseUrl.replace(/\/$/, '')}/${item.locationphoto.replace(/^\/+/, '')}`}
                       alt="อาคารบริษัท"
-                      width={800}
-                      height={600}
+                      width={0}
+                      height={0}
+                      sizes="100vw"
+                      style={{ width: "100%", height: "auto" }}
                       className="companyImage"
-                      priority
                     />
+
 
 
                   </div>

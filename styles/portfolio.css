@@ -340,27 +340,6 @@
   gap: 12px;
 }
 
-.banner-container {
-  position: relative;
-  width: 100vw;
-  /* ใช้ viewport แทน % */
-  aspect-ratio: 3.22 / 1;
-  min-height: 300px;
-  overflow: hidden;
-
-  /* กันไม่ให้โดนบีบจาก parent */
-  margin-left: calc(-50vw + 50%);
-}
-
-
-.banner-image {
-  object-fit: cover;
-  width: 100%;
-  height: 100%;
-  display: block;
-  transition: opacity 0.6s ease-in-out;
-}
-
 .arrow-icon {
   font-size: 16px;
   display: inline-flex;
@@ -370,26 +349,6 @@
   top: 1px;
 }
 
-/* Skeleton loading effect */
-.skeleton {
-  background-color: #e0e0e0;
-  border-radius: 4px;
-  animation: pulse 1.5s infinite ease-in-out;
-}
-
-@keyframes pulse {
-  0% {
-    background-color: #e0e0e0;
-  }
-
-  50% {
-    background-color: #f0f0f0;
-  }
-
-  100% {
-    background-color: #e0e0e0;
-  }
-}
 
 .skeleton-card {
   display: flex;
@@ -422,35 +381,10 @@
   margin-bottom: 16px;
 }
 
-/* Fade-in animation */
-.fade-in {
-  opacity: 0;
-  animation: fadeIn 0.8s ease-in forwards;
-}
-
-@keyframes fadeIn {
-  to {
-    opacity: 1;
-  }
-}
-
-/* Skeleton Banner */
-.skeleton-banner {
-  width: 100%;
-  aspect-ratio: 3.22 / 1;
-  background-color: #e0e0e0;
-  border-radius: 4px;
-  animation: pulse 1.5s infinite ease-in-out;
-  margin-top: 0rem;
-}
 
 /* มุมมองโทรศัพท์ */
 /* Responsive */
 @media (max-width: 768px) {
-  .banner-container {
-    aspect-ratio: 1.92 / 1;
-    /* เหมาะกับมือถือ */
-  }
 
 /* เลือกประเภทบทความ : */
 .portfolio-filters {
@@ -493,8 +427,4 @@
     width: 100% !important;
   }
 
-  .skeleton-banner {
-    aspect-ratio: 1.92 / 1;
-    /* for mobile view */
-  }
 }

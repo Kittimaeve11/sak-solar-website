@@ -9,170 +9,170 @@ import { useLocale } from '../Context/LocaleContext';
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 
+// Banner Cache กันกระพริบ
+let bannerCache = null;
+
 export default function FAQPage() {
   const [faqs, setFaqs] = useState([]);
+  const [banners, setBanners] = useState([]);
   const [openIndex, setOpenIndex] = useState(null);
 
-  const [banners, setBanners] = useState([]);
-  const [loadingBanner, setLoadingBanner] = useState(true);
-  const [fadeInBanner, setFadeInBanner] = useState(false);
-
   const [loadingFaq, setLoadingFaq] = useState(true);
-  const [fadeInFaq, setFadeInFaq] = useState(false);
+  const [loadingBanner, setLoadingBanner] = useState(true);
 
+  const locale = useLocale();
   const answerRefs = useRef([]);
-  const { locale } = useLocale();
+  const [isMobile, setIsMobile] = useState(false);
 
-  // ✅ โหลดข้อมูล FAQ และ Banner จาก API
+  /* =====================================================
+      ตรวจมือถือ (เพื่อเลือกไฟล์ภาพ)
+  ===================================================== */
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // ---- FAQ ----
-        if (window.__FAQ_CACHE__) {
-          setFaqs(window.__FAQ_CACHE__);
-          setLoadingFaq(false);
-          setFadeInFaq(true);
-        } else {
-          setLoadingFaq(true);
-          const resFaq = await fetch(`${baseUrl}/api/FQAapi`, {
-            headers: { 'X-API-KEY': apiKey },
-          });
-          const dataFaq = await resFaq.json();
-          const faqResult = dataFaq.status && dataFaq.result ? dataFaq.result : [];
-          window.__FAQ_CACHE__ = faqResult;
-          setFaqs(faqResult);
-        }
+    const update = () => setIsMobile(window.innerWidth <= 768);
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
 
-        // ---- Banner ----
-        if (window.__BANNER_FAQ_CACHE__) {
-          setBanners(window.__BANNER_FAQ_CACHE__);
-          setLoadingBanner(false);
-          setFadeInBanner(true);
-        } else {
-          setLoadingBanner(true);
-          const resBanner = await fetch(`${baseUrl}/api/branderIDapi/1`, {
-            headers: { 'X-API-KEY': apiKey },
-          });
-          const dataBanner = await resBanner.json();
-          const arr = Array.isArray(dataBanner.data)
-            ? dataBanner.data
-            : dataBanner.data
-            ? [dataBanner.data]
-            : [];
-          window.__BANNER_FAQ_CACHE__ = arr;
-          setBanners(arr);
-        }
-      } catch (err) {
-        console.error('❌ Error fetching FAQ/Banner:', err);
+  /* =====================================================
+      useEffect เดียว — SEO + Fetch API
+  ===================================================== */
+  useEffect(() => {
+    const loc = typeof locale === 'string' ? locale.toLowerCase() : 'th';
+    const isThai = loc.startsWith('th');
+
+    document.title = isThai
+      ? 'คำถามที่พบบ่อย | บริษัท ศักดิ์สยาม โซลาร์ เอ็นเนอร์ยี่ จำกัด'
+      : 'FAQ | Sak Siam Solar Energy Co., Ltd.';
+
+    let meta = document.querySelector("meta[name='description']");
+    if (!meta) {
+      meta = document.createElement('meta');
+      meta.name = 'description';
+      document.head.appendChild(meta);
+    }
+    meta.content = isThai ? 'คำถามที่พบบ่อย' : 'FAQ';
+
+    const loadData = async () => {
+      // FAQ
+      try {
+        const res = await fetch(`${baseUrl}/api/FQAapi`, {
+          headers: { 'X-API-KEY': apiKey },
+        });
+        const json = await res.json();
+        setFaqs(json.status && json.result ? json.result : []);
       } finally {
         setLoadingFaq(false);
+      }
+
+      // Banner
+      try {
+        if (!bannerCache) {
+          const res = await fetch(`${baseUrl}/api/branderIDapi/1`, {
+            headers: { 'X-API-KEY': apiKey },
+          });
+          const json = await res.json();
+          bannerCache = Array.isArray(json.data) ? json.data : [json.data];
+        }
+        setBanners(bannerCache);
+      } finally {
         setLoadingBanner(false);
-        setFadeInFaq(true);
-        setTimeout(() => setFadeInBanner(true), 50);
       }
     };
 
-    fetchData();
+    loadData();
   }, [locale]);
 
-  const toggle = (index) => setOpenIndex((prev) => (prev === index ? null : index));
+  /* -------- Clean HTML -------- */
+  const cleanHtml = (str) =>
+    (!str || typeof str !== 'string'
+      ? ''
+      : str
+          .replace(/^"|"$/g, '')
+          .replace(/\\\//g, '/')
+          .replace(/\\"/g, '"')
+          .replace(/\\n/g, ' ')
+          .replace(/&nbsp;/g, ' ')
+          .replace(/ style="[^"]*"/g, '')
+          .replace(/<br\s*\/?>/gi, '<br/>')
+    ).trim();
 
-  // ✅ เปิด/ปิดคำตอบแบบ animation
-  useEffect(() => {
-    answerRefs.current.forEach((el, i) => {
-      if (!el) return;
-      if (i === openIndex) {
-        el.style.maxHeight = el.scrollHeight + 'px';
-        el.style.paddingTop = '1rem';
-        el.style.paddingBottom = '1rem';
-      } else {
-        el.style.maxHeight = '0px';
-        el.style.paddingTop = '0';
-        el.style.paddingBottom = '0';
-      }
-    });
-  }, [openIndex, faqs]);
-
-  const cleanHtml = (str) => {
-    if (!str || typeof str !== 'string') return '';
-    return str
-      .replace(/^"|"$/g, '')
-      .replace(/\\\//g, '/')
-      .replace(/\\"/g, '"')
-      .replace(/\\n/g, ' ')
-      .replace(/&nbsp;/g, ' ')
-      .replace(/ style="[^"]*"/g, '')
-      .replace(/<br\s*\/?>/gi, '<br/>')
-      .trim();
-  };
-
+  /* -------- Skeleton -------- */
   const SkeletonFaq = () => (
-    <div className="faq-skeleton-card">
+    <div className="faq-skeleton-card fade-in">
       <div className="faq-skeleton-question skeleton" />
-      <div className="faq-skeleton-answer" />
+      <div className="faq-skeleton-answer skeleton" />
     </div>
   );
 
   return (
     <div className="no-margin">
-      {/* 🖼 Banner */}
+
+      {/* ================= Banner ================= */}
       {loadingBanner ? (
-        <div className="skeleton-banner"></div>
+        <div className="skeleton skeleton-banner fade-in"></div>
       ) : (
-        banners.map((item) => (
-          <div
-            key={item.brander_ID}
-            className={`banner-container ${fadeInBanner ? 'fade-in' : ''}`}
-          >
-            <picture>
-              <source
-                srcSet={`${baseUrl}/${item.brander_pictureMoblie}`}
-                media="(max-width: 768px)"
-              />
+        banners.map((b) => {
+          const imgSrc = isMobile
+            ? `${baseUrl}/${b.brander_pictureMoblie}`
+            : `${baseUrl}/${b.brander_picturePC}`;
+
+          return (
+            <div key={b.brander_ID} className="banner-container fade-in">
               <Image
-                src={`${baseUrl}/${item.brander_picturePC}`}
-                alt={item.brander_name || 'Banner Image'}
-                width={1530}
-                height={800}
+                src={imgSrc}
+                alt={b.brander_name}
+                fill
                 className="banner-image"
-                style={{ objectFit: 'cover', width: '100%', height: '100%' }}
                 unoptimized
+                priority
+                sizes="100vw"
               />
-            </picture>
-          </div>
-        ))
+            </div>
+          );
+        })
       )}
 
-      {/* 📋 FAQ */}
-      <main className={`layout-faq ${fadeInFaq ? 'fade-in' : ''}`}>
+      {/* ================= FAQ ================= */}
+      <main className="layout-faq fade-in">
         <h1 className="headtitle">คำถามที่พบบ่อยเกี่ยวกับโซลาร์เซลล์</h1>
 
         {loadingFaq
           ? Array.from({ length: 5 }).map((_, i) => <SkeletonFaq key={i} />)
-          : faqs.map((item, index) => (
-              <div key={item.fqa_id} className="faq-item">
-                <button
-                  onClick={() => toggle(index)}
-                  className="faq-button"
-                  type="button"
-                >
-                  {cleanHtml(item.fqa_questionTH)}
-                  <span className={`faq-icon ${openIndex === index ? 'open' : ''}`}>
-                    <MdOutlineArrowForwardIos />
-                  </span>
-                </button>
-                <div
-                  ref={(el) => (answerRefs.current[index] = el)}
-                  className="faq-answer"
-                >
+          : faqs.map((item, index) => {
+              const isOpen = openIndex === index;
+
+              return (
+                <div key={item.fqa_id} className="faq-item fade-in">
+                  <button
+                    className="faq-button"
+                    onClick={() => setOpenIndex(isOpen ? null : index)}
+                  >
+                    {cleanHtml(item.fqa_questionTH)}
+                    <span className={`faq-icon ${isOpen ? 'open' : ''}`}>
+                      <MdOutlineArrowForwardIos />
+                    </span>
+                  </button>
+
                   <div
-                    dangerouslySetInnerHTML={{
-                      __html: cleanHtml(item.fqa_answersTH),
+                    className="faq-answer"
+                    ref={(el) => (answerRefs.current[index] = el)}
+                    style={{
+                      maxHeight: isOpen
+                        ? answerRefs.current[index]?.scrollHeight
+                        : 0,
+                      padding: isOpen ? '1rem 3rem' : '0 3rem',
                     }}
-                  />
+                  >
+                    <div
+                      dangerouslySetInnerHTML={{
+                        __html: cleanHtml(item.fqa_answersTH),
+                      }}
+                    />
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
       </main>
     </div>
   );
