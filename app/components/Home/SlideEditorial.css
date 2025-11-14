@@ -2,7 +2,7 @@
    Layout หลักของ SlideEditorial
    ========================================================= */
 .editorial-wrapperslide {
-  padding: 0rem 1rem;
+  padding: 0 1rem;
   max-width: 1200px;
   margin: auto;
   padding-top: 1rem;
@@ -14,7 +14,7 @@
   margin-bottom: 1rem;
 }
 
-/* ให้ทุก slide มีความสูงเท่ากันใน react-slick */
+/* ปรับ slick ให้ไม่บีบ slide */
 .slick-track {
   display: flex !important;
   align-items: stretch !important;
@@ -36,7 +36,7 @@
    Card ของบทความ
    ========================================================= */
 .slide-itemeditorial {
-  padding: 1rem;
+  padding: 0.7rem; /* ลด padding ให้การ์ดกว้างขึ้น */
   margin-bottom: 0.8rem;
   box-sizing: border-box;
   display: flex;
@@ -66,12 +66,12 @@
 }
 
 /* =========================================================
-   ภาพด้านบนของการ์ด (ทำให้มืดเวลา hover)
+   ภาพด้านบนการ์ด
    ========================================================= */
 .editorial-image-wrapper {
   position: relative;
   width: 100%;
-  aspect-ratio: 16 / 9; /* ✅ คงสัดส่วน 16:9 เสมอ */
+  aspect-ratio: 16 / 9;
   overflow: hidden;
   border-radius: 6px 6px 0 0;
   background-color: #f3f3f3;
@@ -83,20 +83,19 @@
   left: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover; /* ✅ ครอบภาพให้เต็มกรอบ */
+  object-fit: cover;
   transition: filter 0.3s ease;
 }
 
-/* ให้ภาพมืดลง เวลา hover */
 .editorial-cardslide:hover .card-imageslide {
   filter: brightness(0.4);
 }
 
 /* =========================================================
-   เนื้อหาด้านล่าง
+   เนื้อหา
    ========================================================= */
 .card-contentslide {
-  padding: 10px 25px 16px 25px;
+  padding: 12px 18px 16px;
   display: flex;
   flex-direction: column;
   flex-grow: 1;
@@ -140,7 +139,7 @@
 }
 
 /* =========================================================
-   Skeleton Loader (SlideEditorial)
+   Skeleton Loader
    ========================================================= */
 .editorial-loading-wrapper {
   max-width: 1200px;
@@ -181,7 +180,7 @@
 
 .skeleton-imagesilde-editorial {
   width: 100%;
-  aspect-ratio: 16 / 9; /* ✅ เหมือนของจริง */
+  aspect-ratio: 16 / 9;
   background-color: #e0e0e0;
   border-radius: 6px 6px 0 0;
 }
@@ -192,43 +191,6 @@
   flex-direction: column;
   flex-grow: 1;
   gap: 10px;
-}
-
-.skeleton-titlesilde-editorial {
-  height: 22px;
-  width: 60%;
-  margin-top: 22px;
-  margin-bottom: 20px;
-  border-radius: 4px;
-}
-
-.skeleton-datesilde-editorial {
-  height: 14px;
-  width: 30%;
-  margin-top: 2px;
-  margin-bottom: 22px;
-  border-radius: 4px;
-}
-
-.skeleton-textsilde-editorial {
-  height: 18px;
-  width: 85%;
-  margin-bottom: 10px;
-  border-radius: 4px;
-}
-
-.skeleton-textsilde-editorial:last-child {
-  width: 70%;
-  margin-bottom: 0;
-}
-
-
-
-.skeleton-imagesilde-editorial,
-.skeleton-titlesilde-editorial,
-.skeleton-datesilde-editorial,
-.skeleton-textsilde-editorial {
-  background-color: #e0e0e0;
 }
 
 /* =========================================================
@@ -245,24 +207,54 @@
 }
 
 @media (max-width: 768px) {
-  .skeleton-slide-itemeditorial {
-    flex: 1 1 260px;
-    max-width: 50%;
+
+  /* slick ไม่ให้เว้นขอบ */
+  .slick-slide {
+    margin: 0 !important;
   }
+  .slick-track {
+    margin-left: 0 !important;
+  }
+
+  .editorial-wrapperslide {
+    padding: 0 0.5rem !important;
+  }
+
+  .slide-itemeditorial {
+    padding: 0.5rem !important;
+  }
+
+  .card-contentslide {
+    padding: 10px 14px 14px !important;
+  }
+
   .card-titleslide {
     font-size: 16px;
   }
   .card-snippetslide {
     font-size: 14px;
   }
+
+  .skeleton-slide-itemeditorial {
+    flex: 1 1 260px;
+    max-width: 50%;
+  }
 }
 
 @media (max-width: 480px) {
+
+  /* บังคับเต็มจอ 100% */
+  .slide-itemeditorial {
+    max-width: 100% !important;
+    padding: 0.4rem !important;
+  }
+
+  .card-contentslide {
+    padding: 10px 14px 14px !important;
+  }
+
   .skeleton-slide-itemeditorial {
     flex: 1 1 200px;
     max-width: 100%;
-  }
-  .card-contentslide {
-    padding: 10px 16px 14px;
   }
 }

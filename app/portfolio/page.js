@@ -25,11 +25,39 @@ const formatDate = (dateString, locale = 'th') => {
   if (!dateString || dateString === '-') return '-';
   const date = new Date(dateString);
   return locale === 'th'
-    ? new Intl.DateTimeFormat('th-TH', { day: 'numeric', month: 'long', year: 'numeric' }).format(date)
-    : new Intl.DateTimeFormat('en-US', { day: 'numeric', month: 'long', year: 'numeric' }).format(date);
+    ? new Intl.DateTimeFormat('th-TH', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      }).format(date)
+    : new Intl.DateTimeFormat('en-US', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      }).format(date);
 };
 
-export default function PortfolioPage() {
+function SkeletonCard() {
+  return (
+    <div className="portfolio-card skeleton-card">
+      <div className="portfolio-image-wrapper">
+        <div className="skeleton skeleton-image" />
+      </div>
+      <div className="portfolio-content">
+        <div className="skeleton skeleton-title" />
+        <ul className="project-details">
+          {[...Array(4)].map((_, i) => (
+            <li key={i}>
+              <div className="skeleton skeleton-line" />
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+}
+
+export default function PortfolioClient() {
   const { locale } = useLocale();
 
   const [projects, setProjects] = useState([]);
@@ -50,33 +78,12 @@ export default function PortfolioPage() {
   const topRef = useRef(null);
 
   /* =========================================================
-     ⭐ SkeletonCard (ต้องอยู่ก่อน return)
-  ========================================================= */
-  function SkeletonCard() {
-    return (
-      <div className="portfolio-card skeleton-card">
-        <div className="portfolio-image-wrapper">
-          <div className="skeleton skeleton-image" />
-        </div>
-        <div className="portfolio-content">
-          <div className="skeleton skeleton-title" />
-          <ul className="project-details">
-            {[...Array(4)].map((_, i) => (
-              <li key={i}>
-                <div className="skeleton skeleton-line" />
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-    );
-  }
-
-  /* =========================================================
      ⭐ useEffect เดียว (โหลดทั้งหมด + SEO + Responsive)
   ========================================================= */
   useEffect(() => {
-    // mobile
+    if (typeof window === 'undefined') return;
+
+    // Mobile check
     const checkMobile = () => setIsMobile(window.innerWidth <= 768);
     checkMobile();
     window.addEventListener('resize', checkMobile);
@@ -103,6 +110,7 @@ export default function PortfolioPage() {
       setLoadingBanner(false);
       setIsLoading(false);
       setFadeIn(true);
+
       return () => window.removeEventListener('resize', checkMobile);
     }
 
@@ -122,9 +130,9 @@ export default function PortfolioPage() {
         ]);
 
         const [typesData, projectsData, bannerData] = await Promise.all([
-          typesRes.json(),
-          projectsRes.json(),
-          bannerRes.json(),
+          typesRes.ok ? typesRes.json() : { status: false },
+          projectsRes.ok ? projectsRes.json() : { status: false },
+          bannerRes.ok ? bannerRes.json() : { data: [] },
         ]);
 
         const typesList = typesData.status ? typesData.result : [];
@@ -136,7 +144,9 @@ export default function PortfolioPage() {
                 gallery = item.portfolio_gallery
                   ? JSON.parse(item.portfolio_gallery)
                   : [];
-              } catch {}
+              } catch {
+                gallery = [];
+              }
 
               return {
                 portfolio_id: item.portfolio_id,
@@ -191,7 +201,7 @@ export default function PortfolioPage() {
   }, [locale]);
 
   /* =========================================================
-     ⭐ Banner Renderer (เหมือน FAQ)
+     ⭐ Banner Renderer
   ========================================================= */
   const renderBanner = () => {
     if (loadingBanner)
@@ -234,7 +244,9 @@ export default function PortfolioPage() {
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
-    localStorage.setItem('portfolioCurrentPage', page.toString());
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('portfolioCurrentPage', page.toString());
+    }
     topRef.current?.scrollIntoView({ behavior: 'auto' });
   };
 
@@ -242,7 +254,11 @@ export default function PortfolioPage() {
     const pages = [];
     if (currentPage > 1) {
       pages.push(
-        <button key="prev" className="btn-with-arrow" onClick={() => handlePageChange(currentPage - 1)}>
+        <button
+          key="prev"
+          className="btn-with-arrow"
+          onClick={() => handlePageChange(currentPage - 1)}
+        >
           <IoIosArrowBack />
         </button>
       );
@@ -262,7 +278,11 @@ export default function PortfolioPage() {
 
     if (currentPage < totalPages) {
       pages.push(
-        <button key="next" className="btn-with-arrow" onClick={() => handlePageChange(currentPage + 1)}>
+        <button
+          key="next"
+          className="btn-with-arrow"
+          onClick={() => handlePageChange(currentPage + 1)}
+        >
           <IoIosArrowForward />
         </button>
       );
@@ -274,11 +294,9 @@ export default function PortfolioPage() {
   /* =========================================================
      ⭐ UI
   ========================================================= */
-
   return (
     <div className="no-margin">
-
-      {/* ⭐ Banner เหมือน FAQ */}
+      {/* ⭐ Banner */}
       {renderBanner()}
 
       <main
@@ -296,7 +314,9 @@ export default function PortfolioPage() {
           {/* ⭐ Filter */}
           <div className="portfolio-filters">
             <label htmlFor="filter-select" className="filter-label">
-              {locale === 'th' ? 'เลือกประเภทผลงาน :' : 'Select Portfolio Type:'}
+              {locale === 'th'
+                ? 'เลือกประเภทผลงาน :'
+                : 'Select Portfolio Type:'}
             </label>
             <div className="filter-row">
               <div className="select-wrapper">
@@ -314,7 +334,10 @@ export default function PortfolioPage() {
                   </option>
 
                   {types.map((type) => (
-                    <option key={type.portfoliotypeID} value={type.portfoliotypeID}>
+                    <option
+                      key={type.portfoliotypeID}
+                      value={type.portfoliotypeID}
+                    >
                       {locale === 'th'
                         ? type.portfoliotypenameTH
                         : type.portfoliotypenameEN}
@@ -337,7 +360,7 @@ export default function PortfolioPage() {
                 <p className="no-data-text">
                   {locale === 'th' ? 'ไม่พบข้อมูลผลงาน' : 'No projects found'}
                 </p>
-              )
+                )
               : paginated.map((proj, i) => (
                   <div
                     key={`${proj.id}-${i}`}
@@ -374,19 +397,34 @@ export default function PortfolioPage() {
                       </h3>
                       <ul className="project-details">
                         <li>
-                          <strong>{locale === 'th' ? 'ขนาดติดตั้ง' : 'Installation Size'}</strong>
+                          <strong>
+                            {locale === 'th'
+                              ? 'ขนาดติดตั้ง'
+                              : 'Installation Size'}
+                          </strong>
                           <span>{proj.size}</span>
                         </li>
                         <li>
-                          <strong>{locale === 'th' ? 'ประเภทผลิตภัณฑ์' : 'Product Type'}</strong>
+                          <strong>
+                            {locale === 'th'
+                              ? 'ประเภทผลิตภัณฑ์'
+                              : 'Product Type'}
+                          </strong>
                           <span>{proj.productTypeTH}</span>
                         </li>
                         <li>
-                          <strong>{locale === 'th' ? 'จำนวนแผง' : 'Panel Count'}</strong>
-                          <span>{proj.panelCount} {locale === 'th' ? 'แผง' : 'panels'}</span>
+                          <strong>
+                            {locale === 'th' ? 'จำนวนแผง' : 'Panel Count'}
+                          </strong>
+                          <span>
+                            {proj.panelCount}{' '}
+                            {locale === 'th' ? 'แผง' : 'panels'}
+                          </span>
                         </li>
                         <li className="date-post">
-                          <strong><FaCalendar /></strong>
+                          <strong>
+                            <FaCalendar />
+                          </strong>
                           <span>{formatDate(proj.postDate, locale)}</span>
                         </li>
                       </ul>
