@@ -14,205 +14,272 @@ import { useLocale } from '@/app/Context/LocaleContext';
 import styles from './Productdetails.module.css';
 import RecommendedProducts from './RecommendedProducts';
 
-
+/* =========================================================
+   ENV ตัวแปร API จากไฟล์ .env (ใช้ฝั่ง Client)
+   ========================================================= */
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 
-/* -------------------- Helpers -------------------- */
+/* =========================================================
+   ฟังก์ชันแปลงข้อความเป็น slug สำหรับใช้บน URL
+   เช่น "Solar Rooftop" → "solar-rooftop"
+   ========================================================= */
+const slugify = (name) =>
+  name?.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') || '';
+
+/* =========================================================
+   ฟังก์ชันรวม URL สำหรับโหลดรูปจาก API หรือ fallback
+   ========================================================= */
 const getImageUrl = (path) => {
-  if (!path) return '/images/no-image.jpg';
-  if (/^https?:\/\//.test(path)) return path;
+  if (!path) return '/images/no-image.jpg'; // ถ้าไม่มีรูป → รูป default
+  if (/^https?:\/\//.test(path)) return path; // ถ้าเป็น URL จริง → ใช้เลย
   return `${baseUrl?.replace(/\/$/, '')}/${String(path).replace(/^\//, '')}`;
 };
 
+/* =========================================================
+   ฟังก์ชันแปลง HTML entity → ตัวหนังสือปกติ
+   เช่น &amp; → &
+   ========================================================= */
 const decodeHtml = (html) => {
   if (!html) return '';
-  const txt = typeof window !== 'undefined' ? document.createElement('textarea') : null;
+  const txt = typeof window !== 'undefined'
+    ? document.createElement('textarea')
+    : null;
   if (!txt) return html;
   txt.innerHTML = html;
   return txt.value;
 };
 
-/* -------------------- Slider Arrows -------------------- */
-const PrevArrow = ({ onClick }) => (
-  <button className={styles.arrowPrev} onClick={onClick}><FaChevronLeft size={20} /></button>
-);
-const NextArrow = ({ onClick }) => (
-  <button className={styles.arrowNext} onClick={onClick}><FaChevronRight size={20} /></button>
-);
-
-/* -------------------- Lightbox -------------------- */
-function Lightbox({ images, currentIndex, onClose, setCurrentIndex }) {
-  const total = images.length;
-  const prevImage = () => setCurrentIndex((currentIndex - 1 + total) % total);
-  const nextImage = () => setCurrentIndex((currentIndex + 1) % total);
-
-  useEffect(() => {
-    const handleKey = (e) => {
-      if (e.key === 'Escape') onClose();
-      if (e.key === 'ArrowLeft') prevImage();
-      if (e.key === 'ArrowRight') nextImage();
-    };
-    document.addEventListener('keydown', handleKey);
-    return () => document.removeEventListener('keydown', handleKey);
-  }, [currentIndex]);
-
-  return (
-    <div
-      className={styles.lightboxOverlay}
-      onClick={(e) => {
-        if (e.target.classList.contains(styles.lightboxOverlay)) onClose();
-      }}
-    >
-      <button className={styles.lightboxClose} onClick={onClose}><FaTimes size={28} /></button>
-      <button className={styles.lightboxArrowLeft} onClick={prevImage}><FaChevronLeft size={30} /></button>
-
-      <div className={styles.lightboxContent}>
-        <Image
-          src={getImageUrl(images[currentIndex])}
-          alt={`Image ${currentIndex + 1}`}
-          width={1000}
-          height={700}
-          style={{ objectFit: 'contain', maxWidth: '90vw', maxHeight: '80vh' }}
-          unoptimized
-        />
-      </div>
-
-      <button className={styles.lightboxArrowRight} onClick={nextImage}><FaChevronRight size={30} /></button>
-    </div>
-  );
-}
-
-/* -------------------- Main -------------------- */
+/* =========================================================
+   MAIN PAGE — หน้าแสดงรายละเอียดสินค้า
+   ========================================================= */
 export default function ProductDetailPage() {
-  const { typeID, brandID, productID } = useParams(); // productID = product_num
-  const { locale } = useLocale();
+  const { productID } = useParams();      // รับ productID จาก URL
+  const { locale } = useLocale();         // ใช้ locale ภาษาไทย/อังกฤษ
 
-  const [product, setProduct] = useState(null);
-  const [typeName, setTypeName] = useState('');
-  const [brandName, setBrandName] = useState('');
-  const [loading, setLoading] = useState(true);
+  /* ---------------------------------------------------------
+     State สำหรับเก็บข้อมูลสินค้าและ header
+     --------------------------------------------------------- */
+  const [product, setProduct] = useState(null);              // ข้อมูลสินค้าจริง
+  const [categoryList, setCategoryList] = useState([]);      // รายชื่อหมวดหมู่จาก API
+  const [brandName, setBrandName] = useState("");            // ชื่อแบรนด์ (UI)
+  const [typeName, setTypeName] = useState("");              // ชื่อประเภท (UI)
+  const [typeSlug, setTypeSlug] = useState("");              // slug สำหรับ query
+  const [brandSlug, setBrandSlug] = useState("");            // slug สำหรับ query
+  const [loading, setLoading] = useState(true);              // สถานะโหลดข้อมูล
 
+  /* ---------------------------------------------------------
+     State ของ Lightbox และ Slider
+     --------------------------------------------------------- */
   const [selectedImage, setSelectedImage] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const sliderRef = useRef(null);
 
+  /* =========================================================
+     USE EFFECT เดียว (หลักการสำคัญของหน้า detail)
+     โหลด: สินค้าเดียว + header + คีย์ลิสเนอร์ Lightbox
+     ========================================================= */
   useEffect(() => {
     const fetchData = async () => {
       if (!productID) return;
       setLoading(true);
+
       try {
-        // 1) พยายามดึงจาก endpoint รายการเดียวก่อน (เสถียรสุด)
         let foundProduct = null;
+
+        /* ---------------------------------------------------------
+           1) โหลดข้อมูลสินค้าแบบทีละตัวก่อน (เร็วที่สุด / แม่นสุด)
+           --------------------------------------------------------- */
         try {
           const resOne = await fetch(
-            `${baseUrl}/api/producIDpageapi/${encodeURIComponent(String(productID))}`,
+            `${baseUrl}/api/producIDpageapi/${encodeURIComponent(productID)}`,
             { headers: { 'X-API-KEY': apiKey } }
           );
           const dataOne = await resOne.json();
-          if (dataOne?.status && dataOne?.result) {
-            foundProduct = dataOne.result;
-          }
-        } catch {
-          // เงียบไว้ แล้วไป fallback ข้างล่าง
-        }
 
-        // 2) ถ้าไม่เจอจาก endpoint เดี่ยว ให้ fallback ไปหาจาก list
+          if (dataOne?.status && dataOne?.result) foundProduct = dataOne.result;
+        } catch { }
+
+        /* ---------------------------------------------------------
+           2) ถ้า endpoint แบบทีละตัวไม่มี → fallback ไป list ทั้งหมด
+           --------------------------------------------------------- */
         if (!foundProduct) {
           const resList = await fetch(
             `${baseUrl}/api/productpageapi?offset=0&limit=9999`,
             { headers: { 'X-API-KEY': apiKey } }
           );
           const dataList = await resList.json();
-          if (dataList?.status && Array.isArray(dataList.result?.data)) {
+
+          if (dataList?.status) {
             foundProduct = dataList.result.data.find(
-              p =>
-                String(p.product_num).trim().toLowerCase() === String(productID).trim().toLowerCase()
+              (p) => String(p.product_num) === String(productID)
             );
           }
         }
 
-        if (foundProduct) {
-          // parse gallery
-          let gallery = [];
-          try { gallery = JSON.parse(foundProduct.gallery || '[]'); } catch { gallery = []; }
+        if (!foundProduct) return;
 
-          // เก็บ product
-          setProduct({ ...foundProduct, gallery });
+        /* ---------------------------------------------------------
+           3) Parse รูปภาพ gallery
+           --------------------------------------------------------- */
+        let gallery = [];
+        try { gallery = JSON.parse(foundProduct.gallery || "[]"); } catch { }
+        setProduct({ ...foundProduct, gallery });
 
-          // 3) โหลด header เพื่อดึงชื่อประเภทและยี่ห้อ
-          try {
-            const resHeader = await fetch(`${baseUrl}/api/productHeaderapi`, {
-              headers: { 'X-API-KEY': apiKey }
-            });
-            const dataHeader = await resHeader.json();
-            if (dataHeader?.status && Array.isArray(dataHeader.result)) {
-              const typeData = dataHeader.result.find(
-                t => Number(t.producttypeID) === Number(foundProduct.protypeID)
-              );
-              if (typeData) {
-                setTypeName(locale === 'en' ? typeData.producttypenameEN : typeData.producttypenameTH);
-                const brandData = typeData.Brand?.find(
-                  b => Number(b.productbrandID) === Number(foundProduct.probrandID)
-                );
-                if (brandData) setBrandName(brandData.productbrandname);
-              }
+        /* ---------------------------------------------------------
+           4) โหลดข้อมูล header — เพื่อหา type + brand ที่ถูกต้อง
+           --------------------------------------------------------- */
+        const resHeader = await fetch(`${baseUrl}/api/productHeaderapi`, {
+          headers: { "X-API-KEY": apiKey }
+        });
+        const dataHeader = await resHeader.json();
+
+        if (Array.isArray(dataHeader?.result)) {
+          setCategoryList(dataHeader.result);
+
+          // หา type object จากฐานข้อมูล
+          const typeObj = dataHeader.result.find(
+            (t) => Number(t.producttypeID) === Number(foundProduct.protypeID)
+          );
+
+          if (typeObj) {
+            // ชื่อที่ต้องแสดงบน UI
+            setTypeName(locale === "en"
+              ? typeObj.producttypenameEN
+              : typeObj.producttypenameTH
+            );
+
+            // slug ที่ถูกต้องสำหรับ filter page
+            setTypeSlug(slugify(typeObj.producttypenameEN));
+
+            // หา brand object
+            const brandObj = typeObj.Brand?.find(
+              (b) => Number(b.productbrandID) === Number(foundProduct.probrandID)
+            );
+
+            if (brandObj) {
+              setBrandName(brandObj.productbrandname);
+              setBrandSlug(slugify(brandObj.productbrandname));
             }
-          } catch {
-            // ถ้าโหลด header ไม่ได้ ก็ปล่อยชื่อว่าง ๆ ไว้
           }
         }
+
       } catch (err) {
-        console.error('Fetch Product Error:', err);
+        console.error("Fetch Product Error:", err);
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [productID, locale]);
 
+    /* ---------------------------------------------------------
+       Event: ควบคุม Lightbox ด้วยคีย์บอร์ด
+       --------------------------------------------------------- */
+    const handleKey = (e) => {
+      if (!lightboxOpen) return;
+
+      if (e.key === "Escape") setLightboxOpen(false);
+      if (e.key === "ArrowLeft") setSelectedImage(i => i - 1);
+      if (e.key === "ArrowRight") setSelectedImage(i => i + 1);
+    };
+
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
+
+  }, [productID, locale, lightboxOpen]);
+
+  /* =========================================================
+     Loading และ Error Handling
+     ========================================================= */
   if (loading) return <p>กำลังโหลด...</p>;
   if (!product) return <p>ไม่พบข้อมูลสินค้า</p>;
 
-  /* -------------------- Display Name -------------------- */
+  /* =========================================================
+     Display Name — ชื่อที่จะใช้บน UI
+     มี logic แยกระหว่าง Solar Air vs Solar Rooftop
+     ========================================================= */
   const isSolarAir =
-    String(product.protypeID) === '2' ||
-    typeName.includes('โซลาร์แอร์') ||
-    typeName.toLowerCase().includes('solar air');
+    String(product.protypeID) === "2" ||
+    typeName.includes("โซลาร์แอร์") ||
+    typeName.toLowerCase().includes("solar air");
 
-  const displayName = isSolarAir
-    ? (product.modelairname || product.solarpanel)
-    : (product.modelname || product.solarpanel);
+  const displayName =
+    isSolarAir
+      ? product.modelairname || product.solarpanel
+      : product.modelname || product.solarpanel;
 
-  /* -------------------- Price -------------------- */
+  /* =========================================================
+     ฟังก์ชำนวณราคา (รองรับราคาโปรโมชัน)
+     ========================================================= */
   const calculatePrice = () => {
     if (product.productpro_ispromotion === "1" && product.productpro_percent) {
-      const price = Number(product.price) || 0;
-      const discountPercent = Number(String(product.productpro_percent).replace('%', '')) || 0;
-      const finalPrice = price - (price * discountPercent / 100);
-      return { original: price, final: finalPrice };
+      const p = Number(product.price) || 0;
+      const dp = Number(String(product.productpro_percent).replace("%", "")) || 0;
+      return {
+        original: p,
+        final: p - (p * dp) / 100,   // ราคาหลังหัก %
+      };
     }
-    return { original: null, final: Number(product.price) || null };
+
+    return {
+      original: null,
+      final: Number(product.price) || null,
+    };
   };
+
   const priceObj = calculatePrice();
 
+  /* ============================================
+     Render UI — โครงสร้างหน้า Product Detail
+     ============================================ */
   return (
     <main className={styles.productslayout}>
-      {/* Breadcrumb */}
+
+      {/* =========================================================
+        Breadcrumb — เส้นทางนำทางของผู้ใช้
+        เช่น หน้าหลัก > ผลิตภัณฑ์ > ประเภท > แบรนด์ > รุ่นสินค้า
+       ========================================================= */}
       <div className={styles.meta}>
-        <Link href="/" className={styles.productlink}>หน้าหลัก <MdKeyboardDoubleArrowRight /></Link>
-        <Link href="/products" className={styles.productlink}>บริการและผลิตภัณฑ์ <MdKeyboardDoubleArrowRight /></Link>
-        <Link href={`/products/${product.protypeID}`} className={styles.productlink}>{typeName || '...'} <MdKeyboardDoubleArrowRight /></Link>
-        <Link href={`/products/${product.protypeID}/${product.probrandID}`} className={styles.productlink}>{brandName || '...'} <MdKeyboardDoubleArrowRight /></Link>
+        {/* กลับหน้าหลัก */}
+        <Link href="/" className={styles.productlink}>
+          หน้าหลัก <MdKeyboardDoubleArrowRight />
+        </Link>
+
+        {/* กลับหน้ารายการสินค้าหลัก */}
+        <Link href="/products" className={styles.productlink}>
+          บริการและผลิตภัณฑ์ <MdKeyboardDoubleArrowRight />
+        </Link>
+
+        {/* กลับไปดูสินค้าตามประเภท */}
+        <Link href={`/products?categories=${typeSlug}`} className={styles.productlink}>
+          {typeName} <MdKeyboardDoubleArrowRight />
+        </Link>
+
+        {/* กลับไปดูสินค้าตามประเภท + แบรนด์ */}
+        <Link
+          href={`/products?categories=${typeSlug}&brands=${brandSlug}`}
+          className={styles.productlink}
+        >
+          {brandName} <MdKeyboardDoubleArrowRight />
+        </Link>
+
+        {/* ชื่อรุ่นสินค้า */}
         <span>{displayName}</span>
       </div>
 
+      {/* =========================================================
+        ส่วนเนื้อหาใหญ่ (Gallery + รายละเอียดสินค้า)
+       ========================================================= */}
       <div className={styles.detailcontent}>
-        {/* Gallery */}
+
+        {/* ============================
+          GALLERY แสดงรูปสินค้า
+         ============================ */}
         <div className={styles.galleryContainer}>
           {product.gallery?.length > 1 ? (
             <>
+              {/* --- Slider รูปสินค้า --- */}
               <Slider
                 ref={sliderRef}
                 dots={false}
@@ -220,39 +287,49 @@ export default function ProductDetailPage() {
                 speed={600}
                 slidesToShow={1}
                 slidesToScroll={1}
-                nextArrow={<NextArrow />}
-                prevArrow={<PrevArrow />}
+                nextArrow={<FaChevronRight />}
+                prevArrow={<FaChevronLeft />}
                 beforeChange={(_, next) => setSelectedImage(next)}
               >
                 {product.gallery.map((img, idx) => (
-                  <div key={idx} style={{ width: '100%', position: 'relative' }}>
+                  <div key={idx} style={{ position: "relative" }}>
                     <Image
-                      src={getImageUrl(product.gallery?.[0])}
+                      src={getImageUrl(img)}
                       alt="Main"
                       width={500}
                       height={500}
-                      style={{ objectFit: 'contain', width: '100%', height: 'auto', marginBottom: '1rem', cursor: 'pointer' }}
                       unoptimized
-                      priority  //
-                      onClick={() => { setSelectedImage(0); setLightboxOpen(true); }}
+                      style={{
+                        width: '100%',
+                        height: 'auto',
+                        objectFit: 'contain',
+                        cursor: 'pointer'
+                      }}
+                      onClick={() => {
+                        setSelectedImage(idx);
+                        setLightboxOpen(true); // เปิด lightbox
+                      }}
                     />
-
                   </div>
                 ))}
               </Slider>
 
+              {/* --- Thumbnail รูปเล็กใต้สไลด์ --- */}
               <div className={styles.thumbnailWrapper}>
                 {product.gallery.map((img, idx) => (
                   <div
                     key={idx}
                     className={`${styles.thumbnail} ${idx === selectedImage ? styles.active : ''}`}
-                    onClick={() => { setSelectedImage(idx); sliderRef.current?.slickGoTo(idx); }}
+                    onClick={() => {
+                      setSelectedImage(idx);
+                      sliderRef.current?.slickGoTo(idx); // เลื่อน slider ไปยังรูปที่คลิก
+                    }}
                   >
                     <Image
                       src={getImageUrl(img)}
-                      alt={`Thumbnail ${idx + 1}`}
-                      width={100}
-                      height={100}
+                      alt=""
+                      width={90}
+                      height={90}
                       unoptimized
                     />
                   </div>
@@ -260,46 +337,72 @@ export default function ProductDetailPage() {
               </div>
             </>
           ) : (
+            /* ถ้ามีรูปเดียว */
             <Image
               src={getImageUrl(product.gallery?.[0])}
               alt="Main"
               width={500}
               height={500}
-              style={{ objectFit: 'contain', width: '100%', height: 'auto', marginBottom: '1rem', cursor: 'pointer' }}
               unoptimized
-              onClick={() => { setSelectedImage(0); setLightboxOpen(true); }}
+              style={{
+                width: '100%',
+                height: 'auto',
+                objectFit: 'contain',
+                cursor: 'pointer'
+              }}
+              onClick={() => {
+                setSelectedImage(0);
+                setLightboxOpen(true);
+              }}
             />
           )}
         </div>
 
-        {/* Product Info */}
+        {/* ============================
+          PRODUCT INFO — ข้อมูลสินค้า
+         ============================ */}
         <div className={styles.detaiinfo}>
+
+          {/* ชื่อรุ่นสินค้า */}
           <h1 className={styles.poductmodel}>{displayName}</h1>
 
-          {product.productpro_ispromotion === "1" && product.productpro_percent && (
-            <div className={styles.productpromo}>ลด {product.productpro_percent}</div>
+          {/* Badge ส่วนลด */}
+          {product.productpro_ispromotion === "1" && (
+            <div className={styles.productpromo}>
+              ลด {product.productpro_percent}
+            </div>
           )}
 
+          {/* ประเภท + แบรนด์ */}
           <h4 className={styles.detail_header}>
             ประเภท : {typeName} <span>ยี่ห้อ : {brandName}</span>
           </h4>
 
-          <h4 className={styles.detail_label} id="product-detail">รายละเอียดผลิตภัณฑ์</h4>
+          <h4 className={styles.detail_label}>รายละเอียดผลิตภัณฑ์</h4>
 
+          {/* -------------------------
+            รายการข้อมูลสินค้า
+           ------------------------- */}
           <div>
             <p>ชื่อแผงโซลาร์เซลล์ : {product.solarpanel}</p>
+
+            {/* เฉพาะสินค้าประเภทกำลังไฟ */}
             {product.isprice === "0" && product.installationsize && (
               <p>ขนาดติดตั้ง : {product.installationsize}</p>
             )}
+
             <p>จำนวนแผง : {product.panelsolarcout} แผง</p>
-            <p>พื้นที่การติดตั้ง : {product.roofarea} ตารางเมตร</p>
+            <p>พื้นที่การติดตั้ง : {product.roofarea} ตร.ม.</p>
+
+            {/* เฟสไฟฟ้า */}
             {product.phase && <p>จำนวนเฟสไฟฟ้า : {product.phase} เฟส</p>}
-            {product.battery && <p>รุ่นแบตเตอรี่ {product.battery} kWh</p>}
 
+            {/* Battery */}
+            {product.battery && <p>รุ่นแบตเตอรี่ : {product.battery} kWh</p>}
 
+            {/* รายละเอียดแบบ rich HTML จาก backend */}
             {(product.product_detailTH || product.product_detailEN) && (
               <div
-                // className={styles.detailSection}
                 dangerouslySetInnerHTML={{
                   __html: locale === 'en'
                     ? decodeHtml(product.product_detailEN)
@@ -309,81 +412,131 @@ export default function ProductDetailPage() {
             )}
           </div>
 
-          {/* Price */}
+          {/* ============================
+            PRICE — ราคาสินค้า
+           ============================ */}
           {product.isprice !== "0" && (
             <>
+              {/* ราคาเดิมก่อนลด */}
               {priceObj.original && (
-                <span style={{
-                  fontSize: '20px',
-                  color: '#888',
-                  textDecoration: 'line-through',
-                  display: 'block',
-                  marginTop: '1rem',
-                  marginBottom: '-0.5rem',
-                }}>
+                <span
+                  style={{
+                    textDecoration: 'line-through',
+                    color: '#888',
+                    fontSize: '18px'
+                  }}
+                >
                   {priceObj.original.toLocaleString()} บาท
                 </span>
               )}
-              <span style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '2px',
-                fontWeight: 800,
-                fontSize: '32px',
-                marginTop: '0.5rem',
-              }}>
+
+              {/* ราคาหลังลดหรือราคาปกติ */}
+              <span
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  fontSize: '32px',
+                  fontWeight: 800,
+                  marginTop: '0.5rem'
+                }}
+              >
                 <TbCurrencyBaht size={35} /> {priceObj.final?.toLocaleString()} บาท
               </span>
             </>
           )}
 
+          {/* ปุ่มติดต่อบริษัท */}
           <Link href={`/?product=${product.protypeID}#contact`}>
-            <button className={styles.buttonproducts}>สนใจโซลารเซลล์</button>
+            <button className={styles.buttonproducts}>สนใจโซลาร์เซลล์</button>
           </Link>
         </div>
       </div>
 
-      {/* ตารางเปรียบเทียบและดาวน์ */}
+      {/* =========================================================
+        ส่วนตารางเปรียบเทียบราคา + ตารางผ่อน
+       ========================================================= */}
       <div className={styles.compareInstallmentWrapper}>
         {product.comparepic && (
-          <div className={styles.compareItem} id="compare-table">
+          <div className={styles.compareItem}>
             <Image
               src={getImageUrl(product.comparepic)}
-              alt="Compare Table"
-              width={800}
-              height={400}
-              style={{ width: '100%', height: 'auto', objectFit: 'contain' }}
+              alt="Compare"
+              width={1000}
+              height={500}
               unoptimized
             />
           </div>
         )}
+
         {product.installmentpic && (
-          <div className={styles.compareItem} id="installment-table">
+          <div className={styles.compareItem}>
             <Image
               src={getImageUrl(product.installmentpic)}
-              alt="Installment Table"
-              width={800}
-              height={400}
-              style={{ width: '100%', height: 'auto', objectFit: 'contain' }}
+              alt="Installment"
+              width={1000}
+              height={500}
               unoptimized
             />
           </div>
         )}
       </div>
 
-      {/* Lightbox */}
+      {/* =========================================================
+        LIGHTBOX — เปิดรูปใหญ่
+       ========================================================= */}
       {lightboxOpen && (
-        <Lightbox
-          images={product.gallery || []}
-          currentIndex={selectedImage}
-          setCurrentIndex={setSelectedImage}
-          onClose={() => setLightboxOpen(false)}
-        />
+        <div className={styles.lightboxOverlay}>
+
+          {/* ปุ่มปิด */}
+          <button
+            className={styles.lightboxClose}
+            onClick={() => setLightboxOpen(false)}
+          >
+            <FaTimes size={28} />
+          </button>
+
+          {/* ลูกศรซ้าย */}
+          <button
+            className={styles.lightboxArrowLeft}
+            onClick={() =>
+              setSelectedImage(
+                (i) => (i - 1 + product.gallery.length) % product.gallery.length
+              )
+            }
+          >
+            <FaChevronLeft size={30} />
+          </button>
+
+          {/* รูปใหญ่ */}
+          <div className={styles.lightboxContent}>
+            <Image
+              src={getImageUrl(product.gallery[selectedImage])}
+              alt=""
+              width={1000}
+              height={700}
+              unoptimized
+              style={{ objectFit: "contain", maxWidth: "85vw", maxHeight: "75vh" }}
+            />
+          </div>
+
+          {/* ลูกศรขวา */}
+          <button
+            className={styles.lightboxArrowRight}
+            onClick={() =>
+              setSelectedImage((i) => (i + 1) % product.gallery.length)
+            }
+          >
+            <FaChevronRight size={30} />
+          </button>
+        </div>
       )}
 
+      {/* =========================================================
+        สินค้าแนะนำตามแบรนด์เดียวกัน
+       ========================================================= */}
       <RecommendedProducts
         brandId={product.probrandID}
-        productId={product.product_num} // ใช้ product_num ที่มีอยู่จริง
+        productId={product.product_num}
       />
     </main>
   );
