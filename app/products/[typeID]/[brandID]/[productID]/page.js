@@ -14,6 +14,25 @@ import { useLocale } from '@/app/Context/LocaleContext';
 import styles from './Productdetails.module.css';
 import RecommendedProducts from './RecommendedProducts';
 
+
+function PrevArrow({ onClick }) {
+  return (
+    <button className={styles.arrowPrev} onClick={onClick}>
+      <FaChevronLeft />
+    </button>
+  );
+}
+
+function NextArrow({ onClick }) {
+  return (
+    <button className={styles.arrowNext} onClick={onClick}>
+      <FaChevronRight />
+    </button>
+  );
+}
+
+
+
 /* =========================================================
    ENV ตัวแปร API จากไฟล์ .env (ใช้ฝั่ง Client)
    ========================================================= */
@@ -287,8 +306,8 @@ export default function ProductDetailPage() {
                 speed={600}
                 slidesToShow={1}
                 slidesToScroll={1}
-                nextArrow={<FaChevronRight />}
-                prevArrow={<FaChevronLeft />}
+                nextArrow={<NextArrow />}
+                prevArrow={<PrevArrow />}
                 beforeChange={(_, next) => setSelectedImage(next)}
               >
                 {product.gallery.map((img, idx) => (
@@ -328,8 +347,8 @@ export default function ProductDetailPage() {
                     <Image
                       src={getImageUrl(img)}
                       alt=""
-                      width={90}
-                      height={90}
+                      width={100}
+                      height={100}
                       unoptimized
                     />
                   </div>

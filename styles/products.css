@@ -5,36 +5,47 @@
   display: flex;
   align-items: flex-start;
   width: 100%;
-  height: auto; /*  ให้สูงตามเนื้อหา */
-  min-height: unset !important; /* ยกเลิกการบังคับความสูง */
+  height: auto;
+  /*  ให้สูงตามเนื้อหา */
+  min-height: unset !important;
+  /* ยกเลิกการบังคับความสูง */
   border-right: 1px solid #eee;
-  box-shadow: rgba(0, 0, 0, 0.384);
 }
+
+
 
 .products-sidebar {
   flex: 0 0 260px;
-  position: sticky; /*  ล็อก sidebar */
-  top: 0; /*  ติดขอบบนของ viewport */
+  position: sticky;
+  /*  ล็อก sidebar */
+  top: 0;
+  /*  ติดขอบบนของ viewport */
   align-self: flex-start;
   height: fit-content;
-  max-height: 100vh; /*  ไม่เกินความสูงจอ */
-  overflow-y: auto; /*  เลื่อนเฉพาะใน sidebar ถ้ายาวเกินจอ */
+  max-height: 100vh;
+  /*  ไม่เกินความสูงจอ */
+  overflow-y: auto;
+  /*  เลื่อนเฉพาะใน sidebar ถ้ายาวเกินจอ */
   background: #fff;
+  box-shadow: rgba(0, 0, 0, 0.384);
+
   z-index: 99;
 }
 
 .products-list {
   flex: 1;
   width: 100%;
-  background: #f5f5f5;
+  background: hsl(0, 0%, 96%);
   padding: 2rem;
   box-sizing: border-box;
-  height: auto; /*  ให้สูงเท่ากับเนื้อหาจริง */
+  height: auto;
+  /*  ให้สูงเท่ากับเนื้อหาจริง */
   min-height: unset !important;
 }
 
 .products-sidebar h3:first-of-type {
-  border-bottom: 1px solid #ddd; /*  เส้นสีเทาอ่อน */
+  border-bottom: 1px solid #ddd;
+  /*  เส้นสีเทาอ่อน */
   padding-bottom: 8px;
   margin-bottom: 12px;
 }
@@ -118,8 +129,10 @@
 
   display: block;
   margin-left: auto;
-  margin-right: 15px;   /* ⭐ ถอยออกจากขอบขวา */
+  margin-right: 15px;
+  /* ถอยออกจากขอบขวา */
   margin-top: 1.2rem;
+  margin-bottom: 1rem;
 }
 
 
@@ -140,8 +153,10 @@
   border: 1px solid #e0e0e0;
   border-radius: 10px;
   background-color: #ffffff;
-  width: 300px; /*  ล็อคกว้าง */
-  height: 425px; /*  ล็อคสูง */
+  width: 300px;
+  /*  ล็อคกว้าง */
+  height: 425px;
+  /*  ล็อคสูง */
   margin: 0 auto;
   transition: all 0.25s ease-in-out;
 }
@@ -157,7 +172,8 @@
 .product-image-wrapper {
   position: relative;
   width: 100%;
-  height: 300px; /* คงขนาด wrapper */
+  height: 300px;
+  /* คงขนาด wrapper */
   overflow: hidden;
   border-radius: 10px 10px 0 0;
   background: #f9f9f9;
@@ -233,9 +249,11 @@
    ========================================= */
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, 300px); /*  การ์ดขนาดคงที่ */
+  grid-template-columns: repeat(auto-fit, 300px);
+  /*  การ์ดขนาดคงที่ */
   gap: 2rem 1.2rem;
-  justify-content: center; /*  จัดกลางจอ */
+  justify-content: center;
+  /*  จัดกลางจอ */
   align-items: start;
   width: 100%;
   height: auto;
@@ -284,7 +302,7 @@
   border-top-right-radius: 6px;
   border-bottom-left-radius: 0 !important;
   border-bottom-right-radius: 0 !important;
-    background-color: #e0e0e0;
+  background-color: #e0e0e0;
 
 
   box-sizing: border-box;
@@ -292,73 +310,154 @@
   margin-bottom: 0;
   /* แนบกับข้อความ */
 }
+
 .skeletonText {
   width: 90%;
   height: 20px;
   border-radius: 6px;
   margin-top: 1.5rem;
   margin-left: 1rem;
-    background-color: #e0e0e0;
+  background-color: #e0e0e0;
 
 }
 
-.skeletonText.title { 
- width: 90%;
+.skeletonText.title {
+  width: 90%;
   height: 20px;
   border-radius: 6px;
   margin-top: 1.5rem;
-    margin-left: 1rem;
+  margin-left: 1rem;
 
-    background-color: #e0e0e0;
+  background-color: #e0e0e0;
 
 }
+
 .skeletonText.subTitle {
   width: 40%;
   height: 16px;
   border-radius: 6px;
   margin-top: 0.5rem;
-    margin-left: 1rem;
+  margin-left: 1rem;
 
-    background-color: #e0e0e0;
+  background-color: #e0e0e0;
 
 }
+
 .skeletonText.price {
-    width: 55%;
+  width: 55%;
   height: 20px;
   margin-top: 2rem;
-    background-color: #e0e0e0;
+  background-color: #e0e0e0;
 }
 
 
 /* =========================================
-   ✨ Animation
+    Animation
    ========================================= */
 .fade-inproduck {
   opacity: 0;
-  animation: fadeIn 0.8s ease-in-out forwards;
+  animation: fadeIn 0.8s ease-out forwards;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* =========================================
-   Responsive Layout
-   ========================================= */
-@media (max-width: 991px) {
-  .products-container {
-    flex-direction: column;
+@keyframes fadeInProducts {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
   }
 
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* เพิ่ม delay อัตโนมัติ */
+.fade-inproduck:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.fade-inproduck:nth-child(2) {
+  animation-delay: 0.05s;
+}
+
+.fade-inproduck:nth-child(3) {
+  animation-delay: 0.1s;
+}
+
+.fade-inproduck:nth-child(4) {
+  animation-delay: 0.15s;
+}
+
+.fade-inproduck:nth-child(5) {
+  animation-delay: 0.2s;
+}
+
+.fade-inproduck:nth-child(6) {
+  animation-delay: 0.25s;
+}
+
+.fade-inproduck:nth-child(7) {
+  animation-delay: 0.3s;
+}
+
+.fade-inproduck:nth-child(8) {
+  animation-delay: 0.35s;
+}
+
+
+/* =========================================================
+   Sticky Sidebar + Header สำหรับมือถือ (≤ 991px)
+   ========================================================= */
+@media (max-width: 991px) {
+
+  /* Layout เป็นคอลัมน์ */
+  .products-container {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  /* Sidebar ติดบนสุด (Sticky แค่ตัวนี้ตัวเดียว) */
   .products-sidebar {
+    width: 100% !important;
+    flex: none !important;
+    position: sticky !important;
+    top: 0px;
+    /* ความสูง header บนเว็บ */
+    z-index: 999;
+    overflow: hidden !important;
+    box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.06),
+    0 8px 16px rgba(0, 0, 0, 0.10);
+  }
+
+  /* Header สีส้ม (ห้าม sticky ซ้อน) */
+  .sidebar-header {
+    position: relative !important;
+    /* ← แก้ตรงนี้ */
+    top: 0 !important;
+    z-index: 1000;
+    background: #e88534;
+    padding: 12px;
+    color: #fff;
+    text-align: center;
+    font-weight: bold;
+    cursor: pointer;
     width: 100%;
-    border-right: none;
-    border-bottom: 1px solid #eee;
+  }
+
+  /* ปิด → ซ่อนเนื้อหา */
+  .products-sidebar.closed .sidebar-body {
+    display: none !important;
+  }
+
+  /* เปิด → แสดงเนื้อหา */
+  .products-sidebar.open .sidebar-body {
+    display: block !important;
   }
 
   .products-list {
-    padding: 1.5rem;
+    margin-top: 15px;
+    width: 100% !important;
   }
 }
 
@@ -379,10 +478,12 @@
 }
 
 .layout-container {
-  padding-bottom: 0 !important; /* ลบ padding ล่าง 50px ออก */
+  padding-bottom: 0 !important;
+  /* ลบ padding ล่าง 50px ออก */
 }
 
-main, section {
+main,
+section {
   height: auto !important;
   min-height: auto !important;
 }
@@ -396,5 +497,3 @@ footer {
   border: none;
   margin: -2rem 0 1.5rem 0;
 }
-
-
