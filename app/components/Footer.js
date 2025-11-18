@@ -249,7 +249,7 @@ export default function Footer() {
             <Image
               src="/images/logo3.8549861c.png"
               alt="โลโก้สีส้ม"
-              width={100}
+              width={40}
               height={40}
             />
 
@@ -263,7 +263,7 @@ export default function Footer() {
               <Image
                 src="/images/Logo-of-the-Provincial-Electricity-Authority-of-Thailand.png"
                 alt="โลโก้การไฟฟ้าส่วนภูมิภาค"
-                width={100}
+                width={40}
                 height={40}
               />
             </Link>
@@ -272,7 +272,7 @@ export default function Footer() {
             <Image
               src="/images/ERCNewLogo.png"
               alt="โลโก้กกพ"
-              width={100}
+              width={40}
               height={40}
             />
           </div>

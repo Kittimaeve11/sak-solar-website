@@ -86,6 +86,8 @@ export default function ProductDetailPage() {
   const [typeSlug, setTypeSlug] = useState("");              // slug สำหรับ query
   const [brandSlug, setBrandSlug] = useState("");            // slug สำหรับ query
   const [loading, setLoading] = useState(true);              // สถานะโหลดข้อมูล
+  const [activeSection, setActiveSection] = useState("section-detail");
+
 
   /* ---------------------------------------------------------
      State ของ Lightbox และ Slider
@@ -94,38 +96,34 @@ export default function ProductDetailPage() {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const sliderRef = useRef(null);
 
-  /* =========================================================
-     USE EFFECT เดียว (หลักการสำคัญของหน้า detail)
-     โหลด: สินค้าเดียว + header + คีย์ลิสเนอร์ Lightbox
-     ========================================================= */
   useEffect(() => {
+    /* ---------------------------------------------------------
+       1) โหลดข้อมูลสินค้า
+       --------------------------------------------------------- */
     const fetchData = async () => {
       if (!productID) return;
+
       setLoading(true);
 
       try {
         let foundProduct = null;
 
-        /* ---------------------------------------------------------
-           1) โหลดข้อมูลสินค้าแบบทีละตัวก่อน (เร็วที่สุด / แม่นสุด)
-           --------------------------------------------------------- */
+        // 1) โหลดสินค้าแบบรายตัว
         try {
           const resOne = await fetch(
             `${baseUrl}/api/producIDpageapi/${encodeURIComponent(productID)}`,
-            { headers: { 'X-API-KEY': apiKey } }
+            { headers: { "X-API-KEY": apiKey } }
           );
           const dataOne = await resOne.json();
 
           if (dataOne?.status && dataOne?.result) foundProduct = dataOne.result;
         } catch { }
 
-        /* ---------------------------------------------------------
-           2) ถ้า endpoint แบบทีละตัวไม่มี → fallback ไป list ทั้งหมด
-           --------------------------------------------------------- */
+        // 2) ไม่เจอ → fallback ไปโหลดทั้งหมด
         if (!foundProduct) {
           const resList = await fetch(
             `${baseUrl}/api/productpageapi?offset=0&limit=9999`,
-            { headers: { 'X-API-KEY': apiKey } }
+            { headers: { "X-API-KEY": apiKey } }
           );
           const dataList = await resList.json();
 
@@ -138,16 +136,12 @@ export default function ProductDetailPage() {
 
         if (!foundProduct) return;
 
-        /* ---------------------------------------------------------
-           3) Parse รูปภาพ gallery
-           --------------------------------------------------------- */
+        // 3) แปลงรูป gallery
         let gallery = [];
         try { gallery = JSON.parse(foundProduct.gallery || "[]"); } catch { }
         setProduct({ ...foundProduct, gallery });
 
-        /* ---------------------------------------------------------
-           4) โหลดข้อมูล header — เพื่อหา type + brand ที่ถูกต้อง
-           --------------------------------------------------------- */
+        // 4) โหลด header หา brand/type
         const resHeader = await fetch(`${baseUrl}/api/productHeaderapi`, {
           headers: { "X-API-KEY": apiKey }
         });
@@ -156,22 +150,19 @@ export default function ProductDetailPage() {
         if (Array.isArray(dataHeader?.result)) {
           setCategoryList(dataHeader.result);
 
-          // หา type object จากฐานข้อมูล
           const typeObj = dataHeader.result.find(
             (t) => Number(t.producttypeID) === Number(foundProduct.protypeID)
           );
 
           if (typeObj) {
-            // ชื่อที่ต้องแสดงบน UI
             setTypeName(locale === "en"
               ? typeObj.producttypenameEN
               : typeObj.producttypenameTH
             );
 
-            // slug ที่ถูกต้องสำหรับ filter page
             setTypeSlug(slugify(typeObj.producttypenameEN));
 
-            // หา brand object
+            // brand
             const brandObj = typeObj.Brand?.find(
               (b) => Number(b.productbrandID) === Number(foundProduct.probrandID)
             );
@@ -190,23 +181,80 @@ export default function ProductDetailPage() {
       }
     };
 
-    fetchData();
-
     /* ---------------------------------------------------------
-       Event: ควบคุม Lightbox ด้วยคีย์บอร์ด
+       2) Keyboard Controls — Lightbox
        --------------------------------------------------------- */
     const handleKey = (e) => {
       if (!lightboxOpen) return;
 
       if (e.key === "Escape") setLightboxOpen(false);
-      if (e.key === "ArrowLeft") setSelectedImage(i => i - 1);
-      if (e.key === "ArrowRight") setSelectedImage(i => i + 1);
+      if (e.key === "ArrowLeft") setSelectedImage((i) => i - 1);
+      if (e.key === "ArrowRight") setSelectedImage((i) => i + 1);
     };
 
     document.addEventListener("keydown", handleKey);
-    return () => document.removeEventListener("keydown", handleKey);
 
-  }, [productID, locale, lightboxOpen]);
+    /* ---------------------------------------------------------
+       3) IntersectionObserver — สำหรับ Sticky Menu
+       --------------------------------------------------------- */
+    const observerInit = () => {
+      const menuEl = document.querySelector(`.${styles.stickyMenu}`);
+      const menuHeight = menuEl ? menuEl.offsetHeight : 70;
+
+      const mapIdToSection = {
+        "section-detail": "section-detail",
+        "marker-compare": "marker-compare",
+        "marker-installment": "marker-installment",
+      };
+
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              setActiveSection(mapIdToSection[entry.target.id]);
+            }
+          });
+        },
+        {
+          threshold: 0.3,
+          rootMargin: `-${menuHeight + 20}px 0px -55% 0px`,
+        }
+      );
+
+      ["section-detail", "marker-compare", "marker-installment"].forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) observer.observe(el);
+      });
+
+      return observer;
+    };
+
+    /* ---------------------------------------------------------
+       4) flow การทำงานใหม่ (สำคัญมาก!!)
+       --------------------------------------------------------- */
+
+    // โหลดข้อมูลเมื่อ product ยังไม่มา
+    if (loading && !product) {
+      fetchData();
+    }
+
+    let obs;
+
+    // observer จะเริ่มทำงานหลังข้อมูลโหลดเสร็จ
+    if (!loading && product) {
+      obs = observerInit();
+    }
+
+    /* ---------------------------------------------------------
+       Cleanup
+       --------------------------------------------------------- */
+    return () => {
+      document.removeEventListener("keydown", handleKey);
+      obs?.disconnect();
+    };
+
+  }, [productID, locale, lightboxOpen, loading, product]);
 
   /* =========================================================
      Loading และ Error Handling
@@ -318,6 +366,8 @@ export default function ProductDetailPage() {
                       width={500}
                       height={500}
                       unoptimized
+                      priority={idx === 0}   // ⭐ ใส่เฉพาะภาพแรก
+                      sizes="(max-width: 768px) 100vw, 50vw" // ⭐ เพิ่ม sizes เพื่อ optimize LCP
                       style={{
                         width: '100%',
                         height: 'auto',
@@ -326,11 +376,12 @@ export default function ProductDetailPage() {
                       }}
                       onClick={() => {
                         setSelectedImage(idx);
-                        setLightboxOpen(true); // เปิด lightbox
+                        setLightboxOpen(true);
                       }}
                     />
                   </div>
                 ))}
+
               </Slider>
 
               {/* --- Thumbnail รูปเล็กใต้สไลด์ --- */}
@@ -380,7 +431,7 @@ export default function ProductDetailPage() {
         {/* ============================
           PRODUCT INFO — ข้อมูลสินค้า
          ============================ */}
-        <div className={styles.detaiinfo}>
+        <div className={styles.detaiinfo} id="section-detail">
 
           {/* ชื่อรุ่นสินค้า */}
           <h1 className={styles.poductmodel}>{displayName}</h1>
@@ -471,35 +522,118 @@ export default function ProductDetailPage() {
         </div>
       </div>
 
+      {/* Sticky Menu */}
+      {(product.comparepic || product.installmentpic) && (
+        <div className={styles.stickyMenu}>
+
+          {/* รายละเอียดผลิตภัณฑ์ */}
+          {/* รายละเอียดผลิตภัณฑ์ */}
+          <Link
+            href="#section-detail"
+            scroll={false}
+            className={activeSection === "section-detail" ? styles.active : ""}
+            onClick={(e) => {
+              e.preventDefault();
+              setActiveSection("section-detail");
+              document.getElementById("section-detail")?.scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+              });
+            }}
+          >
+            รายละเอียดผลิตภัณฑ์
+          </Link>
+
+          {/* ตารางเปรียบเทียบกำลังผลิต */}
+          {product.comparepic && (
+            <Link
+              href="#marker-compare"
+              scroll={false}
+              className={activeSection === "marker-compare" ? styles.active : ""}
+              onClick={(e) => {
+                e.preventDefault();
+                setActiveSection("marker-compare");
+                document.getElementById("marker-compare")?.scrollIntoView({
+                  behavior: "smooth",
+                  block: "start",
+                });
+              }}
+            >
+              ตารางเปรียบเทียบกำลังผลิต
+            </Link>
+          )}
+
+          {/* ตารางการวางเงินดาวน์ */}
+          {product.installmentpic && (
+            <Link
+              href="#marker-installment"
+              scroll={false}
+              className={activeSection === "marker-installment" ? styles.active : ""}
+              onClick={(e) => {
+                e.preventDefault();
+                setActiveSection("marker-installment");
+                document.getElementById("marker-installment")?.scrollIntoView({
+                  behavior: "smooth",
+                  block: "start",
+                });
+              }}
+            >
+              ตารางการวางเงินดาวน์
+            </Link>
+          )}
+        </div>
+      )}
+
+
+
       {/* =========================================================
-        ส่วนตารางเปรียบเทียบราคา + ตารางผ่อน
-       ========================================================= */}
+ส่วนตารางเปรียบเทียบราคา + ตารางผ่อน
+========================================================= */}
       <div className={styles.compareInstallmentWrapper}>
+
+        {/* ========== ตารางเปรียบเทียบกำลังผลิต ========== */}
         {product.comparepic && (
-          <div className={styles.compareItem}>
-            <Image
-              src={getImageUrl(product.comparepic)}
-              alt="Compare"
-              width={1000}
-              height={500}
-              unoptimized
-            />
-          </div>
+          <>
+            {/* Marker สำหรับ observe */}
+            <div id="marker-compare" style={{ height: "1px", marginTop: "-80px" }}></div>
+
+            <div className={styles.compareItem} id="compare-table">
+              <Image
+                src={getImageUrl(product.comparepic)}
+                alt="Compare Table"
+                width={800}
+                height={400}
+                style={{ width: "100%", height: "auto", objectFit: "contain" }}
+                unoptimized
+                loading="lazy"              // ⭐ บอกว่าเป็นภาพด้านล่าง ไม่ใช่ LCP
+                sizes="(max-width: 768px) 100vw, 800px"  // ⭐ ให้ browser คำนวณก่อน ลด CLS/LCP
+              />
+
+            </div>
+          </>
         )}
 
+        {/* ========== ตารางการวางเงินดาวน์ ========== */}
         {product.installmentpic && (
-          <div className={styles.compareItem}>
-            <Image
-              src={getImageUrl(product.installmentpic)}
-              alt="Installment"
-              width={1000}
-              height={500}
-              unoptimized
-            />
-          </div>
-        )}
-      </div>
+          <>
+            {/* Marker สำหรับ observe */}
+            <div id="marker-installment" style={{ height: "1px", marginTop: "-80px" }}></div>
 
+            <div className={styles.compareItem} id="installment-table">
+              <Image
+                src={getImageUrl(product.installmentpic)}
+                alt="Installment Table"
+                width={800}
+                height={400}
+                style={{ width: "100%", height: "auto", objectFit: "contain" }}
+                unoptimized
+                onError={(e) => { e.currentTarget.src = "/images/no-image.jpg"; }}
+              />
+            </div>
+          </>
+        )}
+
+      </div>
       {/* =========================================================
         LIGHTBOX — เปิดรูปใหญ่
        ========================================================= */}
@@ -531,8 +665,8 @@ export default function ProductDetailPage() {
             <Image
               src={getImageUrl(product.gallery[selectedImage])}
               alt=""
-              width={1000}
-              height={700}
+              width={100}
+              height={100}
               unoptimized
               style={{ objectFit: "contain", maxWidth: "85vw", maxHeight: "75vh" }}
             />
@@ -553,10 +687,12 @@ export default function ProductDetailPage() {
       {/* =========================================================
         สินค้าแนะนำตามแบรนด์เดียวกัน
        ========================================================= */}
-      <RecommendedProducts
-        brandId={product.probrandID}
-        productId={product.product_num}
-      />
+      {product && (
+        <RecommendedProducts
+          brandId={product.probrandID}
+          productId={product.product_num}
+        />
+      )}
     </main>
   );
 }

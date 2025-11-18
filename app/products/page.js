@@ -135,175 +135,175 @@ export default function ProductsPage() {
   const [columns, setColumns] = useState(4);              // จำนวนคอลัมน์สินค้า
   const [itemsPerPage, setItemsPerPage] = useState(20);   // จำนวนสินค้าต่อหน้า
 
-useEffect(() => {
-  setMounted(true);
+  useEffect(() => {
+    setMounted(true);
 
-  // ========== คำนวณ columns แบบป้องกันลูป ==========
-  const handleResize = () => {
-    const usable = window.innerWidth - 260 - 64;
-    let newColumns = 2;
+    // ========== คำนวณ columns แบบป้องกันลูป ==========
+    const handleResize = () => {
+      const usable = window.innerWidth - 260 - 64;
+      let newColumns = 2;
 
-    if (usable >= 1500) newColumns = 5;
-    else if (usable >= 1150) newColumns = 4;
-    else if (usable >= 780) newColumns = 3;
+      if (usable >= 1500) newColumns = 5;
+      else if (usable >= 1150) newColumns = 4;
+      else if (usable >= 780) newColumns = 3;
 
-    // ⭐ ป้องกัน infinite loop — อัปเดตก็ต่อเมื่อค่าเปลี่ยนจริง
-    setColumns(prev => (prev === newColumns ? prev : newColumns));
-  };
+      // ⭐ ป้องกัน infinite loop — อัปเดตก็ต่อเมื่อค่าเปลี่ยนจริง
+      setColumns(prev => (prev === newColumns ? prev : newColumns));
+    };
 
-  handleResize();
-  window.addEventListener("resize", handleResize);
+    handleResize();
+    window.addEventListener("resize", handleResize);
 
-  // ========== โหลดข้อมูล ==========
-  const loadData = async () => {
-    let categoriesData, productsData, brandsData;
+    // ========== โหลดข้อมูล ==========
+    const loadData = async () => {
+      let categoriesData, productsData, brandsData;
 
-    const cacheAge = Date.now() - productsCache.timestamp;
-    const useCache =
-      productsCache.products &&
-      productsCache.categories &&
-      productsCache.brands &&
-      cacheAge < 1000 * 60 * 15;
+      const cacheAge = Date.now() - productsCache.timestamp;
+      const useCache =
+        productsCache.products &&
+        productsCache.categories &&
+        productsCache.brands &&
+        cacheAge < 1000 * 60 * 15;
 
-    if (useCache) {
-      categoriesData = productsCache.categories;
-      productsData = productsCache.products;
-      brandsData = productsCache.brands;
-    } else {
-      setLoading(true);
+      if (useCache) {
+        categoriesData = productsCache.categories;
+        productsData = productsCache.products;
+        brandsData = productsCache.brands;
+      } else {
+        setLoading(true);
 
-      const [resHeader, resProducts] = await Promise.all([
-        fetch(`${baseUrl}/api/productHeaderapi`, {
-          headers: { "X-API-KEY": apiKey }
-        }),
-        fetch(`${baseUrl}/api/productpageapi?offset=0&limit=9999`, {
-          headers: { "X-API-KEY": apiKey }
-        })
-      ]);
+        const [resHeader, resProducts] = await Promise.all([
+          fetch(`${baseUrl}/api/productHeaderapi`, {
+            headers: { "X-API-KEY": apiKey }
+          }),
+          fetch(`${baseUrl}/api/productpageapi?offset=0&limit=9999`, {
+            headers: { "X-API-KEY": apiKey }
+          })
+        ]);
 
-      const headerJSON = await resHeader.json();
-      const productJSON = await resProducts.json();
+        const headerJSON = await resHeader.json();
+        const productJSON = await resProducts.json();
 
-      categoriesData = headerJSON.result;
+        categoriesData = headerJSON.result;
 
-      const formatted = productJSON.result.data.map((p) => {
-        let mainImage = "";
-        try {
-          const g = JSON.parse(p.gallery || "[]");
-          mainImage = g[0] || "";
-        } catch {}
+        const formatted = productJSON.result.data.map((p) => {
+          let mainImage = "";
+          try {
+            const g = JSON.parse(p.gallery || "[]");
+            mainImage = g[0] || "";
+          } catch { }
 
-        return {
-          id: p.product_ID,
-          num: p.product_num,
-          model: p.modelname,
-          modelair: p.modelairname,
-          solarpanel: p.solarpanel,
-          size: p.installationsize,
-          price: parseFloat(p.price),
-          isprice: p.isprice,
-          battery: p.battery,
-          mainImage,
-          categoryId: Number(p.protypeID),
-          brandId: Number(p.probrandID),
-          brandName: normalizeBrandName(p.BrandProduct_name),
-          brandOrder: p.BrandProduct_order ? Number(p.BrandProduct_order) : 9999,
-          isPromotion: p.productpro_ispromotion,
-          discountPercent: p.productpro_percent,
-        };
-      });
+          return {
+            id: p.product_ID,
+            num: p.product_num,
+            model: p.modelname,
+            modelair: p.modelairname,
+            solarpanel: p.solarpanel,
+            size: p.installationsize,
+            price: parseFloat(p.price),
+            isprice: p.isprice,
+            battery: p.battery,
+            mainImage,
+            categoryId: Number(p.protypeID),
+            brandId: Number(p.probrandID),
+            brandName: normalizeBrandName(p.BrandProduct_name),
+            brandOrder: p.BrandProduct_order ? Number(p.BrandProduct_order) : 9999,
+            isPromotion: p.productpro_ispromotion,
+            discountPercent: p.productpro_percent,
+          };
+        });
 
-      productsData = formatted;
+        productsData = formatted;
 
-      // === จัดกลุ่ม brand ===
-      const brandMap = new Map();
+        // === จัดกลุ่ม brand ===
+        const brandMap = new Map();
 
-      formatted.forEach((item) => {
-        const normalized = normalizeBrandName(item.brandName);
-        if (!brandMap.has(normalized)) {
-          brandMap.set(normalized, {
-            brandName: normalized,
-            brandId: item.brandId,
-            categoryIds: [item.categoryId],
-            order: item.brandOrder,
-          });
-        } else {
-          const ex = brandMap.get(normalized);
-          if (!ex.categoryIds.includes(item.categoryId)) {
-            ex.categoryIds.push(item.categoryId);
+        formatted.forEach((item) => {
+          const normalized = normalizeBrandName(item.brandName);
+          if (!brandMap.has(normalized)) {
+            brandMap.set(normalized, {
+              brandName: normalized,
+              brandId: item.brandId,
+              categoryIds: [item.categoryId],
+              order: item.brandOrder,
+            });
+          } else {
+            const ex = brandMap.get(normalized);
+            if (!ex.categoryIds.includes(item.categoryId)) {
+              ex.categoryIds.push(item.categoryId);
+            }
           }
-        }
-      });
+        });
 
-      brandsData = Array.from(brandMap.values()).sort(
-        (a, b) => a.order - b.order
+        brandsData = Array.from(brandMap.values()).sort(
+          (a, b) => a.order - b.order
+        );
+
+        productsCache = {
+          categories: categoriesData,
+          products: productsData,
+          brands: brandsData,
+          timestamp: Date.now(),
+        };
+      }
+
+      setCategories(categoriesData);
+      setProducts(productsData);
+      setBrands(brandsData);
+
+      // ========== โหลดค่า filter จาก URL ==========
+      const catParam = searchParams.get("categories");
+      const brandParam = searchParams.get("brands");
+
+      let sCat = [];
+      let sBrand = [];
+
+      if (catParam) {
+        const sl = catParam.split(",");
+        sCat = categoriesData
+          .filter((c) => sl.includes(slugify(c.producttypenameEN)))
+          .map((c) => Number(c.producttypeID));
+      }
+
+      if (brandParam) {
+        const bl = brandParam.split(",");
+        sBrand = brandsData
+          .filter((b) => bl.includes(slugify(b.brandName)))
+          .map((b) => b.brandName);
+      }
+
+      // ⭐ ป้องกันลูป: อัปเดตเฉพาะตอนค่าจริงๆ เปลี่ยน
+      setSelectedCategories(prev =>
+        JSON.stringify(prev) === JSON.stringify(sCat) ? prev : sCat
       );
 
-      productsCache = {
-        categories: categoriesData,
-        products: productsData,
-        brands: brandsData,
-        timestamp: Date.now(),
-      };
-    }
+      setSelectedBrands(prev =>
+        JSON.stringify(prev) === JSON.stringify(sBrand) ? prev : sBrand
+      );
 
-    setCategories(categoriesData);
-    setProducts(productsData);
-    setBrands(brandsData);
-
-    // ========== โหลดค่า filter จาก URL ==========
-    const catParam = searchParams.get("categories");
-    const brandParam = searchParams.get("brands");
-
-    let sCat = [];
-    let sBrand = [];
-
-    if (catParam) {
-      const sl = catParam.split(",");
-      sCat = categoriesData
-        .filter((c) => sl.includes(slugify(c.producttypenameEN)))
-        .map((c) => Number(c.producttypeID));
-    }
-
-    if (brandParam) {
-      const bl = brandParam.split(",");
-      sBrand = brandsData
-        .filter((b) => bl.includes(slugify(b.brandName)))
-        .map((b) => b.brandName);
-    }
-
-    // ⭐ ป้องกันลูป: อัปเดตเฉพาะตอนค่าจริงๆ เปลี่ยน
-    setSelectedCategories(prev =>
-      JSON.stringify(prev) === JSON.stringify(sCat) ? prev : sCat
-    );
-
-    setSelectedBrands(prev =>
-      JSON.stringify(prev) === JSON.stringify(sBrand) ? prev : sBrand
-    );
-
-    const fb =
-      sCat.length > 0
-        ? brandsData.filter((b) =>
+      const fb =
+        sCat.length > 0
+          ? brandsData.filter((b) =>
             sCat.some((id) => b.categoryIds.includes(id))
           )
-        : brandsData;
+          : brandsData;
 
-    setFilteredBrands(fb);
-    setLoading(false);
-  };
+      setFilteredBrands(fb);
+      setLoading(false);
+    };
 
-  loadData();
+    loadData();
 
-  // ========== itemsPerPage คำนวณใหม่เฉพาะตอน columns เปลี่ยน ==========
-  setItemsPerPage(prev =>
-    prev === columns * rowsPerPage ? prev : columns * rowsPerPage
-  );
+    // ========== itemsPerPage คำนวณใหม่เฉพาะตอน columns เปลี่ยน ==========
+    setItemsPerPage(prev =>
+      prev === columns * rowsPerPage ? prev : columns * rowsPerPage
+    );
 
-  setCurrentPage(1);
+    setCurrentPage(1);
 
-  return () => window.removeEventListener("resize", handleResize);
-}, [searchParams, locale]); 
-// ❗❗ คีย์หลัก: ตัด columns ออกเพื่อกันลูป
+    return () => window.removeEventListener("resize", handleResize);
+  }, [searchParams, locale]);
+  // ❗❗ คีย์หลัก: ตัด columns ออกเพื่อกันลูป
   /* =========================================================
      Filtering — ฟิลเตอร์สินค้าแบบ realtime
      ใช้ useMemo เพื่อให้คำนวณเฉพาะตอนที่ products,
@@ -606,11 +606,11 @@ useEffect(() => {
                       <Image
                         src={getImageUrl(item.mainImage)}
                         alt={item.model || item.solarpanel}
-                        fill
-                        unoptimized
-                        priority={index === 0} // preload แค่รูปแรก
+                        width={300}
+                        height={300}
                         style={{ objectFit: "cover" }}
                       />
+
 
                       {/* ป้ายลดราคา */}
                       {item.isPromotion === "1" && item.discountPercent && (

@@ -1,23 +1,13 @@
+/* Layout wrapper ให้อยู่กลางและจำกัดความกว้าง */
 .recommendedWrapper {
-  margin-top: 2rem;
-  margin-bottom: 2rem;
-  /* width: 90%; */
-  max-width: 1500px;
+  margin: 1rem auto;
+  max-width: 1200px;
+  position: relative;
 }
 
-.recommendedTitle {
-  font-size: 20px;
-  font-weight: 600;
-  margin-bottom: 1rem;
-  color: #1e2b4d;
-}
 
-/* ช่องว่างระหว่าง slide */
-.recommendedWrapper .slick-slide {
-  padding: 0 8px;
-  box-sizing: border-box;
-  display: flex !important;
-  justify-content: center; /* การ์ดอยู่กลาง */
+.recommendedproductsWrapper {
+  max-width: 1150px;
 }
 
 /* การ์ดสินค้า */
@@ -31,15 +21,23 @@
   color: inherit;
   overflow: hidden;
   transition: box-shadow 0.2s ease;
-  max-width: 280px;   /*  การ์ดเท่ารูป */
-  width: 100%;
+  width: 270px;
+  margin: 0 5px;
 }
 
 .recommendedCard:hover {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
 }
 
-/* รูปภาพ */
+/* ส่วนหัว */
+.recommendedTitle {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #1e2b4d;
+}
+
+/* ภาพสินค้า */
 .recommendedImage {
   position: relative;
   width: 100%;
@@ -96,24 +94,86 @@
   z-index: 2;
 }
 
-/* ลูกศรสไลด์ */
-.arrowPrev,
-.arrowNext {
+/* ปรับตำแหน่งลูกศรใหม่ ให้ไม่ล้น */
+.arrowPrevpro,
+.arrowNextpro {
   position: absolute;
-  top: 50%; /* ให้อยู่กลางแนวตั้งของ slide */
+  top: 50%;
   transform: translateY(-50%);
-  z-index: 5;
+  z-index: 20;
   background: #fff;
   border: 1px solid #ddd;
   border-radius: 50%;
-  width: 40px;     /*  ขนาดวงกลม */
-  height: 40px;    /*  ขนาดวงกลม */
-  display: flex;   /*  ใช้ flex */
-  align-items: center; /* กึ่งกลางแนวตั้ง */
-  justify-content: center; /*  กึ่งกลางแนวนอน */
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
   box-shadow: 0 2px 6px rgba(0,0,0,0.15);
 }
 
-.arrowPrev { left: -20px; }
-.arrowNext { right: -20px; }
+.arrowPrevpro { left: -20px; }
+.arrowNextpro { right: -10px; }
+
+
+/* Notebook: ≤1200px → 3 cards */
+@media (max-width: 1200px) {
+
+  /* บีบ wrapper ให้แคบลง */
+  .recommendedWrapper {
+    max-width: 950px;
+    margin: 1rem auto;
+    position: relative;
+  }
+
+.recommendedproductsWrapper {
+  max-width: 889px;
+}
+
+
+  /* ลดช่องว่างระหว่าง card */
+  .recommendedCard {
+    margin: 0 20px;
+  }
+
+  /* ปรับลูกศรให้ไม่ล้นออกนอก slide จริง */
+  .arrowPrevpro { left: 0px; }
+  .arrowNextpro { right: -15px; }
+}
+
+
+/* Tablet: ≤991px → 2 cards */
+@media (max-width: 991px) {
+  /* บีบ wrapper ให้แคบลง */
+  .recommendedWrapper {
+    max-width: 700px;
+  }
+
+.recommendedproductsWrapper {
+  max-width: 600px;
+}
+
+
+  /* ปรับลูกศรให้ไม่ล้นออกนอก slide จริง */
+  .arrowNextpro { right: -10px; }
+}
+
+/* Mobile: ≤764px → 1 card */
+@media (max-width: 638px) {
+  .recommendedWrapper {
+    max-width: 400px;
+  }
+.recommendedproductsWrapper {
+  max-width: 300px;
+}
+
+.recommendedCard {
+    margin: 0 auto;
+  }
+
+
+  /* ปรับลูกศรให้ไม่ล้นออกนอก slide จริง */
+  .arrowPrevpro { left: 0px; }
+  .arrowNextpro { right: -5px; }
+}
