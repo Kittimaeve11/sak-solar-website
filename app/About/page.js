@@ -1,30 +1,41 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import '@/styles/about.css';
 import { useLocale } from '../Context/LocaleContext';
-import { usePathname } from 'next/navigation';
 import { IoMdArrowDropright } from 'react-icons/io';
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 
-/* ============================
-   Helper ป้องกัน path พัง
-============================ */
+/* ====================== 🟢 Simple Cache Helper ====================== */
+const getCache = (key, maxAgeMinutes = 30) => {
+  if (typeof window === 'undefined') return null;
+  const cached = sessionStorage.getItem(key);
+  if (!cached) return null;
+
+  const { data, timestamp } = JSON.parse(cached);
+  return Date.now() - timestamp < maxAgeMinutes * 60 * 1000 ? data : null;
+};
+
+const setCache = (key, data) => {
+  if (typeof window === 'undefined') return;
+  sessionStorage.setItem(
+    key,
+    JSON.stringify({ data, timestamp: Date.now() })
+  );
+};
+
+/* ====================== Normalize Image URL ====================== */
 const normalizeSrc = (path) => {
-  if (!path) return '/no-image.png'; // fallback กัน error
-  return path.startsWith('http')
-    ? path
-    : `${baseUrl}/${path.replace(/^\/+/, '')}`;
+  if (!path) return '/no-image.png';
+  return path.startsWith('http') ? path : `${baseUrl}/${path.replace(/^\/+/, '')}`;
 };
 
 export default function AboutPage() {
   const { locale } = useLocale();
-  const pathname = usePathname();
-
   const [sections, setSections] = useState({
     history: null,
     vision: null,
@@ -33,130 +44,123 @@ export default function AboutPage() {
   });
   const [loading, setLoading] = useState(true);
   const [selectedMenu, setSelectedMenu] = useState('history');
-  const [showTeams, setShowTeams] = useState(false);
 
-  const observerRef = useRef(null);
-
-  /* ============================
-     Fetch API
-  ============================= */
+  /* ====================== Fetch Data with Cache ====================== */
   useEffect(() => {
-    const controller = new AbortController();
-    const signal = controller.signal;
+    const cacheKey = `ABOUT_PAGE_CACHE_${locale}`; // 👈 แยก cache ตามภาษา
+    const cachedData = getCache(cacheKey);
+
+    if (cachedData) {
+      setSections(cachedData);
+      setLoading(false);
+      return;
+    }
 
     async function fetchAll() {
       try {
-        const endpoints = [
-          fetch(`${baseUrl}/api/branderIDapi/12`, { headers: { 'X-API-KEY': apiKey }, signal }),
-          fetch(`${baseUrl}/api/branderIDapi/7`, { headers: { 'X-API-KEY': apiKey }, signal }),
-          fetch(`${baseUrl}/api/misstionapi`, { headers: { 'X-API-KEY': apiKey }, signal }),
-          fetch(`${baseUrl}/api/teamsapi`, { headers: { 'X-API-KEY': apiKey }, signal }),
-        ];
+        const [history, vision, mission, teams] = await Promise.all([
+          fetch(`${baseUrl}/api/branderIDapi/12`, { headers: { 'X-API-KEY': apiKey } }),
+          fetch(`${baseUrl}/api/branderIDapi/7`, { headers: { 'X-API-KEY': apiKey } }),
+          fetch(`${baseUrl}/api/misstionapi`, { headers: { 'X-API-KEY': apiKey } }),
+          fetch(`${baseUrl}/api/teamsapi`, { headers: { 'X-API-KEY': apiKey } }),
+        ]);
 
-        const [historyRes, visionRes, missionRes, teamsRes] = await Promise.allSettled(endpoints);
+        const data = {
+          history: (await history.json()).data,
+          vision: (await vision.json()).data,
+          mission: (await mission.json()).result || [],
+          teams: (await teams.json()).result || [],
+        };
 
-        const historyData =
-          historyRes.status === 'fulfilled' ? await historyRes.value.json() : { data: null };
-        const visionData =
-          visionRes.status === 'fulfilled' ? await visionRes.value.json() : { data: null };
-        const missionData =
-          missionRes.status === 'fulfilled' ? await missionRes.value.json() : { status: false };
-        const teamsData =
-          teamsRes.status === 'fulfilled' ? await teamsRes.value.json() : { status: false };
-
-        setSections({
-          history: historyData?.data || null,
-          vision: visionData?.data || null,
-          mission: missionData?.status && missionData?.result ? missionData.result : [],
-          teams: teamsData?.status && teamsData?.result ? teamsData.result : [],
-        });
+        setSections(data);
+        setCache(cacheKey, data); // ⭐ เก็บ cache
       } catch (error) {
-        if (error.name !== 'AbortError') console.error('Fetch error:', error);
+        console.error(error);
       } finally {
         setLoading(false);
       }
     }
 
     fetchAll();
-    return () => controller.abort();
   }, [locale]);
 
-  /* ============================
-     Scroll ไปยัง Section (คลิกเมนู)
-  ============================= */
+  /* ====================== Scroll Menu ====================== */
   const scrollToSection = (id) => {
     setSelectedMenu(id);
-    setShowTeams(id === 'teams');
 
     setTimeout(() => {
       const el = document.getElementById(id);
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 100);
+      if (el) {
+        const headerOffset = 120;
+        const position = el.getBoundingClientRect().top + window.scrollY - headerOffset;
+        window.scrollTo({ top: position, behavior: 'smooth' });
+      }
+    }, 50);
   };
 
-  const handleMenuClick = (e, menu) => {
-    e.preventDefault();
-    scrollToSection(menu);
-  };
+/* ====================== Observer Highlight Menu ====================== */
+useEffect(() => {
+  if (loading) return;
 
-  /* ============================
-     Intersection Observer (อัปเดตเมนูตาม scroll)
-  ============================= */
-  useEffect(() => {
-    const sectionIds = ['history', 'vision', 'mission', 'teams'];
-    const options = {
-      root: null,
-      rootMargin: '0px 0px -60% 0px', // ให้เปลี่ยน active ตอน section เข้ามากลางจอ
-      threshold: 0,
-    };
-
-    observerRef.current = new IntersectionObserver((entries) => {
+  const observer = new IntersectionObserver(
+    (entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          const id = entry.target.id;
-          setSelectedMenu(id);
-          setShowTeams(id === 'teams');
+          setSelectedMenu(entry.target.id);
         }
       });
-    }, options);
 
-    sectionIds.forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) observerRef.current.observe(el);
-    });
+      // ⭐ ถ้าเลื่อนกลับไปบนสุด ให้ active = history เสมอ
+      if (window.scrollY < 200) {
+        setSelectedMenu("history");
+      }
+    },
+    {
+      root: null,
+      threshold: 0.3,          // 👈 จับเร็วขึ้น (เดิม 0.55)
+      rootMargin: '-10% 0px -65% 0px', // 👈 ปรับให้ section บนไม่ถูกแย่ง
+    }
+  );
 
-    return () => {
-      if (observerRef.current) observerRef.current.disconnect();
-    };
-  }, []);
+  document
+    .querySelectorAll('.about-section')
+    .forEach((section) => observer.observe(section));
 
-  /* ============================
-     Render Section
-  ============================= */
-  const renderSection = (content) => {
+  return () => observer.disconnect();
+}, [loading]);
+
+
+  /* ====================== Render Content ====================== */
+  const renderSection = (content, sectionType) => {
     if (!content) return null;
+
+    const sizes = {
+      history: { width: 919, height: 519 },
+      vision: { width: 1600, height: 457 },
+      default: { width: 1200, height: 600 },
+    };
+
+    const img = sizes[sectionType] || sizes.default;
+
     return (
-      <div className="banner-container fade-in show">
-        <div className="banner-image-wrapper">
-          <picture>
-            <source srcSet={normalizeSrc(content?.brander_pictureMoblie)} media="(max-width: 768px)" />
-            <Image
-              src={normalizeSrc(content?.brander_picturePC)}
-              alt={(locale === 'th' ? content?.brander_title : content?.brander_titleEN) || 'Image'}
-              fill
-              className="banner-image"
-              priority
-            />
-          </picture>
+      <div className="bannerabout-container fade-in show">
+        <div className={`bannerabout-image-wrapper-custom image-${sectionType}`}>
+          <Image
+            src={normalizeSrc(content?.brander_picturePC)}
+            alt={sectionType}
+            width={img.width}
+            height={img.height}
+            className="bannerabout-image-custom"
+            priority={sectionType === 'history'}
+          />
         </div>
+
         {(locale === 'th'
           ? content?.brander_detail
           : content?.brander_detailEN || content?.brander_detail
         )
           ?.split('\n')
-          .map((line, idx) => (
-            <p key={idx}>{line}</p>
-          ))}
+          .map((line, idx) => <p key={idx}>{line}</p>)}
       </div>
     );
   };
@@ -173,73 +177,87 @@ export default function AboutPage() {
             <li key={menu}>
               <Link
                 href={`#${menu}`}
-                className={selectedMenu === menu ? 'active' : ''}
-                onClick={(e) => handleMenuClick(e, menu)}
                 scroll={false}
+                className={selectedMenu === menu ? 'active' : ''}
+                onClick={(e) => {
+                  e.preventDefault();
+                  scrollToSection(menu);
+                }}
               >
                 <IoMdArrowDropright className="arrow" />
                 {locale === 'th'
                   ? {
-                      history: 'ประวัติความเป็นมา',
-                      vision: 'วิสัยทัศน์',
-                      mission: 'พันธกิจ',
-                      teams: 'คณะกรรมการ',
-                    }[menu]
+                    history: 'ประวัติความเป็นมา',
+                    vision: 'วิสัยทัศน์',
+                    mission: 'พันธกิจ',
+                    teams: 'คณะกรรมการ',
+                  }[menu]
                   : {
-                      history: 'History',
-                      vision: 'Vision',
-                      mission: 'Mission',
-                      teams: 'Committee',
-                    }[menu]}
+                    history: 'History',
+                    vision: 'Vision',
+                    mission: 'Mission',
+                    teams: 'Committee',
+                  }[menu]}
               </Link>
             </li>
           ))}
         </ul>
       </aside>
 
-      {/* Content */}
+      {/* Content Sections */}
       <section className="about-content">
         {loading ? (
-          <div className="skeleton-banner"></div>
+          <div className="skeleton-bannerabout"></div>
         ) : (
           <>
-            {/* 3 เนื้อหาแรก */}
-            <div className={`content-sections ${showTeams ? 'hidden-section' : ''}`}>
-              <h2 id="history" className="about-title with-lines">
-                {locale === 'th' ? 'ประวัติความเป็นมา' : 'History'}
-              </h2>
-              {renderSection(sections.history)}
+            {/* 🟠 กลุ่ม Content (History, Vision, Mission) */}
+            <div className={`content-sections ${selectedMenu === 'teams' ? 'hidden-section' : ''}`}>
 
-              <h2 id="vision" className="about-title with-lines">
-                {locale === 'th' ? 'วิสัยทัศน์' : 'Vision'}
-              </h2>
-              {renderSection(sections.vision)}
+              {/* HISTORY */}
+              <section id="history" className="about-section">
+                <h2 className="about-title with-lines">
+                  {locale === 'th' ? 'ประวัติความเป็นมา' : 'History'}
+                </h2>
+                {renderSection(sections.history, 'history')}
+              </section>
 
-              <h2 id="mission" className="about-title with-lines">
-                {locale === 'th' ? 'พันธกิจ' : 'Mission'}
-              </h2>
-              <ul className="mission-list fade-in show">
-                {sections.mission.map((item, index) => (
-                  <li key={item.mission_ID || `mission-${index}`} className="mission-item">
-                    {item.picture && (
-                      <Image
-                        src={normalizeSrc(item.picture)}
-                        alt="พันธกิจ"
-                        width={90}
-                        height={90}
-                        className="mission-icon"
-                      />
-                    )}
-                    <span className="mission-text">
-                      {locale === 'th' ? item.titleTH : item.titleEN || item.titleTH}
-                    </span>
-                  </li>
-                ))}
-              </ul>
+              {/* VISION */}
+              <section id="vision" className="about-section">
+                <h2 className="about-title with-lines">
+                  {locale === 'th' ? 'วิสัยทัศน์' : 'Vision'}
+                </h2>
+                {renderSection(sections.vision, 'vision')}
+              </section>
+
+              {/* MISSION */}
+              <section id="mission" className="about-section">
+                <h2 className="about-title with-lines">
+                  {locale === 'th' ? 'พันธกิจ' : 'Mission'}
+                </h2>
+                <ul className="mission-list fade-in show">
+                  {sections.mission.map((item, index) => (
+                    <li key={item.mission_ID || index} className="mission-item">
+                      {item.picture && (
+                        <Image
+                          src={normalizeSrc(item.picture)}
+                          alt="พันธกิจ"
+                          width={90}
+                          height={90}
+                          className="mission-icon"
+                          loading="lazy"
+                        />
+                      )}
+                      <span className="mission-text">
+                        {locale === 'th' ? item.titleTH : item.titleEN || item.titleTH}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
             </div>
 
-            {/* คณะกรรมการ */}
-            <div id="teams" className={`teams-section ${showTeams ? 'fade-in show' : 'hidden-section'}`}>
+            {/* 🟢 TEAMS — แสดงเดี่ยวเต็มหน้า */}
+            <div id="teams" className={`teams-section ${selectedMenu === 'teams' ? 'fade-in show' : 'hidden-section'}`}>
               <h2 className="about-title with-lines">
                 {locale === 'th' ? 'คณะกรรมการ' : 'Committee'}
               </h2>
@@ -252,6 +270,7 @@ export default function AboutPage() {
                       width={300}
                       height={300}
                       className="team-image"
+                      loading="lazy"
                     />
                     <div className="team-info">
                       <p className="team-name">
