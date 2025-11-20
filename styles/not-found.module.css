@@ -1,0 +1,55 @@
+/* Container ให้เต็มจอ และจัดกลาง */
+.container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f8fafc;
+  padding: 1rem;
+}
+
+/* กล่องข้อความ */
+.box {
+  text-align: center;
+  max-width: 600px;
+  padding: 2rem;
+}
+
+/* รูป */
+.image {
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 1.5rem;
+}
+
+/* หัวข้อ */
+.title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #243865;
+}
+
+/* รายละเอียด */
+.text {
+  font-size: 1.1rem;
+  color: #555;
+  margin-bottom: 2rem;
+}
+
+/* ปุ่มกลับหน้าหลัก */
+.homeButton {
+  padding: 12px 28px;
+  font-size: 1rem;
+  text-decoration: none;
+  background-color: #E88534;
+  color: white;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.homeButton:hover {
+  background-color: #d27525;
+  transform: translateY(-2px);
+}
