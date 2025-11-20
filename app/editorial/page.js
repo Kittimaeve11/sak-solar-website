@@ -47,7 +47,7 @@ let editorialCache = {
 };
 
 export default function EditorialListPage() {
-  const locale = useLocale();
+  const { locale } = useLocale();
   const [articles, setArticles] = useState([]);
   const [types, setTypes] = useState([]);
   const [banners, setBanners] = useState([]);
@@ -70,83 +70,92 @@ export default function EditorialListPage() {
   /* =========================================================
      USEEFFECT เดียว (SEO + Fetch + Device)
   ========================================================= */
-  useEffect(() => {
-    /* SEO */
-    document.title =
-      locale === 'en'
-        ? 'Editorials | Sak Siam Solar Energy Co., Ltd.'
-        : 'บทความ | บริษัท ศักดิ์สยาม โซลาร์ เอ็นเนอร์ยี่ จำกัด';
+useEffect(() => {
+  if (typeof window === "undefined") return; // สำคัญมาก ป้องกัน Build crash
 
-    /* ตรวจมือถือ */
-    const updateDevice = () => setIsMobile(window.innerWidth <= 768);
-    updateDevice();
-    window.addEventListener('resize', updateDevice);
+  /* SEO */
+  document.title =
+    locale === 'en'
+      ? 'Editorials | Sak Siam Solar Energy Co., Ltd.'
+      : 'บทความ | บริษัท ศักดิ์สยาม โซลาร์ เอ็นเนอร์ยี่ จำกัด';
 
-    /* โหลดข้อมูล */
-    const load = async () => {
-      try {
-        const cacheAge = Date.now() - editorialCache.timestamp;
-        if (
-          editorialCache.articles &&
-          editorialCache.types &&
-          editorialCache.banners &&
-          cacheAge < 10 * 60 * 1000
-        ) {
-          setArticles(editorialCache.articles);
-          setTypes(editorialCache.types);
-          setBanners(editorialCache.banners);
-        } else {
-          setLoading(true);
-          setLoadingBanner(true);
+  const metaDesc = document.querySelector("meta[name='description']");
+  if (metaDesc) {
+    metaDesc.setAttribute(
+      "content",
+      locale === 'en' ? 'Editorials and Solar Knowledge' : 'บทความและสาระความรู้โซลาร์'
+    );
+  }
 
-          const [resType, resArticle, resBanner] = await Promise.all([
-            fetch(`${baseUrl}/api/edittorTypepageapi`, { headers: { 'X-API-KEY': apiKey } }),
-            fetch(`${baseUrl}/api/edittorpageapi?limit=1000`, { headers: { 'X-API-KEY': apiKey } }),
-            fetch(`${baseUrl}/api/branderIDapi/15`, { headers: { 'X-API-KEY': apiKey } }),
-          ]);
+  /* ตรวจมือถือ */
+  const updateDevice = () => setIsMobile(window.innerWidth <= 768);
+  updateDevice();
+  window.addEventListener('resize', updateDevice);
 
-          const typeJson = await resType.json();
-          const articleJson = await resArticle.json();
-          const bannerJson = await resBanner.json();
+  /* โหลดข้อมูลจาก API หรือ Cache */
+  const load = async () => {
+    try {
+      const cacheAge = Date.now() - editorialCache.timestamp;
+      if (
+        editorialCache.articles &&
+        editorialCache.types &&
+        editorialCache.banners &&
+        cacheAge < 10 * 60 * 1000
+      ) {
+        setArticles(editorialCache.articles);
+        setTypes(editorialCache.types);
+        setBanners(editorialCache.banners);
+      } else {
+        setLoading(true);
+        setLoadingBanner(true);
 
-          const typeList = typeJson?.result ?? [];
-          const articleList = articleJson?.result?.data ?? [];
-          const bannerList = Array.isArray(bannerJson?.data)
-            ? bannerJson.data
-            : bannerJson.data
-              ? [bannerJson.data]
-              : [];
+        const [resType, resArticle, resBanner] = await Promise.all([
+          fetch(`${baseUrl}/api/edittorTypepageapi`, { headers: { 'X-API-KEY': apiKey } }),
+          fetch(`${baseUrl}/api/edittorpageapi?limit=1000`, { headers: { 'X-API-KEY': apiKey } }),
+          fetch(`${baseUrl}/api/branderIDapi/15`, { headers: { 'X-API-KEY': apiKey } }),
+        ]);
 
-          editorialCache = {
-            articles: articleList,
-            types: typeList,
-            banners: bannerList,
-            timestamp: Date.now(),
-          };
+        const typeJson = await resType.json();
+        const articleJson = await resArticle.json();
+        const bannerJson = await resBanner.json();
 
-          setArticles(articleList);
-          setTypes(typeList);
-          setBanners(bannerList);
-        }
-      } catch (err) {
-        console.error('Editorial Load Error:', err);
-        setArticles([]);
-        setTypes([]);
-        setBanners([]);
-      } finally {
-        setLoading(false);
-        setLoadingBanner(false);
-        /* Trigger fade-in */
-        setTimeout(() => setShouldAnimate(true), 50);
+        const typeList = Array.isArray(typeJson?.result) ? typeJson.result : [];
+        const articleList = Array.isArray(articleJson?.result?.data) ? articleJson.result.data : [];
+        const bannerList = Array.isArray(bannerJson?.data)
+          ? bannerJson.data
+          : bannerJson?.data
+            ? [bannerJson.data]
+            : [];
+
+        editorialCache = {
+          articles: articleList,
+          types: typeList,
+          banners: bannerList,
+          timestamp: Date.now(),
+        };
+
+        setArticles(articleList);
+        setTypes(typeList);
+        setBanners(bannerList);
       }
-    };
+    } catch (err) {
+      console.error('Editorial Load Error:', err);
+      setArticles([]);
+      setTypes([]);
+      setBanners([]);
+    } finally {
+      setLoading(false);
+      setLoadingBanner(false);
+      setTimeout(() => setShouldAnimate(true), 50);
+    }
+  };
 
-    load();
+  load();
 
-    return () => window.removeEventListener('resize', updateDevice);
-  }, [locale]);
+  return () => window.removeEventListener('resize', updateDevice);
+}, [locale]);
 
-  /* =========================================================
+/* =========================================================
      PAGINATION
   ========================================================= */
   const filteredArticles =
