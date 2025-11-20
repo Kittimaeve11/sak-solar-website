@@ -10,7 +10,9 @@ import { IoMdArrowDropright } from 'react-icons/io';
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 
-/* ====================== 🟢 Simple Cache Helper ====================== */
+/* ===============================================
+   Simple Cache Helper (ดึง/เก็บข้อมูลใน sessionStorage)
+   =============================================== */
 const getCache = (key, maxAgeMinutes = 30) => {
   if (typeof window === 'undefined') return null;
   const cached = sessionStorage.getItem(key);
@@ -28,7 +30,9 @@ const setCache = (key, data) => {
   );
 };
 
-/* ====================== Normalize Image URL ====================== */
+/* ===============================================
+   Normalize Image URL เพื่อป้องกัน path รูปภาพพัง
+   =============================================== */
 const normalizeSrc = (path) => {
   if (!path) return '/no-image.png';
   return path.startsWith('http') ? path : `${baseUrl}/${path.replace(/^\/+/, '')}`;
@@ -36,26 +40,33 @@ const normalizeSrc = (path) => {
 
 export default function AboutPage() {
   const { locale } = useLocale();
+
+  /* เก็บข้อมูลเนื้อหาแต่ละ section */
   const [sections, setSections] = useState({
     history: null,
     vision: null,
     mission: [],
     teams: [],
   });
-  const [loading, setLoading] = useState(true);
-  const [selectedMenu, setSelectedMenu] = useState('history');
 
-  /* ====================== Fetch Data with Cache ====================== */
+  const [loading, setLoading] = useState(true);         // สถานะโหลดข้อมูล
+  const [selectedMenu, setSelectedMenu] = useState('history'); // เมนูที่ถูก active
+
+  /* =====================================================
+     Fetch Data (พร้อมระบบ Cache ตามภาษา)
+     ===================================================== */
   useEffect(() => {
-    const cacheKey = `ABOUT_PAGE_CACHE_${locale}`; // 👈 แยก cache ตามภาษา
+    const cacheKey = `ABOUT_PAGE_CACHE_${locale}`; // แยก cache ตาม locale
     const cachedData = getCache(cacheKey);
 
+    // ใช้ cache ถ้าข้อมูลยังไม่หมดอายุ
     if (cachedData) {
       setSections(cachedData);
       setLoading(false);
       return;
     }
 
+    // ดึงข้อมูลจาก API เมื่อไม่มี cache
     async function fetchAll() {
       try {
         const [history, vision, mission, teams] = await Promise.all([
@@ -73,7 +84,7 @@ export default function AboutPage() {
         };
 
         setSections(data);
-        setCache(cacheKey, data); // ⭐ เก็บ cache
+        setCache(cacheKey, data); // เก็บ cache
       } catch (error) {
         console.error(error);
       } finally {
@@ -84,7 +95,9 @@ export default function AboutPage() {
     fetchAll();
   }, [locale]);
 
-  /* ====================== Scroll Menu ====================== */
+  /* =====================================================
+     Scroll ไปยัง Section ที่เลือก และ fix header offset
+     ===================================================== */
   const scrollToSection = (id) => {
     setSelectedMenu(id);
 
@@ -98,39 +111,42 @@ export default function AboutPage() {
     }, 50);
   };
 
-/* ====================== Observer Highlight Menu ====================== */
-useEffect(() => {
-  if (loading) return;
+  /* =====================================================
+     Observer เพื่อ highlight menu ตามตำแหน่ง scroll จริง
+     ===================================================== */
+  useEffect(() => {
+    if (loading) return;
 
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          setSelectedMenu(entry.target.id);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setSelectedMenu(entry.target.id); // เปลี่ยน active menu
+          }
+        });
+
+        // ถ้า scroll กลับขึ้นใกล้ top ให้กำหนด active เป็น history
+        if (window.scrollY < 200) {
+          setSelectedMenu("history");
         }
-      });
-
-      // ⭐ ถ้าเลื่อนกลับไปบนสุด ให้ active = history เสมอ
-      if (window.scrollY < 200) {
-        setSelectedMenu("history");
+      },
+      {
+        root: null,
+        threshold: 0.3,                  // ตรวจจับเร็วขึ้น
+        rootMargin: '-10% 0px -65% 0px', // ปรับตำแหน่งตรวจสอบให้สมดุล
       }
-    },
-    {
-      root: null,
-      threshold: 0.3,          // 👈 จับเร็วขึ้น (เดิม 0.55)
-      rootMargin: '-10% 0px -65% 0px', // 👈 ปรับให้ section บนไม่ถูกแย่ง
-    }
-  );
+    );
 
-  document
-    .querySelectorAll('.about-section')
-    .forEach((section) => observer.observe(section));
+    document
+      .querySelectorAll('.about-section')
+      .forEach((section) => observer.observe(section));
 
-  return () => observer.disconnect();
-}, [loading]);
+    return () => observer.disconnect();
+  }, [loading]);
 
-
-  /* ====================== Render Content ====================== */
+  /* =====================================================
+     Render Section พร้อมรูปภาพ + ข้อความรายละเอียด
+     ===================================================== */
   const renderSection = (content, sectionType) => {
     if (!content) return null;
 
@@ -151,10 +167,11 @@ useEffect(() => {
             width={img.width}
             height={img.height}
             className="bannerabout-image-custom"
-            priority={sectionType === 'history'}
+            priority={sectionType === 'history'} // preload เฉพาะภาพแรก
           />
         </div>
 
+        {/* แสดงรายละเอียด โดยเลือกภาษา */}
         {(locale === 'th'
           ? content?.brander_detail
           : content?.brander_detailEN || content?.brander_detail
@@ -167,53 +184,48 @@ useEffect(() => {
 
   return (
     <main className="about-container">
-      {/* Sidebar */}
+      {/* ========== ส่วน Sidebar เมนูด้านซ้าย ========== */}
       <aside className="about-sidebar">
-        <h3 className="sidebar-header">
+        <h3 className="sidebar-headertext">
+          {/* เปลี่ยนหัวข้อเมนูตามภาษา */}
           {locale === 'th' ? 'เกี่ยวกับศักดิ์สยามโซลาร์' : 'About Saksiam Solar'}
         </h3>
+
+        {/* วนเมนูจาก array เพื่อไม่ต้องเขียนซ้ำทีละบรรทัด */}
         <ul className="sidebar-menu">
           {['history', 'vision', 'mission', 'teams'].map((menu) => (
             <li key={menu}>
               <Link
-                href={`#${menu}`}
-                scroll={false}
-                className={selectedMenu === menu ? 'active' : ''}
+                href={`#${menu}`}   // ลิงก์ไปแต่ละ section
+                scroll={false}      // ปิด scroll เริ่มต้นของ Next.js
+                className={selectedMenu === menu ? 'active' : ''} // ไฮไลท์เมนูที่เลือก
                 onClick={(e) => {
-                  e.preventDefault();
-                  scrollToSection(menu);
+                  e.preventDefault(); // ไม่ให้กระโดดทันที
+                  scrollToSection(menu); // ใช้ smooth scroll แทน
                 }}
               >
                 <IoMdArrowDropright className="arrow" />
+                {/* เปลี่ยนชื่อเมนูตามภาษา */}
                 {locale === 'th'
-                  ? {
-                    history: 'ประวัติความเป็นมา',
-                    vision: 'วิสัยทัศน์',
-                    mission: 'พันธกิจ',
-                    teams: 'คณะกรรมการ',
-                  }[menu]
-                  : {
-                    history: 'History',
-                    vision: 'Vision',
-                    mission: 'Mission',
-                    teams: 'Committee',
-                  }[menu]}
+                  ? { history: 'ประวัติความเป็นมา', vision: 'วิสัยทัศน์', mission: 'พันธกิจ', teams: 'คณะกรรมการ' }[menu]
+                  : { history: 'History', vision: 'Vision', mission: 'Mission', teams: 'Committee' }[menu]}
               </Link>
             </li>
           ))}
         </ul>
       </aside>
 
-      {/* Content Sections */}
+      {/* ========== ส่วนเนื้อหา (Content) ========== */}
       <section className="about-content">
         {loading ? (
+          // ถ้ากำลังโหลด ให้แสดง skeleton
           <div className="skeleton-bannerabout"></div>
         ) : (
           <>
-            {/* 🟠 กลุ่ม Content (History, Vision, Mission) */}
+            {/* ซ่อน History, Vision, Mission เมื่อเลือก Teams */}
             <div className={`content-sections ${selectedMenu === 'teams' ? 'hidden-section' : ''}`}>
-
-              {/* HISTORY */}
+              
+              {/* ========= HISTORY ========= */}
               <section id="history" className="about-section">
                 <h2 className="about-title with-lines">
                   {locale === 'th' ? 'ประวัติความเป็นมา' : 'History'}
@@ -221,7 +233,7 @@ useEffect(() => {
                 {renderSection(sections.history, 'history')}
               </section>
 
-              {/* VISION */}
+              {/* ========= VISION ========= */}
               <section id="vision" className="about-section">
                 <h2 className="about-title with-lines">
                   {locale === 'th' ? 'วิสัยทัศน์' : 'Vision'}
@@ -229,14 +241,18 @@ useEffect(() => {
                 {renderSection(sections.vision, 'vision')}
               </section>
 
-              {/* MISSION */}
+              {/* ========= MISSION ========= */}
               <section id="mission" className="about-section">
                 <h2 className="about-title with-lines">
                   {locale === 'th' ? 'พันธกิจ' : 'Mission'}
                 </h2>
+
+                {/* แสดงรายการพันธกิจ พร้อม icon ถ้ามี */}
                 <ul className="mission-list fade-in show">
                   {sections.mission.map((item, index) => (
                     <li key={item.mission_ID || index} className="mission-item">
+                      
+                      {/* รูป icon ถ้ามี */}
                       {item.picture && (
                         <Image
                           src={normalizeSrc(item.picture)}
@@ -247,6 +263,8 @@ useEffect(() => {
                           loading="lazy"
                         />
                       )}
+
+                      {/* ข้อความพันธกิจ (TH/EN) */}
                       <span className="mission-text">
                         {locale === 'th' ? item.titleTH : item.titleEN || item.titleTH}
                       </span>
@@ -256,14 +274,22 @@ useEffect(() => {
               </section>
             </div>
 
-            {/* 🟢 TEAMS — แสดงเดี่ยวเต็มหน้า */}
-            <div id="teams" className={`teams-section ${selectedMenu === 'teams' ? 'fade-in show' : 'hidden-section'}`}>
+            {/* ========= TEAMS (แสดงเต็มหน้าเมื่อเลือก) ========= */}
+            <div
+              id="teams"
+              className={`teams-section ${selectedMenu === 'teams' ? 'fade-in show' : 'hidden-section'}`}
+            >
               <h2 className="about-title with-lines">
                 {locale === 'th' ? 'คณะกรรมการ' : 'Committee'}
               </h2>
+
+              {/* แสดงข้อมูลคณะกรรมการแบบ Card */}
               <div className="teams-grid">
                 {sections.teams.map((member, idx) => (
-                  <div key={member.teamsID || idx} className={idx === 0 ? 'team-boss' : 'team-card'}>
+                  <div
+                    key={member.teamsID || idx}
+                    className={idx === 0 ? 'team-boss' : 'team-card'} // การ์ดแรกเป็นหัวหน้า
+                  >
                     <Image
                       src={normalizeSrc(member.teams_picture)}
                       alt={locale === 'th' ? member.teams_nameTH : member.teams_nameEN}
@@ -272,6 +298,8 @@ useEffect(() => {
                       className="team-image"
                       loading="lazy"
                     />
+
+                    {/* ชื่อ + ตำแหน่ง */}
                     <div className="team-info">
                       <p className="team-name">
                         {locale === 'th' ? member.teams_nameTH : member.teams_nameEN}

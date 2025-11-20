@@ -15,68 +15,43 @@ import 'slick-carousel/slick/slick-theme.css';
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 
-
-/* =========================================================
-   ✅ ฟังก์ชันบันทึก Log ผลงานการติดตั้ง
-========================================================= */
-// ฟังก์ชัน handleLogPortfolioClick ใช้สำหรับบันทึก Log เมื่อผู้ใช้คลิกดูผลงานการติดตั้ง
 const handleLogPortfolioClick = async (item) => {
   try {
-    // เตรียมข้อมูล Log ที่จะส่งไปยัง API
     const logData = {
-      actionType: "3", // รหัสประเภทการกระทำ (3 = คลิกผลงานการติดตั้ง)
-      actionDetail: `หน้าหลัก รหัสผลงานการติดตั้ง: ${item.id ?? "0"} หมายเลขผลงานการติดตั้ง : ${item.num ?? "0"} ที่อยู่: ${item.title ?? "-"}`,
-      // รายละเอียดเหตุการณ์ เช่น ID, หมายเลข, ชื่อ/ที่อยู่ผลงาน
-
-      typeUser: "ผู้เยี่ยมชมเว็บไซต์", // ประเภทผู้ใช้
-      datatype: "ผลงานการติดตั้ง", // ประเภทข้อมูล (ระบุว่าเป็นข้อมูลผลงาน)
-      dataID: item.id ?? "0", // รหัสข้อมูลหลัก (ID ของผลงาน)
-      datatypeID: item.portfolio_typeID ?? "0", // ประเภทผลงาน (type ID)
-      dataname: item.num ?? "0", // หมายเลขผลงาน ใช้เป็นชื่ออ้างอิง
-      brandtype: "0", // ป้องกันค่า null ที่อาจทำให้ API error
+      actionType: '3',
+      actionDetail: `หน้าหลัก รหัสผลงานการติดตั้ง: ${item.id ?? '0'} หมายเลขผลงานการติดตั้ง : ${item.num ?? '0'
+        } ที่อยู่: ${item.title ?? '-'}`,
+      typeUser: 'ผู้เยี่ยมชมเว็บไซต์',
+      datatype: 'ผลงานการติดตั้ง',
+      dataID: item.id ?? '0',
+      datatypeID: item.portfolio_typeID ?? '0',
+      dataname: item.num ?? '0',
+      brandtype: '0',
     };
 
-    // แสดงข้อมูล Log ที่จะถูกส่งออกใน console (สำหรับ debug)
-    console.log("ส่ง Log ผลงาน:", logData);
-
-    // เรียก API เพื่อบันทึก Log
-    const res = await fetch(`${baseUrl}/api/logWebsitepageapi`, {
-      method: "POST",
+    await fetch(`${baseUrl}/api/logWebsitepageapi`, {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json", // ส่งข้อมูลเป็น JSON
-        "X-API-KEY": apiKey, // ส่ง API Key เพื่อยืนยันสิทธิ์
+        'Content-Type': 'application/json',
+        'X-API-KEY': apiKey || '',
       },
-      body: JSON.stringify(logData), // แปลงข้อมูล Log เป็น JSON ก่อนส่ง
+      body: JSON.stringify(logData),
     });
-
-    // ตรวจสอบผลการส่งข้อมูล
-    if (!res.ok) {
-      // ถ้าไม่สำเร็จ ให้แสดง error ที่ได้จาก API
-      console.error("ส่ง Log ล้มเหลว:", await res.text());
-    } else {
-      // ถ้าสำเร็จ แสดงข้อความใน console
-      console.log("บันทึก Log เรียบร้อย");
-    }
   } catch (err) {
-    // ถ้าเกิดข้อผิดพลาดอื่น ๆ (เช่น network error)
-    console.error("เกิดข้อผิดพลาดตอนส่ง Log:", err);
+    console.error('เกิดข้อผิดพลาดตอนส่ง Log:', err);
   }
 };
-
 
 export default function SlidePortfolio() {
   const [projects, setProjects] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeSlide, setActiveSlide] = useState(0);
+  const [activeGroup, setActiveGroup] = useState(0);
   const [slidesToShow, setSlidesToShow] = useState(3);
 
   const sliderRef = useRef(null);
   const router = useRouter();
   const { locale } = useLocale();
 
-  /* =========================================================
-     ✅ โหลดข้อมูล + ตรวจ responsive
-  ========================================================= */
   useEffect(() => {
     let isMounted = true;
 
@@ -96,14 +71,14 @@ export default function SlidePortfolio() {
 
       try {
         const res = await fetch(`${baseUrl}/api/portfoliomainpageapi`, {
-          headers: { 'X-API-KEY': apiKey },
+          headers: { 'X-API-KEY': apiKey || '' },
         });
         const data = await res.json();
 
         if (isMounted && data?.status && Array.isArray(data.result)) {
           const mappedProjects = data.result.map((item) => ({
             id: item.portfolio_id,
-            num: item.portfolio_num, // ✅ ใช้ portfolio_num สำหรับการเชื่อมโยง
+            num: item.portfolio_num,
             title: item.adddressTH || '-',
             size: item.installationsize || '-',
             productType: item.TypeProduct_nameTH || '-',
@@ -112,7 +87,7 @@ export default function SlidePortfolio() {
             coverImage: item.portfolio_gallery
               ? JSON.parse(item.portfolio_gallery)[0]
               : '/images/placeholder.png',
-            portfolio_typeID: item.portfolio_typeID || "0", // ✅ เพิ่มบรรทัดนี้
+            portfolio_typeID: item.portfolio_typeID || '0',
           }));
 
           window.__PORTFOLIO_CACHE__ = mappedProjects;
@@ -135,9 +110,6 @@ export default function SlidePortfolio() {
     };
   }, []);
 
-  /* =========================================================
-     ✅ แปลงวันที่ตาม locale
-  ========================================================= */
   const formatDate = (dateString) => {
     if (!dateString) return '-';
     const date = new Date(dateString);
@@ -154,9 +126,6 @@ export default function SlidePortfolio() {
     });
   };
 
-  /* =========================================================
-     ✅ สไลด์และ dot ควบคุม
-  ========================================================= */
   const slidesPerGroup = slidesToShow;
   const totalGroups = projects.length
     ? Math.ceil(projects.length / slidesPerGroup)
@@ -165,55 +134,27 @@ export default function SlidePortfolio() {
   const handleDotClick = (index) => {
     if (sliderRef.current) {
       sliderRef.current.slickGoTo(index * slidesPerGroup);
-      setActiveSlide(index);
+      setActiveGroup(index);
     }
   };
 
-  const handleBeforeChange = () => { };
-  const handleAfterChange = () => { };
+  const handleAfterChange = (current) => {
+    const groupIndex = Math.floor(current / slidesPerGroup);
+    setActiveGroup(groupIndex);
+  };
 
   const CustomDots = () => (
-    <div className="custom-dots fade-in">
+    <div className="custom-dots">
       {Array.from({ length: totalGroups }).map((_, index) => (
         <div
           key={index}
-          className={`dot-bar ${activeSlide === index ? 'active' : ''}`}
+          className={`dot-bar ${activeGroup === index ? 'active' : ''}`}
           onClick={() => handleDotClick(index)}
         />
       ))}
     </div>
   );
 
-  /* =========================================================
-     ✅ Skeleton Loading
-  ========================================================= */
-  const SkeletonCard = ({ delay = 0 }) => (
-    <div
-      className="slide-itemportfolio skeleton-mode fade-in-stable"
-      style={{ animationDelay: `${delay}s` }}
-    >
-      <div className="portfolio-cardslide skeleton-cardportfolio">
-        <div className="skeleton-imageportfolio skeleton">
-          <div className="skeleton-bannerportfolio">
-            <div className="skeleton-logo"></div>
-            <div className="skeleton-bannertext"></div>
-          </div>
-        </div>
-        <div className="skeleton-contentportfolio">
-          <div className="skeleton skeleton-titleportfolio"></div>
-          <div className="skeleton-row">
-            <div className="skeleton-line-left"></div>
-            <div className="skeleton-line-right"></div>
-          </div>
-          <div className="skeleton-line-full"></div>
-        </div>
-      </div>
-    </div>
-  );
-
-  /* =========================================================
-     ✅ Render
-  ========================================================= */
   return (
     <div className="portfolio-wrapperslide fade-in">
       <h1 className="headtitleone fade-in">ผลงานของเรา</h1>
@@ -226,21 +167,38 @@ export default function SlidePortfolio() {
       </div>
 
       {isLoading ? (
-        <div
-          className={`portfolio-loading-grid fade-in ${slidesToShow === 1
-            ? 'grid-1'
-            : slidesToShow === 2
-              ? 'grid-2'
-              : 'grid-3'
-            }`}
-        >
-          {Array.from({ length: slidesToShow }).map((_, i) => (
-            <SkeletonCard key={i} delay={i * 0.1} />
+        <div className="skeleton-wrapper-portfolio">
+          {Array.from({ length: slidesToShow }).map((_, index) => (
+            <div key={index} className="skeleton-cardportfolio">
+              <div className="skeleton-imageportfolio">
+                <div className="skeleton-bannerportfolio">
+                  <div className="skeleton-logo"></div>
+                  <div className="skeleton-bannertext"></div>
+                </div>
+              </div>
+              <div className="skeleton-contentportfolio">
+                <div className="skeleton-titleportfolio"></div>
+                <div className="skeleton-row">
+                  <div className="skeleton-line-left"></div>
+                  <div className="skeleton-line-right"></div>
+                </div>
+                <div className="skeleton-row">
+                  <div className="skeleton-line-left"></div>
+                  <div className="skeleton-line-right"></div>
+                </div>
+                <div className="skeleton-row">
+                  <div className="skeleton-line-left"></div>
+                  <div className="skeleton-line-right"></div>
+                </div>
+                <div className="skeleton-line-full"></div>
+              </div>
+            </div>
           ))}
         </div>
       ) : (
         <>
           <Slider
+            key={slidesToShow}
             ref={sliderRef}
             dots={false}
             infinite={projects.length > slidesPerGroup}
@@ -249,22 +207,25 @@ export default function SlidePortfolio() {
             slidesToScroll={1}
             swipeToSlide
             arrows={false}
-            responsive={[
-              { breakpoint: 1200, settings: { slidesToShow: 3 } },
-              { breakpoint: 1120, settings: { slidesToShow: 2 } },
-              { breakpoint: 764, settings: { slidesToShow: 1 } },
-            ]}
+            afterChange={handleAfterChange}
           >
             {projects.map((proj, i) => (
-              <div key={proj.num || `proj-${i}`} className="slide-itemportfolio fade-in">
+              <div
+                key={proj.num || `proj-${i}`}
+                className="slide-itemportfolio fade-in"
+              >
                 <div
                   className="portfolio-cardslide clickable"
-                  onMouseDown={(e) => (e.currentTarget.isDragging = false)}
-                  onMouseMove={(e) => (e.currentTarget.isDragging = true)}
+                  onMouseDown={(e) => {
+                    e.currentTarget.isDragging = false;
+                  }}
+                  onMouseMove={(e) => {
+                    e.currentTarget.isDragging = true;
+                  }}
                   onClick={async (e) => {
                     if (!e.currentTarget.isDragging && proj.num) {
-                      await handleLogPortfolioClick(proj); // ✅ เรียก log ก่อน
-                      router.push(`/portfolio/${proj.num}`); // ✅ เปิดหน้าผลงาน
+                      await handleLogPortfolioClick(proj);
+                      router.push(`/portfolio/${proj.num}`);
                     }
                   }}
                   style={{ cursor: 'pointer' }}

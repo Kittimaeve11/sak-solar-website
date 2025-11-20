@@ -190,30 +190,38 @@
 }
 
 
-/* =========================================================
-   Skeleton Loading (แบบซ้ายยาว–ขวาเล็ก)
-   ========================================================= */
+/* 🟠 Container หลัก */
+.skeleton-wrapper-portfolio {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+}
+
+/* 🟢 Card Skeleton ขนาดตรงกับการ์ดจริง */
 .skeleton-cardportfolio {
-  position: relative;
+  flex: 0 0 calc(100% / var(--columns));
+  max-width: calc(100% / var(--columns));
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  background: #fff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   height: 100%;
-  min-height: 360px;
+
+  margin-bottom: 1rem;   /* เพิ่มห่างด้านล่าง */
+  padding-bottom: 1rem;  /* กันเส้นชิดขอบ */
 }
 
-/* ส่วนรูปภาพด้านบน */
+/* 🖼 รูปภาพด้านบน */
 .skeleton-imageportfolio {
-  position: relative;
   width: 100%;
   padding-top: 56.25%;
-  background-color: #e0e0e0;
+  background-color: #f1f1f1;
   border-radius: 8px 8px 0 0;
+  position: relative;
 }
 
-/* แถบ Banner จำลอง */
 .skeleton-bannerportfolio {
   width: 60%;
   position: absolute;
@@ -231,7 +239,7 @@
   width: 24px;
   height: 24px;
   border-radius: 4px;
-  background-color: #d8d8d8;
+  background-color: #ededed;
   margin-right: 6px;
 }
 
@@ -239,12 +247,12 @@
   flex: 1;
   height: 12px;
   border-radius: 4px;
-  background-color: #e0e0e0;
+  background-color: #f1f1f1;
 }
 
-/* ส่วนเนื้อหาล่าง */
+/* 📝 เนื้อหา */
 .skeleton-contentportfolio {
-  padding: 16px 20px 20px;
+  padding: 16px 20px 32px;  /* เพิ่ม padding-bottom */
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -253,12 +261,11 @@
 .skeleton-titleportfolio {
   height: 20px;
   width: 90%;
-  margin-bottom: 1rem;
-  background-color: #e0e0e0;
+  background-color: #f1f1f1;
   border-radius: 4px;
+  margin-bottom: 1rem;
 }
 
-/* บรรทัดซ้าย–ขวา */
 .skeleton-row {
   display: flex;
   justify-content: space-between;
@@ -268,29 +275,40 @@
 
 .skeleton-line-left {
   height: 18px;
-  margin: 0 0 6px 0;
   width: 60%;
-  background-color: #e0e0e0;
+  background-color: #f1f1f1;
   border-radius: 4px;
+  margin-bottom: 6px;
 }
 
 .skeleton-line-right {
   height: 18px;
   width: 25%;
-  margin: 0 0 6px 0;
-
-  background-color: #e0e0e0;
+  background-color: #f1f1f1;
   border-radius: 4px;
+  margin-bottom: 6px;
 }
 
-/* แถวเต็มบรรทัดสุดท้าย */
+/* เส้นสุดท้าย แบบเต็ม */
 .skeleton-line-full {
   height: 16px;
-  width: 30%;
-  margin-top: 1rem;
-  background-color: #e0e0e0;
+  width: 40%;
+  background-color: #f1f1f1;
   border-radius: 4px;
+  margin-bottom: 1rem;  /* ให้ห่างฐานล่าง */
 }
+
+/* 🔹 Dynamic Columns  */
+.skeleton-wrapper-portfolio { --columns: 3; }
+
+@media (max-width: 1120px) {
+  .skeleton-wrapper-portfolio { --columns: 2; }
+}
+
+@media (max-width: 764px) {
+  .skeleton-wrapper-portfolio { --columns: 1; }
+}
+
 
 /* ปิด hover */
 .skeleton-mode,
@@ -300,36 +318,61 @@
   transform: none !important;
   box-shadow: none !important;
 }
-
-/* =========================================================
-   Grid สำหรับ Skeleton Loading
-   ========================================================= */
-.portfolio-loading-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-  padding: 0 16px;
+.editorial-skeleton-wrapper {
+  display: flex;
+  gap: 1rem;
 }
 
-@media (max-width: 1120px) {
-  .portfolio-loading-grid {
-    grid-template-columns: repeat(2, 1fr);
+/* Mobile ≤ 320px: แสดงแค่ชื่อ ไม่แสดงรายละเอียดอื่น */
+@media (max-width: 320px) {
+
+  /* ซ่อนข้อมูลจริงทั้งหมด */
+  .portfolio-contentslide ul.project-detailsslide,
+  .portfolio-contentslide .date-postslide,
+  .portfolio-bannerslide,
+  .portfolio-contentslide ul.project-detailsslide li {
+    display: none !important;
   }
-}
 
-@media (max-width: 768px) {
-  .portfolio-loading-grid {
-    grid-template-columns: 1fr;
+  /* ซ่อนข้อมูล skeleton รายละเอียด */
+  .skeleton-contentportfolio .skeleton-row,
+  .skeleton-contentportfolio .skeleton-line-full,
+  .skeleton-bannerportfolio {
+    display: none !important;
   }
-}
 
-/* ปรับ grid skeleton ให้ตรงกับ slidesToShow */
-.portfolio-loading-grid.grid-3 {
-  grid-template-columns: repeat(3, 1fr);
-}
-.portfolio-loading-grid.grid-2 {
-  grid-template-columns: repeat(2, 1fr);
-}
-.portfolio-loading-grid.grid-1 {
-  grid-template-columns: 1fr;
+  /* ปรับการ์ดให้เหลือแค่รูป + ชื่อ */
+  .portfolio-cardslide,
+  .skeleton-cardportfolio {
+    min-height: auto !important;
+    height: auto !important;
+    padding-bottom: 6px !important;
+  }
+
+  /* ปรับตำแหน่ง title ให้ชิดบน */
+  .portfolio-contentslide,
+  .skeleton-contentportfolio {
+    padding: 8px 12px !important;
+  }
+
+  /* ปรับรูปแบบ title ให้ตัดเหลือ 1 บรรทัด + ... */
+  .project-titleslide,
+  .skeleton-titleportfolio {
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    line-height: 1.3;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 4px 0 2px 0 !important;
+    display: block !important;
+    width: 100% !important;
+  }
+
+  /* ปรับ skeleton title ให้อยู่ในตำแหน่งเหมาะสม */
+  .skeleton-titleportfolio {
+    margin-top: -4px !important;
+    width: 85% !important;
+  }
 }

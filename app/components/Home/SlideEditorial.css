@@ -138,59 +138,94 @@
   font-size: 15px;
 }
 
-/* =========================================================
-   Skeleton Loader
-   ========================================================= */
-.editorial-loading-wrapper {
-  max-width: 1200px;
-  margin: auto;
-  padding: 1rem 1rem 0;
-}
-
-.editorial-loading-grid {
+/* 📦 Wrapper หลักของ Skeleton */
+/* 🟠 Container หลัก */
+.skeleton-cardsilde-editorial-container {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: stretch;
-  margin: 0 -12px;
-  box-sizing: border-box;
+  gap: 1rem;
+  width: 100%;
 }
 
-.skeleton-slide-itemeditorial {
-  flex: 1 1 330px;
-  max-width: 33.333%;
-  padding: 0 12px;
-  box-sizing: border-box;
-  margin-bottom: 10px;
-  display: flex;
-  align-items: stretch;
-}
-
+/* 🟢 Card Skeleton ขนาดต้องตรงกับ Slide จริง */
 .skeleton-cardsilde-editorial {
+  flex: 0 0 calc(100% / var(--columns));
+  max-width: calc(100% / var(--columns));
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  border-radius: 6px;
-  overflow: hidden;
-  background-color: white;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   height: 100%;
-  width: 100%;
+
+  margin-bottom: 1rem;   /* ⬅ ระยะห่างด้านล่าง */
+  padding-bottom: 2rem;  /* ⬅ เพิ่มพื้นที่ด้านล่างข้างในการ์ด */
 }
 
+
+/* 🖼 รูปบน */
 .skeleton-imagesilde-editorial {
   width: 100%;
-  aspect-ratio: 16 / 9;
-  background-color: #e0e0e0;
+  height: 200px;
+  object-fit: cover;
   border-radius: 6px 6px 0 0;
 }
 
+/* 📄 เนื้อหาใน card */
 .skeleton-content-editorial {
-  padding: 16px 25px 20px 25px;
+  padding: 16px 25px 24px; /* เพิ่ม 24px ด้านล่างเพื่อให้ไม่ติดขอบ */
   display: flex;
   flex-direction: column;
-  flex-grow: 1;
   gap: 10px;
+}
+.skeleton-titlesilde-editorial,
+.skeleton-textsilde-editorial,
+.skeleton-datesilde-editorial {
+  margin-left: 25px;
+  margin-right: 25px;
+  border-radius: 6px;
+  background-color: #ddd;
+}
+
+.skeleton-titlesilde-editorial {
+  height: 22px;
+  width: 60%;
+  margin-top: 22px;
+  margin-bottom: 20px;
+}
+
+.skeleton-datesilde-editorial {
+  height: 14px;
+  width: 30%;
+  margin-top: 2px;
+  margin-bottom: 22px;
+}
+
+.skeleton-textsilde-editorial {
+  height: 18px;
+  width: 85%;
+  margin-bottom: 15px;
+  border-radius: 6px;
+  background-color: #ddd;
+}
+
+.skeleton-textsilde-editorial:last-child {
+  width: 85%;
+  margin-bottom: 18px;
+}
+
+
+/* 🔹 Dynamic Columns (เหมือน slidesToShow) */
+.skeleton-cardsilde-editorial-container { --columns: 3; }
+
+/* 🟠 Tablet — 2 ใบ */
+@media (max-width: 1120px) {
+  .skeleton-cardsilde-editorial-container { --columns: 2; }
+}
+
+/* 🔵 Mobile — 1 ใบ */
+@media (max-width: 764px) {
+  .skeleton-cardsilde-editorial-container { --columns: 1; }
 }
 
 /* =========================================================
@@ -235,10 +270,6 @@
     font-size: 14px;
   }
 
-  .skeleton-slide-itemeditorial {
-    flex: 1 1 260px;
-    max-width: 50%;
-  }
 }
 
 @media (max-width: 480px) {
@@ -253,8 +284,4 @@
     padding: 10px 14px 14px !important;
   }
 
-  .skeleton-slide-itemeditorial {
-    flex: 1 1 200px;
-    max-width: 100%;
-  }
 }

@@ -3,8 +3,8 @@ import { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
 import Link from 'next/link';
 import styles from '../../styles/CookieBanner.module.css';
-import { FaRegWindowClose } from "react-icons/fa";
-import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
+import { FaRegWindowClose } from 'react-icons/fa';
+import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 import { pageview } from '../lib/firebase';
 
 const COOKIE_NAME = 'cookieConsentSettings';
@@ -48,7 +48,9 @@ export default function CookieBanner() {
     setSettings(toSave);
     setShowBanner(false);
     setShowSettings(false);
-    if (toSave.analytics) pageview(window.location.pathname + window.location.search);
+    if (toSave.analytics) {
+      pageview(window.location.pathname + window.location.search);
+    }
   };
 
   // ฟังก์ชันไม่ยอมรับทั้งหมด
@@ -76,9 +78,18 @@ export default function CookieBanner() {
     const active = settings[key];
     const bgColor = key === 'necessary' ? '#ccc' : active ? '#0b5ed7' : '#dc3545';
     const icon = key === 'necessary' ? '✓' : active ? '✓' : '✕';
+
+    const handleClick = (e) => {
+      // ❗ กันไม่ให้ไป trigger onClick ของ cookieRow (ไม่ให้เปิด/ปิดดรอปดาวน์)
+      e.stopPropagation();
+      if (key !== 'necessary') {
+        toggleSetting(key);
+      }
+    };
+
     return (
       <div
-        onClick={() => key !== 'necessary' && toggleSetting(key)}
+        onClick={handleClick}
         style={{
           display: 'flex',
           alignItems: 'center',

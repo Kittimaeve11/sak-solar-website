@@ -62,60 +62,8 @@ export default function SlideReview() {
   const [visibleCards, setVisibleCards] = useState(3);
   const sliderRef = useRef(null);
 
-/* =========================================================
-   ฟังก์ชันบันทึก Log “รีวิว” (แก้สมบูรณ์)
-========================================================= */
-// ฟังก์ชัน handleLogReviewClick ใช้สำหรับบันทึก Log เมื่อผู้ใช้คลิกดูวิดีโอรีวิว
-const handleLogReviewClick = async (item) => {
-  try {
-    // สร้างข้อมูล Log ที่จะส่งไปยัง API
-    const logData = {
-      actionType: "4", // รหัสประเภทการกระทำ (4 = การคลิกรีวิววิดีโอ)
-      actionDetail: `หน้าหลัก รหัสวิดีโอ: ${item.vedio_id ?? "0"} ชื่อวิดีโอ : ${item.nameTH_Vedio ?? "-"}`,
-      // รายละเอียดเหตุการณ์ เช่น รหัสวิดีโอและชื่อวิดีโอ
-
-      typeUser: "ผู้เยี่ยมชมเว็บไซต์", // ประเภทผู้ใช้
-      datatype: "รีวิว", // ประเภทข้อมูลที่บันทึก (รีวิววิดีโอ)
-      dataID: item.vedio_id ?? "0", // รหัสข้อมูลหลัก (รหัสวิดีโอ)
-      dataname: item.nameTH_Vedio ?? "-", // ชื่อวิดีโอ (ใช้สำหรับอ้างอิง)
-      datatypeID: "0",  // กำหนดค่าเริ่มต้นเพื่อป้องกันค่า null
-      brandtype: "0"    // กำหนดค่าเริ่มต้นเพื่อป้องกันค่า null
-    };
-
-    // แสดงข้อมูล Log ที่จะส่งใน console เพื่อ debug
-    console.log("ส่ง Log รีวิว:", logData);
-
-    // ส่งข้อมูล Log ไปยัง API สำหรับบันทึกเหตุการณ์
-    const res = await fetch(`${baseUrl}/api/logWebsitepageapi`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json", // ระบุว่าเนื้อหาที่ส่งเป็น JSON
-        "X-API-KEY": apiKey, // ใส่ API Key เพื่อยืนยันสิทธิ์เข้าถึง API
-      },
-      body: JSON.stringify(logData), // แปลงข้อมูล Log เป็น JSON ก่อนส่ง
-    });
-
-    // ตรวจสอบผลลัพธ์การส่งข้อมูล
-    if (!res.ok) {
-      // ถ้า API ตอบกลับไม่สำเร็จ แสดงข้อความ error ที่ได้จาก API
-      console.error("Log API error:", await res.text());
-    } else {
-      // ถ้า API ตอบกลับสำเร็จ แสดงข้อความใน console
-      console.log("Log รีวิวบันทึกสำเร็จ");
-    }
-  } catch (err) {
-    // ถ้ามีข้อผิดพลาดระหว่างการส่ง Log เช่น network error
-    console.error("เกิดข้อผิดพลาดตอนส่ง Log รีวิว:", err);
-  }
-};
-
-
-  /* =========================================================
-     รวม useEffect เดียว: ตรวจขนาดจอ + โหลด API + cleanup
-  ========================================================= */
+  /* Dynamic Update ของ Slide ตามหน้าจอ */
   useEffect(() => {
-    let isMounted = true;
-
     const updateVisibleCards = () => {
       const width = window.innerWidth;
       if (width < 764) setVisibleCards(1);
@@ -125,6 +73,43 @@ const handleLogReviewClick = async (item) => {
 
     updateVisibleCards();
     window.addEventListener('resize', updateVisibleCards);
+    return () => window.removeEventListener('resize', updateVisibleCards);
+  }, []);
+
+  /* =========================================================
+     ฟังก์ชันบันทึก Log
+  ========================================================= */
+  const handleLogReviewClick = async (item) => {
+    try {
+      const logData = {
+        actionType: "4",
+        actionDetail: `หน้าหลัก รหัสวิดีโอ: ${item.vedio_id ?? "0"} ชื่อวิดีโอ : ${item.nameTH_Vedio ?? "-"}`,
+        typeUser: "ผู้เยี่ยมชมเว็บไซต์",
+        datatype: "รีวิว",
+        dataID: item.vedio_id ?? "0",
+        dataname: item.nameTH_Vedio ?? "-",
+        datatypeID: "0",
+        brandtype: "0"
+      };
+
+      await fetch(`${baseUrl}/api/logWebsitepageapi`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-KEY": apiKey,
+        },
+        body: JSON.stringify(logData),
+      });
+    } catch (err) {
+      console.error("เกิดข้อผิดพลาดตอนส่ง Log รีวิว:", err);
+    }
+  };
+
+  /* =========================================================
+     โหลด API รีวิวดิดครั้งเดียว
+  ========================================================= */
+  useEffect(() => {
+    let isMounted = true;
 
     async function loadReviews() {
       try {
@@ -149,19 +134,15 @@ const handleLogReviewClick = async (item) => {
         if (isMounted) setIsLoading(false);
       }
     }
-
     loadReviews();
 
-    return () => {
-      isMounted = false;
-      window.removeEventListener('resize', updateVisibleCards);
-    };
+    return () => { isMounted = false; };
   }, []);
 
   /* =========================================================
      ⚙️ Custom dots
   ========================================================= */
-  const slidesPerGroup = 3;
+  const slidesPerGroup = visibleCards;
   const totalGroups = Math.ceil(reviews.length / slidesPerGroup);
 
   const handleDotClick = (index) => {
@@ -188,19 +169,6 @@ const handleLogReviewClick = async (item) => {
   );
 
   /* =========================================================
-     💀 Skeleton Loading
-  ========================================================= */
-  const SkeletonCard = () => (
-    <div className="skeleton-slide">
-      <div className="skeleton-card">
-        <div className="skeleton skeleton-image"></div>
-        <div className="skeleton skeleton-title"></div>
-        <div className="skeleton skeleton-line"></div>
-      </div>
-    </div>
-  );
-
-  /* =========================================================
      🖥 Render
   ========================================================= */
   return (
@@ -217,9 +185,13 @@ const handleLogReviewClick = async (item) => {
       </div>
 
       {isLoading ? (
-        <div className="skeleton-wrapper">
-          {[...Array(visibleCards)].map((_, i) => (
-            <SkeletonCard key={i} />
+        <div className="skeleton-wrapper-review">
+          {Array.from({ length: visibleCards }).map((_, index) => (
+            <div key={index} className="skeleton-cardreview">
+              <div className="skeleton skeleton-imageslidevideo"></div>
+              <div className="skeleton skeleton-titleslidevideo"></div>
+              <div className="skeleton skeleton-lineslidevideo"></div>
+            </div>
           ))}
         </div>
       ) : (
@@ -229,16 +201,12 @@ const handleLogReviewClick = async (item) => {
             dots={false}
             infinite={reviews.length > slidesPerGroup}
             speed={500}
-            slidesToShow={3}
+            slidesToShow={visibleCards}
             slidesToScroll={1}
             arrows={false}
             swipeToSlide
             beforeChange={handleBeforeChange}
             afterChange={handleAfterChange}
-            responsive={[
-              { breakpoint: 1120, settings: { slidesToShow: 2 } },
-              { breakpoint: 764, settings: { slidesToShow: 1 } },
-            ]}
           >
             {reviews.map((r, i) => {
               const id = extractVideoId(r.vedio_link);
@@ -260,8 +228,8 @@ const handleLogReviewClick = async (item) => {
                     className="video-cardslide"
                     onClick={async () => {
                       if (!dragging) {
-                        await handleLogReviewClick(r); // บันทึก Log ก่อน
-                        window.open(r.vedio_link, '_blank'); // เปิดวิดีโอ
+                        await handleLogReviewClick(r);
+                        window.open(r.vedio_link, '_blank');
                       }
                     }}
                   >

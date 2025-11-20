@@ -155,7 +155,7 @@ export default function RecommendedProducts({ brandId, productId }) {
 
                                         {/* ป้ายส่วนลด ถ้ามี */}
                                         {item.productpro_ispromotion === "1" && discountPercent > 0 && (
-                                            <div className={styles.productPromoRibbon}>- {item.productpro_percent}%</div>
+                                            <div className={styles.productPromoRibbon}>- {item.productpro_percent}</div>
                                         )}
                                     </div>
 

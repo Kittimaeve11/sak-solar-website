@@ -38,10 +38,24 @@
 /* ============================= 
    Sidebar 
 ============================= */
-.sidebar-header {
+.sidebar-headertext {
   font-size: 20px;
-  font-weight: 700;
+  font-weight: 800;
   margin-bottom: 0.5rem;
+  position: relative;  /* ต้องมีเพื่อใช้กับ ::after */
+  display: inline-block; /* ให้แถบไม่เต็มบรรทัด */
+  padding-bottom: 3px; /* เพิ่มช่องว่างใต้ข้อความ */
+}
+
+/* เส้นสีส้มใต้ข้อความ */
+.sidebar-headertext::after {
+  content: "";
+  display: block;
+  width: 100%;              /* ความยาวเส้น (ปรับได้) */
+  height: 3px;             /* ความหนาเส้น */
+  background-color: #E88534; /* สีส้ม */
+  margin: 0px auto 0;      /* จัดให้อยู่กลาง */
+  border-radius: 4px;      /* มุมมนเล็กน้อย */
 }
 
 .sidebar-menu {
@@ -321,4 +335,123 @@ color: #fff;
   overflow: hidden;
   opacity: 0;
   transition: all 0.3s ease;
+}
+
+/* 📱 เมื่อหน้าจอเล็กกว่า 1200px → เปลี่ยนเมนูเป็นแบบ Top Tabs */
+@media (max-width: 1200px) {
+
+  /* Layout เปลี่ยนจาก 2 คอลัมน์ → เป็น 1 คอลัมน์ */
+  .about-container {
+    margin-top: 0;
+    padding-top: 0;
+    flex-direction: column;
+    max-width: 900px;
+    padding: 0;
+  }
+
+  /* เมนูย้ายไปอยู่ด้านบนแบบเต็มกว้าง */
+  .about-sidebar {
+ position: sticky;
+    top: 0;
+    width: 100vw;       /* ⭐ ใช้ vw แทน 100% */
+    margin-left: calc(50% - 50vw); /* ⭐ ดึงออกจาก container */
+    margin-right: calc(50% - 50vw);
+    background: rgba(255, 255, 255, 0.795);
+    padding: 0;
+    z-index: 100;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);  }
+
+  /* เมนูแสดงเป็นแถวเดียว (horizontal tabs) */
+  .sidebar-menu {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 10px 0;
+    overflow-x: auto;
+    white-space: nowrap;
+    background: rgba(255, 255, 255, 0.831);
+  }
+.sidebar-headertext {
+   font-size: 20px;
+    font-weight: 800;
+    color: white;
+    background-color: #E88534;
+    padding: 14px 0;
+    text-align: center;
+    width: 100%;
+    margin: 0;
+    border-bottom: 1px solid #ddd;
+
+}
+
+
+  .sidebar-menu li {
+    margin: 0;
+  }
+
+  .sidebar-menu li a {
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 15px;
+    color: #243865;
+    border: 1px solid transparent;
+  }
+
+  .sidebar-menu li a.active {
+    background-color: #E88534; /* สีส้ม */
+    color: white;
+    border-color: #E88534;
+  }
+
+  .sidebar-menu li a .arrow {
+    display: none; /* ปิดลูกศรใน mobile */
+  }
+
+  /* Content ใต้เมนูให้ชิดบนขึ้น */
+  .about-content {
+    margin-top: 1rem;
+  }
+}
+
+/* 📱 เมื่อหน้าจอเล็กกว่า 950px → แสดงเป็น 2 คอลัมน์ */
+@media (max-width: 950px) {
+    .about-container {
+    max-width: 800px;
+    padding: 0 1rem;
+  }
+
+
+  /* ปรับพันธกิจ (Mission) เป็น 2 คอลัมน์ */
+  .mission-list {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+  }
+
+  /* ปรับคณะกรรมการ (Teams) เป็น 2 คอลัมน์ */
+  .teams-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+  }
+
+  /* รีเซ็ต team-boss ไม่ให้กินเต็มแถว */
+  .team-boss {
+    grid-column: span 2 !important; /* หรือ 1 / 3 ก็ได้ */
+    width: 60% !important;
+    height: auto !important;
+  }
+
+  /* ปรับขนาดการ์ดให้ดูพอดี */
+  .team-card {
+    width: 100% !important;
+    height: auto !important;
+  }
+
+
+  .team-image {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 3/4;
+    object-fit: cover;
+  }
 }

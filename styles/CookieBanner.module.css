@@ -39,13 +39,13 @@
 }
 
 .link {
-  color: #1a73e8;
+  color: #0d3973;
   text-decoration: underline;
 }
 
 .link:hover,
 .link:focus {
-  color: #155ab6;
+  color: #092345;
   outline: none;
 }
 
@@ -58,7 +58,7 @@
 
 /* ปุ่มหลัก */
 .btnPrimary {
-  background-color: #0b5ed7;
+  background-color: #0d3973;
   color: white;
   border: none;
   padding: 0.5rem 1.5rem;
@@ -70,15 +70,15 @@
 
 .btnPrimary:hover,
 .btnPrimary:focus {
-  background-color: #084cbc;
+  background-color: #092345;
   outline: none;
 }
 
 /* ปุ่มรอง */
 .btnSecondary {
   background-color: transparent;
-  border: 2px solid #0b5ed7;
-  color: #0b5ed7;
+  border: 2px solid #0d3973;
+  color: #0d3973;
   padding: 0.5rem 1.5rem;
   font-weight: 600;
   border-radius: 4px;
@@ -88,7 +88,7 @@
 
 .btnSecondary:hover,
 .btnSecondary:focus {
-  background-color: #0b5ed7;
+  background-color: #0d3973;
   color: white;
   outline: none;
 }

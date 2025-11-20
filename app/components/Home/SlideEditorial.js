@@ -10,58 +10,39 @@ import 'slick-carousel/slick/slick-theme.css';
 import { FaArrowRightLong } from 'react-icons/fa6';
 import { HiPlusSm } from 'react-icons/hi';
 import { useRouter } from 'next/navigation';
+import { useLocale } from '@/app/Context/LocaleContext';
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 
-/* =========================================================
-    ฟังก์ชันส่ง Log ไป Backend (แก้ brandtype = '0')
-   ========================================================= */
+/* ===================== Log ===================== */
 const handleLogClick = async (item) => {
   try {
-    // แสดงข้อมูล item ที่ถูกคลิกใน console เพื่อใช้ตรวจสอบ
-    console.log("Log item:", item);
-
-    // สร้างข้อมูล log สำหรับบันทึกเหตุการณ์การคลิกบทความ
     const logData = {
-      actionType: '2', // รหัสประเภทการกระทำ (2 = การคลิกบทความ)
-      actionDetail: `หน้าหลัก รหัสบทความ: ${item.editoria_id ?? '-'} หมายเลขบทความ: ${item.editoria_num ?? '-'} ชื่อบทความ: ${item.editoria_titieTH ?? '-'}`, // รายละเอียดเหตุการณ์
-      typeUser: 'ผู้เยี่ยมชมเว็บไซต์', // ประเภทผู้ใช้
-      datatype: 'บทความ', // ประเภทข้อมูลที่มีการกระทำ
-      dataID: item.editoria_id ?? '0', // ID ของบทความ
-      datatypeID: item.editoria_typeID ?? '0', // ประเภทของบทความ (type ID)
-      brandtype: '0', // กำหนดค่าเริ่มต้นเป็น "0" เพื่อป้องกันค่า null
-      dataname: item.editoria_titieTH ?? '-', // ชื่อบทความ
+      actionType: '2',
+      actionDetail: `หน้าหลัก รหัสบทความ: ${item.editoria_id ?? '-'} หมายเลขบทความ: ${item.editoria_num ?? '-'} ชื่อบทความ: ${item.editoria_titieTH ?? '-'}`,
+      typeUser: 'ผู้เยี่ยมชมเว็บไซต์',
+      datatype: 'บทความ',
+      dataID: item.editoria_id ?? '0',
+      datatypeID: item.editoria_typeID ?? '0',
+      brandtype: '0',
+      dataname: item.editoria_titieTH ?? '-',
     };
 
-    // แสดงข้อมูล logData ที่จะส่งให้ API
-    console.log("LogData ที่จะส่ง:", logData);
-
-    // ส่งข้อมูล log ไปยัง API สำหรับบันทึกเหตุการณ์
-    const res = await fetch(`${baseUrl}/api/logWebsitepageapi`, {
+    await fetch(`${baseUrl}/api/logWebsitepageapi`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json', // กำหนดให้ส่งข้อมูลเป็น JSON
-        'X-API-KEY': apiKey, // ใส่ API Key เพื่อยืนยันสิทธิ์การเข้าถึง API
+        'Content-Type': 'application/json',
+        'X-API-KEY': apiKey || '',
       },
-      body: JSON.stringify(logData), // แปลงข้อมูล log เป็น JSON ก่อนส่ง
+      body: JSON.stringify(logData),
     });
-
-    // ตรวจสอบผลลัพธ์การส่งข้อมูล
-    if (!res.ok) {
-      // ถ้าเกิดข้อผิดพลาดจาก API ให้แสดงข้อความ error ใน console
-      const err = await res.text();
-      console.error('Log API error:', err);
-    } else {
-      // แสดงผลใน console เมื่อบันทึกสำเร็จ
-      console.log('Log: บันทึกข้อมูลบทความสำเร็จ');
-    }
   } catch (err) {
-    // กรณีเกิดข้อผิดพลาดอื่น ๆ ระหว่างกระบวนการ (เช่น network error)
     console.error('เกิดข้อผิดพลาดในการบันทึก Log:', err);
   }
 };
 
+/* ===================== Helpers ===================== */
 function parseDescription(str) {
   if (!str || typeof str !== 'string') return '';
   return str
@@ -75,30 +56,64 @@ function parseDescription(str) {
     .trim();
 }
 
-function safeDateString(dateString) {
-  if (!dateString) return '-';
-  const d = new Date(dateString);
-  return isNaN(d.getTime())
-    ? '-'
-    : d.toLocaleDateString('th-TH', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-      });
+function getImageUrl(galleryStr) {
+  if (!galleryStr) return '/images/no-image.jpg';
+
+  try {
+    const arr = JSON.parse(galleryStr);
+    const first = arr?.[0];
+    if (!first) return '/images/no-image.jpg';
+
+    const cleaned = String(first).replace(/\\/g, '/').replace(/\/{2,}/g, '/');
+    return `${baseUrl}/${cleaned.replace(/^\//, '')}`;
+  } catch {
+    return '/images/no-image.jpg';
+  }
 }
 
+function formatDate(dateString, locale) {
+  if (!dateString) return '-';
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return '-';
+
+  if (locale === 'th') {
+    const buddhistYear = date.getFullYear() + 543;
+    const month = date.toLocaleDateString('th-TH', { month: 'long' });
+    const day = date.getDate();
+    return `${day} ${month} ${buddhistYear}`;
+  }
+
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+}
+
+/* ===================== Component ===================== */
 export default function SlideEditorial() {
+  const { locale } = useLocale();
   const [editorials, setEditorials] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeSlide, setActiveSlide] = useState(0);
-  const [dragging, setDragging] = useState(false);
+
+  const [activeGroup, setActiveGroup] = useState(0);
+  const [slidesToShow, setSlidesToShow] = useState(3);
+
   const sliderRef = useRef(null);
   const router = useRouter();
 
+  /* -------- โหลดข้อมูล + คำนวณ slidesToShow -------- */
   useEffect(() => {
     let isMounted = true;
 
-    async function loadEditorialOnce() {
+    const updateSlidesToShow = () => {
+      const width = window.innerWidth;
+      if (width < 764) setSlidesToShow(1);
+      else if (width < 1120) setSlidesToShow(2);
+      else setSlidesToShow(3);
+    };
+
+    const loadEditorialOnce = async () => {
       if (window.__EDITORIAL_CACHE__) {
         setEditorials(window.__EDITORIAL_CACHE__);
         setIsLoading(false);
@@ -107,70 +122,54 @@ export default function SlideEditorial() {
 
       try {
         const res = await fetch(`${baseUrl}/api/edittormainpageapi`, {
-          headers: { 'X-API-KEY': apiKey },
+          headers: { 'X-API-KEY': apiKey || '' },
         });
         const data = await res.json();
 
-        if (data.status && Array.isArray(data.result)) {
-          const formatted = data.result.map((item) => {
-            let imageUrl = '/images/no-image.jpg';
-            try {
-              const galleryArr = JSON.parse(item.editoria_gallary);
-              if (Array.isArray(galleryArr) && galleryArr.length > 0) {
-                imageUrl = `${baseUrl}/${galleryArr[0]}`;
-              }
-            } catch {}
+        if (isMounted && data?.status && Array.isArray(data.result)) {
+          const mapped = data.result.map((item) => ({
+            ...item,
+            id: item.editoria_num || item.editoria_id,
+            image: getImageUrl(item.editoria_gallary),
+            pin: Number(item.editoria_pin) || 0,
+          }));
 
-            return {
-              ...item, // เก็บค่าจริงทั้งหมดไว้ใช้ใน Log
-              id: item.editoria_num || item.editoria_id,
-              title:
-                item.editoria_titieTH ||
-                item.editoria_titieEN ||
-                'ไม่มีชื่อเรื่อง',
-              content: parseDescription(
-                item.editoria_descriptionTH ||
-                  item.editoria_descriptionEN ||
-                  ''
-              ),
-              date: safeDateString(item.editoria_creacteAt),
-              image: imageUrl,
-              pin: Number(item.editoria_pin) || 0,
-            };
-          });
+          mapped.sort((a, b) => b.pin - a.pin);
 
-          formatted.sort((a, b) => b.pin - a.pin);
-          window.__EDITORIAL_CACHE__ = formatted;
-          setEditorials(formatted);
+          window.__EDITORIAL_CACHE__ = mapped;
+          setEditorials(mapped);
         }
       } catch (error) {
         console.error('❌ Failed to fetch editorial:', error);
       } finally {
         if (isMounted) setIsLoading(false);
       }
-    }
+    };
 
+    updateSlidesToShow();
+    window.addEventListener('resize', updateSlidesToShow);
     loadEditorialOnce();
+
     return () => {
       isMounted = false;
+      window.removeEventListener('resize', updateSlidesToShow);
     };
   }, []);
 
-  const slidesPerGroup = 3;
-  const totalGroups =
-    editorials.length > 0 ? Math.ceil(editorials.length / slidesPerGroup) : 0;
+  /* -------- Dot Control -------- */
+  const slidesPerGroup = slidesToShow;
+  const totalGroups = editorials.length
+    ? Math.ceil(editorials.length / slidesPerGroup)
+    : 0;
 
   const handleDotClick = (index) => {
-    if (sliderRef.current) {
-      sliderRef.current.slickGoTo(index * slidesPerGroup);
-      setActiveSlide(index);
-    }
+    if (sliderRef.current) sliderRef.current.slickGoTo(index * slidesPerGroup);
+    setActiveGroup(index);
   };
 
-  const handleBeforeChange = () => setDragging(true);
-  const handleAfterChange = (i) => {
-    setActiveSlide(Math.floor(i / slidesPerGroup));
-    setTimeout(() => setDragging(false), 50);
+  const handleAfterChange = (current) => {
+    const groupIndex = Math.floor(current / slidesPerGroup);
+    setActiveGroup(groupIndex);
   };
 
   const CustomDots = () => (
@@ -178,96 +177,99 @@ export default function SlideEditorial() {
       {Array.from({ length: totalGroups }).map((_, index) => (
         <div
           key={index}
-          className={`dot-bar ${activeSlide === index ? 'active' : ''}`}
+          className={`dot-bar ${activeGroup === index ? 'active' : ''}`}
           onClick={() => handleDotClick(index)}
         />
       ))}
     </div>
   );
 
-  const SkeletonCard = () => (
-    <div className="skeleton-slide-itemeditorial fade-in">
-      <div className="skeleton-cardsilde-editorial">
-        <div className="skeleton skeleton-imagesilde-editorial" />
-        <div className="skeleton-content-editorial">
-          <div className="skeleton skeleton-titlesilde-editorial" />
-          <div className="skeleton skeleton-datesilde-editorial" />
-          <div className="skeleton skeleton-textsilde-editorial" />
-          <div className="skeleton skeleton-textsilde-editorial" />
-        </div>
-      </div>
-    </div>
-  );
-
+  /* ===================== Render ===================== */
   return (
     <div className="editorial-wrapperslide fade-in">
-      <h1 className="headtitleone">บทความ</h1>
+      <h1 className="headtitleone">{locale === 'en' ? 'Editorials' : 'บทความ'}</h1>
 
       <div className="editorial-headerslide">
         <Link href="/editorial" className="view-all">
           <HiPlusSm className="icon-view" />
-          ดูทั้งหมด
+          {locale === 'en' ? 'View all' : 'ดูทั้งหมด'}
         </Link>
       </div>
 
-      {isLoading ? (
-        <div className="editorial-loading-wrapper">
-          <div className="editorial-loading-grid">
-            {[...Array(3)].map((_, i) => (
-              <SkeletonCard key={i} />
-            ))}
-          </div>
-        </div>
-      ) : (
+      {/* 🔹 Skeleton Loading แบบ Dynamic ตาม slidesToShow */}
+{isLoading ? (
+  <div className="skeleton-cardsilde-editorial-container">
+    {Array.from({ length: slidesToShow }).map((_, index) => (
+      <div key={index} className="skeleton-cardsilde-editorial">
+        <div className="skeleton skeleton-imagesilde-editorial" />
+          <div className="skeleton skeleton-titlesilde-editorial" />
+          <div className="skeleton skeleton-datesilde-editorial" />
+          <div className="skeleton skeleton-textsilde-editorial" />
+          <div className="skeleton skeleton-textsilde-editorial" />
+       
+      </div>
+    ))}
+  </div>
+) : (
         <>
           <Slider
+            key={slidesToShow}
             ref={sliderRef}
             dots={false}
             infinite={editorials.length > slidesPerGroup}
             speed={500}
-            slidesToShow={3}
+            slidesToShow={slidesToShow}
             slidesToScroll={1}
             swipeToSlide
             arrows={false}
-            beforeChange={handleBeforeChange}
             afterChange={handleAfterChange}
-            responsive={[
-              { breakpoint: 1120, settings: { slidesToShow: 2 } },
-              { breakpoint: 764, settings: { slidesToShow: 1 } },
-            ]}
           >
             {editorials.map((item, i) => {
-              const snippet =
-                item.content.length > 100
-                  ? item.content.slice(0, 100) + '...'
-                  : item.content;
+              const title =
+                locale === 'en'
+                  ? item.editoria_titieEN || item.editoria_titieTH
+                  : item.editoria_titieTH || item.editoria_titieEN;
+
+              const rawDesc =
+                locale === 'en'
+                  ? item.editoria_descriptionEN || item.editoria_descriptionTH
+                  : item.editoria_descriptionTH || item.editoria_descriptionEN;
+
+              const content = parseDescription(rawDesc);
+              const snippet = content.length > 100 ? content.slice(0, 100) + '...' : content;
+
+              const dateLabel = formatDate(item.editoria_creacteAt, locale);
 
               return (
-                <div key={item.id || `ed-${i}`} className="slide-itemeditorial fade-in">
+                <div key={item.id || i} className="slide-itemeditorial fade-in">
                   <div
-                    className="editorial-cardslide"
-                    onClick={async () => {
-                      if (dragging) return;
-                      await handleLogClick(item); //  บันทึก Log ก่อนเปลี่ยนหน้า
-                      router.push(`/editorial/${item.id}`);
+                    className="editorial-cardslide clickable"
+                    onMouseDown={(e) => (e.currentTarget.isDragging = false)}
+                    onMouseMove={(e) => (e.currentTarget.isDragging = true)}
+                    onClick={async (e) => {
+                      if (!e.currentTarget.isDragging) {
+                        await handleLogClick(item);
+                        router.push(`/editorial/${item.id}`);
+                      }
                     }}
                   >
                     <div className="editorial-image-wrapper">
                       <Image
                         src={item.image}
-                        alt={item.title}
+                        alt={title}
                         fill
                         className="card-imageslide"
                         sizes="(max-width: 768px) 100vw, 33vw"
+                        unoptimized
                       />
                     </div>
 
                     <div className="card-contentslide">
-                      <h3 className="card-titleslide">{item.title}</h3>
-                      <p className="editorial-dateslide">{item.date}</p>
+                      <h3 className="card-titleslide">{title}</h3>
+                      <p className="editorial-dateslide">{dateLabel}</p>
                       <p className="card-snippetslide">{snippet}</p>
                       <p className="read-more">
-                        อ่านเพิ่มเติม <FaArrowRightLong />
+                        {locale === 'en' ? 'Read more' : 'อ่านเพิ่มเติม'} <FaArrowRightLong />
                       </p>
                     </div>
                   </div>

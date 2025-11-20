@@ -36,13 +36,14 @@ function ThumbnailWithFallback({ videoId, alt }) {
     <Image
       src={urls[srcIndex]}
       alt={alt}
-      width={374}
-      height={210}
+      fill
       className="thumbnail"
+      sizes="(max-width: 768px) 100vw, 330px"
       onError={() => {
         if (srcIndex < urls.length - 1) setSrcIndex(srcIndex + 1);
       }}
       unoptimized
+      priority
     />
   );
 }
@@ -60,17 +61,14 @@ export default function ReviewPage() {
   const [currentPage, setCurrentPage] = useState(1);
 
   const itemsPerPage = 15;
-  const topRef = useRef(null);
+  const titleRef = useRef(null); // 👈 ใช้สำหรับเลื่อนขึ้นหัวข้อ H1
 
-  /* =============== SINGLE EFFECT (เหมือน FAQ) =============== */
+  /* =============== SINGLE EFFECT =============== */
   useEffect(() => {
-
-    /* ตรวจมือถือ */
     const updateDevice = () => setIsMobile(window.innerWidth <= 768);
     updateDevice();
     window.addEventListener("resize", updateDevice);
 
-    /* SEO */
     document.title = "รีวิวของเรา | บริษัท ศักดิ์สยาม โซลาร์ เอ็นเนอร์ยี่ จำกัด";
 
     let meta = document.querySelector(`meta[name="description"]`);
@@ -83,14 +81,12 @@ export default function ReviewPage() {
 
     const load = async () => {
       try {
-        // Use cache
         if (reviewCache && Date.now() - reviewCache.timestamp < 10 * 60 * 1000) {
           setReviews(reviewCache.reviews);
           setBanners(reviewCache.banners);
           return;
         }
 
-        // Fetch API
         const [reviewRes, bannerRes] = await Promise.all([
           fetch(`${baseUrl}/api/Reviewapi`, { headers: { 'X-API-KEY': apiKey } }),
           fetch(`${baseUrl}/api/branderIDapi/11`, { headers: { 'X-API-KEY': apiKey } })
@@ -104,7 +100,6 @@ export default function ReviewPage() {
           ? bannerJson.data
           : [bannerJson.data];
 
-        // Save cache
         reviewCache = {
           reviews: reviewList,
           banners: bannerList,
@@ -117,8 +112,6 @@ export default function ReviewPage() {
       } finally {
         setLoading(false);
         setLoadingBanner(false);
-
-        // ⭐ Trigger fade-in after DOM is ready
         setTimeout(() => setReady(true), 50);
       }
     };
@@ -137,17 +130,23 @@ export default function ReviewPage() {
     currentPage * itemsPerPage
   );
 
+  const scrollToH1 = () => {
+    if (titleRef.current) {
+      titleRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
   const handlePageChange = (p) => {
     if (p < 1 || p > totalPages) return;
     setCurrentPage(p);
-    topRef.current?.scrollIntoView({ behavior: "smooth" });
+    setTimeout(scrollToH1, 50);
   };
 
   /* ---------------- Render ---------------- */
   return (
-    <div ref={topRef} className="no-margin">
+    <div className="no-margin">
 
-      {/* ---------------- Banner แบบ FAQ ---------------- */}
+      {/* Banner */}
       {loadingBanner ? (
         <div className="skeleton skeleton-banner fade-in"></div>
       ) : (
@@ -155,7 +154,6 @@ export default function ReviewPage() {
           const imgSrc = isMobile
             ? `${baseUrl}/${b.brander_pictureMoblie}`
             : `${baseUrl}/${b.brander_picturePC}`;
-
           return (
             <div key={b.brander_ID} className={`banner-container ${ready ? "fade-in" : ""}`}>
               <Image
@@ -165,16 +163,18 @@ export default function ReviewPage() {
                 className="banner-image"
                 unoptimized
                 sizes="100vw"
+                priority
               />
             </div>
           );
         })
       )}
 
-      {/* ---------------- Content ---------------- */}
+      {/* Content */}
       <main className={`layout-review ${ready ? "fade-in" : ""}`}>
 
-        <h1 className="headtitle">
+        {/* 👇 ผูก ref กับ H1 */}
+        <h1 ref={titleRef} className="headtitle">
           {locale === "en"
             ? "Customer Reviews on Our Solar Installations"
             : "รีวิวการติดตั้ง Solar จากลูกค้าของเรา"}
@@ -183,10 +183,10 @@ export default function ReviewPage() {
         <div className="video-grid">
           {loading ? (
             Array.from({ length: itemsPerPage }).map((_, i) => (
-              <div key={i} className="skeleton-card skeleton fade-in">
-                <div className="skeleton-image skeleton" />
-                <div className="skeleton-title skeleton" />
-                <div className="skeleton-line skeleton" />
+              <div key={i} className="skeletonvideo-card skeleton fade-in">
+                <div className="skeletonvideo-image skeleton" />
+                <div className="skeletonvideo-title skeleton" />
+                <div className="skeletonvideo-line skeleton" />
               </div>
             ))
           ) : (
@@ -210,10 +210,9 @@ export default function ReviewPage() {
                     <ThumbnailWithFallback videoId={id} alt={title} />
                     <IoPlayCircleOutline className="play-icon" />
                   </div>
-
-                  <div className="info">
-                    <div className="title">{title}</div>
-                    <div className="date">
+                  <div className="infovideo">
+                    <div className="titlevideo">{title}</div>
+                    <div className="datevideo">
                       {new Date(review.vedio_creationdate).toLocaleDateString(
                         locale === "en" ? "en-US" : "th-TH",
                         { year: "numeric", month: "long", day: "numeric" }
@@ -230,7 +229,6 @@ export default function ReviewPage() {
         {!loading && totalPages > 1 && (
           <div className="pagination-controls">
             <div className="page-buttons">
-
               {currentPage > 1 && (
                 <button className="btn-with-arrow" onClick={() => handlePageChange(currentPage - 1)}>
                   <IoIosArrowBack />
@@ -252,7 +250,6 @@ export default function ReviewPage() {
                   <IoIosArrowForward />
                 </button>
               )}
-
             </div>
           </div>
         )}

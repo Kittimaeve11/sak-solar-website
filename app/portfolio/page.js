@@ -26,32 +26,47 @@ const formatDate = (dateString, locale = 'th') => {
   const date = new Date(dateString);
   return locale === 'th'
     ? new Intl.DateTimeFormat('th-TH', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-      }).format(date)
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    }).format(date)
     : new Intl.DateTimeFormat('en-US', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-      }).format(date);
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    }).format(date);
 };
 
 function SkeletonCard() {
   return (
-    <div className="portfolio-card skeleton-card">
+    <div className="portfolio-card skeletonportfolio-card">
       <div className="portfolio-image-wrapper">
-        <div className="skeleton skeleton-image" />
+        <div className="skeleton-portfoliobanner">
+          <div className="skeleton-logoportfolio"></div>
+          <div className="skeleton-bannertextportfolio"></div>
+        </div>
+        <div className="skeleton skeletonportfolio-image" />
       </div>
       <div className="portfolio-content">
-        <div className="skeleton skeleton-title" />
-        <ul className="project-details">
-          {[...Array(4)].map((_, i) => (
-            <li key={i}>
-              <div className="skeleton skeleton-line" />
-            </li>
-          ))}
-        </ul>
+        <div className="skeleton skeletonportfolio-title" />
+        <div className="skeleton-rowportfolio">
+          <div className="skeleton-line-leftportfolio"></div>
+          <div className="skeleton-line-rightportfolio"></div>
+
+        </div>
+        <div className="skeleton-rowportfolio">
+          <div className="skeleton-line-leftportfolio"></div>
+          <div className="skeleton-line-rightportfolio"></div>
+
+        </div>
+        <div className="skeleton-rowportfolio">
+          <div className="skeleton-line-leftportfolio"></div>
+          <div className="skeleton-line-rightportfolio"></div>
+
+        </div>
+
+        <div className="skeleton-line-fullportfolio"></div>
+
       </div>
     </div>
   );
@@ -73,9 +88,11 @@ export default function PortfolioClient() {
   const [brander, setBrander] = useState([]);
   const [loadingBanner, setLoadingBanner] = useState(true);
 
-  const itemsPerPage = 15;
+  const itemsPerPage = 18;
   const router = useRouter();
   const topRef = useRef(null);
+  const [shouldAnimate, setShouldAnimate] = useState(true);
+
 
   /* =========================================================
      ⭐ useEffect เดียว (โหลดทั้งหมด + SEO + Responsive)
@@ -139,41 +156,41 @@ export default function PortfolioClient() {
 
         const projectList = projectsData.status
           ? projectsData.result.data.map((item) => {
-              let gallery = [];
-              try {
-                gallery = item.portfolio_gallery
-                  ? JSON.parse(item.portfolio_gallery)
-                  : [];
-              } catch {
-                gallery = [];
-              }
+            let gallery = [];
+            try {
+              gallery = item.portfolio_gallery
+                ? JSON.parse(item.portfolio_gallery)
+                : [];
+            } catch {
+              gallery = [];
+            }
 
-              return {
-                portfolio_id: item.portfolio_id,
-                portfolio_num: item.portfolio_num,
-                portfolio_typeID: item.portfolio_typeID,
-                id: item.portfolio_num,
-                titleTH: item.adddressTH || '-',
-                titleEN: item.adddressEN || '-',
-                size: item.installationsize || '-',
-                productTypeTH: item.TypeProduct_nameTH || '-',
-                productTypeEN: item.TypeProduct_nameEN || '-',
-                panelCount: item.panelsolarcout || '-',
-                postDate: item.portfolio_datainstall || '-',
-                coverImage:
-                  gallery.length > 0
-                    ? `${baseUrl}/${gallery[0]}`
-                    : '/images/placeholder.png',
-                type: item.portfolio_typeID,
-              };
-            })
+            return {
+              portfolio_id: item.portfolio_id,
+              portfolio_num: item.portfolio_num,
+              portfolio_typeID: item.portfolio_typeID,
+              id: item.portfolio_num,
+              titleTH: item.adddressTH || '-',
+              titleEN: item.adddressEN || '-',
+              size: item.installationsize || '-',
+              productTypeTH: item.TypeProduct_nameTH || '-',
+              productTypeEN: item.TypeProduct_nameEN || '-',
+              panelCount: item.panelsolarcout || '-',
+              postDate: item.portfolio_datainstall || '-',
+              coverImage:
+                gallery.length > 0
+                  ? `${baseUrl}/${gallery[0]}`
+                  : '/images/placeholder.png',
+              type: item.portfolio_typeID,
+            };
+          })
           : [];
 
         const bannerList = Array.isArray(bannerData.data)
           ? bannerData.data
           : bannerData.data
-          ? [bannerData.data]
-          : [];
+            ? [bannerData.data]
+            : [];
 
         // ⭐ Save cache
         portfolioCache = {
@@ -243,13 +260,19 @@ export default function PortfolioClient() {
   );
 
   const handlePageChange = (page) => {
-    setCurrentPage(page);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('portfolioCurrentPage', page.toString());
-    }
-    topRef.current?.scrollIntoView({ behavior: 'auto' });
-  };
+    if (page < 1 || page > totalPages || page === currentPage) return;
 
+    setShouldAnimate(false);  // ⛔ ปิด fade ก่อนเปลี่ยนหน้า
+    scrollToTitle();          // 🔼 เลื่อนขึ้น
+
+    setTimeout(() => {
+      setCurrentPage(page);   // 🧠 เปลี่ยนหน้า
+    }, 10);
+
+    setTimeout(() => {
+      setShouldAnimate(true); // ✨ เปิด fade-in หน้าใหม่
+    }, 20);
+  };
   const renderPagination = () => {
     const pages = [];
     if (currentPage > 1) {
@@ -289,6 +312,12 @@ export default function PortfolioClient() {
     }
 
     return pages;
+  };
+  const scrollToTitle = () => {
+    topRef.current?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    });
   };
 
   /* =========================================================
@@ -350,18 +379,22 @@ export default function PortfolioClient() {
           </div>
 
           {/* ⭐ Projects */}
-          <div className={`portfolio-grid ${!isLoading ? 'fade-in' : ''}`}>
+          <div
+            key={currentPage}    // สำคัญมาก! บังคับให้ React render ใหม่
+            className={`portfolio-grid ${shouldAnimate ? 'fade-in' : ''}`}
+          >
+
             {isLoading
               ? Array.from({ length: itemsPerPage }).map((_, i) => (
-                  <SkeletonCard key={`sk-${i}`} />
-                ))
+                <SkeletonCard key={`sk-${i}`} />
+              ))
               : paginated.length === 0
-              ? (
-                <p className="no-data-text">
-                  {locale === 'th' ? 'ไม่พบข้อมูลผลงาน' : 'No projects found'}
-                </p>
+                ? (
+                  <p className="no-data-text">
+                    {locale === 'th' ? 'ไม่พบข้อมูลผลงาน' : 'No projects found'}
+                  </p>
                 )
-              : paginated.map((proj, i) => (
+                : paginated.map((proj, i) => (
                   <div
                     key={`${proj.id}-${i}`}
                     className="portfolio-card"

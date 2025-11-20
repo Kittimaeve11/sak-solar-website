@@ -13,36 +13,39 @@ import 'slick-carousel/slick/slick-theme.css';
 import './ProductCarousel.css';
 
 const Slider = dynamic(() => import('react-slick'), { ssr: false });
+
+// กำหนดจำนวนการ์ดตามความกว้างหน้าจอ
 const getSlidesByWidth = (w) => (w < 801 ? 1 : w < 1200 ? 2 : w < 1500 ? 3 : 4);
 
 /* ===============================
-   SKELETON โหลดชั่วคราว
+   SKELETON โหลดชั่วคราว (ใช้ layout ใกล้ของจริง)
    =============================== */
 function HardSkeleton() {
-  const [count, setCount] = useState(4);
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const updateCount = () => setCount(getSlidesByWidth(window.innerWidth));
-    updateCount();
-    window.addEventListener('resize', updateCount);
-    return () => window.removeEventListener('resize', updateCount);
-  }, []);
+  // เรนเดอร์ 4 ใบตายตัว → ให้ CSS เป็นคนซ่อนใบเกินตาม breakpoint
+  const cards = Array.from({ length: 4 });
+
   return (
     <div className="carouselWrapper fade-in">
       <div className="carouselHeader">
         <div
           className="skeleton pc-skeleton-title"
-          style={{ width: '220px', height: '28px', marginBottom: '1.5rem', marginTop: '2.5rem ' }}
+          style={{
+            width: '220px',
+            height: '28px',
+            marginBottom: '1.5rem',
+            marginTop: '2.5rem ',
+          }}
         />
         <div className="pc-skeleton-header-link">
           <HiPlusCircle size={20} />
           <span>ผลิตภัณฑ์ทั้งหมด</span>
         </div>
       </div>
+
       <div className="pc-skeleton-grid">
         <div className="pc-skeleton-row">
-          {[...Array(count)].map((_, i) => (
-            <div key={i} className="pc-skeletonCard">
+          {cards.map((_, i) => (
+            <div key={i} className="pc-skeletonCard skeleton-card">
               <div className="skeleton pc-skeleton-image" />
               <div className="pc-skeleton-content">
                 <div className="skeleton pc-skeleton-title" />
@@ -75,27 +78,37 @@ function Arrow({ onClick, direction }) {
 /* ===============================
    ส่วนหลัก ProductCarousel
    =============================== */
-export default function ProductCarousel({ title, items, link = '#', loading = false }) {
+export default function ProductCarousel({
+  title,
+  items = [],
+  link = '#',
+  loading = false,
+}) {
   const [slidesToShow, setSlidesToShow] = useState(4);
-  const [hydrated, setHydrated] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-  const isSSR = typeof window === 'undefined';
 
   useEffect(() => {
-    setHydrated(true);
     if (typeof window === 'undefined') return;
-    const handleResize = () => setSlidesToShow(getSlidesByWidth(window.innerWidth));
+
+    const handleResize = () => {
+      setSlidesToShow(getSlidesByWidth(window.innerWidth));
+    };
+
+    // เรียกครั้งแรกบน client
     handleResize();
     window.addEventListener('resize', handleResize);
+
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const isHardLoading =
-    isSSR || !hydrated || loading || !items || (Array.isArray(items) && items.length === 0);
-  if (isHardLoading) return <HardSkeleton />;
+  // 💡 ตอนโหลด: ใช้ prop loading จากหน้า HomePage อย่างเดียวพอ
+  if (loading) {
+    return <HardSkeleton />;
+  }
 
-  const showSlider = Array.isArray(items) && items.length > slidesToShow;
+  const hasItems = Array.isArray(items) && items.length > 0;
+  const showSlider = hasItems && items.length > slidesToShow;
 
   const settings = {
     dots: false,
@@ -115,55 +128,56 @@ export default function ProductCarousel({ title, items, link = '#', loading = fa
   };
 
   const handleMouseDown = (e) => setDragStart({ x: e.clientX, y: e.clientY });
+
   const handleMouseUp = (e) => {
     const dx = Math.abs(e.clientX - dragStart.x);
     const dy = Math.abs(e.clientY - dragStart.y);
     setIsDragging(dx > 5 || dy > 5);
   };
 
-/* =========================================================
-   ฟังก์ชันบันทึก Log ไป Backend (ตรงตาม productmainpageapi)
-   ========================================================= */
-const handleLogClick = async (item) => {
-  try {
-    // ตรวจดูข้อมูลก่อนส่ง (ใช้ตอน debug)
-    console.log("Log item:", item);
+  /* =========================================================
+     ฟังก์ชันบันทึก Log ไป Backend (ตรงตาม productmainpageapi)
+     ========================================================= */
+  const handleLogClick = async (item) => {
+    try {
+      console.log('Log item:', item);
 
-    const logData = {
-      actionType: '1', // 1 = ดูผลิตภัณฑ์
-      actionDetail: `หน้าหลัก รหัส: ${item.product_ID ?? '-'} หมายเลขผลิตภัณฑ์: ${item.product_num ?? '-'}`,
-      typeUser: 'ผู้เยี่ยมชมเว็บไซต์', // ใครทำ
-      datatype: 'ผลิตภัณฑ์', // ประเภทเมนูที่กระทำ
-      dataID: item.product_ID ?? '0', // ไอดีข้อมูล
-      datatypeID: item.producttypeID ?? '0', // ไอดีประเภทข้อมูล (จาก producttypeID)
-      brandtype: item.productbrandID ?? item.probrandID ?? '0', // ไอดียี่ห้อ (ไม่มีใน productmainpageapi → ใช้ '0')
-      dataname: item.product_num ?? '-', // ชื่อข้อมูล (จาก product_num)
-    };
+      const logData = {
+        actionType: '1', // 1 = ดูผลิตภัณฑ์
+        actionDetail: `หน้าหลัก รหัส: ${item.product_ID ?? '-'} หมายเลขผลิตภัณฑ์: ${
+          item.product_num ?? '-'
+        }`,
+        typeUser: 'ผู้เยี่ยมชมเว็บไซต์', // ใครทำ
+        datatype: 'ผลิตภัณฑ์', // ประเภทเมนูที่กระทำ
+        dataID: item.product_ID ?? '0', // ไอดีข้อมูล
+        datatypeID: item.producttypeID ?? '0', // ไอดีประเภทข้อมูล (จาก producttypeID)
+        brandtype: item.productbrandID ?? item.probrandID ?? '0', // ไอดียี่ห้อ
+        dataname: item.product_num ?? '-', // ชื่อข้อมูล (จาก product_num)
+      };
 
-    console.log("LogData ที่จะส่ง:", logData);
+      console.log('LogData ที่จะส่ง:', logData);
 
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL_API}/api/logWebsitepageapi`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-API-KEY': process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API,
-      },
-      body: JSON.stringify(logData),
-    });
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL_API}/api/logWebsitepageapi`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-KEY': process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API,
+        },
+        body: JSON.stringify(logData),
+      });
 
-    if (!res.ok) {
-      const err = await res.text();
-      console.error('Log API error:', err);
-    } else {
-      console.log('Log: บันทึกข้อมูลการดูผลิตภัณฑ์สำเร็จ');
+      if (!res.ok) {
+        const err = await res.text();
+        console.error('Log API error:', err);
+      } else {
+        console.log('Log: บันทึกข้อมูลการดูผลิตภัณฑ์สำเร็จ');
+      }
+    } catch (err) {
+      console.error(' เกิดข้อผิดพลาดในการบันทึก Log:', err);
     }
-  } catch (err) {
-    console.error(' เกิดข้อผิดพลาดในการบันทึก Log:', err);
-  }
-};
+  };
 
-
-/* ===============================
+  /* ===============================
      การ์ดสินค้า
      =============================== */
   const renderCard = (item, idx) => {
@@ -177,7 +191,8 @@ const handleLogClick = async (item) => {
       }
     }
 
-    const brandID = item.productbrandID ?? item.probrandID ?? item.brandID ?? item.BrandID ?? '0';
+    const brandID =
+      item.productbrandID ?? item.probrandID ?? item.brandID ?? item.BrandID ?? '0';
     const productNum = item.product_num ?? item.product_ID ?? idx;
 
     return (
@@ -244,10 +259,17 @@ const handleLogClick = async (item) => {
 
           {item.isprice === '1' && item.price && (
             <div className="product-price-display">
-              <TbCurrencyBaht size={25} />
-              {Number(finalPrice ?? item.price).toLocaleString()} บาท
+              {/* ใส่ class ให้ตรงกับ CSS mobile (.price-icon, .product-price-new) */}
+              <span className="price-icon">
+                <TbCurrencyBaht size={25} />
+              </span>
+              <span className="product-price-new">
+                {Number(finalPrice ?? item.price).toLocaleString()} บาท
+              </span>
               {item.productpro_ispromotion === '1' && item.productpro_percent && (
-                <span className="product-price-old">{Number(item.price).toLocaleString()} บาท</span>
+                <span className="product-price-old">
+                  {Number(item.price).toLocaleString()} บาท
+                </span>
               )}
             </div>
           )}
@@ -268,7 +290,7 @@ const handleLogClick = async (item) => {
       </div>
 
       <div className="carouselInner" style={{ minHeight: 380 }}>
-        {Array.isArray(items) && items.length > 0 ? (
+        {hasItems ? (
           showSlider ? (
             <Slider {...settings}>
               {items.map((item, idx) => (

@@ -28,7 +28,6 @@ ul {
   gap: 30px;
   padding: 10px;
   margin: 0;
-  background-color: #0d3973;
 }
 
 .navmenu .nav-root>li>a {
@@ -139,11 +138,6 @@ ul {
   transition: color 0.3s ease;
 }
 
-/* .dropdown-item:hover > .dropdown-toggle,
-.dropdown-item.active > .dropdown-toggle {
-  color: #608bc1;
-} */
-
 /* Dropdown */
 .dropdown {
   position: relative;
@@ -222,8 +216,8 @@ ul {
 /* สียี่ห้อ */
 .brand-submenu li a:hover,
 .brand-submenu li a.active {
-  color: #2172d6 !important;
-  background-color: rgb(240, 240, 240) !important;
+  color: #446795 !important;
+  background-color: #e8f1fc !important;
 }
 
 .dropdown-item {
@@ -237,15 +231,15 @@ ul {
   line-height: 1.2 !important;
   display: block;
   box-sizing: border-box;
-  color: #102e50;
+  color: #446795;
   font-weight: 400;
   transition: color 0.2s ease;
 }
 
 /* สีประเภทสินค้า */
 .dropdown-item:hover .dropdown-toggle {
-  color: #2172d6;
-  background-color: rgb(240, 240, 240);
+  color: #446795;
+  background-color: #e8f1fc;
 
 }
 

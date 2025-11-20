@@ -48,6 +48,13 @@ async function getThemeFromAPI() {
   }
 }
 
+export const metadata = {
+  title: 'บริษัท ศักดิ์สยาม โซลาร์ เอ็นเนอร์ยี่ จำกัด | SAKSIAM SOLAR ENERGY CO., LTD.',
+  description: 'บริษัท ศักดิ์สยาม โซลาร์ เอ็นเนอร์ยี่ จำกัด ให้บริการติดตั้งโซลาร์เซลล์ครบวงจร',
+};
+
+
+
 // ================================
 // Layout หลักของเว็บ (Server Component)
 // ================================
@@ -67,6 +74,8 @@ export default async function RootLayout({ children }) {
         <meta name="robots" content="index, follow" />
         <meta name="theme-color" content="#ffffff" />
       </head>
+
+      
 
       <body
         className={`${sukhumvitTadmai.variable} font-sukhumvit`}

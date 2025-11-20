@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import '@/styles/editorial.css';
 import { IoIosArrowBack, IoIosArrowForward, IoIosArrowDown } from 'react-icons/io';
-import { FaArrowRightLong } from "react-icons/fa6";
+import { FaArrowRightLong } from 'react-icons/fa6';
 import { useLocale } from '../Context/LocaleContext';
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
@@ -61,8 +61,11 @@ export default function EditorialListPage() {
   const itemsPerPage = 15;
 
   const [filter, setFilter] = useState('ทั้งหมด');
+
   const topRef = useRef(null);
+  const titleRef = useRef(null); // 👈 ref สำหรับเลื่อนไปที่ H1
   const router = useRouter();
+  const [pageChanging, setPageChanging] = useState(false);
 
   /* =========================================================
      USEEFFECT เดียว (SEO + Fetch + Device)
@@ -111,8 +114,8 @@ export default function EditorialListPage() {
           const bannerList = Array.isArray(bannerJson?.data)
             ? bannerJson.data
             : bannerJson.data
-            ? [bannerJson.data]
-            : [];
+              ? [bannerJson.data]
+              : [];
 
           editorialCache = {
             articles: articleList,
@@ -133,7 +136,6 @@ export default function EditorialListPage() {
       } finally {
         setLoading(false);
         setLoadingBanner(false);
-
         /* Trigger fade-in */
         setTimeout(() => setShouldAnimate(true), 50);
       }
@@ -153,10 +155,39 @@ export default function EditorialListPage() {
       : articles.filter((a) => a.editoria_typeID === filter);
 
   const totalPages = Math.ceil(filteredArticles.length / itemsPerPage) || 1;
+
   const paginatedArticles = filteredArticles.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+
+  // ฟังก์ชันเลื่อนไปที่ H1
+  const scrollToTitle = () => {
+    if (!titleRef.current) return;
+    titleRef.current.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    });
+  };
+
+  // ฟังก์ชันเปลี่ยนหน้า + scroll
+  const handlePageChange = (page) => {
+    if (page < 1 || page > totalPages || page === currentPage) return;
+
+    setShouldAnimate(false);     // ⛔ ปิด animation ก่อน render หน้าใหม่
+
+    scrollToTitle();             // 🔼 เลื่อนขึ้นก่อนเปลี่ยนหน้า
+
+    setTimeout(() => {
+      setCurrentPage(page);     // 🧠 บังคับ React render หน้าใหม่
+    }, 10);
+
+    setTimeout(() => {
+      setShouldAnimate(true);   // ✨ ค่อย fade-in หน้าใหม่
+    }, 20);                     // ❗ต้องเร็วนิดเดียวเพื่อไม่ให้ DOM แสดงก่อน
+  };
+
+
 
   const parseDescription = (str) => {
     if (!str || typeof str !== 'string') return '';
@@ -189,8 +220,7 @@ export default function EditorialListPage() {
   ========================================================= */
   return (
     <div ref={topRef} className="no-margin">
-
-      {/* ⭐⭐⭐ BANNER (เหมือน FAQ 100%) ⭐⭐⭐ */}
+      {/* ⭐⭐⭐ BANNER ⭐⭐⭐ */}
       {loadingBanner ? (
         <div className="skeleton skeleton-banner fade-in"></div>
       ) : (
@@ -217,7 +247,10 @@ export default function EditorialListPage() {
 
       {/* ⭐⭐⭐ CONTENT ⭐⭐⭐ */}
       <main className="layout-editorial">
-        <h1 className="headtitle">{locale === 'en' ? 'Editorials' : 'บทความ'}</h1>
+        {/* 👇 ผูก ref ที่ H1 */}
+        <h1 ref={titleRef} className="headtitle">
+          {locale === 'en' ? 'Editorials' : 'บทความ'}
+        </h1>
 
         {/* Filter */}
         <div className="portfolio-filters">
@@ -229,8 +262,11 @@ export default function EditorialListPage() {
               <select
                 value={filter}
                 onChange={(e) => {
-                  setFilter(e.target.value);
+                  const value = e.target.value;
+                  setFilter(value);
                   setCurrentPage(1);
+                  // เวลาปรับ filter เลื่อนกลับไปที่หัวเรื่องด้วย
+                  setTimeout(scrollToTitle, 50);
                 }}
                 className="filter-dropdown"
               >
@@ -253,7 +289,7 @@ export default function EditorialListPage() {
 
         {/* Grid */}
         {loading ? (
-          <div className="editorial-grid">
+          <div className={`editorial-grid ${pageChanging ? 'fade-in' : ''}`}>
             {Array.from({ length: itemsPerPage }).map((_, idx) => (
               <div className="skeleton-card" key={idx}>
                 <div className="skeleton skeleton-image"></div>
@@ -265,12 +301,18 @@ export default function EditorialListPage() {
             ))}
           </div>
         ) : (
-          <div className={`editorial-grid fade-in ${shouldAnimate ? 'active' : ''}`}>
+          <div
+            key={currentPage}
+            className={`editorial-grid ${shouldAnimate ? 'fade-in' : ''}`}
+          >
+
             {paginatedArticles.map((item) => {
-              const title = locale === 'en' ? item.editoria_titieEN : item.editoria_titieTH;
-              const description = locale === 'en'
-                ? item.editoria_descriptionEN
-                : item.editoria_descriptionTH;
+              const title =
+                locale === 'en' ? item.editoria_titieEN : item.editoria_titieTH;
+              const description =
+                locale === 'en'
+                  ? item.editoria_descriptionEN
+                  : item.editoria_descriptionTH;
 
               return (
                 <div
@@ -278,7 +320,10 @@ export default function EditorialListPage() {
                   className="editorial-card"
                   onClick={async () => {
                     await handleLogClick(item);
-                    setTimeout(() => router.push(`/editorial/${item.editoria_num}`), 300);
+                    setTimeout(
+                      () => router.push(`/editorial/${item.editoria_num}`),
+                      300
+                    );
                   }}
                 >
                   <div className="card-image-wrapper">
@@ -319,11 +364,10 @@ export default function EditorialListPage() {
         {!loading && totalPages > 1 && (
           <div className="pagination-controls">
             <div className="page-buttons">
-
               {currentPage > 1 && (
                 <button
                   className="btn-with-arrow"
-                  onClick={() => setCurrentPage(currentPage - 1)}
+                  onClick={() => handlePageChange(currentPage - 1)}
                 >
                   <IoIosArrowBack />
                 </button>
@@ -333,7 +377,7 @@ export default function EditorialListPage() {
                 <button
                   key={i}
                   className={currentPage === i + 1 ? 'active-page' : ''}
-                  onClick={() => setCurrentPage(i + 1)}
+                  onClick={() => handlePageChange(i + 1)}
                 >
                   {i + 1}
                 </button>
@@ -342,16 +386,14 @@ export default function EditorialListPage() {
               {currentPage < totalPages && (
                 <button
                   className="btn-with-arrow"
-                  onClick={() => setCurrentPage(currentPage + 1)}
+                  onClick={() => handlePageChange(currentPage + 1)}
                 >
                   <IoIosArrowForward />
                 </button>
               )}
-
             </div>
           </div>
         )}
-
       </main>
     </div>
   );

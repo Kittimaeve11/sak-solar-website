@@ -582,3 +582,28 @@
   }
 }
 
+/* ให้ skeleton-card แสดง 4 ใบเป็นค่าเริ่มต้น (จอใหญ่) */
+.skeleton-card {
+  display: block;
+}
+
+/* จอกว้างไม่เกิน 1499px → แสดง 3 ใบ (ซ่อนใบที่ 4) */
+@media (max-width: 1499px) {
+  .pc-skeleton-row .skeleton-card:nth-child(4) {
+    display: none;
+  }
+}
+
+/* จอกว้างไม่เกิน 1200px → แสดง 2 ใบ (ซ่อนใบที่ 3–4) */
+@media (max-width: 1200px) {
+  .pc-skeleton-row .skeleton-card:nth-child(n+3) {
+    display: none;
+  }
+}
+
+/* จอกว้างไม่เกิน 800px → แสดง 1 ใบ (ซ่อนใบที่ 2–4) */
+@media (max-width: 800px) {
+  .pc-skeleton-row .skeleton-card:nth-child(n+2) {
+    display: none;
+  }
+}

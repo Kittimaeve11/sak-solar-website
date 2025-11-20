@@ -82,13 +82,13 @@ const handleLogClick = async (item) => {
 ========================================================= */
 function ProductSkeleton({ count }) {
   return (
-    <div className="skeletonGrid">
+    <div className="skeletonGridservices">
       {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="skeletonCard">
-          <div className="skeleton skeletonImage"></div>
-          <div className="skeleton skeletonText title"></div>
-          <div className="skeleton skeletonText subTitle"></div>
-          <div className="skeleton skeletonText price"></div>
+        <div key={i} className="skeletonCardservices">
+          <div className="skeleton skeletonImageservices"></div>
+          <div className="skeleton skeletonTextservices title"></div>
+          <div className="skeleton skeletonTextservices subTitle"></div>
+          <div className="skeleton skeletonTextservices price"></div>
         </div>
       ))}
     </div>
@@ -482,10 +482,10 @@ export default function ProductsPage() {
      PAGE UI START — ส่วนแสดงผลหน้ารวมสินค้า
   ========================================================= */
   return (
-    <main className="products-container page-fullwidth">
+    <main className="servicesproducts-container page-fullwidth">
 
       {/* ================= Sidebar (ตัวกรอง) ================ */}
-      <aside className={`products-sidebar ${isSidebarOpen ? "open" : "closed"}`}>
+      <aside className={`servicesproducts-sidebar ${isSidebarOpen ? "open" : "closed"}`}>
 
         {/* Header — ติดบนสุดตลอดเวลา */}
         <div
@@ -555,7 +555,7 @@ export default function ProductsPage() {
 
 
       {/* ================= Product List — รายการสินค้า ================ */}
-      <section className="products-list">
+      <section className="servicesproducts-list">
         <h2>
           {loading
             ? "กำลังโหลดข้อมูลสินค้า..."
@@ -573,7 +573,7 @@ export default function ProductsPage() {
         ) : (
           <>
             {/* ================= Grid สินค้า ================= */}
-            <div className="products-grid">
+            <div className="servicesproducts-grid">
               {currentItems.map((item, index) => {
                 const discount =
                   item.isPromotion === "1"
@@ -598,11 +598,11 @@ export default function ProductsPage() {
                   <Link
                     key={`${item.num}-${index}-${currentPage}`}
                     href={`/products/${typeSlug}/${brandSlug}/${item.num}`}
-                    className="product-card fade-inproduck"
+                    className="servicesproduct-card fade-inproduck"
                     onClick={() => handleLogClick(item)} // log การคลิกสินค้า
                   >
                     {/* รูปสินค้า */}
-                    <div className="product-image-wrapper">
+                    <div className="servicesproduct-image-wrapper">
                       <Image
                         src={getImageUrl(item.mainImage)}
                         alt={item.model || item.solarpanel}
@@ -614,18 +614,18 @@ export default function ProductsPage() {
 
                       {/* ป้ายลดราคา */}
                       {item.isPromotion === "1" && item.discountPercent && (
-                        <div className="product-promo-ribbon">
+                        <div className="servicesproduct-promo-ribbon">
                           - {item.discountPercent}
                         </div>
                       )}
                     </div>
 
                     {/* ข้อมูลสินค้า */}
-                    <div className="product-info">
+                    <div className="servicesproduct-info">
                       <h3>{item.modelair || item.model || item.solarpanel}</h3>
 
                       {item.battery && (
-                        <h6>รุ่นแบตเตอรี่ {item.battery} kWh</h6>
+                        <h6 style={{marginTop:'-0.5rem'}}>รุ่นแบตเตอรี่ {item.battery} kWh</h6>
                       )}
 
                       {/* แสดงขนาด */}
