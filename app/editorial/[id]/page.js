@@ -168,7 +168,7 @@ export default function EditorialDetailPage() {
   return (
     <main>
       <div className={styles.wrapper}>
-        <div className={styles.layout}>
+<div className={subList.length > 0 ? styles.layout : styles.layoutFullWidth}>
           {/* ---------------- เนื้อหาหลัก ---------------- */}
           <div className={styles.contentBox}>
             <article className={styles.article}>
@@ -258,32 +258,33 @@ export default function EditorialDetailPage() {
           </div>
 
           {/* ---------------- Sidebar ---------------- */}
-          <aside className={styles.sidebar}>
-            <h3 className={styles.tocTitle}>
-              {locale === "en" ? "Table of Contents" : "สารบัญ"}
-            </h3>
-            <ul className={styles.tocList}>
-              {subList.map((sub, index) => {
-                const subTitle = locale === "en"
-                  ? sub?.subtitiEN || sub?.subtitiTH || "-"
-                  : sub?.subtitiTH || "-";
-                const isActive = activeIndex === index;
-                return (
-                  <li key={index} className={styles.tocItem}>
-                    <Link
-                      href={`#section-${index}`}
-                      className={`${styles.tocLink} ${isActive ? styles.active : ""}`}
-                    >
-                      <IoMdArrowDropright className={styles.tocIcon} />
-                      <span className={styles.tocText}>{subTitle}</span>
-                    </Link>
-                  </li>
+          {subList.length > 0 && (
+            <aside className={styles.sidebar}>
+              <h3 className={styles.tocTitle}>
+                {locale === "en" ? "Table of Contents" : "สารบัญ"}
+              </h3>
+              <ul className={styles.tocList}>
+                {subList.map((sub, index) => {
+                  const subTitle = locale === "en"
+                    ? sub?.subtitiEN || sub?.subtitiTH || "-"
+                    : sub?.subtitiTH || "-";
+                  const isActive = activeIndex === index;
+                  return (
+                    <li key={index} className={styles.tocItem}>
+                      <Link
+                        href={`#section-${index}`}
+                        className={`${styles.tocLink} ${isActive ? styles.active : ""}`}
+                      >
+                        <IoMdArrowDropright className={styles.tocIcon} />
+                        <span className={styles.tocText}>{subTitle}</span>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </aside>
+          )}
 
-
-                );
-              })}
-            </ul>
-          </aside>
         </div>
       </div>
 

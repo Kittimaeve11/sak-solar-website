@@ -135,29 +135,29 @@
   display: block;
   flex: 1;
 }
-
-/* =============================
-    Social Section
-============================= */
-
 .socialSection {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
 }
 
 .socialItem {
   display: flex;
-  align-items: center;
-  gap: 0.75rem;
+  align-items: flex-start;  /*  ให้ไอคอนอยู่กึ่งกลางเมื่อข้อความขึ้นหลายบรรทัด */
+  gap: 1rem;                /*  เพิ่มช่องไฟ icon ↔ ข้อความ */
   font-size: 1.1rem;
   color: #000;
+  line-height: 1.7;         /* ทำให้ข้อความโล่งขึ้น ดูอ่านง่าย */
+  margin-bottom: 0.5rem;
 }
 
 .iconFL {
+  flex-shrink: 0;           /* ห้าม icon หดเวลา text ยาว */
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 36px;              /* กำหนดขนาดพื้นที่ icon ให้สมดุล */
+  height: 36px;
+  margin-top: 2px;          /* ดัน icon ลงเล็กน้อยให้กึ่งกลางเมื่อข้อความ 2 บรรทัด */
 }
 
 /* =============================

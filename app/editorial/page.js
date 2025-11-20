@@ -188,17 +188,20 @@ export default function EditorialListPage() {
   };
 
 
-
   const parseDescription = (str) => {
     if (!str || typeof str !== 'string') return '';
-    return str
-      .replace(/^"+|"+$/g, '')
-      .replace(/\\\//g, '/')
-      .replace(/\\"/g, '"')
-      .replace(/&nbsp;/g, ' ')
-      .replace(/\\n/g, '')
-      .replace(/ style="[^"]*"/g, '')
-      .trim();
+    try {
+      return str
+        .replace(/^"+|"+$/g, '')
+        .replace(/\\\//g, '/')
+        .replace(/\\"/g, '"')
+        .replace(/&nbsp;/g, ' ')
+        .replace(/\\n/g, '')
+        .replace(/ style="[^"]*"/g, '')
+        .trim();
+    } catch (e) {
+      return ''; // ⛔ กัน error ไม่ให้ Build พัง
+    }
   };
 
   const getImageUrl = (galleryStr) => {
@@ -210,10 +213,11 @@ export default function EditorialListPage() {
 
       const cleaned = first.replace(/\\/g, '/').replace(/\/{2,}/g, '/');
       return `${baseUrl}/${cleaned.replace(/^\//, '')}`;
-    } catch {
-      return '/images/no-image.jpg';
+    } catch (err) {
+      return '/images/no-image.jpg';  // ← ป้องกัน Build error
     }
   };
+
 
   /* =========================================================
      RENDER PAGE
@@ -339,10 +343,12 @@ export default function EditorialListPage() {
                   <div className="card-content">
                     <h3 className="card-title">{title}</h3>
                     <p className="editorial-date">
-                      {new Date(item.editoria_creacteAt).toLocaleDateString(
-                        locale === 'en' ? 'en-US' : 'th-TH',
-                        { day: 'numeric', month: 'long', year: 'numeric' }
-                      )}
+                      {item.editoria_creacteAt
+                        ? new Date(item.editoria_creacteAt).toLocaleDateString(
+                          locale === 'en' ? 'en-US' : 'th-TH',
+                          { day: 'numeric', month: 'long', year: 'numeric' }
+                        )
+                        : ''}
                     </p>
                     <p
                       className="card-snippet"

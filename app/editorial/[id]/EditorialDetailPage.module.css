@@ -13,6 +13,12 @@
   max-width: 1500px;           /* กำหนดความกว้างสูงสุด */
   width: 100%;
 }
+.layoutFullWidth {
+  display: flex;
+  flex-direction: column;
+    max-width: 1500px;           /* กำหนดความกว้างสูงสุด */
+  width: 100%;
+}
 
 /* --------------------- กล่องเนื้อหาหลัก --------------------- */
 .contentBox {

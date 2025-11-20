@@ -281,11 +281,11 @@ useEffect(() => {
       ไอคอนโซเชียล
      ========================================================= */
   const socialIconMap = {
-    facebook: <FaFacebookSquare style={{ color: "#1877f2", fontSize: 36 }} />,
+    facebook: <FaFacebookSquare style={{ color: "#1877f2", fontSize: 40 }} />,
     line: <FaLine style={{ color: "#00c300", fontSize: 35 }} />,
-    instagram: <FaInstagramSquare style={{ color: "#F5058D", fontSize: 36 }} />,
-    youtube: <FaYoutube style={{ color: "#FF0033", fontSize: 36 }} />,
-    tiktok: <AiFillTikTok style={{ color: "#101010", fontSize: 36 }} />,
+    instagram: <FaInstagramSquare style={{ color: "#F5058D", fontSize: 40 }} />,
+    youtube: <FaYoutube style={{ color: "#FF0033", fontSize: 40 }} />,
+    tiktok: <AiFillTikTok style={{ color: "#101010", fontSize: 40 }} />,
   };
 
   /* =========================================================
@@ -293,7 +293,7 @@ useEffect(() => {
      ========================================================= */
   const getIcon = [
     <Image key="building" src="/images/icons/building.png" alt="Building" width={28} height={28} />,
-    <Image key="phone" src="/images/icons/phone.png" alt="Phone" width={25} height={25} />,
+    <Image key="phone" src="/images/icons/phone.png" alt="Phone" width={28} height={28} />,
     <Image key="fax" src="/images/icons/fax.png" alt="Email" width={28} height={28} />,
     <Image key="mail" src="/images/icons/mail.png" alt="Email" width={28} height={28} />,
     <Image key="work" src="/images/icons/working-hours.png" alt="Email" width={28} height={28} />,
