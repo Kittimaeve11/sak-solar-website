@@ -12,7 +12,7 @@ const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 
 /* =========================================================
-   ⭐ Cache เก็บไว้ใน Memory ระหว่างเปลี่ยนหน้า
+    Cache เก็บไว้ใน Memory ระหว่างเปลี่ยนหน้า
 ========================================================= */
 let portfolioCache = {
   projects: null,
@@ -84,7 +84,7 @@ export default function PortfolioClient() {
   const [fadeIn, setFadeIn] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
-  // ⭐ Banner
+  //  Banner
   const [brander, setBrander] = useState([]);
   const [loadingBanner, setLoadingBanner] = useState(true);
 
@@ -95,7 +95,7 @@ export default function PortfolioClient() {
 
 
   /* =========================================================
-     ⭐ useEffect เดียว (โหลดทั้งหมด + SEO + Responsive)
+      useEffect เดียว (โหลดทั้งหมด + SEO + Responsive)
   ========================================================= */
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -115,10 +115,12 @@ export default function PortfolioClient() {
     const content = locale === 'th' ? 'ผลงานของเรา' : 'Our Portfolio';
     if (meta) meta.setAttribute('content', content);
 
-    const savedPage = localStorage.getItem('portfolioCurrentPage');
-    if (savedPage) setCurrentPage(Number(savedPage));
+    if (typeof window !== 'undefined') {
+      const savedPage = localStorage.getItem('portfolioCurrentPage');
+      if (savedPage) setCurrentPage(Number(savedPage));
+    }
 
-    // ⭐ Cache อายุไม่เกิน 10 นาที
+    //  Cache อายุไม่เกิน 10 นาที
     const cacheAge = Date.now() - portfolioCache.timestamp;
     if (portfolioCache.projects && cacheAge < 1000 * 60 * 10) {
       setProjects(portfolioCache.projects);
@@ -131,7 +133,7 @@ export default function PortfolioClient() {
       return () => window.removeEventListener('resize', checkMobile);
     }
 
-    // ⭐ โหลดใหม่ทั้งหมด
+    //  โหลดใหม่ทั้งหมด
     const load = async () => {
       try {
         const [typesRes, projectsRes, bannerRes] = await Promise.all([
@@ -192,7 +194,7 @@ export default function PortfolioClient() {
             ? [bannerData.data]
             : [];
 
-        // ⭐ Save cache
+        //  Save cache
         portfolioCache = {
           projects: projectList,
           types: typesList,
@@ -218,7 +220,7 @@ export default function PortfolioClient() {
   }, [locale]);
 
   /* =========================================================
-     ⭐ Banner Renderer
+      Banner Renderer
   ========================================================= */
   const renderBanner = () => {
     if (loadingBanner)
@@ -246,7 +248,7 @@ export default function PortfolioClient() {
   };
 
   /* =========================================================
-     ⭐ Pagination
+      Pagination
   ========================================================= */
   const filteredProjects =
     filter === 'ทั้งหมด'
@@ -254,10 +256,10 @@ export default function PortfolioClient() {
       : projects.filter((proj) => proj.type === filter);
 
   const totalPages = Math.ceil(filteredProjects.length / itemsPerPage);
-  const paginated = filteredProjects.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  const paginated = Array.isArray(filteredProjects)
+    ? filteredProjects.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+    : [];
+
 
   const handlePageChange = (page) => {
     if (page < 1 || page > totalPages || page === currentPage) return;
@@ -321,11 +323,11 @@ export default function PortfolioClient() {
   };
 
   /* =========================================================
-     ⭐ UI
+      UI
   ========================================================= */
   return (
     <div className="no-margin">
-      {/* ⭐ Banner */}
+      {/*  Banner */}
       {renderBanner()}
 
       <main
@@ -340,7 +342,7 @@ export default function PortfolioClient() {
               : 'Solar Installation Portfolio'}
           </h1>
 
-          {/* ⭐ Filter */}
+          {/*  Filter */}
           <div className="portfolio-filters">
             <label htmlFor="filter-select" className="filter-label">
               {locale === 'th'
@@ -378,7 +380,7 @@ export default function PortfolioClient() {
             </div>
           </div>
 
-          {/* ⭐ Projects */}
+          {/*  Projects */}
           <div
             key={currentPage}    // สำคัญมาก! บังคับให้ React render ใหม่
             className={`portfolio-grid ${shouldAnimate ? 'fade-in' : ''}`}
@@ -402,12 +404,14 @@ export default function PortfolioClient() {
                   >
                     <div className="portfolio-image-wrapper">
                       <Image
-                        src={proj.coverImage}
-                        alt={proj.titleTH}
+                        src={proj.coverImage || "/images/placeholder.png"}
+                        alt={proj.titleTH || "portfolio"}
                         fill
+                        unoptimized
                         className="portfolio-image"
                         sizes="(max-width: 768px) 100vw, 33vw"
                       />
+
                       <div className="portfolio-banner">
                         <Image
                           src="/images/logosak-solar.png"
