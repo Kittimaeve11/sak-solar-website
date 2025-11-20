@@ -132,7 +132,7 @@
 
 
 
-/* 🟠 Container หลัก */
+/*  Container หลัก */
 .skeleton-wrapper-review {
   display: flex;
   gap: 1rem;
@@ -140,7 +140,7 @@
   animation: fadeIn 0.3s ease-in-out;
 }
 
-/* 🟢 Card Skeleton ขนาดเท่าการ์ดวิดีโอจริง */
+/*  Card Skeleton ขนาดเท่าการ์ดวิดีโอจริง */
 .skeleton-cardreview {
   flex: 0 0 calc(100% / var(--columns));
   max-width: calc(100% / var(--columns));
@@ -158,14 +158,14 @@
   border-radius: 8px;
 }
 
-/* 📝 Title */
+/*  Title */
 .skeleton-titleslidevideo {
   height: 20px;
   margin: 16px 0px 8px 0px;
   width: 70%;
 }
 
-/* 📅 Date line */
+/*  Date line */
 .skeleton-lineslidevideo {
   height: 16px;
   margin: 6px 0px 16px 0px;
@@ -173,7 +173,7 @@
   display: block;
 }
 
-/* 🔹 Responsive Columns */
+/*  Responsive Columns */
 .skeleton-wrapper-review { --columns: 3; }
 
 @media (max-width:1120px) {

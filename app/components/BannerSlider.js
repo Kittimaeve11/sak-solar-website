@@ -7,14 +7,13 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
-// อ่านค่า environment
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 
-// ✅ เพิ่ม cache เก็บข้อมูลใน memory ระหว่าง navigation
+// Global Cache ใช้ร่วมกันทั้ง session
 let bannerCache = {
   data: null,
-  timestamp: 0, // เวลาเก็บ cache ล่าสุด
+  timestamp: 0,
 };
 
 /* ปุ่มเลื่อนซ้าย */
@@ -67,40 +66,33 @@ function NextArrow({ onClick }) {
   );
 }
 
-/* =============================
-   Banner Slider Component
-============================= */
+// ป้องกัน Invalid URL
+const safeURL = (url) => {
+  if (!url) return null;
+  if (url.startsWith("http")) return url;
+  return `https://${url.replace(/^\/*/, "")}`;
+};
+
 export default function BannerSlider() {
   const sliderRef = useRef(null);
+  const isDragging = useRef(false);
+
   const [banners, setBanners] = useState([]);
   const [loadedIndexes, setLoadedIndexes] = useState({});
   const [initialSlide, setInitialSlide] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
   const [loading, setLoading] = useState(true);
-  const isDragging = useRef(false);
 
-  /* ตรวจสอบขนาดหน้าจอ */
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 767);
-    };
-
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-
-    const savedIndex = localStorage.getItem("bannerSlideIndex");
-    if (savedIndex !== null) setInitialSlide(parseInt(savedIndex));
-
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
-
-  /* ดึงข้อมูลแบนเนอร์ (ใช้ cache ป้องกันโหลดซ้ำ) */
+  // 🎯 ใช้ useEffect อันเดียว รวมทุกอย่าง
   useEffect(() => {
     let isMounted = true;
 
-    const fetchBanners = async () => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 767);
+    };
+
+    const loadBanners = async () => {
       try {
-        // ✅ ถ้ามี cache และอายุไม่เกิน 10 นาที ใช้ข้อมูลเดิมเลย
         const cacheAge = Date.now() - bannerCache.timestamp;
         if (bannerCache.data && cacheAge < 1000 * 60 * 10) {
           if (isMounted) {
@@ -109,8 +101,6 @@ export default function BannerSlider() {
           }
           return;
         }
-
-        // ✅ โหลดใหม่จาก API
         setLoading(true);
         const res = await fetch(`${baseUrl}/api/branderhomeapi`, {
           headers: { "X-API-KEY": apiKey },
@@ -118,13 +108,9 @@ export default function BannerSlider() {
         });
         const data = await res.json();
 
-        if (isMounted && data.status && data.result) {
+        if (isMounted && data?.status && data.result) {
           setBanners(data.result);
-          // ✅ เก็บ cache
-          bannerCache = {
-            data: data.result,
-            timestamp: Date.now(),
-          };
+          bannerCache = { data: data.result, timestamp: Date.now() };
         }
       } catch (err) {
         console.error("Error fetching banners:", err);
@@ -133,13 +119,21 @@ export default function BannerSlider() {
       }
     };
 
-    fetchBanners();
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    const savedIndex = localStorage.getItem("bannerSlideIndex");
+    if (savedIndex !== null) setInitialSlide(parseInt(savedIndex));
+
+    loadBanners();
+
     return () => {
       isMounted = false;
+      window.removeEventListener("resize", handleResize);
     };
   }, []);
 
-  /* ตั้งค่า Slider */
+  /* Slider Settings */
   const settings = {
     dots: banners.length > 1,
     infinite: banners.length > 1,
@@ -158,18 +152,18 @@ export default function BannerSlider() {
     onEdge: () => (isDragging.current = false),
   };
 
-  /* คลิกแบนเนอร์ */
   const handleClick = (e, href) => {
     if (isDragging.current) {
       isDragging.current = false;
       return;
     }
-    if (href) window.open(href, "_blank");
+    const finalURL = safeURL(href);
+    if (finalURL) window.open(finalURL, "_blank", "noopener,noreferrer");
   };
 
   return (
-    <div className="w-full relative" style={{ lineHeight: 0, fontSize: 0 }}>
-      {/* Skeleton โหลดครั้งแรก */}
+    <div className="w-full relative" style={{ lineHeight: 0 }}>
+      {/* Skeleton โหลดตอนแรก */}
       {(loading || banners.length === 0) && (
         <div className="banner-skeleton">
           <div className="skeleton-overlay" />
@@ -178,7 +172,11 @@ export default function BannerSlider() {
 
       {/* แสดง Slider */}
       {!loading && banners.length > 0 && (
-        <Slider key={isMobile ? "mobile" : "desktop"} ref={sliderRef} {...settings}>
+        <Slider
+          key={isMobile ? "mobile" : "desktop"}
+          ref={sliderRef}
+          {...settings}
+        >
           {banners.map((banner, index) => {
             const imgSrc = isMobile
               ? `${baseUrl}/${banner.brander_pictureMoblie}`
@@ -195,20 +193,19 @@ export default function BannerSlider() {
                     src={imgSrc}
                     alt={banner.brander_name || "banner"}
                     fill
-                    priority={index === 0} // ✅ ปรับปรุง LCP
+                    priority={index === 0}
                     loading={index === 0 ? "eager" : "lazy"}
                     draggable={false}
-                    unoptimized
                     style={{
                       objectFit: "cover",
                       opacity: isLoaded ? 1 : 0,
-                      transition: "opacity 0.5s ease-in-out",
+                      transition: "opacity 0.6s ease-in-out",
+                      willChange: "opacity",
                     }}
                     onLoad={() =>
                       setLoadedIndexes((prev) => ({ ...prev, [index]: true }))
                     }
                   />
-
                   {!isLoaded && <div className="skeleton-overlay" />}
                 </div>
               </div>
@@ -222,68 +219,40 @@ export default function BannerSlider() {
         .banner-container {
           position: relative;
           width: 100%;
-          height: 100%;
+          overflow: hidden;
         }
-
         @media (min-width: 768px) {
           .banner-container {
             aspect-ratio: 3840 / 1191;
           }
         }
-
         @media (max-width: 767px) {
           .banner-container {
             aspect-ratio: 768 / 1032;
           }
         }
-
         .banner-skeleton {
           width: 100%;
           aspect-ratio: 3840 / 1191;
-          min-height: 400px;
+          min-height: min(60vh, 450px);
           position: relative;
           overflow: hidden;
         }
-
         @media (max-width: 767px) {
           .banner-skeleton {
             aspect-ratio: 768 / 1032;
-            min-height: 400px;
           }
         }
-
         .skeleton-overlay {
           position: absolute;
           inset: 0;
           background: #e0e0e0;
           animation: pulse 1.5s infinite ease-in-out;
-          z-index: 2;
         }
-
         @keyframes pulse {
           0% { opacity: 1; }
           50% { opacity: 0.5; }
           100% { opacity: 1; }
-        }
-
-        :global(.slick-dots) {
-          bottom: 15px;
-        }
-        :global(.slick-dots li button) {
-          width: 9px;
-          height: 9px;
-          padding: 0;
-          border-radius: 50%;
-          background: rgba(255, 255, 255, 0.27);
-          border: 2px solid transparent;
-          transition: background-color 0.3s ease, border-color 0.3s ease;
-        }
-        :global(.slick-dots li.slick-active button),
-        :global(.slick-dots li button:hover) {
-          background: rgba(255, 255, 255, 0.89);
-        }
-        :global(.slick-dots li button:before) {
-          display: none;
         }
       `}</style>
     </div>

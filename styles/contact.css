@@ -111,6 +111,30 @@
   box-shadow: 0 2px 6px rgba(0,0,0,0.05);
   background: #fff;
 }
+/* ปรับให้ไอคอนและข้อความอยู่กึ่งกลางแนวตั้ง */
+.infoItem {
+  display: flex;
+  align-items: center;      /* กึ่งกลางแนวตั้งให้ทั้ง icon + text */
+  gap: 0.8rem;              /* ระยะห่างระหว่าง icon และ text */
+  line-height: 1.6;         /* เพิ่มความสูงบรรทัดให้ดูสวยขึ้น */
+  margin-bottom: 0.7rem;    /* ระยะห่างแต่ละแถว */
+}
+
+/* กำหนดขนาดกล่อง icon ให้สมดุลและ icon อยู่ตรงกลาง */
+.infoItem .icon {
+  flex-shrink: 0;           /* ไม่ให้ icon หดตัว */
+  width: 32px;              /* กำหนดพื้นที่แนวตั้ง/แนวนอนให้ icon */
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;  /* จัด icon ให้อยู่กลาง perfectly */
+}
+
+/* ป้องกันข้อความยาวแล้วเบียด icon */
+.infoItem span:last-child {
+  display: block;
+  flex: 1;
+}
 
 /* =============================
     Social Section

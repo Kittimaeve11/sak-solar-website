@@ -44,80 +44,91 @@ export default function Page() {
   const [touched, setTouched] = useState({});
   const [errors, setErrors] = useState({});
 
-  console.log("Brander:", brander);
+  // console.log("Brander:", brander);
+
+  const [isMobile, setIsMobile] = useState(false);
+
 
   /* =========================================================
       โหลดข้อมูล contacts / brander / topics
      ========================================================= */
-  useEffect(() => {
-    document.title = 'ติดต่อเรา | บริษัท ศักดิ์สยาม โซลาร์ เอ็นเนอร์ยี่ จำกัด';
-    const metaDescription = document.querySelector("meta[name='description']");
-    if (metaDescription) {
-      metaDescription.setAttribute("content", "หน้าติดต่อเรา");
-    } else {
-      const meta = document.createElement('meta');
-      meta.name = 'description';
-      meta.content = 'หน้าติดต่อเรา';
-      document.head.appendChild(meta);
-    }
+useEffect(() => {
+  // 1️⃣ จัดการ SEO
+  document.title = 'ติดต่อเรา | บริษัท ศักดิ์สยาม โซลาร์ เอ็นเนอร์ยี่ จำกัด';
+  let meta = document.querySelector("meta[name='description']");
+  if (!meta) {
+    meta = document.createElement('meta');
+    meta.name = 'description';
+    document.head.appendChild(meta);
+  }
+  meta.content = 'หน้าติดต่อเรา';
 
-    const fetchAllData = async () => {
-      try {
-        const cacheAge = Date.now() - contactCache.timestamp;
-        if (
-          contactCache.contacts &&
-          contactCache.brander &&
-          contactCache.topics &&
-          cacheAge < 1000 * 60 * 10
-        ) {
-          console.log("ใช้ข้อมูลจาก cache");
-          setContacts(contactCache.contacts);
-          setBrander(contactCache.brander);
-          setTopics(contactCache.topics);
-          setLoading(false);
-          return;
-        }
+  // 2️⃣ ตรวจมือถือครั้งแรก + เวลา resize
+  const updateMobile = () => setIsMobile(window.innerWidth <= 768);
+  updateMobile();
+  window.addEventListener('resize', updateMobile);
 
-        console.log("โหลดข้อมูลจาก API");
-        setLoading(true);
-        const [contactsRes, branderRes, topicsRes] = await Promise.all([
-          fetch(`${baseUrl}/api/contactapi`, { headers: { 'X-API-KEY': apiKey } }),
-          fetch(`${baseUrl}/api/branderIDapi/8`, { headers: { 'X-API-KEY': apiKey } }),
-          fetch(`${baseUrl}/api/topicsapi`, { headers: { 'X-API-KEY': apiKey } }),
-        ]);
-
-        const [contactsData, branderData, topicsData] = await Promise.all([
-          contactsRes.json(),
-          branderRes.json(),
-          topicsRes.json(),
-        ]);
-
-        const contactsList = contactsData.result || [];
-        const branderList = branderData.data ? [branderData.data] : [];
-        const topicsList =
-          topicsData.status && Array.isArray(topicsData.result)
-            ? topicsData.result
-            : [];
-
-        setContacts(contactsList);
-        setBrander(branderList);
-        setTopics(topicsList);
-
-        contactCache = {
-          contacts: contactsList,
-          brander: branderList,
-          topics: topicsList,
-          timestamp: Date.now(),
-        };
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      } finally {
+  // 3️⃣ โหลดข้อมูล Contacts / Banner / Topics
+  const fetchAllData = async () => {
+    try {
+      const cacheAge = Date.now() - contactCache.timestamp;
+      if (
+        contactCache.contacts &&
+        contactCache.brander &&
+        contactCache.topics &&
+        cacheAge < 1000 * 60 * 10
+      ) {
+        // ใช้ข้อมูลจาก Cache
+        setContacts(contactCache.contacts);
+        setBrander(contactCache.brander);
+        setTopics(contactCache.topics);
         setLoading(false);
+        return;
       }
-    };
 
-    fetchAllData();
-  }, []);
+      setLoading(true);
+
+      const [contactsRes, branderRes, topicsRes] = await Promise.all([
+        fetch(`${baseUrl}/api/contactapi`, { headers: { 'X-API-KEY': apiKey } }),
+        fetch(`${baseUrl}/api/branderIDapi/8`, { headers: { 'X-API-KEY': apiKey } }),
+        fetch(`${baseUrl}/api/topicsapi`, { headers: { 'X-API-KEY': apiKey } }),
+      ]);
+
+      const [contactsData, branderData, topicsData] = await Promise.all([
+        contactsRes.json(),
+        branderRes.json(),
+        topicsRes.json(),
+      ]);
+
+      const contactsList = contactsData.result || [];
+      const branderList = branderData.data ? [branderData.data] : [];
+      const topicsList =
+        topicsData.status && Array.isArray(topicsData.result)
+          ? topicsData.result
+          : [];
+
+      setContacts(contactsList);
+      setBrander(branderList);
+      setTopics(topicsList);
+
+      contactCache = {
+        contacts: contactsList,
+        brander: branderList,
+        topics: topicsList,
+        timestamp: Date.now(),
+      };
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchAllData();
+
+  // Cleanup
+  return () => window.removeEventListener('resize', updateMobile);
+}, []);
 
   /* =========================================================
       ฟังก์ชันบันทึก Log การส่งข้อความสอบถามเพิ่มเติม (actionType = 7)
@@ -283,9 +294,10 @@ export default function Page() {
   const getIcon = [
     <Image key="building" src="/images/icons/building.png" alt="Building" width={28} height={28} />,
     <Image key="phone" src="/images/icons/phone.png" alt="Phone" width={25} height={25} />,
-    <Image key="fax" src="/images/icons/fax.png" alt="Fax" width={28} height={28} />,
-    <Image key="mail" src="/images/icons/mail.png" alt="Mail" width={28} height={28} />,
-    <Image key="work" src="/images/icons/working-hours.png" alt="Work Hours" width={28} height={28} />,
+    <Image key="fax" src="/images/icons/fax.png" alt="Email" width={28} height={28} />,
+    <Image key="mail" src="/images/icons/mail.png" alt="Email" width={28} height={28} />,
+    <Image key="work" src="/images/icons/working-hours.png" alt="Email" width={28} height={28} />,
+
   ];
 
 
@@ -316,7 +328,7 @@ export default function Page() {
         <div className="skeleton skeleton-banner fade-in"></div>
       ) : (
         brander.map((b) => {
-          const imgSrc = window.innerWidth <= 768
+          const imgSrc = isMobile
             ? `${baseUrl}/${b.brander_pictureMoblie}`
             : `${baseUrl}/${b.brander_picturePC}`;
 
@@ -326,10 +338,10 @@ export default function Page() {
                 src={imgSrc}
                 alt={b.brander_name}
                 fill
-                className="banner-image"
-                unoptimized
                 priority
+                unoptimized
                 sizes="100vw"
+                className="banner-image"
               />
             </div>
           );
@@ -340,7 +352,7 @@ export default function Page() {
         <h1 className="headtitle">{messages.contact}</h1>
         {loading ? (
           <div className="contactGrid">
-            {/* ข้อมูลบริษัท */}
+             {/* ข้อมูลบริษัท */}
             <div className="skeleton-card" style={{ gridColumn: '1 / 2' }}>
               <div className="skeleton-title" style={{ width: '40%' }}></div>
               <div className="skeleton-bullet-list">
@@ -383,7 +395,6 @@ export default function Page() {
             </div>
           </div>
         ) : (
-
 
           <div className="contactGrid fade-in">
             {contacts.map((item) => {
