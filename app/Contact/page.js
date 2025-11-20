@@ -12,7 +12,10 @@ import Image from 'next/image';
 import { validateFieldmoreInfo } from '../Utils/validation';
 import Swal from 'sweetalert2';
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
-import ReCAPTCHA from 'react-google-recaptcha';
+import dynamic from 'next/dynamic';
+const ReCAPTCHA = dynamic(() => import('react-google-recaptcha'), { ssr: false });
+
+
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
@@ -49,26 +52,33 @@ export default function Page() {
   const [isMobile, setIsMobile] = useState(false);
 
 
-  /* =========================================================
-      โหลดข้อมูล contacts / brander / topics
-     ========================================================= */
 useEffect(() => {
-  // 1️⃣ จัดการ SEO
-  document.title = 'ติดต่อเรา | บริษัท ศักดิ์สยาม โซลาร์ เอ็นเนอร์ยี่ จำกัด';
-  let meta = document.querySelector("meta[name='description']");
-  if (!meta) {
-    meta = document.createElement('meta');
-    meta.name = 'description';
-    document.head.appendChild(meta);
+  // 1️⃣ SEO — ใช้ document ต้องเช็คก่อน
+  if (typeof document !== "undefined") {
+    document.title = 'ติดต่อเรา | บริษัท ศักดิ์สยาม โซลาร์ เอ็นเนอร์ยี่ จำกัด';
+
+    let meta = document.querySelector("meta[name='description']");
+    if (!meta) {
+      meta = document.createElement('meta');
+      meta.name = 'description';
+      document.head.appendChild(meta);
+    }
+    meta.content = 'หน้าติดต่อเรา';
   }
-  meta.content = 'หน้าติดต่อเรา';
 
-  // 2️⃣ ตรวจมือถือครั้งแรก + เวลา resize
-  const updateMobile = () => setIsMobile(window.innerWidth <= 768);
+  // 2️⃣ จัดการมือถือ (ต้องเช็ค window)
+  const updateMobile = () => {
+    if (typeof window !== "undefined") {
+      setIsMobile(window.innerWidth <= 768);
+    }
+  };
   updateMobile();
-  window.addEventListener('resize', updateMobile);
 
-  // 3️⃣ โหลดข้อมูล Contacts / Banner / Topics
+  if (typeof window !== "undefined") {
+    window.addEventListener('resize', updateMobile);
+  }
+
+  // 3️⃣ โหลดข้อมูล API (fetch ใช้ SSR ได้ ไม่ต้องเช็ค window)
   const fetchAllData = async () => {
     try {
       const cacheAge = Date.now() - contactCache.timestamp;
@@ -78,7 +88,6 @@ useEffect(() => {
         contactCache.topics &&
         cacheAge < 1000 * 60 * 10
       ) {
-        // ใช้ข้อมูลจาก Cache
         setContacts(contactCache.contacts);
         setBrander(contactCache.brander);
         setTopics(contactCache.topics);
@@ -126,8 +135,12 @@ useEffect(() => {
 
   fetchAllData();
 
-  // Cleanup
-  return () => window.removeEventListener('resize', updateMobile);
+  // 4️⃣ Cleanup — ใช้ได้เฉพาะใน client
+  return () => {
+    if (typeof window !== "undefined") {
+      window.removeEventListener('resize', updateMobile);
+    }
+  };
 }, []);
 
   /* =========================================================
@@ -352,7 +365,7 @@ useEffect(() => {
         <h1 className="headtitle">{messages.contact}</h1>
         {loading ? (
           <div className="contactGrid">
-             {/* ข้อมูลบริษัท */}
+            {/* ข้อมูลบริษัท */}
             <div className="skeleton-card" style={{ gridColumn: '1 / 2' }}>
               <div className="skeleton-title" style={{ width: '40%' }}></div>
               <div className="skeleton-bullet-list">
@@ -440,29 +453,29 @@ useEffect(() => {
                     {console.log("Full Image URL:", `${baseUrl.replace(/\/$/, '')}/${item.locationphoto.replace(/^\/+/, '')}`)}
 
                     <Image
-                      src={`${baseUrl.replace(/\/$/, '')}/${item.locationphoto.replace(/^\/+/, '')}`}
+                      src={`${baseUrl}/${item.locationphoto}`}
                       alt="อาคารบริษัท"
-                      width={0}
-                      height={0}
+                      fill
                       sizes="100vw"
-                      style={{ width: "100%", height: "auto" }}
                       className="companyImage"
+                      unoptimized
                     />
-
 
 
                   </div>
 
                   <div className="gridItem googleMapWrapper">
-                    <iframe
-                      className="googleMap"
-                      src={`${item.google_map}`}
-                      width="100%"
-                      height="400"
-                      allowFullScreen=""
-                      loading="lazy"
-                      referrerPolicy="no-referrer-when-downgrade"
-                    />
+                    {item.google_map && (
+                      <iframe
+                        className="googleMap"
+                        src={item.google_map}
+                        width="100%"
+                        height="400"
+                        loading="lazy"
+                        allowFullScreen
+                        referrerPolicy="no-referrer-when-downgrade"
+                      />
+                    )}
                   </div>
 
                   <div className="gridItem socialSection">
@@ -611,10 +624,13 @@ useEffect(() => {
           {/* reCAPTCHA */}
           {showCaptcha && (
             <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1rem' }}>
-              <ReCAPTCHA
-                sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
-                onChange={handleCaptchaChange}
-              />
+              {showCaptcha && process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY && (
+                <ReCAPTCHA
+                  sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+                  onChange={handleCaptchaChange}
+                />
+              )}
+
             </div>
           )}
 
@@ -639,7 +655,7 @@ useEffect(() => {
             </button>
 
             {/* ปุ่มย้อนกลับ */}
-            <Link href="/" passHref>
+            <Link href="/">
               <button type="button" className="buttonPrimary">
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5em' }}>
                   {/* <IoChevronBackOutline style={{ fontSize: '1.2rem' }} /> */}
