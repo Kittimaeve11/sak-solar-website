@@ -264,15 +264,15 @@ export default function PortfolioClient() {
   const handlePageChange = (page) => {
     if (page < 1 || page > totalPages || page === currentPage) return;
 
-    setShouldAnimate(false);  // ⛔ ปิด fade ก่อนเปลี่ยนหน้า
-    scrollToTitle();          // 🔼 เลื่อนขึ้น
+    setShouldAnimate(false);  // ปิด fade ก่อนเปลี่ยนหน้า
+    scrollToTitle();          // เลื่อนขึ้น
 
     setTimeout(() => {
-      setCurrentPage(page);   // 🧠 เปลี่ยนหน้า
+      setCurrentPage(page);   // เปลี่ยนหน้า
     }, 10);
 
     setTimeout(() => {
-      setShouldAnimate(true); // ✨ เปิด fade-in หน้าใหม่
+      setShouldAnimate(true); // เปิด fade-in หน้าใหม่
     }, 20);
   };
   const renderPagination = () => {

@@ -63,6 +63,31 @@ body {
   transform: scaleX(1.01); /* ขยายเล็กน้อยให้ดูหนาแน่นขึ้น */  letter-spacing: 0.05px;
 }
 
+/* ================================
+   ฟอนต์ SukhumvitTadmai หนาโทนส้มสวยคม
+   ================================ */
+.font-300blue {
+  font-family: 'SukhumvitTadmai', sans-serif;
+  font-weight: 200; /* ใช้ UltraLight */
+  color: #0D3973!important;
+  transform: scaleX(1.02); /* ขยายแนวนอนเล็กน้อยให้ไม่บางเกิน */
+  letter-spacing: 0.3px;   /* เพิ่มช่องไฟเล็กน้อยให้อ่านง่าย */
+}
+
+.font-500blue {
+  font-family: 'SukhumvitTadmai', sans-serif;
+  font-weight: 600; /* ใช้ SemiBold */
+  color: #0D3973!important;
+  letter-spacing: 0.15px;
+}
+
+/* หนาเต็ม (ดูเหมือน 700–800) */
+.font-700blue {
+  font-family: 'SukhumvitTadmai', sans-serif;
+  font-weight: 800; /* ใช้ ExtraBold */
+  color: #0D3973!important;
+  transform: scaleX(1.01); /* ขยายเล็กน้อยให้ดูหนาแน่นขึ้น */  letter-spacing: 0.05px;
+}
 
 /* ================================
    การตั้งค่าพื้นฐาน
@@ -834,7 +859,7 @@ h6 {
 }
 
 
-/* ก่อนโหลดให้ซ่อนไว้ */
+/* ก่อนโหลดให้ซ่อนไว้ของข้อมูลบริการฟรี */
 .hiddenBeforeLoad {
 opacity: 0;
   visibility: hidden;         /* ซ่อนสายตา */

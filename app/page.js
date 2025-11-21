@@ -66,7 +66,7 @@ export default function HomePage() {
     // ฟังก์ชันโหลดจาก API (กรณีไม่มี cache หรือ cache เสียหาย)
     async function loadData() {
       try {
-        console.log('🌞 โหลดข้อมูลจาก API...');
+        console.log(' โหลดข้อมูลจาก API...');
 
         const [serviceRes, provRes, amphRes, tambRes, headerRes, prodRes] =
           await Promise.all([

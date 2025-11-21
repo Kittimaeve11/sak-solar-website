@@ -61,7 +61,7 @@ export default function ReviewPage() {
   const [currentPage, setCurrentPage] = useState(1);
 
   const itemsPerPage = 15;
-  const titleRef = useRef(null); // 👈 ใช้สำหรับเลื่อนขึ้นหัวข้อ H1
+  const titleRef = useRef(null); //  ใช้สำหรับเลื่อนขึ้นหัวข้อ H1
 
   /* =============== SINGLE EFFECT =============== */
   useEffect(() => {

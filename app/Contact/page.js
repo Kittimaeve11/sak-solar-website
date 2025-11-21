@@ -52,96 +52,96 @@ export default function Page() {
   const [isMobile, setIsMobile] = useState(false);
 
 
-useEffect(() => {
-  // 1️⃣ SEO — ใช้ document ต้องเช็คก่อน
-  if (typeof document !== "undefined") {
-    document.title = 'ติดต่อเรา | บริษัท ศักดิ์สยาม โซลาร์ เอ็นเนอร์ยี่ จำกัด';
+  useEffect(() => {
+    // 1️⃣ SEO — ใช้ document ต้องเช็คก่อน
+    if (typeof document !== "undefined") {
+      document.title = 'ติดต่อเรา | บริษัท ศักดิ์สยาม โซลาร์ เอ็นเนอร์ยี่ จำกัด';
 
-    let meta = document.querySelector("meta[name='description']");
-    if (!meta) {
-      meta = document.createElement('meta');
-      meta.name = 'description';
-      document.head.appendChild(meta);
-    }
-    meta.content = 'หน้าติดต่อเรา';
-  }
-
-  // 2️⃣ จัดการมือถือ (ต้องเช็ค window)
-  const updateMobile = () => {
-    if (typeof window !== "undefined") {
-      setIsMobile(window.innerWidth <= 768);
-    }
-  };
-  updateMobile();
-
-  if (typeof window !== "undefined") {
-    window.addEventListener('resize', updateMobile);
-  }
-
-  // 3️⃣ โหลดข้อมูล API (fetch ใช้ SSR ได้ ไม่ต้องเช็ค window)
-  const fetchAllData = async () => {
-    try {
-      const cacheAge = Date.now() - contactCache.timestamp;
-      if (
-        contactCache.contacts &&
-        contactCache.brander &&
-        contactCache.topics &&
-        cacheAge < 1000 * 60 * 10
-      ) {
-        setContacts(contactCache.contacts);
-        setBrander(contactCache.brander);
-        setTopics(contactCache.topics);
-        setLoading(false);
-        return;
+      let meta = document.querySelector("meta[name='description']");
+      if (!meta) {
+        meta = document.createElement('meta');
+        meta.name = 'description';
+        document.head.appendChild(meta);
       }
-
-      setLoading(true);
-
-      const [contactsRes, branderRes, topicsRes] = await Promise.all([
-        fetch(`${baseUrl}/api/contactapi`, { headers: { 'X-API-KEY': apiKey } }),
-        fetch(`${baseUrl}/api/branderIDapi/8`, { headers: { 'X-API-KEY': apiKey } }),
-        fetch(`${baseUrl}/api/topicsapi`, { headers: { 'X-API-KEY': apiKey } }),
-      ]);
-
-      const [contactsData, branderData, topicsData] = await Promise.all([
-        contactsRes.json(),
-        branderRes.json(),
-        topicsRes.json(),
-      ]);
-
-      const contactsList = contactsData.result || [];
-      const branderList = branderData.data ? [branderData.data] : [];
-      const topicsList =
-        topicsData.status && Array.isArray(topicsData.result)
-          ? topicsData.result
-          : [];
-
-      setContacts(contactsList);
-      setBrander(branderList);
-      setTopics(topicsList);
-
-      contactCache = {
-        contacts: contactsList,
-        brander: branderList,
-        topics: topicsList,
-        timestamp: Date.now(),
-      };
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    } finally {
-      setLoading(false);
+      meta.content = 'หน้าติดต่อเรา';
     }
-  };
 
-  fetchAllData();
+    // 2️⃣ จัดการมือถือ (ต้องเช็ค window)
+    const updateMobile = () => {
+      if (typeof window !== "undefined") {
+        setIsMobile(window.innerWidth <= 768);
+      }
+    };
+    updateMobile();
 
-  // 4️⃣ Cleanup — ใช้ได้เฉพาะใน client
-  return () => {
     if (typeof window !== "undefined") {
-      window.removeEventListener('resize', updateMobile);
+      window.addEventListener('resize', updateMobile);
     }
-  };
-}, []);
+
+    // 3️⃣ โหลดข้อมูล API (fetch ใช้ SSR ได้ ไม่ต้องเช็ค window)
+    const fetchAllData = async () => {
+      try {
+        const cacheAge = Date.now() - contactCache.timestamp;
+        if (
+          contactCache.contacts &&
+          contactCache.brander &&
+          contactCache.topics &&
+          cacheAge < 1000 * 60 * 10
+        ) {
+          setContacts(contactCache.contacts);
+          setBrander(contactCache.brander);
+          setTopics(contactCache.topics);
+          setLoading(false);
+          return;
+        }
+
+        setLoading(true);
+
+        const [contactsRes, branderRes, topicsRes] = await Promise.all([
+          fetch(`${baseUrl}/api/contactapi`, { headers: { 'X-API-KEY': apiKey } }),
+          fetch(`${baseUrl}/api/branderIDapi/8`, { headers: { 'X-API-KEY': apiKey } }),
+          fetch(`${baseUrl}/api/topicsapi`, { headers: { 'X-API-KEY': apiKey } }),
+        ]);
+
+        const [contactsData, branderData, topicsData] = await Promise.all([
+          contactsRes.json(),
+          branderRes.json(),
+          topicsRes.json(),
+        ]);
+
+        const contactsList = contactsData.result || [];
+        const branderList = branderData.data ? [branderData.data] : [];
+        const topicsList =
+          topicsData.status && Array.isArray(topicsData.result)
+            ? topicsData.result
+            : [];
+
+        setContacts(contactsList);
+        setBrander(branderList);
+        setTopics(topicsList);
+
+        contactCache = {
+          contacts: contactsList,
+          brander: branderList,
+          topics: topicsList,
+          timestamp: Date.now(),
+        };
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAllData();
+
+    // 4️⃣ Cleanup — ใช้ได้เฉพาะใน client
+    return () => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener('resize', updateMobile);
+      }
+    };
+  }, []);
 
   /* =========================================================
       ฟังก์ชันบันทึก Log การส่งข้อความสอบถามเพิ่มเติม (actionType = 7)
@@ -364,43 +364,41 @@ useEffect(() => {
       <main className="layout-containercontact">
         <h1 className="headtitle">{messages.contact}</h1>
         {loading ? (
-          <div className="contactGrid">
-            {/* ข้อมูลบริษัท */}
-            <div className="skeleton-card" style={{ gridColumn: '1 / 2' }}>
-              <div className="skeleton-title" style={{ width: '40%' }}></div>
-              <div className="skeleton-bullet-list">
-                {[...Array(5)].map((_, i) => (
-                  <div key={i} className="skeleton-bullet">
-                    <div className="skeleton-bullet-circle"></div>
-                    <div
-                      className="skeleton-bullet-line"
-                      style={{ width: `${90 - i * 5}%` }}
-                    ></div>
-                  </div>
-                ))}
-              </div>
+          <div className="contactGrid skeleton-flat">
+            {/* Company Info */}
+            <div>
+              <div className="skeleton skeleton-line title"></div>
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="skeleton-bullet">
+                  <div className="skeleton skeleton-circle"></div>
+                  <div
+                    className="skeleton skeleton-line"
+                    style={{ width: `${90 - i * 7}%` }}
+                  ></div>
+                </div>
+              ))}
             </div>
 
-            {/* รูปบริษัท */}
-            <div className="skeleton-card" style={{ gridColumn: '2 / 3' }}>
-              <div className="skeleton-image skeleton-image--medium"></div>
+            {/* Company Image */}
+            <div>
+              <div className="skeleton skeleton-image--large"></div>
             </div>
 
-            {/* แผนที่ */}
-            <div className="skeleton-card" style={{ gridColumn: '1 / 2' }}>
-              <div className="skeleton-image skeleton-image--large"></div>
+            {/* Google Map */}
+            <div>
+              <div className="skeleton skeleton-image--large"></div>
             </div>
 
-            {/* ช่องทางติดต่อ */}
-            <div className="skeleton-card" style={{ gridColumn: '2 / 3' }}>
-              <div className="skeleton-title" style={{ width: '50%' }}></div>
-              <div className="skeleton-bullet-list">
+            {/* Social Links */}
+            <div className="social-skeleton">
+              <div className="skeleton skeleton-line title"></div>
+              <div className="skeleton-bullet-wrapper">
                 {[...Array(4)].map((_, i) => (
                   <div key={i} className="skeleton-bullet">
-                    <div className="skeleton-bullet-circle"></div>
+                    <div className="skeleton skeleton-circle"></div>
                     <div
-                      className="skeleton-bullet-line"
-                      style={{ width: `${80 - i * 5}%` }}
+                      className="skeleton skeleton-line"
+                      style={{ width: `${85 - i * 10}%` }}
                     ></div>
                   </div>
                 ))}
@@ -408,264 +406,251 @@ useEffect(() => {
             </div>
           </div>
         ) : (
+          <>
+            {/* ข้อมูลจริง */}
+            <div className="contactGrid fade-in">
+              {contacts.map((item) => {
+                const infoValues = [
+                  locale === 'th' ? item.address_th : item.address_en,
+                  item.phone_number.replace(/ *, */g, ' | '),
+                  item.fax || '',
+                  item.email_sub
+                    ? `${item.email_main} | ${item.email_sub}`
+                    : item.email_main,
+                  locale === 'th' ? item.officehours_th : item.officehours_en,
+                ];
 
-          <div className="contactGrid fade-in">
-            {contacts.map((item) => {
-              const infoValues = [
-                locale === 'th' ? item.address_th : item.address_en,
-                item.phone_number.replace(/ *, */g, ' | '),
-                item.fax || '',
-                item.email_sub
-                  ? `${item.email_main} | ${item.email_sub}`
-                  : item.email_main,
-                locale === 'th' ? item.officehours_th : item.officehours_en,
-              ];
+                const socialValues = [
+                  { link: item.facebook, name: messages.contacts.socialmedia.facebook, key: 'facebook' },
+                  { link: item.line, name: messages.contacts.socialmedia.line, key: 'line' },
+                  { link: item.instagram, name: messages.contacts.socialmedia.ig, key: 'instagram' },
+                  { link: item.youtube, name: messages.contacts.socialmedia.youtube, key: 'youtube' },
+                  { link: item.tiktok, name: messages.contacts.socialmedia.tiktok, key: 'tiktok' },
+                ].filter(data =>
+                  data.link &&
+                  data.link !== 'null' &&
+                  data.link !== 'undefined' &&
+                  data.link.trim() !== ''
+                );
 
-              const socialValues = [
-                { link: item.facebook, name: messages.contacts.socialmedia.facebook, key: 'facebook' },
-                { link: item.line, name: messages.contacts.socialmedia.line, key: 'line' },
-                { link: item.instagram, name: messages.contacts.socialmedia.ig, key: 'instagram' },
-                { link: item.youtube, name: messages.contacts.socialmedia.youtube, key: 'youtube' },
-                { link: item.tiktok, name: messages.contacts.socialmedia.tiktok, key: 'tiktok' },
-              ].filter(data =>
-                data.link !== null &&
-                data.link !== undefined &&
-                data.link !== 'null' &&
-                data.link !== 'undefined' &&
-                typeof data.link === 'string' &&
-                data.link.trim() !== ''
-              );
+                return (
+                  <React.Fragment key={item.id}>
+                    <div className="gridItem companyInfo">
+                      <h1 className="companyName">
+                        <span className="companyName-full">{messages.company}</span>
+                        <span className="companyName-mobile">
+                          {locale === 'th' ? (
+                            <>
+                              บริษัท ศักดิ์สยาม<br />โซลาร์ เอ็นเนอร์ยี่ จำกัด
+                            </>
+                          ) : (
+                            <>
+                              SAKSIAM<br />SOLAR ENERGY CO., LTD.
+                            </>
+                          )}
+                        </span>
+                      </h1>
 
-
-              return (
-                <React.Fragment key={item.id}>
-                  <div className="gridItem companyInfo">
-                    <h1 className="companyName">{messages.company}</h1>
-                    {infoValues.map((value, index) => (
-                      <div key={index} className="infoItem">
-                        <span className="icon">{getIcon[index]}</span>
-                        <span>{value}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="gridItem companyImageWrapper">
-                    {console.log("Full Image URL:", `${baseUrl.replace(/\/$/, '')}/${item.locationphoto.replace(/^\/+/, '')}`)}
-
-                    <Image
-                      src={`${baseUrl}/${item.locationphoto}`}
-                      alt="อาคารบริษัท"
-                      fill
-                      sizes="100vw"
-                      className="companyImage"
-                      unoptimized
-                    />
-
-
-                  </div>
-
-                  <div className="gridItem googleMapWrapper">
-                    {item.google_map && (
-                      <iframe
-                        className="googleMap"
-                        src={item.google_map}
-                        width="100%"
-                        height="400"
-                        loading="lazy"
-                        allowFullScreen
-                        referrerPolicy="no-referrer-when-downgrade"
-                      />
-                    )}
-                  </div>
-
-                  <div className="gridItem socialSection">
-                    <h1 className="communicationName">{messages.communication}</h1>
-                    <div className="socialLinks">
-                      {socialValues.map(({ link, name, key }) => (
-                        <div
-                          key={key}
-                          className="socialItem"
-                          style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}
-                        >
-                          <span className="iconFL">{socialIconMap[key]}</span>
-                          <Link
-                            href={link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="label"
-                            style={{ textDecoration: 'none', color: 'inherit' }}
-                          >
-                            {name}
-                          </Link>
+                      {infoValues.map((value, index) => (
+                        <div key={index} className="infoItem">
+                          <span className="icon">{getIcon[index]}</span>
+                          <span>{value}</span>
                         </div>
                       ))}
                     </div>
+
+                    <div className="gridItem companyImageWrapper">
+                      <Image
+                        src={`${baseUrl.replace(/\/$/, '')}/${item.locationphoto.replace(/^\/+/, '')}`}
+                        alt="อาคารบริษัท"
+                        width={0}
+                        height={0}
+                        sizes="100vw"
+                        priority
+                        style={{ width: "100%", height: "auto" }}
+                        className="companyImage"
+                      />
+                    </div>
+
+                    <div className="gridItem googleMapWrapper">
+                      {item.google_map && (
+                        <iframe
+                          className="googleMap"
+                          src={item.google_map}
+                          width="100%"
+                          height="400"
+                          loading="lazy"
+                          allowFullScreen
+                          referrerPolicy="no-referrer-when-downgrade"
+                        />
+                      )}
+                    </div>
+
+                    <div className="gridItem socialSection">
+                      <h1 className="communicationName">{messages.communication}</h1>
+                      <div className="socialLinks">
+                        {socialValues.map(({ link, name, key }) => (
+                          <div
+                            key={key}
+                            className="socialItem"
+                            style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}
+                          >
+                            <span className="iconFL">{socialIconMap[key]}</span>
+                            <Link
+                              href={link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="label"
+                              style={{ textDecoration: 'none', color: 'inherit' }}
+                            >
+                              {name}
+                            </Link>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </React.Fragment>
+                );
+              })}
+            </div>
+
+            <hr className="custom-divider" />
+
+            {/* FORM แสดงเฉพาะตอน loading === false */}
+            <h1 className="headtitle" style={{ marginBottom: '-1rem' }}>
+              {messages.ask}
+            </h1>
+
+            <form onSubmit={handleSubmit} className="form-container fade-in">
+              <div>
+                {/* Select Topic */}
+                <div className="form-select-wrapper">
+                  <label htmlFor="topic" className="form-label">
+                    {messages.selecttop} <span className="required-asterisk">*</span>
+                  </label>
+                  <div className={`custom-select-container ${touched.topic && errors.topic ? 'error-border' : ''}`}>
+                    <select
+                      id="topic"
+                      name="topic"
+                      value={formData.topic}
+                      onChange={handleChange}
+                      onBlur={() => setTouched((prev) => ({ ...prev, topic: true }))}
+                      className={`${getClassName(formData.topic, "form-select")} ${touched.topic && errors.topic ? 'error-border' : ''}`}
+                    >
+                      <option value="" disabled hidden>
+                        {messages.pleaseselect}**
+                      </option>
+                      {topics.map((topic) => (
+                        <option key={topic.topicID} value={topic.topicID}>
+                          {locale === "th" ? topic.topic_nameTH : topic.topic_nameEN}
+                        </option>
+                      ))}
+                    </select>
+                    <MdOutlineKeyboardArrowDown className="select-arrow" />
                   </div>
-                </React.Fragment>
-              );
-            })}
-          </div>
-        )}
+                  {touched.topic && errors.topic && <p className="error-text">*{errors.topic}</p>}
+                </div>
 
-        <hr
-          style={{
-            border: 'none',
-            borderTop: '2px solid #CBDCEB',
-            width: 'calc(100% - 5px)',
-            margin: '1rem 10px'
-          }}
-        />
+                {/* Name */}
+                <div>
+                  <label htmlFor="name" className="form-label">
+                    {messages.namelast} <span className="required-asterisk">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    onBlur={() => setTouched((prev) => ({ ...prev, name: true }))}
+                    placeholder={`${messages.please_fill}**`}
+                    className={`${getClassName(formData.name, "form-field")} ${touched.name && errors.name ? 'error-border' : ''}`}
+                  />
+                  {touched.name && errors.name && <p className="error-text">*{errors.name}</p>}
+                </div>
 
-        <h1 className="headtitle" style={{ marginBottom: '-1rem' }}>
-          {messages.ask}
-        </h1>
-        <form onSubmit={handleSubmit} className="form-container">
-          <div >
-            {/* Select Topic */}
-            <div className="form-select-wrapper">
-              <label htmlFor="topic" className="form-label">
-                {messages.selecttop} <span className="required-asterisk">*</span>
-              </label>
-              <div className={`custom-select-container ${touched.topic && errors.topic ? 'error-border' : ''}`}>
+                {/* Phone */}
+                <div>
+                  <label htmlFor="phone" className="form-label">
+                    {messages.pnumber} <span className="required-asterisk">*</span>
+                  </label>
+                  <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    onBlur={() => setTouched((prev) => ({ ...prev, phone: true }))}
+                    placeholder={`${messages.onlyphone} (0912345678)**`}
+                    className={`${getClassName(formData.phone, "form-field")} ${touched.phone && errors.phone ? 'error-border' : ''}`}
+                    inputMode="numeric"
+                    maxLength={10}
+                  />
+                  {touched.phone && errors.phone && <p className="error-text">*{errors.phone}</p>}
+                </div>
 
-                <select
-                  id="topic"
-                  name="topic"
-                  value={formData.topic}
-                  onChange={handleChange}
-                  onBlur={() => setTouched((prev) => ({ ...prev, topic: true }))}
-                  className={`${getClassName(formData.topic, "form-select")} ${touched.topic && errors.topic ? 'error-border' : ''}`}
-                >
-                  <option value="" disabled hidden>
-                    {messages.pleaseselect}**
-                  </option>
-                  {topics.map((topic) => (
-                    <option key={topic.topicID} value={topic.topicID}>
-                      {locale === "th" ? topic.topic_nameTH : topic.topic_nameEN}
-                    </option>
-                  ))}
-                </select>
-                <MdOutlineKeyboardArrowDown className="select-arrow" />
+                {/* Email */}
+                <div>
+                  <label htmlFor="email" className="form-label">อีเมล์ (ถ้ามี)</label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    onBlur={() => setTouched((prev) => ({ ...prev, email: true }))}
+                    placeholder="example@example.com"
+                    className={`${getClassName(formData.email, "form-field")} ${touched.email && errors.email ? 'error-border' : ''}`}
+                  />
+                  {touched.email && errors.email && <p className="error-text">*{errors.email}</p>}
+                </div>
+
+                {/* Message */}
+                <div>
+                  <label htmlFor="message" className="form-label">
+                    ฝากข้อความ <span className="required-asterisk">*</span>
+                  </label>
+                  <textarea
+                    id="message"
+                    name="message"
+                    rows={4}
+                    value={formData.message}
+                    onChange={handleChange}
+                    onBlur={() => setTouched((prev) => ({ ...prev, message: true }))}
+                    className={`${getClassName(formData.message, "form-textarea")} ${touched.message && errors.message ? 'error-border' : ''}`}
+                  />
+                  {touched.message && errors.message && <p className="error-text">*{errors.message}</p>}
+                </div>
               </div>
-              {touched.topic && errors.topic && <p className="error-text">*{errors.topic}</p>}
-            </div>
 
-            {/* Name */}
-            <div>
-              <label className="form-label">
-                {messages.namelast} <span className="required-asterisk">*</span>
-              </label>
-              <input
-                type="text"
-                id='name'
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                onBlur={() => setTouched((prev) => ({ ...prev, name: true }))}
-                placeholder={`${messages.please_fill}**`}
-                className={`${getClassName(formData.name, "form-field")} ${touched.name && errors.name ? 'error-border' : ''}`} />
-              {touched.name && errors.name && <p className="error-text">*{errors.name}</p>}
-            </div>
-
-            {/* Phone */}
-            <div>
-              <label className="form-label">
-                {messages.pnumber} <span className="required-asterisk">*</span>
-              </label>
-              <input
-                type="tel"
-                id='phone'
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                onBlur={() => setTouched((prev) => ({ ...prev, phone: true }))}
-                placeholder={`${messages.onlyphone} (0912345678)**`}
-                className={`${getClassName(formData.phone, "form-field")} ${touched.phone && errors.phone ? 'error-border' : ''}`} inputMode="numeric"
-                maxLength={10}
-              />
-              {touched.phone && errors.phone && <p className="error-text">*{errors.phone}</p>}
-            </div>
-
-            {/* Email */}
-            {/* Email */}
-            <div>
-              <label className="form-label">อีเมล์ (ถ้ามี)</label>
-              <input
-                type="email"
-                id='email'
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                onBlur={() => setTouched((prev) => ({ ...prev, email: true }))}
-                placeholder="example@example.com"
-                className={`${getClassName(formData.email, "form-field")} ${touched.email && errors.email ? 'error-border' : ''}`}
-              />
-              {touched.email && errors.email && <p className="error-text">*{errors.email}</p>}
-            </div>
-
-            {/* Message */}
-            <div>
-              <label className="form-label">
-                ฝากข้อความ <span className="required-asterisk">*</span>
-              </label>
-              <textarea
-                id='message'
-                name="message"
-                rows={4}
-                value={formData.message}
-                onChange={handleChange}
-                onBlur={() => setTouched((prev) => ({ ...prev, message: true }))}
-                className={`${getClassName(formData.message, "form-textarea")} ${touched.message && errors.message ? 'error-border' : ''}`}
-              />
-              {touched.message && errors.message && <p className="error-text">*{errors.message}</p>}
-            </div>
-          </div>
-
-          {/* reCAPTCHA */}
-          {showCaptcha && (
-            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1rem' }}>
+              {/* reCAPTCHA */}
               {showCaptcha && process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY && (
-                <ReCAPTCHA
-                  sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
-                  onChange={handleCaptchaChange}
-                />
+                <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1rem' }}>
+                  <ReCAPTCHA
+                    sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+                    onChange={handleCaptchaChange}
+                  />
+                </div>
               )}
 
-            </div>
-          )}
+              {/* Submit Buttons */}
+              <div className="form-submit">
+                <button
+                  type="submit"
+                  className="buttonPrimaryorange"
+                  disabled={isSubmitting}
+                  style={{ fontSize: '14px' }}
+                >
+                  {isSubmitting ? 'กำลังส่ง...' : 'ส่งข้อความ'}
+                </button>
 
-          {/* ปุ่มส่งฟอร์มและย้อนกลับ */}
-          <div
-            className="form-submit"
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              gap: '24px',
-              marginTop: '1.5rem',
-            }}
-          >
-            {/* ปุ่มส่ง */}
-            <button
-              type="submit"
-              className="buttonPrimaryorange"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? 'กำลังส่ง...' : 'ส่งข้อความ'}
-            </button>
-
-            {/* ปุ่มย้อนกลับ */}
-            <Link href="/">
-              <button type="button" className="buttonPrimary">
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5em' }}>
-                  {/* <IoChevronBackOutline style={{ fontSize: '1.2rem' }} /> */}
+                <Link href="/" className="buttonPrimary link-button" style={{ fontSize: '14px' }}>
                   กลับสู่หน้าหลัก
-                </div>
-              </button>
-            </Link>
-          </div>
-
-        </form>
+                </Link>
+              </div>
+            </form>
+          </>
+        )}
 
       </main>
 

@@ -1,106 +1,74 @@
+/* ===== Wrapper ให้อยู่กลาง จับขอบเหมือนสินค้า ===== */
 .wrapper {
-  width: 100%;
-  margin: 0 auto;
-  padding: 0 1rem;
-}
-
-.layout {
+  margin: 1rem auto;
   max-width: 1500px;
-  margin: 0 auto;
-}
-
-.title {
-  font-size: 24px;
-  font-weight: bold;
-  color: #0c3c78;
-  margin: 0 0 1rem 0;
-}
-
-/* Slider wrapper */
-.sliderWrapper {
   position: relative;
 }
 
-/* ปุ่มเลื่อน */
-.arrowPrev,
-.arrowNext {
-  position: absolute;
-  top: 40%;
-  transform: translateY(-50%);
-  z-index: 10;
-  background: #fff;
-  border: none;
-  border-radius: 50%;
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-  transition: background 0.3s ease;
+.sliderWrapper {
+  max-width: 1500px;
+  margin: 0 auto;
+  position: relative;
 }
 
-.arrowPrev:hover,
-.arrowNext:hover {
-  background: #f0f0f0;
+/* ===== Title ===== */
+.title {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #1e2b4d;
 }
 
-.arrowPrev {
-  left: -15px;
-}
-
-.arrowNext {
-  right: -15px;
-}
-
-/* --------- Spacing ของ slick --------- */
+/* ให้ช่องว่างระหว่างการ์ดเหมือนสินค้า */
 .sliderWrapper :global(.slick-slide) {
-  padding: 0 0.75rem;   /* เว้นซ้าย-ขวา */
+  padding: 0 10px; /* สามารถเพิ่มเป็น 15px หรือ 20px ได้ */
   box-sizing: border-box;
 }
 
+/* ให้ชดเชย padding ที่เราใส่ เพื่อให้ slider ไม่ถูกบีบ */
 .sliderWrapper :global(.slick-list) {
-  margin: 0 -0.75rem;   /* ดึงออก เพื่อให้ spacing เท่ากัน */
+  margin: 0 -10px; /* ต้องเท่ากับ padding ด้านบน */
 }
 
-/* Card */
+
+/* ===== Card (ให้เหมือนสินค้า) ===== */
 .card {
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  background: #fff;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  overflow: hidden;
+  margin-bottom: 10px;
   text-decoration: none;
-  color: inherit;
-  transition: transform 0.3s ease;
-  margin-bottom: 1rem;   /* ✅ เว้นด้านล่างเท่านั้น */
-}
+  color: inherit;}
 
 .card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-4px);
+  text-decoration: none;
 }
 
-.cardImage {
+/* ===== Image (เท่ากับสินค้า container) ===== */
+.imageWrapper {
+  position: relative;
   width: 100%;
-  height: auto;
-  object-fit: cover;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
-  transition: filter 0.3s ease;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
 }
 
-.card:hover .cardImage {
-  filter: brightness(0.4);
-}
-
+/* ===== Content ===== */
 .cardContent {
-  padding: 0.75rem 1rem;
+  padding: 10px 25px 16px 25px;
 }
 
 .cardTitle {
   font-size: 18px;
   font-weight: 600;
-  margin: 0rem;
-
+  margin-bottom: 0;
   display: block;
   width: 100%;
   white-space: nowrap;
@@ -113,19 +81,78 @@
 .editorial-date {
   color: #888;
   font-size: 14px;
-  margin: 0.25rem 0;
 }
 
 .cardDescription {
+  font-size: 14px;
   color: #555;
-  font-size: 15px;
-  margin-top: 0.5rem;
+  line-height: 1.4;
+  margin: 0 0 6px 0;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
-  text-decoration: none;
-  border-bottom: none;
-  box-shadow: none;
+}
+
+/* ===== Read more ===== */
+.readMore {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  margin: 0;
+  color: #0c3c78;
+  font-weight: 500;
+}
+
+/* ===== ปุ่มลูกศรเหมือนสินค้า ===== */
+.arrowPrev,
+.arrowNext {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 20;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.arrowPrev { left: -20px; }
+.arrowNext { right: -10px; }
+
+/* ====== Responsive: Notebook (≤1200px) ====== */
+@media (max-width: 1200px) {
+  .wrapper { max-width: 950px; }
+  .sliderWrapper { max-width: 889px; }
+
+  .card { margin: 0 20px; }
+
+  .arrowPrev { left: 0px; }
+  .arrowNext { right: -15px; }
+}
+
+/* ====== Responsive: Tablet (≤991px) ====== */
+@media (max-width: 991px) {
+  .wrapper { max-width: 700px; }
+  .sliderWrapper { max-width: 600px; }
+
+  .arrowNext { right: -10px; }
+}
+
+/* ====== Responsive: Mobile (≤638px) ====== */
+@media (max-width: 638px) {
+  .wrapper { max-width: 400px; }
+  .sliderWrapper { max-width: 300px; }
+
+  .card { margin: 0 auto; }
+
+  .arrowPrev { left: 0px; }
+  .arrowNext { right: -5px; }
 }

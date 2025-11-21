@@ -1,3 +1,6 @@
+/* =============================
+   CONTAINER LAYOUT (Main)
+============================= */
 .layout-containercontact {
   width: 100%;
   max-width: 1200px;
@@ -5,36 +8,19 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  padding: 0 16px 50px 16px;
+  padding: 0 16px 40px; /* Removed invalid -10px */
   gap: 24px;
 }
 
-
 /* =============================
-    Contact Layout + Global
+   Global Contact Layout
 ============================= */
-
 .contact-container {
   display: flex;
   justify-content: center;
   gap: 30px;
   flex-wrap: wrap;
   text-align: center;
-  margin-top: 0px;
-}
-
-.contact-box {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  max-width: 240px;
-  margin: 0 10px;
-}
-
-.contact-text {
-  color: #102e50;
-  line-height: 1.5;
-  margin: 0;
 }
 
 .centeredText {
@@ -42,276 +28,401 @@
   color: #19489d;
   font-weight: 400;
   font-size: 40px;
-  margin: 1rem 0;
+  margin: 0;
 }
 
-.contact-form {
-  max-width: 700px;
-  margin: 0 auto;
+.communicationName {
+  font-weight: 600;
 }
 
-.form-submit {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 1.5rem;
+/* Default: Desktop */
+.companyName-full {
+  font-weight: 600;
+
+  display: inline;
 }
 
-.infoSection {
-  flex: 1 1 50%;
-  min-width: 300px;
-  max-width: 600px;
+.companyName-mobile {
+  display: none;
 }
 
-.imageSection {
-  flex: 1 1 40%;
-  min-width: 300px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+/* Divider */
+.custom-divider {
+  width: 90%;
+  margin: 1rem auto;
+  border: 0;
+  border-top: 2px solid #CBDCEB;
+  border-radius: 2px;
 }
 
 /* =============================
-    Company Image — FIXED VERSION
+   Company Image
 ============================= */
-
-/* Wrapper */
 .companyImageWrapper {
   width: 100%;
-  max-width: 100%;
   display: flex;
   justify-content: center;
 }
 
-/* Next.js <span> wrapper */
-.companyImageWrapper span {
-  width: 100% !important;
-  max-width: 100% !important;
-}
-
-/* Actual image */
 .companyImageWrapper img,
 .companyImage {
   width: 100% !important;
   height: auto !important;
-  max-width: 100% !important;
-  object-fit: contain !important;
+  object-fit: cover !important;
   border-radius: 16px;
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
 /* =============================
-    Google Map
+   Google Map
 ============================= */
-
 .googleMap {
   width: 100%;
   height: 350px;
+  border: none;
   border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  overflow: hidden;
+  box-shadow: 0 0 10px rgba(0,0,0,0.29);
   background: #fff;
 }
-/* ปรับให้ไอคอนและข้อความอยู่กึ่งกลางแนวตั้ง */
+
+/* =============================
+   Info List
+============================= */
 .infoItem {
   display: flex;
-  align-items: center;      /* กึ่งกลางแนวตั้งให้ทั้ง icon + text */
-  gap: 0.8rem;              /* ระยะห่างระหว่าง icon และ text */
-  line-height: 1.6;         /* เพิ่มความสูงบรรทัดให้ดูสวยขึ้น */
-  margin-bottom: 0.7rem;    /* ระยะห่างแต่ละแถว */
+  align-items: center;
+  gap: 0.8rem;
+  line-height: 1.6;
+  margin-bottom: 0.7rem;
 }
 
-/* กำหนดขนาดกล่อง icon ให้สมดุลและ icon อยู่ตรงกลาง */
 .infoItem .icon {
-  flex-shrink: 0;           /* ไม่ให้ icon หดตัว */
-  width: 32px;              /* กำหนดพื้นที่แนวตั้ง/แนวนอนให้ icon */
+  width: 32px;
   height: 32px;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
-  justify-content: center;  /* จัด icon ให้อยู่กลาง perfectly */
+  justify-content: center;
 }
 
-/* ป้องกันข้อความยาวแล้วเบียด icon */
-.infoItem span:last-child {
-  display: block;
-  flex: 1;
-}
+/* =============================
+   Social Links
+============================= */
 .socialSection {
   display: flex;
   flex-direction: column;
+  text-align: center;
+}
+
+.socialLinks {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .socialItem {
   display: flex;
-  align-items: flex-start;  /*  ให้ไอคอนอยู่กึ่งกลางเมื่อข้อความขึ้นหลายบรรทัด */
-  gap: 1rem;                /*  เพิ่มช่องไฟ icon ↔ ข้อความ */
-  font-size: 1.1rem;
-  color: #000;
-  line-height: 1.7;         /* ทำให้ข้อความโล่งขึ้น ดูอ่านง่าย */
-  margin-bottom: 0.5rem;
+  align-items: center;
+  gap: 1rem;
 }
 
 .iconFL {
-  flex-shrink: 0;           /* ห้าม icon หดเวลา text ยาว */
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;              /* กำหนดขนาดพื้นที่ icon ให้สมดุล */
-  height: 36px;
-  margin-top: 2px;          /* ดัน icon ลงเล็กน้อยให้กึ่งกลางเมื่อข้อความ 2 บรรทัด */
 }
 
 /* =============================
-    CONTACT GRID (Desktop)
+   CONTACT GRID (Desktop)
 ============================= */
-
 .contactGrid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 1.5rem;
-  margin: 2rem 0;
 }
 
 .gridItem {
   padding: 1rem;
 }
 
-.companyInfo,
-.googleMapWrapper {
-  grid-column: 1;
-}
-
-.companyImageWrapper,
-.socialSection {
-  grid-column: 2;
-}
-
-/* =============================
-    Skeleton Loaders
-============================= */
-
-.skeleton-card {
-  padding: 1.5rem 0;
-  width: 100%;
+.form-submit {
   display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+  margin-top: 1.5rem;
 }
 
-.skeleton-title,
-.skeleton-line,
-.skeleton-bullet-line,
-.skeleton-image--medium,
-.skeleton-image--large {
-  background-color: #e0e0e0;
-  animation: pulse 1.5s infinite ease-in-out;
-  border-radius: 6px;
+.link-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none !important;
 }
 
-.skeleton-title {
-  height: 22px;
-  width: 45%;
-}
-
-.skeleton-line {
-  height: 14px;
-}
-
-.skeleton-image--medium {
-  width: 100%;
-  height: 200px;
-}
-
-.skeleton-image--large {
-  width: 100%;
-  height: 300px;
-}
-
-@keyframes pulse {
-  0% { opacity: 0.7; }
-  50% { opacity: 1; }
-  100% { opacity: 0.7; }
-}
 
 /* =============================
-       MOBILE  (<=600px)
+   TABLET (601px–1024px)
 ============================= */
-
-@media (max-width: 600px) {
-
+@media (max-width: 1024px) {
   .contactGrid {
     grid-template-columns: 1fr;
-    padding: 1rem;
-    row-gap: 1.5rem;
+    padding: 0 1rem;
+    row-gap: 0.2rem;
+    margin-top: -3rem;
+  }
+  .gridItem.socialSection {
+    margin-top: -1rem;
+    padding: 0 5rem;
+  }
+  .companyName {
+  text-align: center;     /* จัดกลางทั้ง Desktop และ Mobile */
+  width: 100%;
+  display: block;
+  margin: 0 auto;
+}
+  
+}
+
+/* =============================
+   MOBILE (<=600px)
+============================= */
+@media (max-width: 600px) {
+  .contactGrid {
+    grid-template-columns: 1fr;
+    padding: 0rem;
+    margin-top: -1rem;
+    row-gap: 0;
+  }
+  .companyName {
+  margin: 0 auto;
+  margin-bottom: 1rem;
+}
+
+  /* Company name—mobile formatting */
+  .companyName-full {
+    display: none;
+  }
+  .companyName-mobile {
+    display: inline;
+    line-height: 1.5;
+    text-align: center;
+    font-weight: 600;
+
   }
 
-  .companyInfo,
-  .companyImageWrapper,
-  .googleMapWrapper,
-  .socialSection {
-    grid-column: 1;
-  }
-
-  .companyImageWrapper img,
-  .companyImage {
-    border-radius: 12px;
-  }
-
+  /* Adjust Map size */
   .googleMap {
-    height: 250px;
-    margin-top: 1rem;
+    height: 280px;
   }
 
-  .contact-container {
-    flex-direction: column;
+  /* Social icons layout */
+  .iconFL {
+    font-size: 36px;
+    width: 42px;
+    height: 42px;
+  }
+
+  .custom-divider {
+    width: 90%;
+  }
+    .gridItem.socialSection {
+    padding: 0 1rem;
+  }
+}
+/* =============================
+   VERY SMALL MOBILE (<=400px)
+============================= */
+@media (max-width: 400px) {
+    .contactGrid {
+    margin-top: -2.5rem;
+  }
+  /* Hide text; show icons only */
+  .socialItem .label {
+    display: none;
+  }
+
+  .socialLinks {
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
     gap: 1rem;
   }
 
-  .contact-box {
-    max-width: 100%;
+  .iconFL {
+    width: 55px !important;
+    height: 55px !important;
+    font-size: 55px !important;
+  }
+
+  .socialSection {
+    margin-top: -0.5rem;
+  }
+.form-submit {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .form-submit button,
+  .form-submit .link-button {
+    width: 100%;
     margin: 0 auto;
   }
+}
+/* ================================
+   FLAT SKELETON (No Card Wrapper)
+================================ */
+.skeleton-flat {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+}
 
-  .centeredText {
-    font-size: 28px;
+/* เส้นข้อความ + หัวข้อ */
+.skeleton-line {
+   height: 26px;                      /* ปรับให้เท่ากับวงกลม */
+  display: flex;                    /* จัด alignment ภายใน */
+  align-items: center;              /* จัดให้เนื้อหากึ่งกลางแนวตั้ง */
+  background: #e5e5e5;
+  border-radius: 4px;
+  animation: pulse 1.6s infinite ease-in-out;
+}
+
+.skeleton-line.title {
+  width: 55%;
+  height: 32px;
+  margin-bottom: 28px;
+  border-radius: 4px;
+}
+
+/* Bullet item (จัดวงกลมให้อยู่กลางเส้น) */
+.skeleton-bullet {
+  display: flex;
+  align-items: center;   /* จัดให้ทั้งวงกลมและเส้นอยู่กึ่งกลางแนวตั้ง */
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.skeleton-circle {
+  width: 32px;
+  height: 32px;
+  background: #e0e0e0;
+  border-radius: 50%;
+}
+
+/* รูปภาพ/แผนที่ */
+.skeleton-image {
+  width: 100%;
+  background: #e1e1e1;
+  border-radius: 8px;
+}
+
+.skeleton-image--large {
+  height: 350px;
+}
+
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .skeleton-flat {
+    grid-template-columns: 1fr; /* เปลี่ยนเป็น 1 คอลัมน์ */
+    gap: 2rem;                  /* เพิ่มระยะให้โปร่ง */
+    margin-top: -2rem;           /* ขยับ skeleton ลงมา */
   }
 
-  .companyName,
-  .communicationName {
-    font-size: 1.4rem;
-    text-align: center;
+  /* ปรับเส้นให้เล็กลงใน Tablet รองรับพื้นที่ */
+  .skeleton-line {
+    height: 22px;
+    margin-bottom: 14px;
   }
 
-  .socialItem {
-    justify-content: flex-start;
-    gap: 24px;
+.skeleton-line.title {
+  width: 60%;
+  height: 28px;
+  margin: 24px auto;   /* auto ช่วยจัดให้อยู่กลางแนวนอน */
+  border-radius: 4px;
+}
+
+
+  /* ปรับ bullet ให้ดูรองรับ Tablet */
+  .skeleton-circle {
+    width: 26px;
+    height: 26px;
+  }
+
+  /* ปรับรูปภาพให้เป็นสัดส่วน 4:3 โดยใช้ aspect-ratio (ถ้า browser รองรับ) */
+  .skeleton-image--large {
+    height: auto;
+    min-height: 260px;       /* กำหนดความสูงขั้นต่ำ */
   }
 }
 
-/* =============================
-       TABLET (601–1024px)
-============================= */
 
-@media (max-width: 1024px) {
+/* Mobile */
+@media (max-width: 600px) {
+  .skeleton-line.title {
+    width: 55%;
+  }
+  .skeleton-image--large {
+    height: 180px;
+    display: block;          /* ให้ element รองรับ margin auto */
+  margin: 0 auto;
+  }
+  .skeleton-circle {
+    width: 20px;
+    height: 20px;
+  }
+  .skeleton-line {
+    height: 18px;
+  }
+}
+@media (max-width: 400px) {
 
-  .contactGrid {
-    grid-template-columns: 1fr;
-    padding: 1.5rem;
-    row-gap: 2rem;
+  /* แสดง title ปกติ */
+  .social-skeleton .skeleton-line.title {
+    display: block !important;
+    width: 55%;
+    margin: 0 auto 16px;
   }
 
-  .companyInfo,
-  .companyImageWrapper,
-  .googleMapWrapper,
-  .socialSection {
-    grid-column: 1;
+  /* ซ่อนเส้นข้อความทั้งหมด ยกเว้น title */
+  .social-skeleton .skeleton-line:not(.title) {
+    display: none !important;
   }
 
-  .googleMap {
-    height: 300px;
+  /* 🟢 จัด container ให้เรียงวงกลมในแถวเดียว */
+  .social-skeleton {
+    display: flex !important;
+    flex-direction: column; /* title อยู่บน */
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
   }
 
-  .companyName,
-  .communicationName {
-    text-align: center;
+  /* 🟢 จัด "ทุกวงกลม" ให้อยู่ในบรรทัดเดียว */
+  .social-skeleton .skeleton-bullet-wrapper {
+    display: flex;
+    flex-direction: row;      /* เรียงแนวนอน */
+    gap: 14px;
+    justify-content: center;
+    align-items: center;
   }
+
+  /* ขนาดวงกลม */
+  .social-skeleton .skeleton-circle {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+  }
+}
+.loading-text {
+  padding: 10px 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  color: #555;
+  font-size: 14px;
+  background-color: #f9f9f9;
 }
