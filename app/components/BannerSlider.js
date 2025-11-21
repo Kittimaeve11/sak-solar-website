@@ -254,6 +254,25 @@ export default function BannerSlider() {
           50% { opacity: 0.5; }
           100% { opacity: 1; }
         }
+          :global(.slick-dots) {
+          bottom: 15px;
+        }
+        :global(.slick-dots li button) {
+          width: 9px;
+          height: 9px;
+          padding: 0;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.27);
+          border: 2px solid transparent;
+          transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+        :global(.slick-dots li.slick-active button),
+        :global(.slick-dots li button:hover) {
+          background: rgba(255, 255, 255, 0.89);
+        }
+        :global(.slick-dots li button:before) {
+          display: none;
+        }
       `}</style>
     </div>
   );

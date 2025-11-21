@@ -105,21 +105,6 @@ export default function PortfolioClient() {
     checkMobile();
     window.addEventListener('resize', checkMobile);
 
-    // SEO
-    document.title =
-      locale === 'th'
-        ? 'ผลงานของเรา | บริษัท ศักดิ์สยาม โซลาร์ เอ็นเนอร์ยี่ จำกัด'
-        : 'Our Portfolio | Sak Siam Solar Energy Co., Ltd.';
-
-    const meta = document.querySelector("meta[name='description']");
-    const content = locale === 'th' ? 'ผลงานของเรา' : 'Our Portfolio';
-    if (meta) meta.setAttribute('content', content);
-
-    if (typeof window !== 'undefined') {
-      const savedPage = localStorage.getItem('portfolioCurrentPage');
-      if (savedPage) setCurrentPage(Number(savedPage));
-    }
-
     //  Cache อายุไม่เกิน 10 นาที
     const cacheAge = Date.now() - portfolioCache.timestamp;
     if (portfolioCache.projects && cacheAge < 1000 * 60 * 10) {

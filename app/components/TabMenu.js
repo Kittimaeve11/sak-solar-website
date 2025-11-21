@@ -11,17 +11,30 @@ import '../../styles/tabmenu.css';
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 
-/* =========================================================
-   🔹 Best-practice slugify (ตรงกับ ProductsPage)
-========================================================= */
-const slugify = (name) =>
-  name
-    ?.toString()
-    .toLowerCase()
-    .trim()
-    .replace(/\s+/g, '-')        // space → hyphen
-    .replace(/[^a-z0-9-]/g, '')  // remove symbols
-    || '';
+/* 🟢 Category slug */
+const slugifyCategory = (name) =>
+  name?.toLowerCase().trim().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "") || "";
+
+/* 🟠 Normalize Brand → คืน slug ที่ถูกต้อง */
+const normalizeBrandSlug = (name) => {
+  if (!name) return '';
+  const cleaned = name.toLowerCase().trim();
+  const mapping = {
+    huawel: 'huawei',
+    huwei: 'huawei',
+    huwail: 'huawei',
+    hweai: 'huawei',
+    huawei: 'huawei',
+    growatt: 'growatt',
+    growwat: 'growatt',
+    growat: 'growatt',
+    deye: 'deye',
+    daye: 'deye',
+    sinclare: 'sinclair',
+    sinclair: 'sinclair',
+  };
+  return mapping[cleaned] || cleaned.replace(/\s+/g, "-");
+};
 
 export default function TabMenu() {
   const { messages, locale } = useLocale();
@@ -35,68 +48,61 @@ export default function TabMenu() {
 
   const timeoutRef = useRef(null);
 
+  /* 🟢 เช็ค Active ของเมนู */
   const isActive = (path) =>
     path === '/' ? pathname === '/' : pathname.startsWith(path);
 
   const isInProductsSection = pathname.startsWith('/products');
 
   /* =========================================================
-     📌 Load Menu Products (Cache + Clean Slug)
-  ========================================================== */
+     รวม useEffect → เหลือแค่ 1 อันตามที่ขอ
+  ========================================================= */
   useEffect(() => {
+    // 🟠 โหลดข้อมูล Product Header
     const cached = sessionStorage.getItem('menuProducts');
     if (cached) {
       setProducts(JSON.parse(cached));
-      return;
-    }
-
-    const fetchProducts = async () => {
-      try {
-        const res = await fetch(`${baseUrl}/api/productHeaderapi`, {
-          headers: { 'X-API-KEY': apiKey },
-        });
-
-        if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
-
-        const data = await res.json();
-        if (data.status && Array.isArray(data.result)) {
-          const formatted = data.result.map((item) => {
-            const seen = new Set();
-            const uniqueBrands =
-              item.Brand?.filter((b) => {
+    } else {
+      const fetchProducts = async () => {
+        try {
+          const res = await fetch(`${baseUrl}/api/productHeaderapi`, {
+            headers: { 'X-API-KEY': apiKey },
+          });
+          if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
+          const data = await res.json();
+          if (data.status && Array.isArray(data.result)) {
+            const formatted = data.result.map((item) => {
+              const seen = new Set();
+              const uniqueBrands = item.Brand?.filter((b) => {
                 if (seen.has(b.productbrandname)) return false;
                 seen.add(b.productbrandname);
                 return true;
               }) || [];
 
-            return {
-              slug: slugify(item.producttypenameEN),
-              name: {
-                th: item.producttypenameTH?.trim() || '',
-                en: item.producttypenameEN?.trim() || '',
-              },
-              brands: uniqueBrands.map((b) => ({
-                slug: slugify(b.productbrandname),
-                name: b.productbrandname.trim(),
-              })),
-            };
-          });
+              return {
+                slug: slugifyCategory(item.producttypenameEN),
+                name: {
+                  th: item.producttypenameTH?.trim() || '',
+                  en: item.producttypenameEN?.trim() || '',
+                },
+                brands: uniqueBrands.map((b) => ({
+                  slug: normalizeBrandSlug(b.productbrandname),
+                  name: b.productbrandname.trim(),
+                })),
+              };
+            });
 
-          setProducts(formatted);
-          sessionStorage.setItem('menuProducts', JSON.stringify(formatted));
+            setProducts(formatted);
+            sessionStorage.setItem('menuProducts', JSON.stringify(formatted));
+          }
+        } catch (err) {
+          console.error('Error loading menu products:', err);
         }
-      } catch (err) {
-        console.error('Error loading menu products:', err);
-      }
-    };
+      };
+      fetchProducts();
+    }
 
-    fetchProducts();
-  }, []);
-
-  /* =========================================================
-     🖥️ Handle mobile view
-  ========================================================== */
-  useEffect(() => {
+    // 📱 เช็ค mobile
     const checkMobile = () => {
       setIsMobile(window.matchMedia('(max-width: 991px)').matches);
     };
@@ -109,9 +115,9 @@ export default function TabMenu() {
     };
   }, []);
 
-  /* =========================================================
-     🐭 Dropdown hover (Desktop only)
-  ========================================================== */
+  /* ============================
+     Hover บน Desktop
+  ============================ */
   const handleMouseEnter = () => {
     if (!isMobile) {
       clearTimeout(timeoutRef.current);
@@ -140,11 +146,10 @@ export default function TabMenu() {
   };
 
   /* =========================================================
-     🎯 MAIN RENDER
-  ========================================================== */
+     RENDER START
+  ========================================================= */
   return (
     <nav className="navbar">
-      {/* Hamburger (Mobile) */}
       <button
         className="hamburger"
         onClick={() => setOpen((prev) => !prev)}
@@ -155,6 +160,7 @@ export default function TabMenu() {
 
       <nav id="navmenu" className={`navmenu ${open ? 'active' : ''}`}>
         <ul className="nav-root">
+
           {/* Home */}
           <li>
             <Link
@@ -192,7 +198,7 @@ export default function TabMenu() {
               </button>
             </div>
 
-            {/* 👉 dropdown level-1 */}
+            {/* Dropdown */}
             {serviceOpen && (
               <ul className="dropdown-menu level-1">
                 {products.map((product) => {
@@ -206,7 +212,6 @@ export default function TabMenu() {
                       onMouseLeave={() => !isMobile && setActiveProductSlug(null)}
                     >
                       <div className="dropdown-header">
-                        {/* 🌟 ใช้ slug แบบตรงกับ ProductsPage */}
                         <Link
                           href={`/products?categories=${product.slug}`}
                           onClick={handleLinkClick}
@@ -228,7 +233,6 @@ export default function TabMenu() {
                         )}
                       </div>
 
-                      {/* 🔽 Brand submenu */}
                       {isOpen && product.brands.length > 0 && (
                         <ul className="brand-submenu">
                           {product.brands.map((brand, index) => (
@@ -250,7 +254,7 @@ export default function TabMenu() {
             )}
           </li>
 
-          {/* Other Menu */}
+          {/* Other Menus */}
           <li>
             <Link href="/Faq" className={isActive('/Faq') ? 'active' : ''} onClick={handleLinkClick}>
               {messages.faq}

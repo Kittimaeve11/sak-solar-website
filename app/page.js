@@ -44,7 +44,7 @@ export default function HomePage() {
     if (cacheText) {
       try {
         const c = JSON.parse(cacheText);
-        console.log('ใช้ข้อมูลจาก cache');
+        // console.log('ใช้ข้อมูลจาก cache');
 
         setServices(c.services || []);
         setProductTypes(c.productTypes || []);
@@ -164,7 +164,7 @@ export default function HomePage() {
         setAmphures(amph);
         setTambons(tamb);
       } catch (error) {
-        console.error('❌ Error loading data:', error);
+        // console.error(' Error loading data:', error);
       } finally {
         setLoadingServices(false);
         setLoadingProducts(false);

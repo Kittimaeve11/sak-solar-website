@@ -3,92 +3,129 @@ import { NextResponse } from 'next/server';
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 
-// แปลงชื่อให้เป็น slug
-const slugify = (str) =>
-  str
-    ?.toLowerCase()
-    .trim()
-    .replace(/\s+/g, "-")
-    .replace(/[^a-z0-9-]/g, "")
-    || "";
+/* -------------------------------------------------
+ 🟢 slugify ใช้สร้าง slug ของ Category เท่านั้น
+--------------------------------------------------*/
+const slugifyCategory = (str) =>
+  str?.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') || '';
 
-// normalize huawel → huawei
-const normalizeBrandName = (name) => {
-  if (!name) return "";
-  const cleaned = name.trim().toLowerCase();
+/* -------------------------------------------------
+ 🟠 Normalize Brand → คืน slug ของ brand เสมอ
+--------------------------------------------------*/
+const normalizeBrandSlug = (name) => {
+  if (!name) return '';
+  const cleaned = name.toLowerCase().trim();
+
   const mapping = {
-    huawel: "huawei",
-    huawei: "huawei",
-    growatt: "growatt",
-    deye: "deye",
-    sinclair: "sinclair"
+    huawel: 'huawei',
+    huwei: 'huawei',
+    huwail: 'huawei',
+    huawei: 'huawei',
+
+    growat: 'growatt',
+    growwat: 'growatt',
+    growatt: 'growatt',
+
+    deye: 'deye',
+    daye: 'deye',
+
+    sinclare: 'sinclair',
+    sinclair: 'sinclair',
   };
-  return mapping[cleaned] || cleaned;
+
+  return mapping[cleaned] || cleaned.replace(/\s+/g, '-');
 };
 
-// โหลด header API เพื่อดึง mapping จริง
+/* -------------------------------------------------
+ 🧠 Cache โครงสร้าง Category + Brand (15 นาที)
+--------------------------------------------------*/
+let headerCache = {
+  categoryMap: null,
+  brandMap: null,
+  timestamp: 0,
+};
+
 async function loadHeaderMap() {
+  const now = Date.now();
+
+  if (headerCache.timestamp && now - headerCache.timestamp < 15 * 60 * 1000) {
+    return headerCache;
+  }
+
   try {
     const res = await fetch(`${baseUrl}/api/productHeaderapi`, {
-      headers: { "X-API-KEY": apiKey }
+      headers: { 'X-API-KEY': apiKey },
+      cache: 'force-cache',
     });
 
     const data = await res.json();
-
     if (!data?.status || !Array.isArray(data.result)) return null;
 
-    const typeMap = {};
+    const categoryMap = {};
     const brandMap = {};
 
-    data.result.forEach((typeItem) => {
-      const typeID = typeItem.producttypeID;
-      const typeSlug = slugify(typeItem.producttypenameEN);
+    data.result.forEach((item) => {
+      const typeID = item.producttypeID;
+      const typeSlug = slugifyCategory(item.producttypenameEN);
 
-      typeMap[typeSlug] = typeID;
+      // 🟢 Map slug → typeID
+      categoryMap[typeSlug] = typeID;
 
-      typeItem.Brand.forEach((b) => {
+      (item.Brand || []).forEach((b) => {
         const brandID = b.productbrandID;
-        const brandSlug = slugify(normalizeBrandName(b.productbrandname));
+        const brandSlug = normalizeBrandSlug(b.productbrandname);
 
+        // 🟠 Map slug → brandID
         brandMap[brandSlug] = brandID;
       });
     });
 
-    return { typeMap, brandMap };
+    headerCache = {
+      categoryMap,
+      brandMap,
+      timestamp: now,
+    };
+
+    return headerCache;
   } catch (err) {
-    console.error("HeaderAPI load failed:", err);
+    console.error('⚠️ Failed to load HeaderAPI:', err);
     return null;
   }
 }
 
+/* -------------------------------------------------
+ 🛠️ Middleware ทำ URL Rewrite :
+ จาก /products/solar-rooftop/huawei/P1234
+ เป็น   /products/1/2/P1234   (ID จริง)
+--------------------------------------------------*/
 export async function middleware(req) {
   const url = req.nextUrl;
 
-  // match: /products/slug-type/slug-brand/productID
   const match = url.pathname.match(/^\/products\/([^\/]+)\/([^\/]+)\/([^\/]+)$/);
-
   if (!match) return NextResponse.next();
 
-  const [, typeSlug, brandSlug, productID] = match;
+  const [, categorySlug, brandSlug, productID] = match;
 
   const headerMap = await loadHeaderMap();
-
   if (!headerMap) return NextResponse.next();
 
-  const { typeMap, brandMap } = headerMap;
+  const { categoryMap, brandMap } = headerMap;
 
-  const realTypeID = typeMap[typeSlug];
+  const realTypeID = categoryMap[categorySlug];
   const realBrandID = brandMap[brandSlug];
 
-  // ถ้า slug ไม่มีใน mapping → ไม่ rewrite
-  if (!realTypeID || !realBrandID) return NextResponse.next();
+  if (!realTypeID || !realBrandID) {
+    return NextResponse.next();
+  }
 
-  // Rewrite ไป route จริง
   return NextResponse.rewrite(
     new URL(`/products/${realTypeID}/${realBrandID}/${productID}`, req.url)
   );
 }
 
+/* -------------------------------------------------
+ 🔍 ใช้ Middleware เฉพาะ path /products/*
+--------------------------------------------------*/
 export const config = {
   matcher: ['/products/:path*'],
 };

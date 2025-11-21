@@ -53,18 +53,7 @@ export default function Page() {
 
 
   useEffect(() => {
-    // 1️⃣ SEO — ใช้ document ต้องเช็คก่อน
-    if (typeof document !== "undefined") {
-      document.title = 'ติดต่อเรา | บริษัท ศักดิ์สยาม โซลาร์ เอ็นเนอร์ยี่ จำกัด';
-
-      let meta = document.querySelector("meta[name='description']");
-      if (!meta) {
-        meta = document.createElement('meta');
-        meta.name = 'description';
-        document.head.appendChild(meta);
-      }
-      meta.content = 'หน้าติดต่อเรา';
-    }
+    
 
     // 2️⃣ จัดการมือถือ (ต้องเช็ค window)
     const updateMobile = () => {

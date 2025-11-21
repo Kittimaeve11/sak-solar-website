@@ -46,6 +46,33 @@ const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 const slugify = (name) =>
   name?.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') || '';
 
+
+  const normalizeBrandSlug = (name) => {
+    if (!name) return '';
+    const cleaned = name.toLowerCase().trim();
+
+    const mapping = {
+      huawel: 'huawei',
+      huwei: 'huawei',
+      huwail: 'huawei',
+      hweai: 'huawei',
+      huawei: 'huawei',
+
+      growat: 'growatt',
+      growwat: 'growatt',
+      growatt: 'growatt',
+
+      daye: 'deye',
+      deye: 'deye',
+
+      sinclare: 'sinclair',
+      sinclair: 'sinclair',
+    };
+
+    return mapping[cleaned] || cleaned.replace(/\s+/g, "-");
+  };
+
+  
 /* =========================================================
    ฟังก์ชันรวม URL สำหรับโหลดรูปจาก API หรือ fallback
    ========================================================= */
@@ -169,7 +196,7 @@ export default function ProductDetailPage() {
 
             if (brandObj) {
               setBrandName(brandObj.productbrandname);
-              setBrandSlug(slugify(brandObj.productbrandname));
+              setBrandSlug(normalizeBrandSlug(brandObj.productbrandname));
             }
           }
         }
@@ -297,6 +324,7 @@ export default function ProductDetailPage() {
 
   const priceObj = calculatePrice();
 
+
   /* ============================================
      Render UI — โครงสร้างหน้า Product Detail
      ============================================ */
@@ -319,13 +347,16 @@ export default function ProductDetailPage() {
         </Link>
 
         {/* กลับไปดูสินค้าตามประเภท */}
-        <Link href={`/products?categories=${typeSlug}`} className={styles.productlink}>
+        <Link
+          href={`/products?categories=${typeSlug}`}
+          className={styles.productlink}
+        >
           {typeName} <MdKeyboardDoubleArrowRight />
         </Link>
 
         {/* กลับไปดูสินค้าตามประเภท + แบรนด์ */}
         <Link
-          href={`/products?categories=${typeSlug}&brands=${brandSlug}`}
+          href={`/products?categories=${typeSlug}&brands=${normalizeBrandSlug(brandName)}`}
           className={styles.productlink}
         >
           {brandName} <MdKeyboardDoubleArrowRight />
@@ -334,6 +365,7 @@ export default function ProductDetailPage() {
         {/* ชื่อรุ่นสินค้า */}
         <span>{displayName}</span>
       </div>
+
 
       {/* =========================================================
         ส่วนเนื้อหาใหญ่ (Gallery + รายละเอียดสินค้า)

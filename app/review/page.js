@@ -69,15 +69,6 @@ export default function ReviewPage() {
     updateDevice();
     window.addEventListener("resize", updateDevice);
 
-    document.title = "รีวิวของเรา | บริษัท ศักดิ์สยาม โซลาร์ เอ็นเนอร์ยี่ จำกัด";
-
-    let meta = document.querySelector(`meta[name="description"]`);
-    if (!meta) {
-      meta = document.createElement("meta");
-      meta.name = "description";
-      document.head.appendChild(meta);
-    }
-    meta.content = "รีวิวของเรา";
 
     const load = async () => {
       try {

@@ -148,8 +148,6 @@ ul {
   position: absolute;
   top: calc(100% + 2px);
   left: 0;
-  background-color: #ffffff;
-  border: 1px solid #ccc;
   min-width: 200px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   z-index: 1000;
@@ -185,7 +183,7 @@ ul {
   position: absolute;
   top: 0;
   left: 100%;
-  /* 👉 ด้านขวาของเมนูหลัก */
+  /* ด้านขวาของเมนูหลัก */
   background-color: white;
   border: 1px solid #ccc;
   border-radius: 4px;
@@ -214,6 +212,13 @@ ul {
 }
 
 /* สียี่ห้อ */
+.dropdown-menu li a:hover,
+.dropdown-menu li a.active {
+  color: #446795 !important;
+  background-color: #e8f1fc !important;
+}
+
+/* สียี่ห้อ */
 .brand-submenu li a:hover,
 .brand-submenu li a.active {
   color: #446795 !important;
@@ -231,14 +236,14 @@ ul {
   line-height: 1.2 !important;
   display: block;
   box-sizing: border-box;
-  color: #446795;
+  color: #446795!important;
   font-weight: 400;
   transition: color 0.2s ease;
 }
 
 /* สีประเภทสินค้า */
 .dropdown-item:hover .dropdown-toggle {
-  color: #446795;
+  color: #446795!important;
   background-color: #e8f1fc;
 
 }
@@ -255,19 +260,24 @@ ul {
 
 /* ทำให้สินค้าที่ active ใน dropdown เป็นสีฟ้า */
 .dropdown-item.active>.dropdown-toggle {
-  color: #ffc300 !important;
+  color: #446795 !important;
   border-radius: 4px;
 }
 
-/* hover ของ dropdown item */
-/* .dropdown-item:hover > .dropdown-toggle {
-  color: #ffc300;
-  background-color: #f8f3ef4b;
-} */
-/* ลบเส้นสีส้มในเมนูย่อย dropdown และ brand submenu */
-.dropdown-menu li a::after,
-.brand-submenu li a::after {
-  content: none !important;
+.dropdown-menu li a.active-dropdown,
+.brand-submenu li a.active-dropdown {
+  background-color: #e8f1fc !important;
+  color: #446795 !important;
+  font-weight: 600;
+  border-radius: 4px;
+}
+
+
+/* ทำให้เมนูที่อยู่หน้าเดียวกันเปลี่ยนสี */
+.active-dropdown {
+  background-color: #e8f1fc !important; /* ฟ้าอ่อน */
+  color: #446795 !important;            /* น้ำเงินอ่อน */
+  border-radius: 4px;
 }
 
 /* Responsive */

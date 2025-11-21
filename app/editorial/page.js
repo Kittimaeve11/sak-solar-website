@@ -73,20 +73,6 @@ export default function EditorialListPage() {
 useEffect(() => {
   if (typeof window === "undefined") return; // สำคัญมาก ป้องกัน Build crash
 
-  /* SEO */
-  document.title =
-    locale === 'en'
-      ? 'Editorials | Sak Siam Solar Energy Co., Ltd.'
-      : 'บทความ | บริษัท ศักดิ์สยาม โซลาร์ เอ็นเนอร์ยี่ จำกัด';
-
-  const metaDesc = document.querySelector("meta[name='description']");
-  if (metaDesc) {
-    metaDesc.setAttribute(
-      "content",
-      locale === 'en' ? 'Editorials and Solar Knowledge' : 'บทความและสาระความรู้โซลาร์'
-    );
-  }
-
   /* ตรวจมือถือ */
   const updateDevice = () => setIsMobile(window.innerWidth <= 768);
   updateDevice();

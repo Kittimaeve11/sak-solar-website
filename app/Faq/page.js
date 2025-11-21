@@ -38,20 +38,7 @@ export default function FAQPage() {
       useEffect เดียว — SEO + Fetch API
   ===================================================== */
   useEffect(() => {
-    const loc = typeof locale === 'string' ? locale.toLowerCase() : 'th';
-    const isThai = loc.startsWith('th');
 
-    document.title = isThai
-      ? 'คำถามที่พบบ่อย | บริษัท ศักดิ์สยาม โซลาร์ เอ็นเนอร์ยี่ จำกัด'
-      : 'FAQ | Sak Siam Solar Energy Co., Ltd.';
-
-    let meta = document.querySelector("meta[name='description']");
-    if (!meta) {
-      meta = document.createElement('meta');
-      meta.name = 'description';
-      document.head.appendChild(meta);
-    }
-    meta.content = isThai ? 'คำถามที่พบบ่อย' : 'FAQ';
 
     const loadData = async () => {
       // FAQ

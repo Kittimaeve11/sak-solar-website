@@ -105,13 +105,14 @@ let productsCache = {
   timestamp: 0,
 };
 
+
 /* =========================================================
    Component หลัก — หน้า Products
 ========================================================= */
 export default function ProductsPage() {
   const [mounted, setMounted] = useState(false);
 
-  const rowsPerPage = 5; // ⭐ จำนวนแถวต่อหน้า
+  const rowsPerPage = 6;
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
@@ -138,23 +139,33 @@ export default function ProductsPage() {
   useEffect(() => {
     setMounted(true);
 
-    // ========== คำนวณ columns แบบป้องกันลูป ==========
+    /* ============================
+       📌 คำนวณ Columns (Responsive)
+       และอัปเดต itemsPerPage ภายใน
+    ============================ */
     const handleResize = () => {
       const usable = window.innerWidth - 260 - 64;
-      let newColumns = 2;
+      let newColumns = 1;
 
       if (usable >= 1500) newColumns = 5;
       else if (usable >= 1150) newColumns = 4;
       else if (usable >= 780) newColumns = 3;
+      else newColumns = 2;
 
-      // ⭐ ป้องกัน infinite loop — อัปเดตก็ต่อเมื่อค่าเปลี่ยนจริง
-      setColumns(prev => (prev === newColumns ? prev : newColumns));
+      // ⭐ อัปเดต columns และ itemsPerPage พร้อมกัน
+      setColumns(prev => {
+        if (prev === newColumns) return prev;
+        setItemsPerPage(newColumns * rowsPerPage); // ⬅ set ตรงนี้เลย
+        return newColumns;
+      });
     };
 
     handleResize();
     window.addEventListener("resize", handleResize);
 
-    // ========== โหลดข้อมูล ==========
+    /* ============================
+       📦 โหลดข้อมูลครั้งเดียว
+    ============================ */
     const loadData = async () => {
       let categoriesData, productsData, brandsData;
 
@@ -171,7 +182,6 @@ export default function ProductsPage() {
         brandsData = productsCache.brands;
       } else {
         setLoading(true);
-
         const [resHeader, resProducts] = await Promise.all([
           fetch(`${baseUrl}/api/productHeaderapi`, {
             headers: { "X-API-KEY": apiKey }
@@ -215,9 +225,8 @@ export default function ProductsPage() {
 
         productsData = formatted;
 
-        // === จัดกลุ่ม brand ===
+        // === Group Brand ===
         const brandMap = new Map();
-
         formatted.forEach((item) => {
           const normalized = normalizeBrandName(item.brandName);
           if (!brandMap.has(normalized)) {
@@ -251,7 +260,7 @@ export default function ProductsPage() {
       setProducts(productsData);
       setBrands(brandsData);
 
-      // ========== โหลดค่า filter จาก URL ==========
+      // 🎯 Apply URL Filter (ไม่ loop)
       const catParam = searchParams.get("categories");
       const brandParam = searchParams.get("brands");
 
@@ -272,7 +281,6 @@ export default function ProductsPage() {
           .map((b) => b.brandName);
       }
 
-      // ⭐ ป้องกันลูป: อัปเดตเฉพาะตอนค่าจริงๆ เปลี่ยน
       setSelectedCategories(prev =>
         JSON.stringify(prev) === JSON.stringify(sCat) ? prev : sCat
       );
@@ -294,16 +302,11 @@ export default function ProductsPage() {
 
     loadData();
 
-    // ========== itemsPerPage คำนวณใหม่เฉพาะตอน columns เปลี่ยน ==========
-    setItemsPerPage(prev =>
-      prev === columns * rowsPerPage ? prev : columns * rowsPerPage
-    );
-
+    // ⭐ กลับไปหน้าแรกเมื่อ filter/load เสร็จ
     setCurrentPage(1);
 
     return () => window.removeEventListener("resize", handleResize);
   }, [searchParams, locale]);
-  // ❗❗ คีย์หลัก: ตัด columns ออกเพื่อกันลูป
   /* =========================================================
      Filtering — ฟิลเตอร์สินค้าแบบ realtime
      ใช้ useMemo เพื่อให้คำนวณเฉพาะตอนที่ products,
@@ -389,12 +392,11 @@ export default function ProductsPage() {
         "categories",
         newCategories
           .map((id) => {
-            // หา category จาก id แล้วแปลงชื่อเป็น slug
             const c = categories.find((x) => Number(x.producttypeID) === id);
             return c ? slugify(c.producttypenameEN) : null;
           })
-          .filter(Boolean)     // ตัดค่าที่เป็น null ออก
-          .join(",")           // รวมเป็น list คั่นด้วย comma
+          .filter(Boolean)
+          .join(",")
       );
     }
 
@@ -402,7 +404,9 @@ export default function ProductsPage() {
     if (newBrands.length > 0) {
       params.set(
         "brands",
-        newBrands.map((b) => slugify(b)).join(",") // แปลงชื่อแบรนด์เป็น slug
+        newBrands
+          .map((b) => slugify(normalizeBrandName(b))) // ⭐ Normalize ก่อน slugify
+          .join(",")
       );
     }
 
@@ -625,7 +629,7 @@ export default function ProductsPage() {
                       <h3>{item.modelair || item.model || item.solarpanel}</h3>
 
                       {item.battery && (
-                        <h6 style={{marginTop:'-0.5rem'}}>รุ่นแบตเตอรี่ {item.battery} kWh</h6>
+                        <h6 style={{ marginTop: '-0.5rem' }}>รุ่นแบตเตอรี่ {item.battery} kWh</h6>
                       )}
 
                       {/* แสดงขนาด */}
