@@ -256,7 +256,7 @@ export default function TabMenu() {
 
           {/* Other Menus */}
           <li>
-            <Link href="/Faq" className={isActive('/Faq') ? 'active' : ''} onClick={handleLinkClick}>
+            <Link href="/Faqsolar" className={isActive('/Faqsolar') ? 'active' : ''} onClick={handleLinkClick}>
               {messages.faq}
             </Link>
           </li>
@@ -271,7 +271,7 @@ export default function TabMenu() {
             </Link>
           </li>
           <li>
-            <Link href="/editorial" className={isActive('/editorial') ? 'active' : ''} onClick={handleLinkClick}>
+            <Link href="/editorialsolar" className={isActive('/editorialsolar') ? 'active' : ''} onClick={handleLinkClick}>
               {messages.editorial}
             </Link>
           </li>

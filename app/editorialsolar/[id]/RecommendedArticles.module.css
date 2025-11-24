@@ -1,0 +1,74 @@
+/* 🔹 Container — เต็มจอ, จัดกลาง, รองรับ mobile */
+.container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background-color: #f8fafc;
+  padding: 2rem 1rem;
+}
+
+/* 🔹 กล่องเนื้อหา */
+.box {
+  max-width: 600px;
+  width: 100%;
+  padding: 2rem 1.5rem;
+}
+
+/* 🔹 รูปภาพรองรับทั้ง Desktop และ Mobile */
+.image {
+  width: 100%;
+  max-width: 350px;
+  height: auto;
+  margin: 0 auto 1.5rem auto;
+  display: block;
+}
+
+/* 🔹 หัวข้อหลัก */
+.title {
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #243865;
+}
+
+/* 🔹 ข้อความรอง */
+.text {
+  font-size: clamp(1rem, 2.5vw, 1.15rem);
+  color: #555;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+/* 🔹 ปุ่มกลับหน้าหลัก */
+.homeButton {
+  display: inline-block;
+  padding: 12px 28px;
+  font-size: 1rem;
+  background-color: #E88534;
+  color: white;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.3s ease, transform 0.25s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.homeButton:hover {
+  background-color: #d27525;
+  transform: translateY(-3px);
+}
+
+/* 🔹 ปรับสำหรับ Mobile */
+@media (max-width: 480px) {
+  .box {
+    padding: 1.5rem 1rem;
+  }
+
+  .homeButton {
+    width: 100%;
+    padding: 14px 0;
+    font-size: 1.05rem;
+  }
+}

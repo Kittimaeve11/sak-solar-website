@@ -672,27 +672,33 @@ h6 {
 
 
 /* ====== สปินเนอร์ (วงกลมหมุนโหลดข้อมูล) ====== */
-.spinner-container {
+/* 🎯 Spinner เต็มหน้าจอจริง — ครอบทั้ง viewport */
+/* 🔹 Spinner เต็มจอจริงๆ — ไม่โดน Layout อื่นจำกัด */
+.spinner-fullscreen {
+  position: fixed;  /* ครอบทั้ง viewport */
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100px; /* ความสูงขั้นต่ำเพื่อให้อยู่ตรงกลาง */
-  width: 100%;
+  background: rgba(255, 255, 255, 0.92); /* สีพื้นหลังจาง ๆ */
+  z-index: 9999;  /* ให้สูงกว่า Header/Footer ทุกอย่าง */
 }
 
+/* 🔄 ตัวหมุน */
 .spinner {
-  width: 60px;
-  height: 60px;
-  border: 6px solid #ccc;
-  border-top: 6px solid #F25C05;  /* แถบสีหมุน */
+  width: 70px;
+  height: 70px;
+  border: 6px solid #d0d0d0;
+  border-top: 6px solid #F25C05; /* สีหลัก */
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+  100% { transform: rotate(360deg); }
 }
 
 /* ====== ข้อความ ... (ellipsis) ====== */
@@ -940,4 +946,15 @@ html[data-theme-mode="normal"] {
     object-position: top center;
     background-color: transparent;
   }
+}
+/* Hide Footer & Floating UI in 404 page */
+body.not-found-page footer,
+body.not-found-page .footer,
+body.not-found-page [class*="footer"],
+body.not-found-page [class*="Floating"],
+body.not-found-page [class*="floating"],
+body.not-found-page [class*="back"],
+body.not-found-page [class*="chat"],
+body.not-found-page [class*="line"] {
+  display: none !important;
 }
