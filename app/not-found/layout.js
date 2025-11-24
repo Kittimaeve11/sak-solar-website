@@ -1,7 +1,7 @@
-export default function NotFoundLayout({ children }) {
+export default function NotFoundRootLayout({ children }) {
   return (
     <html lang="th">
-      <body className="not-found-page">
+      <body style={{ margin: 0, padding: 0 }}>
         {children}
       </body>
     </html>
