@@ -1,4 +1,5 @@
 // 📄 app/about/layout.js
+import '@/styles/about.css';
 
 export const metadata = {
   title:
