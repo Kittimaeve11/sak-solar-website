@@ -1,8 +1,9 @@
 'use client';
-import { useEffect } from 'react';
-import styles from './PortfolioDetail.module.css';
+
+import { useEffect } from "react";
 
 export default function LoadingSpinner() {
+
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => {
@@ -11,13 +12,13 @@ export default function LoadingSpinner() {
   }, []);
 
   return (
-    <div className={styles.spinnerFullscreen}>
-      <div className={styles.spinner}></div>
-      <div className={styles.loadingText}>
+    <div className="spinner-fullscreen">
+      <div className="spinner"></div>
+      <div className="loading-text">
         กำลังโหลดข้อมูล
-        <span className={styles.dot}>.</span>
-        <span className={styles.dot}>.</span>
-        <span className={styles.dot}>.</span>
+        <span className="dot">.</span>
+        <span className="dot">.</span>
+        <span className="dot">.</span>
       </div>
     </div>
   );

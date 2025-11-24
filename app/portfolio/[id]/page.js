@@ -9,6 +9,7 @@ import { BsCalendarCheck } from 'react-icons/bs';
 import { FaSolarPanel } from 'react-icons/fa';
 import Gallery from '../gallery';
 import { useLocale } from '@/app/Context/LocaleContext';
+import LoadingSpinner from './LoadingSpinner'; // 🔥 เพิ่ม import
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
@@ -30,7 +31,6 @@ export default function PortfolioDetailPage({ params }) {
     async function fetchData() {
       setLoading(true);
       try {
-        // Fetch project
         const resProject = await fetch(`${baseUrl}/api/portfolioIDpageapi/${id}`, {
           headers: { 'X-API-KEY': apiKey },
         });
@@ -62,7 +62,7 @@ export default function PortfolioDetailPage({ params }) {
             gallery: gallery.map((img) => `${baseUrl}/${img}`),
             workSteps,
             product_ID: item.product_ID,
-            product_num: item.product_num, // ✅ เพิ่มฟิลด์ product_num จาก portfolio
+            product_num: item.product_num,
             productTypeTH: item.TypeProduct_nameTH,
             productTypeEN: item.TypeProduct_nameEN,
           };
@@ -70,7 +70,6 @@ export default function PortfolioDetailPage({ params }) {
           setProject(projectData);
         }
 
-        // Fetch products
         const resProducts = await fetch(`${baseUrl}/api/productpageapi`, {
           headers: { 'X-API-KEY': apiKey },
         });
@@ -96,7 +95,6 @@ export default function PortfolioDetailPage({ params }) {
           setProducts(productsData);
         }
 
-        // ✅ Match product — จับคู่แบบหลายเงื่อนไข
         if (projectData && productsData.length > 0 && isMounted) {
           const matched =
             productsData.find(
@@ -126,7 +124,6 @@ export default function PortfolioDetailPage({ params }) {
 
     fetchData();
 
-    // ปิด scroll เวลา lightbox เปิด
     document.body.style.overflow = lightboxIndex !== null ? 'hidden' : '';
 
     return () => {
@@ -135,10 +132,21 @@ export default function PortfolioDetailPage({ params }) {
     };
   }, [id, lightboxIndex]);
 
-  if (loading) return <p style={{ textAlign: 'center', marginTop: 50 }}>Loading...</p>;
-  if (!project) return <p style={{ textAlign: 'center', marginTop: 50 }}>Project not found</p>;
+  /* 🟡 ใช้ LoadingSpinner แบบบทความ */
+  if (loading) {
+    return (
+      <>
+        <LoadingSpinner />
+        <div className="loading-placeholder"></div>
+      </>
+    );
+  }
 
-  const t = {
+  if (!project) {
+    return <p style={{ textAlign: 'center', marginTop: 50 }}>Project not found</p>;
+  }
+
+ const t = {
     detail: locale === 'th' ? 'รายละเอียด' : 'Details',
     workSteps: locale === 'th' ? 'ขั้นตอนการดำเนินงาน' : 'Work Steps',
     gallery: locale === 'th' ? 'แกลเลอรี่รูปภาพ' : 'Gallery',
