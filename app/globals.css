@@ -977,14 +977,3 @@ html[data-theme-mode="normal"] {
     background-color: transparent;
   }
 }
-/* Hide Footer & Floating UI in 404 page */
-body.not-found-page footer,
-body.not-found-page .footer,
-body.not-found-page [class*="footer"],
-body.not-found-page [class*="Floating"],
-body.not-found-page [class*="floating"],
-body.not-found-page [class*="back"],
-body.not-found-page [class*="chat"],
-body.not-found-page [class*="line"] {
-  display: none !important;
-}

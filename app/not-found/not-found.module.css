@@ -1,4 +1,4 @@
-/* พื้นหลังเต็มจอ + จัดกลาง */
+/* not-found.module.css */
 .wrapper {
   min-height: 100vh;
   display: flex;
@@ -8,7 +8,6 @@
   padding: 2rem 1rem;
 }
 
-/* กล่องเนื้อหา */
 .card {
   text-align: center;
   max-width: 600px;
@@ -16,7 +15,6 @@
   padding: 2rem 1.5rem;
 }
 
-/* รูปภาพ */
 .image {
   width: 100%;
   max-width: 350px;
@@ -25,7 +23,6 @@
   display: block;
 }
 
-/* หัวข้อ */
 .title {
   font-size: clamp(1.8rem, 4vw, 2.4rem);
   font-weight: 700;
@@ -33,7 +30,6 @@
   color: #243865;
 }
 
-/* ข้อความรอง */
 .text {
   font-size: clamp(1rem, 2.5vw, 1.15rem);
   color: #555;
@@ -41,7 +37,6 @@
   line-height: 1.6;
 }
 
-/* ปุ่มกลับหน้าหลัก */
 .homeButton {
   display: inline-block;
   padding: 12px 28px;
@@ -58,26 +53,4 @@
 .homeButton:hover {
   background-color: #d27525;
   transform: translateY(-3px);
-}
-
-/* Responsive สำหรับมือถือ */
-@media (max-width: 480px) {
-  .card {
-    padding: 1.5rem 1rem;
-  }
-
-  .homeButton {
-    width: 100%;
-    padding: 14px 0;
-    font-size: 1.05rem;
-  }
-}
-/* รีเซ็ตให้หน้านี้สะอาด */
-:global(body.not-found-page) {
-  all: unset;
-  background: #f8fafc !important;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
 }
