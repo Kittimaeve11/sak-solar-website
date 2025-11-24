@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function NotFound() {
   return (
     <html>
@@ -12,14 +14,14 @@ export default function NotFound() {
       }}>
         <h1>404 - ไม่พบหน้าที่คุณต้องการ</h1>
         <p>หน้าที่คุณค้นหาอาจถูกลบ ย้าย หรือไม่มีอยู่จริง</p>
-        <a href="/" style={{
+        <Link href="/" style={{
           marginTop: '20px',
           padding: '10px 16px',
           background: '#333',
           color: '#fff',
           textDecoration: 'none',
           borderRadius: '4px'
-        }}>กลับสู่หน้าหลัก</a>
+        }}>กลับสู่หน้าหลัก</Link>
       </body>
     </html>
   );
