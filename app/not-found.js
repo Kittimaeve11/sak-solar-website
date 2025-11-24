@@ -30,7 +30,7 @@ export default function NotFoundPage() {
         }}
       >
         กลับสู่หน้าหลัก
-      </a>
+      </Link>
     </div>
   );
 }
