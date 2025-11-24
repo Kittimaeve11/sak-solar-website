@@ -18,139 +18,172 @@ const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 
 export default function EditorialDetailPage() {
-  const params = useParams();
-  const id = params?.id;
-  const { locale } = useLocale();
+    const params = useParams();
+    const id = params?.id;
+    const { locale } = useLocale();
 
-  // 👉 editorial = undefined (ยังไม่โหลด) / null (โหลดแล้วแต่ไม่เจอ) / object (เจอข้อมูล)
-  const [editorial, setEditorial] = useState(undefined);
-  const [isLoading, setIsLoading] = useState(true);
-  const [activeIndex, setActiveIndex] = useState(null);
-  const sectionsRef = useRef([]);
+    const [editorial, setEditorial] = useState(undefined);
+    const [isLoading, setIsLoading] = useState(true);
+    const [activeIndex, setActiveIndex] = useState(null);
+    const sectionsRef = useRef([]);
 
-  useEffect(() => {
-    if (!id) return;
+    useEffect(() => {
+        if (!id) return;
 
-    const controller = new AbortController();
+        const controller = new AbortController();
 
-    async function fetchArticle() {
-      setIsLoading(true);
-      setEditorial(undefined); // เคลียร์ state ทุกครั้งที่เริ่มโหลดใหม่
+        async function fetchArticle() {
+            setIsLoading(true);
+            setEditorial(undefined);
 
-      try {
-        const res = await fetch(`${baseUrl}/api/edittorIDpageapi/${id}`, {
-          headers: { "X-API-KEY": apiKey },
-          signal: controller.signal,
-        });
+            try {
+                const res = await fetch(`${baseUrl}/api/edittorIDpageapi/${id}`, {
+                    headers: { "X-API-KEY": apiKey },
+                    signal: controller.signal,
+                });
 
-        const data = await res.json();
+                const data = await res.json();
+                const article =
+                    data?.result?.[0] ||
+                    data?.result ||
+                    data?.data ||
+                    null;
 
-        const article =
-          data?.result?.[0] ||
-          data?.result ||
-          data?.data ||
-          null;
-
-        setEditorial(article); // ถ้าไม่มี ให้เป็น null ไม่ใช่ {}
-      } catch (err) {
-        if (err.name !== "AbortError") {
-          console.error("❌ Fetch Error:", err);
+                if (!controller.signal.aborted) {
+                    console.log("🟢 editorial object จาก API:", article); // 👀 ดูค่า typeID ตรงนี้
+                    setEditorial(article);
+                }
+            } catch {
+                if (!controller.signal.aborted) {
+                    setEditorial(null);
+                }
+            } finally {
+                if (!controller.signal.aborted) {
+                    setIsLoading(false);
+                }
+            }
         }
-        setEditorial(null); // error = ไม่มีข้อมูล
-      } finally {
-        setIsLoading(false); // จบโหลด
-      }
+
+        fetchArticle();
+
+        const onScroll = () => {
+            let current = null;
+            sectionsRef.current.forEach((section, idx) => {
+                if (!section) return;
+                const rect = section.getBoundingClientRect();
+                if (rect.top <= 120 && rect.bottom > 120) current = idx;
+            });
+            setActiveIndex(current);
+        };
+
+        window.addEventListener("scroll", onScroll, { passive: true });
+        return () => {
+            controller.abort();
+            window.removeEventListener("scroll", onScroll);
+        };
+    }, [id, locale]);
+
+    /* ==========================
+       🟡 Loading Stage
+    ========================== */
+    if (isLoading || editorial === undefined) {
+        return (
+            <>
+                <LoadingSpinner />
+                <div className="loading-placeholder"></div>
+            </>
+        );
     }
 
-    fetchArticle();
+    /* ❌ Loaded but no data */
+    if (editorial === null) {
+        return (
+            <div className={styles.notFoundBox}>
+                <p>{locale === "en" ? "Article not found" : "ไม่พบบทความ"}</p>
+            </div>
+        );
+    }
 
-    // ScrollSpy
-    const onScroll = () => {
-      let current = null;
-      sectionsRef.current.forEach((section, idx) => {
-        if (!section) return;
-        const rect = section.getBoundingClientRect();
-        if (rect.top <= 120 && rect.bottom > 120) current = idx;
-      });
-      setActiveIndex(current);
-    };
+    /* 🟢 Valid Data */
+    const title =
+        locale === "en"
+            ? editorial?.titiemainEN || editorial?.editoria_titieEN
+            : editorial?.titiemainTH || editorial?.editoria_titieTH;
 
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => {
-      controller.abort();
-      window.removeEventListener("scroll", onScroll);
-    };
-  }, [id, locale]);
+    const description =
+        locale === "en"
+            ? editorial?.descriptionmainEN || editorial?.editoria_descriptionEN
+            : editorial?.descriptionmainTH || editorial?.editoria_descriptionTH;
 
-  /* 🟡 Loading state */
-  if (isLoading || editorial === undefined) {
-    return <LoadingSpinner />;
-  }
+    const date = editorial?.editoria_creacteAt
+        ? new Date(editorial.editoria_creacteAt).toLocaleDateString(
+            locale === "en" ? "en-EN" : "th-TH",
+            { day: "numeric", month: "long", year: "numeric" }
+        )
+        : "-";
 
-  /* 🔴 No data AFTER loaded */
-  if (editorial === null) {
+    const subList = editorial?.subEditoria || [];
+
+    /* 🔥 ใช้ editoriatypeID ที่ถูกต้องแทน editoria_typeID */
+    const safeTypeId =
+        editorial?.editoriatypeID ||
+        editorial?.typeID ||
+        editorial?.editoria_typeID ||
+        null;
+
+    console.log("💡 typeID ที่ส่งให้ RecommendedArticles:", safeTypeId);
+    console.log("💡 currentIdSafe:", Number(editorial?.editoria_id));
+
     return (
-      <div className={styles.notFoundBox}>
-        <p>{locale === "en" ? "Article not found" : "ไม่พบบทความ"}</p>
-      </div>
-    );
-  }
+        <>
+            <main className="fade-in">
+                <div className={styles.wrapper}>
+                    <div className={subList.length > 0 ? styles.layout : styles.layoutFullWidth}>
+                        <div className={styles.contentBox}>
+                            <article className={styles.article}>
+                                <ArticleHeader title={title} date={date} locale={locale} />
+                                <ArticleMainImage
+                                    images={getImageUrls(editorial?.gallarymain)}
+                                    title={title}
+                                />
+                                <div
+                                    className={styles.mainContent}
+                                    dangerouslySetInnerHTML={{ __html: parseHTML(description) }}
+                                />
+                                {subList.map((sub, index) => (
+                                    <ArticleSubSection
+                                        key={index}
+                                        index={index}
+                                        title={locale === "en" ? sub?.subtitiEN || sub?.subtitiTH : sub?.subtitiTH}
+                                        desc={parseHTML(
+                                            locale === "en" ? sub?.subdescriptionEN : sub?.subdescriptionTH
+                                        )}
+                                        images={getImageUrls(sub.subgallary)}
+                                        sectionRef={(el) => (sectionsRef.current[index] = el)}
+                                        isActive={activeIndex === index}
+                                    />
+                                ))}
+                            </article>
+                        </div>
 
-  /* 🟢 Valid article — Show content */
-  const title =
-    locale === "en"
-      ? editorial?.titiemainEN || editorial?.editoria_titieEN
-      : editorial?.titiemainTH || editorial?.editoria_titieTH;
+                        {subList.length > 0 && (
+                            <TableOfContents
+                                subList={subList}
+                                activeIndex={activeIndex}
+                                locale={locale}
+                            />
+                        )}
+                    </div>
+                </div>
+            </main>
 
-  const description =
-    locale === "en"
-      ? editorial?.descriptionmainEN || editorial?.editoria_descriptionEN
-      : editorial?.descriptionmainTH || editorial?.editoria_descriptionTH;
-
-  const date = editorial?.editoria_creacteAt
-    ? new Date(editorial.editoria_creacteAt).toLocaleDateString(
-        locale === "en" ? "en-EN" : "th-TH",
-        { day: "numeric", month: "long", year: "numeric" }
-      )
-    : "-";
-
-  const subList = editorial?.subEditoria || [];
-
-  return (
-    <main>
-      <div className={styles.wrapper}>
-        <div className={subList.length > 0 ? styles.layout : styles.layoutFullWidth}>
-          <div className={styles.contentBox}>
-            <article className={styles.article}>
-              <ArticleHeader title={title} date={date} locale={locale} />
-              <ArticleMainImage images={getImageUrls(editorial?.gallarymain)} title={title} />
-              <div
-                className={styles.mainContent}
-                dangerouslySetInnerHTML={{ __html: parseHTML(description) }}
-              />
-              {subList.map((sub, index) => (
-                <ArticleSubSection
-                  key={index}
-                  index={index}
-                  title={locale === "en" ? sub?.subtitiEN || sub?.subtitiTH : sub?.subtitiTH}
-                  desc={parseHTML(locale === "en" ? sub?.subdescriptionEN : sub?.subdescriptionTH)}
-                  images={getImageUrls(sub.subgallary)}
-                  sectionRef={(el) => (sectionsRef.current[index] = el)}
-                  isActive={activeIndex === index}
+            <section style={{ marginTop: "50px", paddingBottom: "80px" }}>
+                <RecommendedArticles
+                    typeID={editorial?.editoriatypeID || editorial?.typeID}
+                    currentId={Number(editorial?.editoria_id)}
                 />
-              ))}
-            </article>
-          </div>
+            </section>
 
-          {subList.length > 0 && (
-            <TableOfContents subList={subList} activeIndex={activeIndex} locale={locale} />
-          )}
-        </div>
-      </div>
-
-      <div className={styles.recommendedSection}>
-        <RecommendedArticles typeID={3} currentId={editorial?.editoria_id} />
-      </div>
-    </main>
-  );
+        </>
+    );
 }

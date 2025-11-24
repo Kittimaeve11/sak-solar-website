@@ -19,7 +19,7 @@ export default function EditorialCard({ item, locale }) {
       className="editorial-card"
       onClick={async () => {
         await handleLogClick(item);
-        router.push(`/editorialsolar/${item.editoria_num}`); // แก้ path ถูกแล้ว
+        router.push(`/editorialsolar/${item.editoria_num}`, { scroll: false });
       }}
     >
       <div className="card-image-wrapper">

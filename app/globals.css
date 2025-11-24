@@ -672,27 +672,27 @@ h6 {
 
 
 /* ====== สปินเนอร์ (วงกลมหมุนโหลดข้อมูล) ====== */
-/* 🎯 Spinner เต็มหน้าจอจริง — ครอบทั้ง viewport */
-/* 🔹 Spinner เต็มจอจริงๆ — ไม่โดน Layout อื่นจำกัด */
 .spinner-fullscreen {
-  position: fixed;  /* ครอบทั้ง viewport */
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+  position: fixed;
+  inset: 0;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: rgba(255, 255, 255, 0.92); /* สีพื้นหลังจาง ๆ */
-  z-index: 9999;  /* ให้สูงกว่า Header/Footer ทุกอย่าง */
+
+  background: rgba(255, 255, 255, 0.88);  /* ทึบขึ้นนิด หน้าดูหรู */
+  backdrop-filter: blur(4px);             /* เบลอพื้นหลังให้ดู fancy */
+  
+  z-index: 99999;                         /* สูงสุด บัง header / footer */
+  pointer-events: all;                    /* บังการคลิกทุกอย่าง */
 }
 
-/* 🔄 ตัวหมุน */
+/* 🔄 Spinner วงกลมหมุน */
 .spinner {
-  width: 70px;
-  height: 70px;
-  border: 6px solid #d0d0d0;
-  border-top: 6px solid #F25C05; /* สีหลัก */
+  width: 80px;
+  height: 80px;
+  border: 6px solid #d8d8d8;
+  border-top: 6px solid #F25C05;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -700,6 +700,36 @@ h6 {
 @keyframes spin {
   100% { transform: rotate(360deg); }
 }
+
+/* ✨ ข้อความกำลังโหลด */
+.loading-text {
+  margin-top: 18px;
+  font-size: 19px;
+  font-weight: 600;
+  color: #333;
+  display: flex;
+  gap: 3px;
+}
+
+/* จุดกระพริบ (…) */
+.dot {
+  animation: blink 1.2s infinite ease-in-out;
+}
+
+.dot:nth-child(2) { animation-delay: 0.2s; }
+.dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes blink {
+  0%, 20% { opacity: 0; }
+  50%, 100% { opacity: 1; }
+}
+
+/* ====== กัน Footer ชิด Navbar ระหว่างโหลด ====== */
+.loading-placeholder {
+  min-height: 80vh; /* ปรับให้สูง */
+  width: 100%;
+}
+
 
 /* ====== ข้อความ ... (ellipsis) ====== */
 .ellipsis {

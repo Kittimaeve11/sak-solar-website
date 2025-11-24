@@ -1,74 +1,112 @@
-/* 🔹 Container — เต็มจอ, จัดกลาง, รองรับ mobile */
-.container {
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  background-color: #f8fafc;
-  padding: 2rem 1rem;
-}
-
-/* 🔹 กล่องเนื้อหา */
-.box {
-  max-width: 600px;
+/* ===== Wrapper ของ Section ทั้งหมด ===== */
+.wrapper {
   width: 100%;
-  padding: 2rem 1.5rem;
-}
+  max-width: 1280px;
+  margin: 3rem auto;
+  padding: 1rem;
 
-/* 🔹 รูปภาพรองรับทั้ง Desktop และ Mobile */
-.image {
-  width: 100%;
-  max-width: 350px;
-  height: auto;
-  margin: 0 auto 1.5rem auto;
+  /* เพิ่มเติมเพื่อให้ slider แสดงแน่นอน */
+  position: relative;
   display: block;
+  min-height: 260px;
 }
 
-/* 🔹 หัวข้อหลัก */
+/* ===== Title ===== */
 .title {
-  font-size: clamp(1.8rem, 4vw, 2.4rem);
-  font-weight: 700;
-  margin-bottom: 0.5rem;
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin-bottom: 1.5rem;
   color: #243865;
 }
 
-/* 🔹 ข้อความรอง */
-.text {
-  font-size: clamp(1rem, 2.5vw, 1.15rem);
-  color: #555;
-  margin-bottom: 2rem;
-  line-height: 1.6;
+/* ===== Slider Container ===== */
+.sliderWrapper {
+  position: relative;
+  overflow: visible; 
+  min-height: 200px;
 }
 
-/* 🔹 ปุ่มกลับหน้าหลัก */
-.homeButton {
-  display: inline-block;
-  padding: 12px 28px;
-  font-size: 1rem;
-  background-color: #E88534;
-  color: white;
-  border-radius: 8px;
-  font-weight: 600;
+/* ===== Card ของบทความ ===== */
+.card {
+  display: block;
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
   text-decoration: none;
-  transition: background-color 0.3s ease, transform 0.25s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  color: inherit;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.homeButton:hover {
-  background-color: #d27525;
-  transform: translateY(-3px);
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
 }
 
-/* 🔹 ปรับสำหรับ Mobile */
-@media (max-width: 480px) {
-  .box {
-    padding: 1.5rem 1rem;
-  }
+/* ===== Image Wrapper ===== */
+.imageWrapper {
+  position: relative; 
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+}
 
-  .homeButton {
-    width: 100%;
-    padding: 14px 0;
-    font-size: 1.05rem;
-  }
+/* ===== Content ใน Card ===== */
+.cardContent {
+  padding: 1rem;
+}
+
+.cardTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.date {
+  font-size: 0.9rem;
+  color: #777;
+  margin-bottom: 0.5rem;
+}
+
+.cardDescription {
+  font-size: 0.95rem;
+  margin-bottom: 0.75rem;
+  color: #333;
+}
+
+.readMore {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #E88534;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* ===== ลูกศร Prev/Next ===== */
+.arrowPrev,
+.arrowNext {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #FFF;
+  border: none;
+  padding: 10px;
+  border-radius: 50%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  z-index: 10;
+}
+
+.arrowPrev:hover,
+.arrowNext:hover {
+  background: #f4f4f4;
+}
+
+.arrowPrev {
+  left: -15px;
+}
+
+.arrowNext {
+  right: -15px;
 }
