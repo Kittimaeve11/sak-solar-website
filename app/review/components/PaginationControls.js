@@ -2,25 +2,14 @@
 
 import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io';
 
-export default function PaginationControls({ currentPage, totalPages, handlePageChange, titleRef }) {
+export default function PaginationControls({ currentPage, totalPages, handlePageChange }) {
   if (totalPages <= 1) return null;
-
-  const onPageClick = (page) => {
-    handlePageChange(page);
-
-    setTimeout(() => {
-      if (titleRef?.current) {
-        const y = titleRef.current.offsetTop - 10; // ปรับได้ (-10, -50, -100)
-        window.scrollTo({ top: y, behavior: 'smooth' });
-      }
-    }, 80);
-  };
 
   return (
     <div className="pagination-controls">
       <div className="page-buttons">
         {currentPage > 1 && (
-          <button className="btn-with-arrow" onClick={() => onPageClick(currentPage - 1)}>
+          <button onClick={() => handlePageChange(currentPage - 1)}>
             <IoIosArrowBack />
           </button>
         )}
@@ -29,14 +18,14 @@ export default function PaginationControls({ currentPage, totalPages, handlePage
           <button
             key={i + 1}
             className={currentPage === i + 1 ? 'active-page' : ''}
-            onClick={() => onPageClick(i + 1)}
+            onClick={() => handlePageChange(i + 1)}
           >
             {i + 1}
           </button>
         ))}
 
         {currentPage < totalPages && (
-          <button className="btn-with-arrow" onClick={() => onPageClick(currentPage + 1)}>
+          <button onClick={() => handlePageChange(currentPage + 1)}>
             <IoIosArrowForward />
           </button>
         )}

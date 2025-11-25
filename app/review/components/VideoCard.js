@@ -3,10 +3,11 @@
 import Link from 'next/link';
 import { IoPlayCircleOutline } from 'react-icons/io5';
 import ThumbnailWithFallback from './ThumbnailWithFallback';
-import { extractVideoId } from './ExtractVideoId';
+import { extractVideoId } from './utils';
+import { logReviewAction } from './logReviewAction';
 
 export default function VideoCard({ review, locale }) {
-  const id = extractVideoId(review?.vedio_link);
+  const id = extractVideoId(review.vedio_link);
   if (!id) return null;
 
   const title =
@@ -15,7 +16,12 @@ export default function VideoCard({ review, locale }) {
       : review.nameTH_Vedio || review.nameEN_Vedio;
 
   return (
-    <Link href={review.vedio_link} target="_blank" className="video-card fade-in">
+    <Link
+      href={review.vedio_link}
+      target="_blank"
+      className="video-card fade-in"
+      onClick={() => logReviewAction(review)}
+    >
       <div className="thumbnail-placeholder">
         <ThumbnailWithFallback videoId={id} alt={title} />
         <IoPlayCircleOutline className="play-icon" />
