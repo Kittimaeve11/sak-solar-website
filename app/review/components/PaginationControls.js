@@ -10,7 +10,7 @@ export default function PaginationControls({ currentPage, totalPages, handlePage
 
     setTimeout(() => {
       if (titleRef?.current) {
-        const y = titleRef.current.getBoundingClientRect().top + window.pageYOffset - 120;
+        const y = titleRef.current.offsetTop - 10; // ปรับได้ (-10, -50, -100)
         window.scrollTo({ top: y, behavior: 'smooth' });
       }
     }, 80);
@@ -19,7 +19,6 @@ export default function PaginationControls({ currentPage, totalPages, handlePage
   return (
     <div className="pagination-controls">
       <div className="page-buttons">
-
         {currentPage > 1 && (
           <button className="btn-with-arrow" onClick={() => onPageClick(currentPage - 1)}>
             <IoIosArrowBack />
