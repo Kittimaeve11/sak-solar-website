@@ -1,12 +1,14 @@
 'use client';
-
 import Image from 'next/image';
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API || '';
 
-export default function BannerList({ banners, baseUrl, isMobile }) {
+export default function BannerList({ banners, isMobile }) {
   return banners.map((b) => {
-    const imgSrc = isMobile
-      ? `${baseUrl}/${b.brander_pictureMoblie}`
-      : `${baseUrl}/${b.brander_picturePC}`;
+    const imgPath = isMobile ? b.brander_pictureMoblie : b.brander_picturePC;
+
+    const imgSrc = imgPath?.startsWith('http')
+      ? imgPath
+      : `${baseUrl}/${imgPath?.replace(/^\/+/, '')}`;
 
     return (
       <div key={b.brander_ID} className="banner-container fade-in">
