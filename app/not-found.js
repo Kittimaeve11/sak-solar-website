@@ -11,12 +11,12 @@ export default function NotFound() {
         alignItems: "center",
         textAlign: "center",
         fontFamily: "sans-serif",
-        background: "#f8f8f8",
+        backgroundColor: "#f8f8f8",
         padding: "20px",
       }}
     >
       <h1 style={{ fontSize: "3rem", marginBottom: "1rem", color: "#222" }}>
-        404 - ไม่พบหน้าที่คุณต้องการ
+        404 - ไม่พบหน้านี้
       </h1>
 
       <p style={{ fontSize: "1.2rem", marginBottom: "1.5rem", color: "#555" }}>
@@ -27,7 +27,7 @@ export default function NotFound() {
         href="/"
         style={{
           padding: "10px 20px",
-          background: "#333",
+          backgroundColor: "#333",
           color: "#fff",
           textDecoration: "none",
           borderRadius: "6px",
