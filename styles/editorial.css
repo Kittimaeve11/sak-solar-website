@@ -264,17 +264,6 @@
 }
 
 /* =========================================================
-   PAGINATION CONTROLS
-   ========================================================= */
-.pagination-controls {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 35px;
-  gap: 12px;
-}
-
-/* =========================================================
    SKELETON LOADING 
    ========================================================= */
 .skeleton-card {
