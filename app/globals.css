@@ -680,14 +680,16 @@ h6 {
   justify-content: center;
   align-items: center;
 
-  background: rgba(255, 255, 255, 0.88);  /* ทึบขึ้นนิด หน้าดูหรู */
-  backdrop-filter: blur(4px);             /* เบลอพื้นหลังให้ดู fancy */
-  
-  z-index: 99999;                         /* สูงสุด บัง header / footer */
-  pointer-events: all;                    /* บังการคลิกทุกอย่าง */
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(4px);
+
+  z-index: 99999;
+
+  /* เปลี่ยนจาก all → none */
+  pointer-events: none; /* ให้คลิกผ่าน element นี้ได้ เพื่อไม่ block scroll/focus */
 }
 
-/* 🔄 Spinner วงกลมหมุน */
+/* Spinner วงกลมหมุน */
 .spinner {
   width: 80px;
   height: 80px;
@@ -695,6 +697,8 @@ h6 {
   border-top: 6px solid #F25C05;
   border-radius: 50%;
   animation: spin 1s linear infinite;
+
+  pointer-events: auto; /* 🟢 ให้ spinner รับ event ได้ */
 }
 
 @keyframes spin {

@@ -12,7 +12,10 @@ export default function LoadingSpinner() {
   }, []);
 
   return (
-    <div className="spinner-fullscreen">
+    <div
+      className="spinner-fullscreen"
+      data-next-scroll-ignore   // 🛑 บอก Next.js ว่าอย่าพยายาม scroll focus element นี้
+    >
       <div className="spinner"></div>
       <div className="loading-text">
         กำลังโหลดข้อมูล
