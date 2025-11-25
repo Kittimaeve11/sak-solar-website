@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useLocale } from './Context/LocaleContext';
 import { useSearchParams } from 'next/navigation';
 
@@ -17,7 +17,10 @@ import BannerSlider from './components/BannerSlider';
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 
-export default function HomePage() {
+/* =========================================================
+   🔹 ส่วนเนื้อหาทั้งหมด ย้ายมาไว้ใน Client Component นี้
+========================================================= */
+function HomeContent() {
   const { locale } = useLocale();
   const searchParams = useSearchParams();
   const productFromUrl = searchParams?.get('product') || '';
@@ -32,20 +35,18 @@ export default function HomePage() {
   const [amphures, setAmphures] = useState([]);
   const [tambons, setTambons] = useState([]);
 
-  // โหลดข้อมูลทั้งหมด (บริการ, สินค้า, จังหวัด/อำเภอ/ตำบล)
+  /* =========================================================
+      📌 Fetch API + Cache (Client-only)
+  ========================================================= */
   useEffect(() => {
-    // useEffect รันเฉพาะฝั่ง client อยู่แล้ว แต่กันไว้เผื่อ
     if (typeof window === 'undefined') return;
 
     const CACHE_KEY = 'HOME_CACHE';
     const cacheText = sessionStorage.getItem(CACHE_KEY);
 
-    // ถ้ามี cache -> ใช้ข้อมูลจาก cache แทน API
     if (cacheText) {
       try {
         const c = JSON.parse(cacheText);
-        // console.log('ใช้ข้อมูลจาก cache');
-
         setServices(c.services || []);
         setProductTypes(c.productTypes || []);
         setProvinces(c.provinces || []);
@@ -54,34 +55,21 @@ export default function HomePage() {
 
         setLoadingServices(false);
         setLoadingProducts(false);
-
-        // ไม่ต้องโหลด API แล้ว
-        // แต่ยังให้ส่วน scrollTo contact ด้านล่างทำงานได้
       } catch {
-        console.warn('Cache เสียหาย ลบออก');
         sessionStorage.removeItem(CACHE_KEY);
       }
     }
 
-    // ฟังก์ชันโหลดจาก API (กรณีไม่มี cache หรือ cache เสียหาย)
     async function loadData() {
       try {
-        console.log(' โหลดข้อมูลจาก API...');
-
         const [serviceRes, provRes, amphRes, tambRes, headerRes, prodRes] =
           await Promise.all([
-            fetch(`${baseUrl}/api/serviceapi`, {
-              headers: { 'X-API-KEY': apiKey },
-            }),
+            fetch(`${baseUrl}/api/serviceapi`, { headers: { 'X-API-KEY': apiKey } }),
             fetch('/data/thai_provinces.json'),
             fetch('/data/thai_amphures.json'),
             fetch('/data/thai_tambons.json'),
-            fetch(`${baseUrl}/api/productHeaderapi`, {
-              headers: { 'X-API-KEY': apiKey },
-            }),
-            fetch(`${baseUrl}/api/productmainpageapi`, {
-              headers: { 'X-API-KEY': apiKey },
-            }),
+            fetch(`${baseUrl}/api/productHeaderapi`, { headers: { 'X-API-KEY': apiKey } }),
+            fetch(`${baseUrl}/api/productmainpageapi`, { headers: { 'X-API-KEY': apiKey } }),
           ]);
 
         const [serviceData, prov, amph, tamb, headerData, prodData] =
@@ -98,7 +86,6 @@ export default function HomePage() {
         const headers = headerData?.result || [];
         const products = prodData?.result || [];
 
-        // จัดกลุ่มสินค้าให้เป็น productTypes ที่ใช้ในหน้า Home
         const sortedProducts = headers
           .map((h) => {
             const ptype = products.find(
@@ -109,14 +96,8 @@ export default function HomePage() {
             const items =
               ptype.Products?.map((prod) => {
                 const nameClean =
-                  prod.modelname
-                    ?.replace(/เฟส\s*/gi, '')
-                    .replace(/Phase\s*/gi, '')
-                    .trim() ||
-                  prod.solarpanel
-                    ?.replace(/เฟส\s*/gi, '')
-                    .replace(/Phase\s*/gi, '')
-                    .trim() ||
+                  prod.modelname?.replace(/เฟส\s*/gi, '').replace(/Phase\s*/gi, '').trim() ||
+                  prod.solarpanel?.replace(/เฟส\s*/gi, '').replace(/Phase\s*/gi, '').trim() ||
                   'ไม่พบข้อมูลชื่อสินค้า';
 
                 const wattMatch = prod.solarpanel?.match(/\d+\s*W/i);
@@ -147,36 +128,32 @@ export default function HomePage() {
           })
           .filter(Boolean);
 
-        // เก็บลง cache
-        const cacheData = {
-          services: serviceList,
-          productTypes: sortedProducts,
-          provinces: prov,
-          amphures: amph,
-          tambons: tamb,
-        };
-        sessionStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
+        sessionStorage.setItem(
+          CACHE_KEY,
+          JSON.stringify({
+            services: serviceList,
+            productTypes: sortedProducts,
+            provinces: prov,
+            amphures: amph,
+            tambons: tamb,
+          })
+        );
 
-        // อัปเดต state
         setServices(serviceList);
         setProductTypes(sortedProducts);
         setProvinces(prov);
         setAmphures(amph);
         setTambons(tamb);
-      } catch (error) {
-        // console.error(' Error loading data:', error);
       } finally {
         setLoadingServices(false);
         setLoadingProducts(false);
       }
     }
 
-    // ถ้าไม่มี cache หรือ cache parse ไม่ผ่าน -> โหลด API
     if (!cacheText) {
       loadData();
     }
 
-    // ถ้ามีพารามิเตอร์ ?product= ให้ scroll ไปฟอร์มติดต่อ
     if (productFromUrl) {
       const el = document.getElementById('contact');
       if (el) {
@@ -187,17 +164,17 @@ export default function HomePage() {
     }
   }, [productFromUrl]);
 
+  /* =========================================================
+    💚 Render หน้า Home ตามแบบเดิมของคุณ
+  ========================================================= */
   return (
     <>
-      {/* Banner Section */}
       <BannerSlider />
-
       <h5 className="headline" style={{ marginTop: '-0.5px' }}>
         ติดตั้งโซลาร์เซลล์กับทีมช่างที่ได้มาตรฐาน <br />
         และได้รับการรับรองจากการไฟฟ้า (PEA)
       </h5>
 
-      {/* Free Services */}
       <FreeServices
         contacts={services}
         locale={locale}
@@ -205,7 +182,6 @@ export default function HomePage() {
         baseUrl={baseUrl}
       />
 
-      {/* Product Section */}
       <div>
         {loadingProducts && productTypes.length === 0
           ? [1, 2, 3].map((i) => (
@@ -219,11 +195,7 @@ export default function HomePage() {
           : productTypes.map((ptype) => (
               <ProductCarousel
                 key={ptype.producttypeID}
-                title={
-                  locale === 'th'
-                    ? ptype.producttypenameTH
-                    : ptype.producttypenameEN
-                }
+                title={locale === 'th' ? ptype.producttypenameTH : ptype.producttypenameEN}
                 items={ptype.items}
                 link={`/products/${ptype.producttypeID}`}
                 loading={false}
@@ -231,10 +203,8 @@ export default function HomePage() {
             ))}
       </div>
 
-      {/* Solar Form */}
       <SolarFormnew />
 
-      {/* Contact Section */}
       <div id="contact">
         <ContactForm
           productOptions={productTypes}
@@ -253,10 +223,20 @@ export default function HomePage() {
         }}
       ></div>
 
-      {/* Editorial / Portfolio / Review */}
       <SlideEditorial />
       <SlidePortfolio />
       <SlideReview />
     </>
+  );
+}
+
+/* =========================================================
+   🛡 Wrapper ครอบ Suspense (แก้ useSearchParams Error)
+========================================================= */
+export default function HomePage() {
+  return (
+    <Suspense fallback={<div>Loading page...</div>}>
+      <HomeContent />
+    </Suspense>
   );
 }
