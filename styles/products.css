@@ -356,7 +356,8 @@
    ========================================= */
 .fade-inproduck {
   opacity: 0;
-  animation: fadeIn 0.8s ease-out forwards;
+  animation: fadeInProducts 0.7s ease-out forwards;
+  animation-delay: var(--delay, 0s); /* ใช้ค่า delay ที่รับมาจาก inline css */
 }
 
 @keyframes fadeInProducts {
@@ -364,12 +365,13 @@
     opacity: 0;
     transform: translateY(10px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
+
+
 
 /* เพิ่ม delay อัตโนมัติ */
 .fade-inproduck:nth-child(1) {
