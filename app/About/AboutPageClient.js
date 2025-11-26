@@ -1,10 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { IoMdArrowDropright } from 'react-icons/io';
+import '@/styles/about.css';
 import { useLocale } from '../Context/LocaleContext';
+
+import AboutSidebar from './components/AboutSidebar';
+import HistoryVisionMission from './components/HistoryVisionMission';
+import TeamsSection from './components/TeamsSection';
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
@@ -17,24 +19,16 @@ const getCache = (key, maxAgeMinutes = 30) => {
   const cached = sessionStorage.getItem(key);
   if (!cached) return null;
 
-  try {
-    const { data, timestamp } = JSON.parse(cached);
-    return Date.now() - timestamp < maxAgeMinutes * 60 * 1000 ? data : null;
-  } catch {
-    return null;
-  }
+  const { data, timestamp } = JSON.parse(cached);
+  return Date.now() - timestamp < maxAgeMinutes * 60 * 1000 ? data : null;
 };
 
 const setCache = (key, data) => {
   if (typeof window === 'undefined') return;
-  try {
-    sessionStorage.setItem(
-      key,
-      JSON.stringify({ data, timestamp: Date.now() })
-    );
-  } catch {
-    // ignore
-  }
+  sessionStorage.setItem(
+    key,
+    JSON.stringify({ data, timestamp: Date.now() })
+  );
 };
 
 /* ===============================================
@@ -47,135 +41,10 @@ const normalizeSrc = (path) => {
     : `${baseUrl}/${path.replace(/^\/+/, '')}`;
 };
 
-/* ===============================================
-   Sidebar เมนูด้านซ้าย
-   =============================================== */
-function AboutSidebar({ locale, selectedMenu, onMenuClick }) {
-  const labelsTH = {
-    history: 'ประวัติความเป็นมา',
-    vision: 'วิสัยทัศน์',
-    mission: 'พันธกิจ',
-    teams: 'คณะกรรมการ',
-  };
-
-  const labelsEN = {
-    history: 'History',
-    vision: 'Vision',
-    mission: 'Mission',
-    teams: 'Committee',
-  };
-
-  const labelMap = locale === 'th' ? labelsTH : labelsEN;
-
-  return (
-    <aside className="about-sidebar">
-      <h3 className="sidebar-headertext">
-        {locale === 'th' ? 'เกี่ยวกับศักดิ์สยามโซลาร์' : 'About Saksiam Solar'}
-      </h3>
-
-      <ul className="sidebar-menu">
-        {['history', 'vision', 'mission', 'teams'].map((menu) => (
-          <li key={menu}>
-            <Link
-              href={`#${menu}`}
-              scroll={false}
-              className={selectedMenu === menu ? 'active' : ''}
-              onClick={(e) => {
-                e.preventDefault();
-                onMenuClick(menu);
-              }}
-            >
-              <IoMdArrowDropright className="arrow" />
-              {labelMap[menu]}
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </aside>
-  );
-}
-
-/* ===============================================
-   รายการ Mission
-   =============================================== */
-function MissionList({ missions, locale }) {
-  if (!missions || missions.length === 0) return null;
-
-  return (
-    <ul className="mission-list fade-in show">
-      {missions.map((item, index) => (
-        <li key={item.mission_ID || index} className="mission-item">
-          {item.picture && (
-            <Image
-              src={normalizeSrc(item.picture)}
-              alt="พันธกิจ"
-              width={90}
-              height={90}
-              className="mission-icon"
-              loading="lazy"
-            />
-          )}
-
-          <span className="mission-text">
-            {locale === 'th' ? item.titleTH : item.titleEN || item.titleTH}
-          </span>
-        </li>
-      ))}
-    </ul>
-  );
-}
-
-/* ===============================================
-   ส่วนแสดง Teams
-   =============================================== */
-function TeamsSection({ teams, locale, isActive }) {
-  return (
-    <div
-      id="teams"
-      className={`teams-section ${isActive ? 'fade-in show' : 'hidden-section'}`}
-    >
-      <h2 className="about-title with-lines">
-        {locale === 'th' ? 'คณะกรรมการ' : 'Committee'}
-      </h2>
-
-      <div className="teams-grid">
-        {teams.map((member, idx) => (
-          <div
-            key={member.teamsID || idx}
-            className={idx === 0 ? 'team-boss' : 'team-card'}
-          >
-            <Image
-              src={normalizeSrc(member.teams_picture)}
-              alt={locale === 'th' ? member.teams_nameTH : member.teams_nameEN}
-              width={300}
-              height={300}
-              className="team-image"
-              loading="lazy"
-            />
-
-            <div className="team-info">
-              <p className="team-name">
-                {locale === 'th' ? member.teams_nameTH : member.teams_nameEN}
-              </p>
-              <p className="team-position">
-                {locale === 'th'
-                  ? member.teams_positionTH
-                  : member.teams_positionEN}
-              </p>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-/* ===============================================
-   หน้า About หลัก (Client)
-   =============================================== */
 export default function AboutPageClient() {
   const { locale } = useLocale();
 
+  /* เก็บข้อมูลเนื้อหาแต่ละ section */
   const [sections, setSections] = useState({
     history: null,
     vision: null,
@@ -284,98 +153,33 @@ export default function AboutPageClient() {
     return () => observer.disconnect();
   }, [loading]);
 
-  /* =====================================================
-     Render Section พร้อมรูปภาพ + ข้อความรายละเอียด
-     ===================================================== */
-  const renderSection = (content, sectionType) => {
-    if (!content) return null;
-
-    const sizes = {
-      history: { width: 919, height: 519 },
-      vision: { width: 1600, height: 457 },
-      default: { width: 1200, height: 600 },
-    };
-
-    const img = sizes[sectionType] || sizes.default;
-
-    const text =
-      locale === 'th'
-        ? content?.brander_detail
-        : content?.brander_detailEN || content?.brander_detail;
-
-    return (
-      <div className="bannerabout-container fade-in show">
-        <div className={`bannerabout-image-wrapper-custom image-${sectionType}`}>
-          <Image
-            src={normalizeSrc(content?.brander_picturePC)}
-            alt={sectionType}
-            width={img.width}
-            height={img.height}
-            className="bannerabout-image-custom"
-            priority={sectionType === 'history'}
-          />
-        </div>
-
-        {text
-          ?.split('\n')
-          .map((line, idx) => (
-            <p key={idx}>{line}</p>
-          ))}
-      </div>
-    );
-  };
-
   return (
     <main className="about-container">
-      {/* ========== Sidebar ========== */}
+      {/* Sidebar */}
       <AboutSidebar
         locale={locale}
         selectedMenu={selectedMenu}
-        onMenuClick={scrollToSection}
+        onSelectMenu={scrollToSection}
       />
 
-      {/* ========== Content ========== */}
+      {/* Content */}
       <section className="about-content">
         {loading ? (
           <div className="skeleton-bannerabout"></div>
         ) : (
           <>
-            {/* ซ่อน History, Vision, Mission เมื่อเลือก Teams */}
-            <div
-              className={`content-sections ${
-                selectedMenu === 'teams' ? 'hidden-section' : ''
-              }`}
-            >
-              {/* ========= HISTORY ========= */}
-              <section id="history" className="about-section">
-                <h2 className="about-title with-lines">
-                  {locale === 'th' ? 'ประวัติความเป็นมา' : 'History'}
-                </h2>
-                {renderSection(sections.history, 'history')}
-              </section>
-
-              {/* ========= VISION ========= */}
-              <section id="vision" className="about-section">
-                <h2 className="about-title with-lines">
-                  {locale === 'th' ? 'วิสัยทัศน์' : 'Vision'}
-                </h2>
-                {renderSection(sections.vision, 'vision')}
-              </section>
-
-              {/* ========= MISSION ========= */}
-              <section id="mission" className="about-section">
-                <h2 className="about-title with-lines">
-                  {locale === 'th' ? 'พันธกิจ' : 'Mission'}
-                </h2>
-                <MissionList missions={sections.mission} locale={locale} />
-              </section>
-            </div>
-
-            {/* ========= TEAMS ========= */}
-            <TeamsSection
-              teams={sections.teams}
+            <HistoryVisionMission
               locale={locale}
-              isActive={selectedMenu === 'teams'}
+              sections={sections}
+              selectedMenu={selectedMenu}
+              normalizeSrc={normalizeSrc}
+            />
+
+            <TeamsSection
+              locale={locale}
+              sections={sections}
+              selectedMenu={selectedMenu}
+              normalizeSrc={normalizeSrc}
             />
           </>
         )}
