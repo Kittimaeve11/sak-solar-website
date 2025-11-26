@@ -5,7 +5,7 @@ import HomeClient from './HomeClient';
 
 export default function Page() {
   return (
-    <Suspense fallback={<div>Loading page...</div>}>
+    <Suspense fallback={null}>
       <HomeClient />
     </Suspense>
   );
