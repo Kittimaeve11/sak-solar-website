@@ -1,19 +1,7 @@
-// app/not-found.js
-'use client';
-
-import { useEffect } from 'react';
+// 📄 app/not-found.js
 import Link from 'next/link';
 
 export default function NotFound() {
-    // 🔒 ล็อกการเลื่อนหน้า
-    useEffect(() => {
-        const prevOverflow = document.body.style.overflow;
-        document.body.style.overflow = 'hidden';
-        return () => {
-            document.body.style.overflow = prevOverflow;
-        };
-    }, []);
-
     return (
         <div
             style={{
@@ -51,7 +39,6 @@ export default function NotFound() {
                         fontWeight: 700,
                         marginBottom: '0.75rem',
                         color: '#f9fafb',
-
                     }}
                 >
                     ไม่พบหน้าที่คุณต้องการ
