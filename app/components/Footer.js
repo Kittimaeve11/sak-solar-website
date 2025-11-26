@@ -21,19 +21,35 @@ const slugify = (name) =>
     .replace(/[^a-z0-9-]/g, "") || "";
 
 /* ======================
+   Static extra menu (ไม่ใช่ API)
+====================== */
+const EXTRA_MENUS = [
+  {
+    label: "สินเชื่อโซล่ารูฟ",
+    href: "https://saksiam.com/service/solarrooftop",
+    external: true,
+  },
+  { label: "ใบรับรองการไฟฟ้า", href: "/file/Inverter.pdf" },
+];
+
+/* ======================
    Footer Component
 ====================== */
 export default function Footer() {
   const [socials, setSocials] = useState([]);
   const [policies, setPolicies] = useState([]);
-  const [dynamicProducts, setDynamicProducts] = useState([]);
+  const [dynamicProducts, setDynamicProducts] = useState([]); // จาก API productHeaderapi เท่านั้น
   const [contact, setContact] = useState(null);
-  const [loading, setLoading] = useState(true);
+
+  const [loadingProducts, setLoadingProducts] = useState(true);
+  const [loadingPolicies, setLoadingPolicies] = useState(true);
+  const [loadingContact, setLoadingContact] = useState(true);
 
   /* ======================
      Load data from API
   ======================= */
   useEffect(() => {
+    // local /api/data (ถ้ามีใช้ socials)
     fetch("/api/data")
       .then((res) => res.json())
       .then((data) => setSocials(data.socials || []))
@@ -61,26 +77,19 @@ export default function Footer() {
             ? policiesData.result
             : []
         );
+        setLoadingPolicies(false);
 
-        // Dynamic Product Menu
+        // Dynamic Product Menu (เฉพาะ API)
         if (productsData?.status && Array.isArray(productsData.result)) {
           const productMenus = productsData.result.map((item) => ({
             label: item.producttypenameTH.trim(),
-            href: `/products?categories=${slugify(item.producttypenameEN)}`, // ⭐ ใช้ slug แบบ SEO friendly
+            href: `/products?categories=${slugify(item.producttypenameEN)}`, // SEO friendly
           }));
-
-          // Extra links 
-          const extraMenus = [
-            {
-              label: "สินเชื่อโซล่ารูฟ",
-              href: "https://saksiam.com/service/solarrooftop",
-              external: true,
-            },
-            { label: "ใบรับรองการไฟฟ้า", href: "/file/Inverter.pdf" },
-          ];
-
-          setDynamicProducts([...productMenus, ...extraMenus]);
+          setDynamicProducts(productMenus);
+        } else {
+          setDynamicProducts([]);
         }
+        setLoadingProducts(false);
 
         // Contact Info
         setContact(
@@ -90,13 +99,15 @@ export default function Footer() {
             ? contactData.result[0]
             : null
         );
+        setLoadingContact(false);
       } catch (err) {
         console.error("Error fetching footer data:", err);
         setPolicies([]);
         setDynamicProducts([]);
         setContact(null);
-      } finally {
-        setLoading(false);
+        setLoadingPolicies(false);
+        setLoadingProducts(false);
+        setLoadingContact(false);
       }
     };
 
@@ -118,12 +129,14 @@ export default function Footer() {
   );
 
   /* ======================
-     Merge Static & Dynamic 
+     Merge Static & Dynamic (เฉพาะ API)
   ======================= */
   const firstTwoMenus = [
     {
       ...staticMenu[0],
-      items: dynamicProducts.length > 0 ? dynamicProducts : staticMenu[0].items,
+      // ถ้ามีข้อมูลจาก API ใช้อันนั้น, ถ้าไม่มีใช้ค่าจาก config เดิมเป็น fallback
+      items:
+        dynamicProducts.length > 0 ? dynamicProducts : staticMenu[0].items || [],
     },
     staticMenu[1],
   ];
@@ -135,29 +148,59 @@ export default function Footer() {
     <div>
       <footer className={styles.footer}>
         <div className={styles.footerContent}>
-          
           {/* Column 1: Products + Policies */}
           <div className={styles.column}>
             <h4>{firstTwoMenus[0].title}</h4>
+
             <ul>
-              {firstTwoMenus[0].items.map(({ label, href, external }, i) => (
-                <li key={href || label + i}>
-                  {href ? (
-                    <Link
-                      href={href}
-                      {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-                    >
-                      {label}
-                    </Link>
-                  ) : (
-                    <span>{label}</span>
-                  )}
+              {/* แสดงกำลังโหลดเฉพาะ API */}
+              {loadingProducts ? (
+                <li>กำลังโหลด...</li>
+              ) : firstTwoMenus[0].items.length > 0 ? (
+                firstTwoMenus[0].items.map(({ label, href, external }, i) => (
+                  <li
+                    key={href || label + i}
+                    className="fade-in"
+                    style={{ animationDelay: `${i * 0.1}s` }}
+                  >
+                    {href ? (
+                      <Link
+                        href={href}
+                        {...(external
+                          ? { target: "_blank", rel: "noopener noreferrer" }
+                          : {})}
+                      >
+                        {label}
+                      </Link>
+                    ) : (
+                      <span>{label}</span>
+                    )}
+                  </li>
+                ))
+              ) : (
+                <li>ไม่มีข้อมูลบริการ</li>
+              )}
+
+              {/* Extra Static Menus (ไม่ต้องโหลด API) */}
+              {EXTRA_MENUS.map(({ label, href, external }, i) => (
+                <li
+                  key={href || label + "extra" + i}
+                  className="fade-in"
+                  style={{ animationDelay: `${(firstTwoMenus[0].items.length + i) * 0.1}s` }}
+                >
+                  <Link
+                    href={href}
+                    {...(external
+                      ? { target: "_blank", rel: "noopener noreferrer" }
+                      : {})}
+                  >
+                    {label}
+                  </Link>
                 </li>
               ))}
             </ul>
-
             <h4>นโยบาย</h4>
-            {loading ? (
+            {loadingPolicies ? (
               <p>กำลังโหลด...</p>
             ) : policies.length > 0 ? (
               <ul>
@@ -193,7 +236,7 @@ export default function Footer() {
           {/* Column 3 */}
           <div className={styles.column}>
             <h4>ติดต่อเรา</h4>
-            {loading ? (
+            {loadingContact ? (
               <p>กำลังโหลด...</p>
             ) : contact ? (
               <div className="fade-in">

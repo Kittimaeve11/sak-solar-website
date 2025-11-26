@@ -3,7 +3,7 @@ import AboutPageClient from './AboutPageClient';
 
 export default function Page() {
   return (
-    <Suspense fallback={<div>Loading page...</div>}>
+    <Suspense fallback={null}>
       <AboutPageClient />
     </Suspense>
   );

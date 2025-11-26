@@ -1,10 +1,10 @@
-// 📄 app/editorialsolar/page.js
+//  app/editorialsolar/page.js
 import EditorialClient from './EditorialClient';
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 
-// ✅ กรณีพิเศษ: อยู่บน production แต่ BASE_URL ยังเป็น localhost
+//  กรณีพิเศษ: อยู่บน production แต่ BASE_URL ยังเป็น localhost
 //    แปลว่าบน Netlify จะเรียก API ไม่ได้แน่นอน
 const isProdWithLocalApi =
   process.env.NODE_ENV === 'production' &&
@@ -35,7 +35,7 @@ async function safeJsonFetch(url, options = {}) {
     return data;
   } catch (err) {
     console.error('[Editorial] Error fetching:', url, err);
-    return null; // ❗ สำคัญ: อย่า throw ต่อ
+    return null; // สำคัญ: อย่า throw ต่อ
   }
 }
 
@@ -43,8 +43,8 @@ async function safeJsonFetch(url, options = {}) {
    Page Component
 ========================================================= */
 export default async function EditorialPage() {
-  // 🛡️ เคสนี้คือ: Build/Run อยู่บน production + ใช้ localhost เป็น API
-  // 👉 Netlify ต่อไม่ถึงแน่นอน เลยส่งข้อมูลว่าง ๆ ไปก่อน เพื่อให้ build ผ่าน
+  //  เคสนี้คือ: Build/Run อยู่บน production + ใช้ localhost เป็น API
+  //  Netlify ต่อไม่ถึงแน่นอน เลยส่งข้อมูลว่าง ๆ ไปก่อน เพื่อให้ build ผ่าน
   if (isProdWithLocalApi) {
     return (
       <EditorialClient
@@ -55,7 +55,7 @@ export default async function EditorialPage() {
     );
   }
 
-  // 🟢 กรณีปกติ (เช่น dev บนเครื่อง หรือ production ที่ใช้ API จริง)
+  //  กรณีปกติ (เช่น dev บนเครื่อง หรือ production ที่ใช้ API จริง)
   const [typesRes, articlesRes, bannersRes] = await Promise.all([
     safeJsonFetch(`${baseUrl}/api/edittorTypepageapi`),
     safeJsonFetch(`${baseUrl}/api/edittorpageapi?limit=1000`),
