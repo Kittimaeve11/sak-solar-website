@@ -26,14 +26,7 @@ export const metadata = {
     url: 'https://www.saksiamsolar.com/portfolio',
     type: 'website',
     siteName: 'Saksiam Solar',
-    images: [
-      {
-        url: '/images/seo/portfolio-cover.jpg', // ใส่รูป Banner หรือภาพรวม Portfolio
-        width: 1200,
-        height: 630,
-        alt: 'ตัวอย่างผลงานติดตั้งโซลาร์เซลล์ของลูกค้า',
-      },
-    ],
+    images: ['/images/locationPhoto685cbc7c35ef8.jpg'], // รูปตัวอย่างตอนแชร์ลิงก์ (ควรเป็นขนาด 1200x630px)
   },
 };
 

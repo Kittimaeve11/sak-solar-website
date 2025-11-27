@@ -29,14 +29,7 @@ export const metadata = {
     url: "https://www.saksiamsolar.com/editorial",
     type: "website",
     siteName: "Saksiam Solar",
-    images: [
-      {
-        url: "/images/seo/editorial-cover.jpg", // อาจเปลี่ยนได้
-        width: 1200,
-        height: 630,
-        alt: "บทความโซลาร์เซลล์จาก Saksiam Solar",
-      },
-    ],
+    images: ['/images/locationPhoto685cbc7c35ef8.jpg'], // รูปตัวอย่างตอนแชร์ลิงก์ (ควรเป็นขนาด 1200x630px)
   },
 
   twitter: {

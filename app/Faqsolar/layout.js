@@ -28,7 +28,7 @@ export const metadata = {
         description:
             'ตอบคำถามเกี่ยวกับโซลาร์เซลล์ ตั้งแต่เริ่มต้น จนถึงการติดตั้งจริง ครอบคลุมทั้งบ้านพักอาศัยและธุรกิจ พร้อมคำแนะนำจากผู้เชี่ยวชาญ.',
         url: 'https://www.saksiamsolar.com/faq',
-        images: ['/images/seo/faq-cover.jpg'],
+    images: ['/images/locationPhoto685cbc7c35ef8.jpg'], // รูปตัวอย่างตอนแชร์ลิงก์ (ควรเป็นขนาด 1200x630px)
         type: 'website',
         siteName: 'Saksiam Solar',
     },

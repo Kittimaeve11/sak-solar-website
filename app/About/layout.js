@@ -25,14 +25,7 @@ export const metadata = {
     url: 'https://www.saksiamsolar.com/about',
     type: 'website',
     siteName: 'Saksiam Solar',
-    images: [
-      {
-        url: '/images/seo/about-cover.jpg', // 🔹 เปลี่ยนเป็นรูปจริงของบริษัท
-        width: 1200,
-        height: 630,
-        alt: 'About Saksiam Solar',
-      },
-    ],
+    images: ['/images/locationPhoto685cbc7c35ef8.jpg'], // รูปตัวอย่างตอนแชร์ลิงก์ (ควรเป็นขนาด 1200x630px)
   },
   twitter: {
     card: 'summary_large_image',

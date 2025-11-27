@@ -23,14 +23,7 @@ export const metadata = {
     url: 'https://www.saksiamsolar.com/review',
     type: 'website',
     siteName: 'Saksiam Solar',
-    images: [
-      {
-        url: '/images/seo/review-cover.jpg', // แนะนำให้มีรูปจริง
-        width: 1200,
-        height: 630,
-        alt: 'รีวิวติดตั้งโซลาร์เซลล์จากลูกค้าจริง',
-      },
-    ],
+    images: ['/images/locationPhoto685cbc7c35ef8.jpg'], // รูปตัวอย่างตอนแชร์ลิงก์ (ควรเป็นขนาด 1200x630px)
   },
   twitter: {
     card: 'summary_large_image',

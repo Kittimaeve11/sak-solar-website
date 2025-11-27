@@ -29,14 +29,8 @@ export const metadata = {
     url: "https://www.saksiamsolar.com/contact",
     type: "website",
     siteName: "Saksiam Solar",
-    images: [
-      {
-        url: "/images/seo/contact-cover.jpg", // เปลี่ยนได้ตามรูปของคุณ
-        width: 1200,
-        height: 630,
-        alt: "Contact Saksiam Solar",
-      },
-    ],
+    images: ['/images/locationPhoto685cbc7c35ef8.jpg'], // รูปตัวอย่างตอนแชร์ลิงก์ (ควรเป็นขนาด 1200x630px)
+   
   },
 
   twitter: {

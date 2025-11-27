@@ -26,7 +26,7 @@ export const metadata = {
         title: 'บริการและผลิตภัณฑ์โซลาร์เซลล์',
         description:
             'เลือกชมผลิตภัณฑ์และบริการโซลาร์เซลล์ Solar Rooftop, Hybrid, Solar Air พร้อมติดตั้งครบวงจร โดยทีมวิศวกรมืออาชีพ.',
-        images: ['/images/banner-default.jpg'],
+    images: ['/images/locationPhoto685cbc7c35ef8.jpg'], // รูปตัวอย่างตอนแชร์ลิงก์ (ควรเป็นขนาด 1200x630px)
         url: 'https://www.saksiamsolar.com/products',
         type: 'website',
         siteName: 'Saksiam Solar',
