@@ -103,8 +103,8 @@
 }
 
 /* ===== ลูกศร Prev/Next ===== */
-.arrowPrev,
-.arrowNext {
+.arrowPrevarticles,
+.arrowNextarticles {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
@@ -121,16 +121,16 @@
   box-shadow: 0 2px 6px rgba(0,0,0,0.15);
 }
 
-.arrowPrev:hover,
-.arrowNext:hover {
+.arrowPrevarticles:hover,
+.arrowNextarticles:hover {
   background: #f4f4f4;
 }
 
-.arrowPrev {
+.arrowPrevarticles {
   left: -15px;
 }
 
-.arrowNext {
+.arrowNextarticles {
   right: -15px;
 }
 /* ให้แต่ละ slide มี padding ซ้าย-ขวา เพื่อไม่ให้การ์ดติดกัน */

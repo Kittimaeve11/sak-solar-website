@@ -30,13 +30,13 @@ function useWindowWidth() {
 
 /* Custom Arrow */
 const PrevArrow = ({ onClick }) => (
-  <button className={styles.arrowPrev} onClick={onClick}>
+  <button className={styles.arrowPrevarticles} onClick={onClick}>
     <IoIosArrowBack />
   </button>
 );
 
 const NextArrow = ({ onClick }) => (
-  <button className={styles.arrowNext} onClick={onClick}>
+  <button className={styles.arrowNextarticles} onClick={onClick}>
     <IoIosArrowForward />
   </button>
 );
