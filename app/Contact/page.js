@@ -4,8 +4,7 @@ import ContactClient from './ContactClient';
 
 export default function Page() {
   return (
-    <Suspense fallback={null}>
-      <ContactClient />
+    <Suspense fallback={<div style={{ minHeight: "100vh" }} />}>      <ContactClient />
     </Suspense>
   );
 }

@@ -5,8 +5,7 @@ import FAQPageClient from './FAQPageClient';
 
 export default function Page() {
   return (
-    <Suspense fallback={null}>
-      <FAQPageClient />
+ <Suspense fallback={<div style={{ minHeight: "100vh" }} />}>      <FAQPageClient />
     </Suspense>
   );
 }

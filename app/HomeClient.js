@@ -112,7 +112,7 @@ function HomeContent() {
                   name: displayName,
                   size: prod.installationsize || null,
                   image: prod.gallery
-                    ? `${baseUrl}/${JSON.parse(prod.gallery)[0]}` 
+                    ? `${baseUrl}/${JSON.parse(prod.gallery)[0]}`
                     : null,
                   producttypeID: h.producttypeID,
                   producttypeNameTH: h.producttypenameTH,
@@ -166,7 +166,7 @@ function HomeContent() {
       💚 Render หน้า Home
   ========================================================= */
   return (
-    <>
+    <main className="fade-in">
       <BannerSlider />
 
       <h5 className="headline" style={{ marginTop: '-0.5px' }}>
@@ -184,22 +184,22 @@ function HomeContent() {
       <div>
         {loadingProducts && productTypes.length === 0
           ? [1, 2, 3].map((i) => (
-              <ProductCarousel
-                key={`skeleton-${i}`}
-                title="กำลังโหลดสินค้า..."
-                items={[]}
-                loading={true}
-              />
-            ))
+            <ProductCarousel
+              key={`skeleton-${i}`}
+              title="กำลังโหลดสินค้า..."
+              items={[]}
+              loading={true}
+            />
+          ))
           : productTypes.map((ptype) => (
-              <ProductCarousel
-                key={ptype.producttypeID}
-                title={locale === 'th' ? ptype.producttypenameTH : ptype.producttypenameEN}
-                items={ptype.items}
-                link={`/products/${ptype.producttypeID}`}
-                loading={false}
-              />
-            ))}
+            <ProductCarousel
+              key={ptype.producttypeID}
+              title={locale === 'th' ? ptype.producttypenameTH : ptype.producttypenameEN}
+              items={ptype.items}
+              link={`/products/${ptype.producttypeID}`}
+              loading={false}
+            />
+          ))}
       </div>
 
       <SolarFormnew />
@@ -225,7 +225,7 @@ function HomeContent() {
       <SlideEditorial />
       <SlidePortfolio />
       <SlideReview />
-    </>
+    </main>
   );
 }
 

@@ -5,8 +5,8 @@ import HomeClient from './HomeClient';
 
 export default function Page() {
   return (
-    <Suspense fallback={null}>
-      <HomeClient />
+    <Suspense fallback={<div style={{ minHeight: "100vh" }} />}>      
+    <HomeClient />
     </Suspense>
   );
 }

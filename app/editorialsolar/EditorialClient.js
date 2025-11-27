@@ -70,9 +70,9 @@ export default function EditorialClient({ articles, types, banners }) {
     }, 200);
   };
 
-  /* 🔹 Render */
+  /*  Render */
   return (
-    <div className="no-margin">
+    <div className="no-margin" >
       {/* Banner */}
       {loading ? (
         <div className="skeleton skeleton-banner fade-in"></div>

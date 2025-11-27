@@ -107,7 +107,7 @@ export default function ContactClient() {
   }, []);
 
   return (
-    <div className="no-margin">
+    <div className="no-margin" >
       {/* ===== Banner (มี skeleton ของตัวเองใน component) ===== */}
       <BannerContact
         brander={brander}
@@ -116,7 +116,7 @@ export default function ContactClient() {
         baseUrl={baseUrl}
       />
 
-      <main className="layout-containercontact">
+      <main className="layout-containercontact ">
         <h1 className="headtitle">{messages.contact}</h1>
 
         {/* ===== ส่วนข้อมูลบริษัท / รูป / map / social ===== */}

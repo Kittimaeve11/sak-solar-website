@@ -155,7 +155,7 @@ export default function AboutPageClient() {
   }, [loading]);
 
   return (
-    <main className="about-container">
+    <main className="about-container fade-in">
       {/* Sidebar */}
       <AboutSidebar
         locale={locale}
