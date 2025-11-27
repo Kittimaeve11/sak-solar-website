@@ -103,7 +103,7 @@ export default function RecommendedArticles({ typeID, currentId }) {
   const sliderRef = useRef(null);
   const width = useWindowWidth();
 
-  const slidesToShow = width > 1200 ? 3 : width > 991 ? 2 : width > 638 ? 2 : 1;
+  const slidesToShow = width > 1200 ? 3 : width > 991 ? 2 : width > 764 ? 2 : 1;
 
   useEffect(() => {
     if (!typeID) return; // ไม่ fetch ถ้า typeID ว่าง

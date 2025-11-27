@@ -159,11 +159,8 @@
   margin-top: 1.5rem; /* เว้นระยะจากส่วนบน */
 }
 
-/* =========================================================
-   ส่วน Responsive สำหรับหน้าจอมือถือ
-   ========================================================= */
-@media (max-width: 600px) {
-  /* จัด Footer Bottom เป็นแนวตั้งเมื่อหน้าจอแคบ */
+@media (max-width: 1050px) {
+    /* จัด Footer Bottom เป็นแนวตั้งเมื่อหน้าจอแคบ */
   .footerBottom {
     flex-direction: column;
     justify-content: center;
@@ -171,6 +168,23 @@
     padding: 0.5rem 1rem;
     text-align: center;
   }
+    .logoGroup {
+    justify-content: center;
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+
+  .logoGroup img {
+    width: 40px; /* ลดขนาดโลโก้บนหน้าจอเล็ก */
+    height: auto;
+  }
+}
+
+/* =========================================================
+   ส่วน Responsive สำหรับหน้าจอมือถือ
+   ========================================================= */
+@media (max-width: 764px) {
+
 
   /* จัดเรียงคอลัมน์ในแนวตั้ง */
   .footerContent {
@@ -192,14 +206,5 @@
     margin-top: 3rem; /* ลดช่องว่างบนมือถือ */
   }
 
-  .logoGroup {
-    justify-content: center;
-    width: 100%;
-    margin-top: 0.5rem;
-  }
 
-  .logoGroup img {
-    width: 40px; /* ลดขนาดโลโก้บนหน้าจอเล็ก */
-    height: auto;
-  }
 }
