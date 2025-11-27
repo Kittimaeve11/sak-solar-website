@@ -74,7 +74,7 @@ const handlePrintScreenshot = () => {
       printWindow.document.close();
     })
     .catch((err) => {
-      console.error('เกิดข้อผิดพลาดในการแคปภาพ:', err);
+      // console.error('เกิดข้อผิดพลาดในการแคปภาพ:', err);
     });
 };
 
@@ -142,73 +142,72 @@ export default function SolarCalculatorForm() {
   const [productsData, setProductsData] = useState([]);
   const [attemptedRoofInput, setAttemptedRoofInput] = useState(false);
 
-// ฟังก์ชัน handleLogCalculate ใช้สำหรับบันทึก Log เมื่อผู้ใช้ทำการคำนวณระบบ Solar Rooftop
-const handleLogCalculate = async () => {
-  try {
-    // ดึงข้อมูลอุปกรณ์ของผู้ใช้ เช่น เบราว์เซอร์ หรือระบบปฏิบัติการ
-    const deviceInfo = navigator.userAgent || 'Unknown Device';
+  // ฟังก์ชัน handleLogCalculate ใช้สำหรับบันทึก Log เมื่อผู้ใช้ทำการคำนวณระบบ Solar Rooftop
+  const handleLogCalculate = async () => {
+    try {
+      // ดึงข้อมูลอุปกรณ์ของผู้ใช้ เช่น เบราว์เซอร์ หรือระบบปฏิบัติการ
+      const deviceInfo = navigator.userAgent || 'Unknown Device';
 
-    // ดึง IP ของผู้ใช้จาก API ภายนอก (ipify.org)
-    const userIP = await fetch('https://api.ipify.org?format=json')
-      .then(res => res.json())
-      .then(data => data.ip)
-      .catch(() => 'Unknown IP'); // หากดึง IP ไม่ได้ให้ใช้ค่าเริ่มต้น
+      // ดึง IP ของผู้ใช้จาก API ภายนอก (ipify.org)
+      const userIP = await fetch('https://api.ipify.org?format=json')
+        .then(res => res.json())
+        .then(data => data.ip)
+        .catch(() => 'Unknown IP'); // หากดึง IP ไม่ได้ให้ใช้ค่าเริ่มต้น
 
-    // เตรียมข้อมูล Log ที่จะส่งไปยัง API
-    const logData = {
-      actionType: '5', // รหัสประเภทการกระทำ (5 = การคำนวณ)
-      actionDetail: `คำนวณ Solar Rooftop | ค่าไฟ ${formValues.electricityCost || 'N/A'} บาท | ระบบ ${
-        formValues.systemType === 'single'
+      // เตรียมข้อมูล Log ที่จะส่งไปยัง API
+      const logData = {
+        actionType: '5', // รหัสประเภทการกระทำ (5 = การคำนวณ)
+        actionDetail: `คำนวณ Solar Rooftop | ค่าไฟ ${formValues.electricityCost || 'N/A'} บาท | ระบบ ${formValues.systemType === 'single'
           ? '1 เฟส'
           : formValues.systemType === 'three'
-          ? '3 เฟส'
-          : 'ไม่ระบุ'
-      } | พื้นที่ ${formValues.roofArea || 'N/A'} ตร.ม.`,
-      // รายละเอียดการคำนวณ เช่น ค่าไฟ ประเภทระบบ และพื้นที่
+            ? '3 เฟส'
+            : 'ไม่ระบุ'
+          } | พื้นที่ ${formValues.roofArea || 'N/A'} ตร.ม.`,
+        // รายละเอียดการคำนวณ เช่น ค่าไฟ ประเภทระบบ และพื้นที่
 
-      typeUser: 'ผู้เยี่ยมชมเว็บไซต์', // ประเภทผู้ใช้
-      datatype: 'คำนวณ', // ประเภทข้อมูลที่บันทึก
-      dataID: '0',        // บังคับให้เป็น "0" เพื่อป้องกันค่า null
-      datatypeID: '0',    // บังคับให้เป็น "0" เพื่อป้องกันค่า null
-      brandtype: 'N/A',   // ข้อมูลแบรนด์ (ไม่ระบุ)
-      dataname: 'Solar Rooftop Calculator', // ชื่อของฟังก์ชันหรือหน้าที่บันทึก Log
-      ipAddress: userIP,  // IP ของผู้ใช้
-      device: deviceInfo, // ข้อมูลอุปกรณ์ของผู้ใช้
-    };
+        typeUser: 'ผู้เยี่ยมชมเว็บไซต์', // ประเภทผู้ใช้
+        datatype: 'คำนวณ', // ประเภทข้อมูลที่บันทึก
+        dataID: '0',        // บังคับให้เป็น "0" เพื่อป้องกันค่า null
+        datatypeID: '0',    // บังคับให้เป็น "0" เพื่อป้องกันค่า null
+        brandtype: 'N/A',   // ข้อมูลแบรนด์ (ไม่ระบุ)
+        dataname: 'Solar Rooftop Calculator', // ชื่อของฟังก์ชันหรือหน้าที่บันทึก Log
+        ipAddress: userIP,  // IP ของผู้ใช้
+        device: deviceInfo, // ข้อมูลอุปกรณ์ของผู้ใช้
+      };
 
-    // แสดงข้อมูล Log ที่จะส่งออกใน console (สำหรับตรวจสอบ)
-    console.log('ส่ง Log การคำนวณ:', logData);
+      // แสดงข้อมูล Log ที่จะส่งออกใน console (สำหรับตรวจสอบ)
+      // console.log('ส่ง Log การคำนวณ:', logData);
 
-    // เรียก API เพื่อบันทึก Log
-    const res = await fetch(`${baseUrl}/api/logWebsitepageapi`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json', // ระบุชนิดข้อมูลที่ส่งเป็น JSON
-        'X-API-KEY': apiKey, // ใส่ API Key เพื่อยืนยันสิทธิ์
-      },
-      body: JSON.stringify(logData), // แปลงข้อมูล Log เป็น JSON ก่อนส่ง
-    });
+      // เรียก API เพื่อบันทึก Log
+      const res = await fetch(`${baseUrl}/api/logWebsitepageapi`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json', // ระบุชนิดข้อมูลที่ส่งเป็น JSON
+          'X-API-KEY': apiKey, // ใส่ API Key เพื่อยืนยันสิทธิ์
+        },
+        body: JSON.stringify(logData), // แปลงข้อมูล Log เป็น JSON ก่อนส่ง
+      });
 
-    // อ่านผลลัพธ์จาก API
-    const text = await res.text();
+      // อ่านผลลัพธ์จาก API
+      const text = await res.text();
 
-    // ตรวจสอบผลการส่งข้อมูล
-    if (!res.ok) {
-      // ถ้า API ตอบกลับไม่สำเร็จ ให้แสดงข้อความ error
-      console.error('Log API error:', text);
-    } else {
-      // ถ้า API ตอบกลับสำเร็จ แสดงข้อความใน console
-      console.log('Log การคำนวณถูกบันทึกเรียบร้อยแล้ว:', text);
+      // ตรวจสอบผลการส่งข้อมูล
+      if (!res.ok) {
+        // ถ้า API ตอบกลับไม่สำเร็จ ให้แสดงข้อความ error
+        // console.error('Log API error:', text);
+      } else {
+        // ถ้า API ตอบกลับสำเร็จ แสดงข้อความใน console
+        // console.log('Log การคำนวณถูกบันทึกเรียบร้อยแล้ว:', text);
+      }
+    } catch (err) {
+      // กรณีเกิดข้อผิดพลาด เช่น network error หรือการ fetch ล้มเหลว
+      // console.error('เกิดข้อผิดพลาดในการบันทึก Log การคำนวณ:', err);
     }
-  } catch (err) {
-    // กรณีเกิดข้อผิดพลาด เช่น network error หรือการ fetch ล้มเหลว
-    console.error('เกิดข้อผิดพลาดในการบันทึก Log การคำนวณ:', err);
-  }
-};
+  };
 
-/**
-   * โหลดข้อมูลสินค้าเมื่อ component mount ครั้งแรก
-   */
+  /**
+     * โหลดข้อมูลสินค้าเมื่อ component mount ครั้งแรก
+     */
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -217,7 +216,7 @@ const handleLogCalculate = async () => {
         });
 
         if (!res.ok) {
-          console.error('การเชื่อมต่อ API ล้มเหลว');
+          // console.error('การเชื่อมต่อ API ล้มเหลว');
           return;
         }
 
@@ -225,10 +224,10 @@ const handleLogCalculate = async () => {
         if (data.status && data.result?.data) {
           setProductsData(data.result.data);
         } else {
-          console.error('ข้อมูลจาก API ไม่ถูกต้อง:', data.message);
+          // console.error('ข้อมูลจาก API ไม่ถูกต้อง:', data.message);
         }
       } catch (err) {
-        console.error('เกิดข้อผิดพลาดในการดึงข้อมูลสินค้า:', err);
+        // console.error('เกิดข้อผิดพลาดในการดึงข้อมูลสินค้า:', err);
       }
     };
 
@@ -391,11 +390,10 @@ const handleLogCalculate = async () => {
           item.sizeNum <= targetSize + tolerance
       );
 
-    //  จุดที่ควรใส่ log
-    console.log('Recommended Size:', recommendedSize);
-    console.log('Products matched:', filtered.map((i) => i.modelname));
+    // console.log('Recommended Size:', recommendedSize);
+    // console.log('Products matched:', filtered.map((i) => i.modelname));
 
-    if (filtered.length === 0) return []; // ❌ ไม่มีสินค้าในเกณฑ์
+    if (filtered.length === 0) return []; //  ไม่มีสินค้าในเกณฑ์
 
     // เรียงลำดับจากที่ใกล้เคียงที่สุด
     const sortedByClosest = filtered.sort(
@@ -420,10 +418,10 @@ const handleLogCalculate = async () => {
   const recommendedItems = getRecommendedItems(formValues.systemType, results?.recommended);
 
   return (
-    <div className={styles.containersolar}>
+    <div className={styles.containersolarcalculate}>
       {/* กล่องหลักของหน้า: แบ่งโหมดแบบฟอร์ม และโหมดแสดงผลลัพธ์ */}
       <div
-        className={`${styles.formWrapper} ${results ? styles.formWrapperResult : styles.formWrapperInitial
+        className={`${styles.formWrappercalculate} ${results ? styles.formWrapperResult : styles.formWrapperInitial
           }`}
       >
         {/* หัวข้อหลักของหน้า */}
@@ -558,7 +556,7 @@ const handleLogCalculate = async () => {
               }}
               suppressHydrationWarning
             />
- 
+
             {/* แสดงผลเปอร์เซ็นต์แบบคู่กลางวัน-กลางคืน */}
             <div className={styles.usageSplit}>
               <span className={styles.day}>
@@ -640,7 +638,7 @@ const handleLogCalculate = async () => {
             {/* ======================= */}
             {/* ปุ่มควบคุม (คำนวณ / รีเซ็ต) */}
             {/* ======================= */}
-            <div className={styles.buttonGroup}>
+            <div className={styles.buttonGroupcalculate}>
               <button type="submit" className="buttonSecondaryonebule">
                 คำนวณ
               </button>
@@ -656,12 +654,20 @@ const handleLogCalculate = async () => {
           </form>
         )}
 
+
+
+
+
+
+
+
+
         {/* =============================== */}
         {/* ส่วนหัวของผลลัพธ์ */}
         {/* =============================== */}
         {results && (
           <>
-            <h4 className={styles.headtitelsolar}>
+            <h4 className={styles.headtitelsolarcalculate}>
               แพ็กเกจที่ออกแบบมาให้เหมาะกับพื้นที่หลังคา และรูปแบบการใช้พลังงานของคุณ
             </h4>
 
@@ -672,11 +678,11 @@ const handleLogCalculate = async () => {
               {/* ===================== */}
               {/* แถวบน: ขนาดระบบ / คืนทุน */}
               {/* ===================== */}
-              <div className={styles.topGrid}>
+              <div className={styles.topGridcalculate}>
                 {/* กล่องแสดง "ขนาดระบบที่แนะนำ" */}
                 <div className={styles.resultBoxc}>
                   <div className={styles.labelRowc}>
-                    <div className={styles.labelheadc}>ขนาดระบบที่แนะนำ</div>
+                    <div className={styles.labelheadcalculate1}>ขนาดระบบที่แนะนำ</div>
                     <div className={styles.valueLargec}>
                       <span className={styles.recommendedNumberc}>
                         {results.recommended?.match(/[\d.]+/)?.[0]}
@@ -689,7 +695,7 @@ const handleLogCalculate = async () => {
                 {/* กล่องแสดง "ระยะเวลาคืนทุน" */}
                 <div className={styles.resultBox}>
                   <div className={styles.labelRow}>
-                    <div className={styles.labelhead}>ระยะเวลาคืนทุน</div>
+                    <div className={styles.labelheadcalculate}>ระยะเวลาคืนทุน</div>
 
                     <div className={styles.valueLarge}>
                       {(() => {
@@ -739,12 +745,12 @@ const handleLogCalculate = async () => {
               {/* ===================== */}
               {/* แถวล่าง: แพ็กเกจ / ผลตอบแทน */}
               {/* ===================== */}
-              <div className={styles.bottomGrid}>
+              <div className={styles.bottomGridcalculate}>
                 {/* -------------------------------------- */}
                 {/* กล่องซ้าย: แสดงแพ็กเกจสินค้าที่แนะนำ */}
                 {/* -------------------------------------- */}
                 <div className={styles.resultBoxL}>
-                  <h4 className={`${styles.packageTitle} font-700orange`}>แพ็กเกจที่เราแนะนำ</h4>
+                  <h4 className={`${styles.packageTitlecalculate} font-700orange`}>แพ็กเกจที่เราแนะนำ</h4>
                   <p
                     className={`${styles.systemType} ${styles['with-lines']}`}
                     style={{ color: '#264798' }}
@@ -753,8 +759,8 @@ const handleLogCalculate = async () => {
                   </p>
 
                   {/* รายการสินค้าแนะนำ */}
-                  <div className="productListWrapper">
-                    <div className={styles.productList}>
+                  <div className="productListWrappercalculate">
+                    <div className={styles.productListcalculate}>
                       {recommendedItems && recommendedItems.length > 0 ? (
                         recommendedItems.map((item, idx) => {
                           // เตรียมข้อมูลพื้นฐานสินค้า
@@ -845,7 +851,7 @@ const handleLogCalculate = async () => {
                                 body: JSON.stringify(logData),
                               });
                             } catch (err) {
-                              console.error('เกิดข้อผิดพลาดในการบันทึก Log:', err);
+                              // console.error('เกิดข้อผิดพลาดในการบันทึก Log:', err);
                             }
                           };
 
@@ -861,22 +867,30 @@ const handleLogCalculate = async () => {
                               onClick={handleLogClick}
                             >
                               <div
-                                className={`${styles.productCard} fade-in`}
+                                className={`${styles.productCardcalculate} fade-in`}
                                 style={{
                                   cursor: 'pointer',
                                   transition: 'transform 0.3s ease, box-shadow 0.3s ease',
                                 }}
                               >
                                 {/* รูปภาพสินค้า */}
-                                <div className="product-image-wrapper" style={{ position: 'relative' }}>
+                                <div className="productImagecalculate" >
                                   <Image
                                     src={mainImage}
                                     alt={name}
                                     width={330}
                                     height={330}
-                                    style={{ objectFit: 'cover' }}
+                                    style={{
+                                      width: '100%',
+                                      height: 'auto',     // สำคัญมาก
+                                      objectFit: 'cover'
+                                    }}
+                                    sizes="(max-width: 450px) 300px, (max-width: 768px) 330px, 330px"
                                     draggable={false}
                                   />
+
+
+                                  <div className={styles.cardOverlay}>ดูรายละเอียดสินค้า</div>
                                   {item.productpro_ispromotion === '1' && item.productpro_percent && (
                                     <div className="product-promo-ribbon">- {item.productpro_percent}</div>
                                   )}
@@ -1028,7 +1042,7 @@ const handleLogCalculate = async () => {
                 {/* กล่องขวา: แสดงผลตอบแทนระบบโซลาร์ */}
                 {/* -------------------------------------- */}
                 <div className={styles.resultBox}>
-                  <h4 className={`${styles.solarTitle} font-700orange`}>
+                  <h4 className={`${styles.solarTitlecalculate} font-700orange`}>
                     ผลตอบแทนระบบโซลาร์
                   </h4>
 
@@ -1133,8 +1147,7 @@ const handleLogCalculate = async () => {
             {/* ปุ่มด้านล่าง (คำนวณใหม่ / ปริ้นผล) */}
             {/* =============================== */}
             <div
-              className={styles.buttonWrapper}
-              style={{ display: 'flex', gap: '10px' }}
+              className={styles.buttonWrappercalculate}
             >
               {/* ปุ่มคำนวณใหม่ */}
               <button
@@ -1143,7 +1156,7 @@ const handleLogCalculate = async () => {
                   setResults(null);
                   setAttemptedRoofInput(false);
                   document
-                    .querySelector(`.${styles.formWrapper}`)
+                    .querySelector(`.${styles.formWrappercalculate}`)
                     ?.scrollIntoView({ behavior: 'smooth' });
                 }}
                 suppressHydrationWarning

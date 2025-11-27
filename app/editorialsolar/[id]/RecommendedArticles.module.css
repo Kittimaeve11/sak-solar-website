@@ -1,7 +1,7 @@
 /* ===== Wrapper ของ Section ทั้งหมด ===== */
 .wrapper {
   width: 100%;
-  max-width: 1280px;
+  max-width: 1200px;
   margin: 3rem auto;
   padding: 1rem;
 
@@ -12,7 +12,7 @@
 }
 
 /* ===== Title ===== */
-.title {
+.titlerecommended {
   font-size: 1.8rem;
   font-weight: 800;
   margin-bottom: 1.5rem;
@@ -20,67 +20,84 @@
 }
 
 /* ===== Slider Container ===== */
-.sliderWrapper {
+.sliderWrapperrecommended {
   position: relative;
   overflow: visible; 
   min-height: 200px;
 }
 
 /* ===== Card ของบทความ ===== */
-.card {
-  display: block;
+.cardrecommended {
   background: #fff;
-  border-radius: 10px;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: transform 0.2s ease;
   overflow: hidden;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  margin-bottom: 10px;
   text-decoration: none;
   color: inherit;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  min-height: 450px; 
+  height: 100%;
 }
 
-.card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+.cardrecommended:hover {
+  transform: translateY(-4px);
+  text-decoration: none;
 }
 
 /* ===== Image Wrapper ===== */
-.imageWrapper {
+.imageWrapperrecommended {
   position: relative; 
   width: 100%;
   height: 200px;
   overflow: hidden;
 }
+.cardrecommended:hover .imageWrapperrecommended {
+  filter: brightness(0.4);
+}
+
 
 /* ===== Content ใน Card ===== */
-.cardContent {
+.cardContentrecommended {
   padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
 }
 
-.cardTitle {
-  font-size: 1.1rem;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
+.cardTitlerecommended {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 0;
+  display: block;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+  box-sizing: border-box;
 }
 
-.date {
-  font-size: 0.9rem;
-  color: #777;
-  margin-bottom: 0.5rem;
+.daterecommended {
+  color: #888;
+  font-size: 14px;
 }
 
 .cardDescription {
-  font-size: 0.95rem;
-  margin-bottom: 0.75rem;
-  color: #333;
-}
-
-.readMore {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: #E88534;
-  display: flex;
-  align-items: center;
-  gap: 5px;
+  color: #555;
+  font-size: 15px;
+  margin-top: -0.5rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-decoration: none;
+  border-bottom: none;
+  box-shadow: none;
 }
 
 /* ===== ลูกศร Prev/Next ===== */
@@ -109,4 +126,13 @@
 
 .arrowNext {
   right: -15px;
+}
+/* ให้แต่ละ slide มี padding ซ้าย-ขวา เพื่อไม่ให้การ์ดติดกัน */
+.sliderWrapperrecommended :global(.slick-slide) {
+  padding: 0 12px; /* ระยะห่างระหว่างการ์ด */
+  box-sizing: border-box;
+}
+.sliderWrapperrecommended :global(.slick-slide) {
+  display: flex; 
+  height: auto;
 }

@@ -35,7 +35,7 @@
 /* =========================================================
    Card ของบทความ
    ========================================================= */
-.slide-itemeditorial {
+.slide-itemeditorialslide {
   padding: 0.7rem; /* ลด padding ให้การ์ดกว้างขึ้น */
   margin-bottom: 0.8rem;
   box-sizing: border-box;
@@ -68,7 +68,7 @@
 /* =========================================================
    ภาพด้านบนการ์ด
    ========================================================= */
-.editorial-image-wrapper {
+.editorial-image-wrapperslide {
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 9;
@@ -128,25 +128,16 @@
   flex-grow: 1;
 }
 
-.read-more {
-  margin-top: auto;
-  color: #F2780C;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 15px;
-}
 
-/* 📦 Wrapper หลักของ Skeleton */
-/* 🟠 Container หลัก */
+/* Wrapper หลักของ Skeleton */
+/* Container หลัก */
 .skeleton-cardsilde-editorial-container {
   display: flex;
   gap: 1rem;
   width: 100%;
 }
 
-/* 🟢 Card Skeleton ขนาดต้องตรงกับ Slide จริง */
+/*  Card Skeleton ขนาดต้องตรงกับ Slide จริง */
 .skeleton-cardsilde-editorial {
   flex: 0 0 calc(100% / var(--columns));
   max-width: calc(100% / var(--columns));
@@ -163,7 +154,7 @@
 }
 
 
-/* 🖼 รูปบน */
+/*  รูปบน */
 .skeleton-imagesilde-editorial {
   width: 100%;
   height: 200px;
@@ -171,7 +162,7 @@
   border-radius: 6px 6px 0 0;
 }
 
-/* 📄 เนื้อหาใน card */
+/*  เนื้อหาใน card */
 .skeleton-content-editorial {
   padding: 16px 25px 24px; /* เพิ่ม 24px ด้านล่างเพื่อให้ไม่ติดขอบ */
   display: flex;
@@ -215,15 +206,15 @@
 }
 
 
-/* 🔹 Dynamic Columns (เหมือน slidesToShow) */
+/*  Dynamic Columns (เหมือน slidesToShow) */
 .skeleton-cardsilde-editorial-container { --columns: 3; }
 
-/* 🟠 Tablet — 2 ใบ */
+/*  Tablet — 2 ใบ */
 @media (max-width: 1120px) {
   .skeleton-cardsilde-editorial-container { --columns: 2; }
 }
 
-/* 🔵 Mobile — 1 ใบ */
+/*  Mobile — 1 ใบ */
 @media (max-width: 764px) {
   .skeleton-cardsilde-editorial-container { --columns: 1; }
 }

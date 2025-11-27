@@ -48,7 +48,7 @@
   width: 100%;
 }
 
-/* ✅ โหมด Skeleton — ปิด flex พิเศษของ react-slick เพื่อไม่ให้บีบ */
+/*  โหมด Skeleton — ปิด flex พิเศษของ react-slick เพื่อไม่ให้บีบ */
 .slide-itemportfolio.skeleton-mode {
   padding: 0;
   margin-bottom: 0;
@@ -190,14 +190,14 @@
 }
 
 
-/* 🟠 Container หลัก */
-.skeleton-wrapper-portfolio {
+/*  Container หลัก */
+.skeleton-wrapper-portfolioslide {
   display: flex;
   gap: 1rem;
   width: 100%;
 }
 
-/* 🟢 Card Skeleton ขนาดตรงกับการ์ดจริง */
+/*  Card Skeleton ขนาดตรงกับการ์ดจริง */
 .skeleton-cardportfolio {
   flex: 0 0 calc(100% / var(--columns));
   max-width: calc(100% / var(--columns));
@@ -213,7 +213,7 @@
   padding-bottom: 1rem;  /* กันเส้นชิดขอบ */
 }
 
-/* 🖼 รูปภาพด้านบน */
+/*  รูปภาพด้านบน */
 .skeleton-imageportfolio {
   width: 100%;
   padding-top: 56.25%;
@@ -235,7 +235,7 @@
   border-bottom-right-radius: 6px;
 }
 
-.skeleton-logo {
+.skeleton-logoslide {
   width: 24px;
   height: 24px;
   border-radius: 4px;
@@ -243,22 +243,22 @@
   margin-right: 6px;
 }
 
-.skeleton-bannertext {
+.skeleton-bannertextslide {
   flex: 1;
   height: 12px;
   border-radius: 4px;
   background-color: #f1f1f1;
 }
 
-/* 📝 เนื้อหา */
-.skeleton-contentportfolio {
+/* เนื้อหา */
+.skeleton-contentportfolioslide {
   padding: 16px 20px 32px;  /* เพิ่ม padding-bottom */
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.skeleton-titleportfolio {
+.skeleton-titleportfolioslide {
   height: 20px;
   width: 90%;
   background-color: #f1f1f1;
@@ -266,14 +266,14 @@
   margin-bottom: 1rem;
 }
 
-.skeleton-row {
+.skeleton-rowslide {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 10px;
 }
 
-.skeleton-line-left {
+.skeleton-line-leftslide {
   height: 18px;
   width: 60%;
   background-color: #f1f1f1;
@@ -281,7 +281,7 @@
   margin-bottom: 6px;
 }
 
-.skeleton-line-right {
+.skeleton-line-rightslide {
   height: 18px;
   width: 25%;
   background-color: #f1f1f1;
@@ -290,7 +290,7 @@
 }
 
 /* เส้นสุดท้าย แบบเต็ม */
-.skeleton-line-full {
+.skeleton-line-fullslide {
   height: 16px;
   width: 40%;
   background-color: #f1f1f1;
@@ -299,10 +299,10 @@
 }
 
 /* 🔹 Dynamic Columns  */
-.skeleton-wrapper-portfolio { --columns: 3; }
+.skeleton-wrapper-portfolioslide { --columns: 3; }
 
 @media (max-width: 1120px) {
-  .skeleton-wrapper-portfolio { --columns: 2; }
+  .skeleton-wrapper-portfolioslide { --columns: 2; }
 }
 
 @media (max-width: 764px) {
@@ -357,7 +357,7 @@
 
   /* ปรับรูปแบบ title ให้ตัดเหลือ 1 บรรทัด + ... */
   .project-titleslide,
-  .skeleton-titleportfolio {
+  .skeleton-titleportfolioslide {
     font-size: 14px !important;
     font-weight: 600 !important;
     line-height: 1.3;
@@ -371,7 +371,7 @@
   }
 
   /* ปรับ skeleton title ให้อยู่ในตำแหน่งเหมาะสม */
-  .skeleton-titleportfolio {
+  .skeleton-titleportfolioslide {
     margin-top: -4px !important;
     width: 85% !important;
   }

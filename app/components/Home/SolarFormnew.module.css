@@ -1,7 +1,7 @@
 /* =========================================================
    พื้นหลังของฟอร์มคำนวณโซลาร์
    ========================================================= */
-.containersolar {
+.containersolarcalculate {
   background-color: #FAFBFF;     /* สีพื้นหลังอ่อน ฟ้าอมเทา */
   padding-top: 3rem;             /* ระยะห่างด้านบน */
   padding-bottom: 3rem;          /* ระยะห่างด้านล่าง */
@@ -12,7 +12,7 @@
 /* =========================================================
    กล่องหลักที่ห่อแบบฟอร์มทั้งหมด
    ========================================================= */
-.formWrapper {
+.formWrappercalculate {
   margin: 0 auto;                /* จัดให้อยู่กึ่งกลาง */
   font-family: sans-serif;       /* ใช้ฟอนต์มาตรฐาน */
   border-radius: 8px;            /* มุมโค้งมน */
@@ -36,7 +36,7 @@
 /* =========================================================
    หัวข้อหลักของส่วนผลลัพธ์ (เช่น “แพ็กเกจที่เราแนะนำ”)
    ========================================================= */
-.headtitelsolar {
+.headtitelsolarcalculate {
   color: #264798;                /* สีฟ้าเข้ม */
   text-align: center;            /* จัดกลาง */
   margin-top: -1rem;             /* ขยับขึ้นเล็กน้อย */
@@ -82,7 +82,7 @@
 /* =========================================================
    กลุ่มปุ่มควบคุม (เช่น ปุ่มคำนวณ / รีเซ็ต)
    ========================================================= */
-.buttonGroup {
+.buttonGroupcalculate {
   display: flex;                 /* ใช้ flexbox จัดแนว */
   justify-content: flex-end;     /* ชิดขวาทั้งหมด */
   margin-top: 1.5rem;            /* ระยะห่างจากส่วนบน */
@@ -175,8 +175,8 @@
 /* =========================================================
    แถวผลคำนวณ (แถวบน / แถวล่าง)
    ========================================================= */
-.topGrid,
-.bottomGrid {
+.topGridcalculate,
+.bottomGridcalculate {
   display: grid;                 /* ใช้ Grid Layout */
   grid-template-columns: 1fr 1fr; /* แบ่งเป็น 2 คอลัมน์เท่ากัน */
   gap: 1.5rem;                   /* ระยะห่างระหว่างกล่อง */
@@ -230,7 +230,7 @@
 /* =========================================================
    ชื่อหัวข้อภายในกล่อง (เช่น “ขนาดระบบที่แนะนำ”)
    ========================================================= */
-.labelheadc {
+.labelheadcalculate1 {
   font-size: 36px;
   font-weight: 800;
   color: #E88534;                /* สีส้มหลักของแบรนด์ */
@@ -265,7 +265,7 @@
 /* =========================================================
    กล่องผลคืนทุน (ฝั่งขวาของแถวบน)
    ========================================================= */
-.labelhead {
+.labelheadcalculate {
   font-size: 36px;
   color: #E88534;
   font-weight: 800;
@@ -318,7 +318,7 @@
 /* =========================================================
    หัวข้อ “แพ็กเกจที่เราแนะนำ”
    ========================================================= */
-.packageTitle {
+.packageTitlecalculate {
   margin-top: 1.5rem;
   margin-bottom: 0rem;
   font-size: 30px;
@@ -335,7 +335,6 @@
   text-align: center;
   font-size: 20px;
   font-weight: 600;
-  text-shadow: 0.02m 0 0 currentColor; /* เงาตัวอักษรเบา ๆ */
   margin-top: 10px;
 }
 
@@ -366,13 +365,13 @@
    ========================================================= */
 
 /* กล่องหลักห่อรายการสินค้า — จัดกลางแนวนอน */
-.productListWrapper {
+.productListWrappercalculate {
   display: flex;
   justify-content: center;
 }
 
 /* กล่องรวมการ์ดสินค้าแต่ละใบ */
-.productList {
+.productListcalculate {
   display: flex;
   gap: 2rem;                    /* ระยะห่างระหว่างการ์ด */
   text-align: center;
@@ -382,7 +381,7 @@
 /* =========================================================
    การ์ดสินค้าแต่ละใบ (Product Card)
    ========================================================= */
-.productCard {
+.productCardcalculate {
   position: relative;
   width: 330px;                 /* ความกว้างของการ์ด */
   text-align: center;           /* จัดข้อความให้อยู่กลาง */
@@ -398,14 +397,17 @@
 }
 
 /* เอฟเฟกต์เมื่อ hover การ์ด */
-.productCard:hover {
+.productCardcalculate:hover {
   transform: translateY(-10px); /* ลอยขึ้น */
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); /* เงาชัดขึ้น */
 }
 
+
 /* =========================================================
    Overlay ปิดทับการ์ดเมื่อ hover (ข้อความแสดงเพิ่มเติม)
    ========================================================= */
+
+
 .cardOverlay {
   position: absolute;
   inset: 0;                     /* ขยายเต็มการ์ด */
@@ -416,26 +418,28 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  max-height: 330px;
   opacity: 0;                   /* ซ่อนไว้ก่อน */
-  pointer-events: none;         /* ไม่ให้คลิก */
   transition: opacity 0.3s ease;
 }
 
 /* แสดง overlay เมื่อ hover การ์ด */
-.productCard:hover .cardOverlay {
-  opacity: 4;
+.productCardcalculate:hover .cardOverlay {
+  opacity: 1;
   pointer-events: auto;
 }
 
 /* =========================================================
    รูปภาพสินค้า (ส่วนบนของการ์ด)
    ========================================================= */
-.productImage {
+.productImagecalculate {
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
   object-fit: cover;            /* ครอบเต็มพื้นที่ไม่บิดเบือน */
-  max-width: 100%;
+  max-width: 330px;
   height: auto;
+  overflow: hidden;   /* ป้องกัน overlay/รูปเกินกรอบ */
+  position: relative; /* ให้ overlay จับตำแหน่งได้ถูก */
 }
 
 /* =========================================================
@@ -481,7 +485,7 @@
 /* =========================================================
    หัวข้อผลตอบแทนระบบโซลาร์ (เช่น "ผลตอบแทนระบบโซลาร์")
    ========================================================= */
-.solarTitle {
+.solarTitlecalculate {
   margin-top: 0.5rem;
   margin-bottom: 0rem;
   font-size: 30px;
@@ -588,7 +592,7 @@
 /* =========================================================
    กลุ่มปุ่มด้านล่าง (ปุ่มคำนวณใหม่ / ปริ้นผล)
    ========================================================= */
-.buttonWrapper {
+.buttonWrappercalculate {
   display: flex;
   justify-content: flex-end;   /* ชิดขวา */
   margin-top: 1rem;
@@ -664,13 +668,13 @@
   }
 
   /* แถวบน/ล่างของผลคำนวณ — เปลี่ยนจาก 2 คอลัมน์เป็น 1 */
-  .topGrid,
-  .bottomGrid {
+  .topGridcalculate,
+  .bottomGridcalculate {
     grid-template-columns: 1fr; /* เรียงซ้อนลงทีละแถว */
   }
 
   /* รายการสินค้า — ยังคงแนวนอนแต่ช่องว่างแคบลง */
-  .productList {
+  .productListcalculate {
     flex-direction: row;         /* เรียงแนวนอน */
     justify-content: center;     /* จัดกึ่งกลาง */
     gap: 1rem;                   /* ลดช่องว่างระหว่างการ์ด */
@@ -685,17 +689,17 @@
   }
 
 
-  .productList {
+  .productListcalculate {
     flex-direction: column;      /* เปลี่ยนเป็นแนวตั้ง */
     gap: 1rem;                   /* ลดช่องว่างระหว่างการ์ด */
   }
 
-  .productCard {
+  .productCardcalculate {
     margin: 0 auto 0;
     margin-bottom: 1.5rem;
   }
 
-  .productImage {
+  .productImagecalculate {
     width: 100%;
     height: auto;
   }
@@ -712,7 +716,7 @@
   /* ---------------------------------------------------------
      ส่วนฟอร์มหลัก (Solar Calculator)
      --------------------------------------------------------- */
-  .formWrapper {
+  .formWrappercalculate {
     width: 80%;                  /* ให้แคบลงเพื่อเหมาะกับจอมือถือ */
     max-width: 100%;
     margin: 0 auto;              /* จัดกลาง */
@@ -741,8 +745,8 @@
   /* ---------------------------------------------------------
      ส่วนผลลัพธ์คำนวณ (Result Boxes)
      --------------------------------------------------------- */
-  .topGrid,
-  .bottomGrid {
+  .topGridcalculate,
+  .bottomGridcalculate {
     grid-template-columns: 1fr;  /* เรียงลงทีละกล่อง */
     gap: 1rem;
   }
@@ -754,8 +758,8 @@
   /* ---------------------------------------------------------
      หัวข้อและตัวเลขผลลัพธ์ — ปรับขนาดให้พอดีจอมือถือ
      --------------------------------------------------------- */
-  .labelhead,
-  .labelheadc {
+  .labelheadcalculate,
+  .labelheadcalculate1 {
     font-size: 1.5rem;
   }
 
@@ -772,11 +776,11 @@
   /* ---------------------------------------------------------
      หัวข้อแพ็กเกจและประเภทระบบ
      --------------------------------------------------------- */
-  .packageTitle {
+  .packageTitlecalculate {
     font-size: 25px;
   }
 
-  .solarTitle {
+  .solarTitlecalculate {
     font-size: 25px;
   }
 
@@ -838,13 +842,13 @@
   /* ---------------------------------------------------------
      กลุ่มปุ่ม (เช่น ปุ่ม "คำนวณ", "รีเซ็ต") — เรียงแนวตั้ง
      --------------------------------------------------------- */
-  .buttonGroup {
+  .buttonGroupcalculate {
     flex-direction: column;       /* เปลี่ยนจากแนวนอน → แนวตั้ง */
     align-items: flex-end;        /* ชิดขวาของ container */
   }
 
   /* ปรับขนาดปุ่มให้เต็มความกว้าง container ของฟอร์มคำนวณ*/
-  .buttonGroup button {
+  .buttonGroupcalculate button {
     width: 100%; /* ให้ปุ่มยืดเต็มแนวกว้างบนหน้าจอเล็ก */
     margin-bottom: 0.5rem;      /* เพิ่มระยะห่างด้านล่าง */
   }
@@ -859,25 +863,131 @@
   /* ---------------------------------------------------------
      กล่องปุ่มส่วนล่าง (ปุ่มรีเซ็ต / ปริ้นผลลัพธ์)
      --------------------------------------------------------- */
-.buttonWrapper {
+.buttonWrappercalculate {
   display: flex;
-  flex-direction: column;    /* เรียงปุ่มแนวตั้ง */
-  justify-content: center;
-  align-items: stretch;
-  gap: 0;                    /* ไม่มีระยะห่างเลย */
-}
-
-.buttonWrapper button {
+  flex-direction: column;
   width: 100%;
-  margin-bottom: 0;          /* ตัด margin ออกทั้งหมด */
+  padding: 0 0.5rem;       /* ขอบซ้าย-ขวาเท่ากัน */
+  box-sizing: border-box;
+  gap: 0.5rem !important;   /* ระยะห่างปุ่มบน-ล่าง */
 }
 
-/* ถ้าอยากให้ชิด “แบบแตะกันสนิท” จริง ๆ */
-.buttonWrapper button + button {
-  margin-top: -1px;         
+.buttonWrappercalculate button {
+  width: 100%;
+  margin: 0 !important;     /* รีเซ็ต margin ทั้งหมดของปุ่ม */
+  padding: 10px;
 }
 
+.buttonWrappercalculate button + button {
+  margin-top: 1rem !important; /* กัน margin เพิ่มของปุ่มตัวที่ 2 */
+}
 
+.formWrapperResult {
+    width: 100vw;
+    max-width: 100vw;
+    margin-left: calc(-1 * (50vw - 50%));
+    padding: 0;
+  }
+
+  .resultGrid {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    gap: 1rem;
+  }
+
+  .resultBox,
+  .resultBoxc,
+  .resultBoxL {
+    width: calc(100vw - 2rem);      /* เต็มจอแต่เผื่อระยะขอบ */
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 1rem;
+    box-sizing: border-box;
+    border-radius: 6px;
+  }
+
+
+.headtitelsolarcalculate {
+    font-size: 18px;
+    margin: 0.5rem 1rem 1rem;
+    text-align: center;
+    padding: 0;
+  }
+
+  .labelheadcalculate,
+  .labelheadcalculate1 {
+    font-size: 22px;
+  }
+  .subtext {
+    display: none !important;
+  }
+   /* ปรับ layout กล่องคืนทุนให้เหมือนกล่อง 20 kW */
+  .labelRow {
+    flex-direction: column;       /* ให้ข้อความหัวกับตัวเลขแยกบรรทัด */
+    align-items: center;
+    text-align: center;
+  }
+
+  .valueLarge {
+    display: flex;
+    flex-direction: row;          /* ให้เลขกับหน่วยอยู่บรรทัดเดียว */
+    justify-content: center;
+    align-items: baseline;        /* จัดให้หน่วยอยู่ระดับเดียวกับเลข */
+    gap: 0.3rem;                  /* ระยะห่างเล็กน้อยระหว่างเลขกับหน่วย */
+    padding-top: 0.3rem;          /* ลด padding ด้านบนลง */
+  }
+
+  .recommendedNumber {
+    font-size: 2.5rem;            /* ปรับให้ใกล้กับ 20 kW */
+    color: #E88534;
+    line-height: 1;
+  }
+
+  .recommendedUnit {
+    font-size: 1.4rem;            /* ให้เล็กกว่าตัวเลขเล็กน้อย */
+    color: #E88534;
+    line-height: 1;
+  }
+
+  .labelheadcalculate {
+    font-size: 1.2rem;            /* ขนาดหัวเรื่อง "ระยะเวลาคืนทุน" */
+    margin-bottom: 0.4rem;
+    text-align: center;
+  }
+  .labelRowc {
+    flex-direction: column;        /* ข้อความหัวบน / ตัวเลขล่าง */
+    align-items: center;
+    text-align: center;
+  }
+
+  .valueLargec {
+    display: flex;
+    flex-direction: row;           /* ตัวเลขและหน่วยอยู่บรรทัดเดียว */
+    justify-content: center;
+    align-items: baseline;         /* ให้หน่วยชิดระดับเลข */
+    gap: 0.3rem;                   /* เว้นระยะเลขกับหน่วย */
+    margin-top: 0.5rem;
+  }
+
+  .recommendedNumberc {
+    font-size: 2.5rem;             /* ขนาดตัวเลขใกล้เคียง 20 kW */
+    color: #E88534;
+    line-height: 1;
+  }
+
+  .recommendedUnitc {
+    font-size: 1.4rem;             /* หน่วย kW */
+    color: #E88534;
+    line-height: 1;
+  }
+
+  .labelheadcalculate1 {
+    font-size: 1.2rem;             /* ข้อความหัว เช่น "ขนาดระบบที่แนะนำ" */
+    margin-bottom: 0.4rem;
+    text-align: center;
+  }
 }
 
 
@@ -912,7 +1022,7 @@
   /* ---------------------------------------------------------
      พื้นหลังส่วนฟอร์ม (ลดระยะขอบรอบนอก)
      --------------------------------------------------------- */
-  .containersolar {
+  .containersolarcalculate {
     padding: 0.3rem; /* ลดระยะ padding รอบฟอร์ม */
   }
 
@@ -921,5 +1031,23 @@
      --------------------------------------------------------- */
   .formWrapperInitial {
     max-width: 320px; 
+  }
+.productCardcalculate {
+    width: 300px;           /* ความกว้างการ์ดตามที่ต้องการ */
+    margin: 0 auto;         /* จัดให้การ์ดอยู่กึ่งกลาง */
+  }
+
+  .productImagecalculate {
+    width: 300px !important;       /* บังคับให้รูปกว้าง 300px จริง */
+    height: auto;
+    margin: 0 auto;         /* จัดรูปให้อยู่กลาง */
+    display: block;    
+  }
+
+  .productImagecalculate img {
+    width: 300px !important; /* สำหรับ Image ของ Next.js */
+    height: auto !important;
+    object-fit: cover;
+    border-radius: 8px;
   }
 }

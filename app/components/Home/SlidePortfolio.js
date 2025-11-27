@@ -38,7 +38,7 @@ const handleLogPortfolioClick = async (item) => {
       body: JSON.stringify(logData),
     });
   } catch (err) {
-    console.error('เกิดข้อผิดพลาดตอนส่ง Log:', err);
+    // console.error('เกิดข้อผิดพลาดตอนส่ง Log:', err);
   }
 };
 
@@ -94,7 +94,7 @@ export default function SlidePortfolio() {
           setProjects(mappedProjects);
         }
       } catch (error) {
-        console.error('❌ โหลดข้อมูลผลงานล้มเหลว:', error);
+        // console.error(' โหลดข้อมูลผลงานล้มเหลว:', error);
       } finally {
         if (isMounted) setIsLoading(false);
       }
@@ -167,30 +167,30 @@ export default function SlidePortfolio() {
       </div>
 
       {isLoading ? (
-        <div className="skeleton-wrapper-portfolio">
+        <div className="skeleton-wrapper-portfolioslide">
           {Array.from({ length: slidesToShow }).map((_, index) => (
             <div key={index} className="skeleton-cardportfolio">
               <div className="skeleton-imageportfolio">
                 <div className="skeleton-bannerportfolio">
-                  <div className="skeleton-logo"></div>
-                  <div className="skeleton-bannertext"></div>
+                  <div className="skeleton-logoslide"></div>
+                  <div className="skeleton-bannertextslide"></div>
                 </div>
               </div>
-              <div className="skeleton-contentportfolio">
-                <div className="skeleton-titleportfolio"></div>
-                <div className="skeleton-row">
-                  <div className="skeleton-line-left"></div>
-                  <div className="skeleton-line-right"></div>
+              <div className="skeleton-contentportfolioslide">
+                <div className="skeleton-titleportfolioslide"></div>
+                <div className="skeleton-rowslide">
+                  <div className="skeleton-line-leftslide"></div>
+                  <div className="skeleton-line-rightslide"></div>
                 </div>
-                <div className="skeleton-row">
-                  <div className="skeleton-line-left"></div>
-                  <div className="skeleton-line-right"></div>
+                <div className="skeleton-rowslide">
+                  <div className="skeleton-line-leftslide"></div>
+                  <div className="skeleton-line-rightslide"></div>
                 </div>
-                <div className="skeleton-row">
-                  <div className="skeleton-line-left"></div>
-                  <div className="skeleton-line-right"></div>
+                <div className="skeleton-rowslide">
+                  <div className="skeleton-line-leftslide"></div>
+                  <div className="skeleton-line-rightslide"></div>
                 </div>
-                <div className="skeleton-line-full"></div>
+                <div className="skeleton-line-fullslide"></div>
               </div>
             </div>
           ))}

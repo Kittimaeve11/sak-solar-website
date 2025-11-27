@@ -241,7 +241,7 @@ export default function SlideEditorial() {
               const dateLabel = formatDate(item.editoria_creacteAt, locale);
 
               return (
-                <div key={item.id || i} className="slide-itemeditorial fade-in">
+                <div key={item.id || i} className="slide-itemeditorialslide fade-in">
                   <div
                     className="editorial-cardslide clickable"
                     onMouseDown={(e) => (e.currentTarget.isDragging = false)}
@@ -253,7 +253,7 @@ export default function SlideEditorial() {
                       }
                     }}
                   >
-                    <div className="editorial-image-wrapper">
+                    <div className="editorial-image-wrapperslide">
                       <Image
                         src={item.image}
                         alt={title}

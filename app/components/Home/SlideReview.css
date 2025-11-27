@@ -42,7 +42,7 @@
   width: 100%;
 }
 
-/* ✅ โหมด Skeleton — ปิด flex พิเศษของ react-slick เพื่อไม่ให้บีบ */
+/*  โหมด Skeleton — ปิด flex พิเศษของ react-slick เพื่อไม่ให้บีบ */
 .slide-itemreview.skeleton-mode {
   padding: 0;
   margin-bottom: 0;
@@ -90,7 +90,7 @@
 }
 
 /* ปุ่ม Play */
-.play-icon {
+.play-iconslide {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -103,18 +103,18 @@
   z-index: 2;
 }
 
-.video-cardslide:hover .play-icon {
+.video-cardslide:hover .play-iconslide {
   opacity: 1;
 }
 
 /* =========================================================
    INFO TEXT
    ========================================================= */
-.infoslide {
+.infoslidereview {
   padding: 0 0.25rem 0.25rem;
 }
 
-.titleslide {
+.titleslidereview {
   font-size: 16px;
   font-weight: 600;
   color: #111;
@@ -125,7 +125,7 @@
   text-overflow: ellipsis;
 }
 
-.dateslide {
+.dateslidereview {
   font-size: 14px;
   color: #777;
 }
@@ -133,7 +133,7 @@
 
 
 /*  Container หลัก */
-.skeleton-wrapper-review {
+.skeleton-wrapper-reviewslide {
   display: flex;
   gap: 1rem;
   width: 100%;
@@ -141,7 +141,7 @@
 }
 
 /*  Card Skeleton ขนาดเท่าการ์ดวิดีโอจริง */
-.skeleton-cardreview {
+.skeleton-cardreviewslide {
   flex: 0 0 calc(100% / var(--columns));
   max-width: calc(100% / var(--columns));
   overflow: hidden;
@@ -151,7 +151,7 @@
 }
 
 
-/* 🖼 รูปวิดีโอ — ขนาด 16:9 */
+/*  รูปวิดีโอ — ขนาด 16:9 */
 .skeleton-imageslidevideo {
  width: 100%;
   aspect-ratio: 16 / 9;
@@ -162,26 +162,26 @@
 .skeleton-titleslidevideo {
   height: 20px;
   margin: 16px 0px 8px 0px;
-  width: 70%;
+  width: 90%;
 }
 
 /*  Date line */
 .skeleton-lineslidevideo {
   height: 16px;
   margin: 6px 0px 16px 0px;
-  width: 90%;
+  width: 50%;
   display: block;
 }
 
 /*  Responsive Columns */
-.skeleton-wrapper-review { --columns: 3; }
+.skeleton-wrapper-reviewslide { --columns: 3; }
 
 @media (max-width:1120px) {
-  .skeleton-wrapper-review { --columns: 2; }
+  .skeleton-wrapper-reviewslide { --columns: 2; }
 }
 
 @media (max-width:764px) {
-  .skeleton-wrapper-review { --columns: 1; }
+  .skeleton-wrapper-reviewslide { --columns: 1; }
 }
 
 
@@ -205,11 +205,11 @@
     padding: 0 8px;
   }
 
-  .titleslide {
+  .titleslidereview {
     font-size: 15px;
   }
 
-  .dateslide {
+  .dateslidereview {
     font-size: 13px;
   }
 }

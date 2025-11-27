@@ -50,7 +50,7 @@ export default function EditorialDetailPage() {
                     null;
 
                 if (!controller.signal.aborted) {
-                    console.log("🟢 editorial object จาก API:", article); // 👀 ดูค่า typeID ตรงนี้
+                    // console.log(" editorial object จาก API:", article); // ดูค่า typeID ตรงนี้
                     setEditorial(article);
                 }
             } catch {
@@ -124,15 +124,15 @@ export default function EditorialDetailPage() {
 
     const subList = editorial?.subEditoria || [];
 
-    /* 🔥 ใช้ editoriatypeID ที่ถูกต้องแทน editoria_typeID */
+    /* ใช้ editoriatypeID ที่ถูกต้องแทน editoria_typeID */
     const safeTypeId =
         editorial?.editoriatypeID ||
         editorial?.typeID ||
         editorial?.editoria_typeID ||
         null;
 
-    console.log("💡 typeID ที่ส่งให้ RecommendedArticles:", safeTypeId);
-    console.log("💡 currentIdSafe:", Number(editorial?.editoria_id));
+    // console.log(" typeID ที่ส่งให้ RecommendedArticles:", safeTypeId);
+    // console.log(" currentIdSafe:", Number(editorial?.editoria_id));
 
     return (
         <>

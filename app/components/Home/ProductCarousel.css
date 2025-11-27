@@ -49,6 +49,13 @@
   padding: 1rem;
 }
 
+/* ปิด interactivity ของ slide ที่ aria-hidden="true" เพื่อไม่ให้โฟกัสได้ */
+.slick-slide[aria-hidden="true"] {
+  inert: '';
+  pointer-events: none;
+  user-select: none;
+}
+
 
 /* =========================================================
    HEADER
@@ -57,8 +64,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 1rem;   /* ✅ เพิ่มระยะด้านบน */
-  margin-bottom: -1rem;  /* ✅ ปรับระยะห่างด้านล่าง */
+  margin-top: 1rem;   /*  เพิ่มระยะด้านบน */
+  margin-bottom: -1rem;  /*  ปรับระยะห่างด้านล่าง */
   padding: 0 1rem;
 }
 
@@ -399,6 +406,31 @@
   align-items: flex-start;
 }
 
+
+  .product-price-display {
+  display: flex;
+  align-items: center;   /* สำคัญ → จัดให้ไอคอนและตัวหนังสืออยู่กลางแนวตั้ง */
+  gap: 0px;              /* ระยะห่างระหว่างราคาและไอคอน */
+  font-size: 20px;
+  font-weight: 600;
+  color: #000;
+}
+
+.price-icon {
+  display: flex;         /* ให้ไอคอนอยู่ตรงกลางพอดีในกล่องตัวมันเอง */
+  align-items: center;
+  justify-content: center;
+  margin-right: 0px;   /* ระยะห่างระหว่างไอคอนกับตัวหนังสือ */
+  line-height: 1;        /* ลบ spacing ด้านบน/ล่าง */
+}
+
+.product-price-new {
+  font-size: 20px;
+  font-weight: 600;
+  color: #000;
+  line-height: 1;        /* ลดช่องว่างไม่ให้ตัวหนังสือสูงเกิน */
+}
+
 /* =========================================================
    RESPONSIVE
    ========================================================= */
@@ -574,36 +606,33 @@
   .product-price-new {
     grid-column: 2;            /* คอลัมน์ 2 */
     grid-row: 2;               /* แถวสอง */
-    font-size: 20px;
-    font-weight: 700;
-    color: #000;
     line-height: 1.25;
     white-space: nowrap;       /* กันตัดบรรทัด */
   }
 }
 
 /* ให้ skeleton-card แสดง 4 ใบเป็นค่าเริ่มต้น (จอใหญ่) */
-.skeleton-card {
+.skeleton-cardslide {
   display: block;
 }
 
 /* จอกว้างไม่เกิน 1499px → แสดง 3 ใบ (ซ่อนใบที่ 4) */
 @media (max-width: 1499px) {
-  .pc-skeleton-row .skeleton-card:nth-child(4) {
+  .pc-skeleton-row .skeleton-cardslide:nth-child(4) {
     display: none;
   }
 }
 
 /* จอกว้างไม่เกิน 1200px → แสดง 2 ใบ (ซ่อนใบที่ 3–4) */
 @media (max-width: 1200px) {
-  .pc-skeleton-row .skeleton-card:nth-child(n+3) {
+  .pc-skeleton-row .skeleton-cardslide:nth-child(n+3) {
     display: none;
   }
 }
 
 /* จอกว้างไม่เกิน 800px → แสดง 1 ใบ (ซ่อนใบที่ 2–4) */
 @media (max-width: 800px) {
-  .pc-skeleton-row .skeleton-card:nth-child(n+2) {
+  .pc-skeleton-row .skeleton-cardslide:nth-child(n+2) {
     display: none;
   }
 }

@@ -45,7 +45,7 @@ function HardSkeleton() {
       <div className="pc-skeleton-grid">
         <div className="pc-skeleton-row">
           {cards.map((_, i) => (
-            <div key={i} className="pc-skeletonCard skeleton-card">
+            <div key={i} className="pc-skeletonCard skeleton-cardslide">
               <div className="skeleton pc-skeleton-image" />
               <div className="pc-skeleton-content">
                 <div className="skeleton pc-skeleton-title" />
@@ -102,7 +102,7 @@ export default function ProductCarousel({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // 💡 ตอนโหลด: ใช้ prop loading จากหน้า HomePage อย่างเดียวพอ
+  // ตอนโหลด: ใช้ prop loading จากหน้า HomePage อย่างเดียวพอ
   if (loading) {
     return <HardSkeleton />;
   }
@@ -140,13 +140,12 @@ export default function ProductCarousel({
      ========================================================= */
   const handleLogClick = async (item) => {
     try {
-      console.log('Log item:', item);
+      // console.log('Log item:', item);
 
       const logData = {
         actionType: '1', // 1 = ดูผลิตภัณฑ์
-        actionDetail: `หน้าหลัก รหัส: ${item.product_ID ?? '-'} หมายเลขผลิตภัณฑ์: ${
-          item.product_num ?? '-'
-        }`,
+        actionDetail: `หน้าหลัก รหัส: ${item.product_ID ?? '-'} หมายเลขผลิตภัณฑ์: ${item.product_num ?? '-'
+          }`,
         typeUser: 'ผู้เยี่ยมชมเว็บไซต์', // ใครทำ
         datatype: 'ผลิตภัณฑ์', // ประเภทเมนูที่กระทำ
         dataID: item.product_ID ?? '0', // ไอดีข้อมูล
@@ -155,7 +154,7 @@ export default function ProductCarousel({
         dataname: item.product_num ?? '-', // ชื่อข้อมูล (จาก product_num)
       };
 
-      console.log('LogData ที่จะส่ง:', logData);
+      // console.log('LogData ที่จะส่ง:', logData);
 
       const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL_API}/api/logWebsitepageapi`, {
         method: 'POST',
@@ -168,12 +167,12 @@ export default function ProductCarousel({
 
       if (!res.ok) {
         const err = await res.text();
-        console.error('Log API error:', err);
+        // console.error('Log API error:', err);
       } else {
-        console.log('Log: บันทึกข้อมูลการดูผลิตภัณฑ์สำเร็จ');
+        // console.log('Log: บันทึกข้อมูลการดูผลิตภัณฑ์สำเร็จ');
       }
     } catch (err) {
-      console.error(' เกิดข้อผิดพลาดในการบันทึก Log:', err);
+      // console.error(' เกิดข้อผิดพลาดในการบันทึก Log:', err);
     }
   };
 
@@ -199,6 +198,9 @@ export default function ProductCarousel({
       <Link
         key={productNum}
         prefetch={false}
+        tabIndex={-1}               //  ปิดการโฟกัส (สำคัญสุด)
+        role="button"              //  สำหรับ screen reader
+        aria-label={getProductName(item)} //  เพิ่มข้อมูลแทน
         href={`/products/${item.producttypeID}/${brandID}/${productNum}`}
         className="carouselCard no-underline hover:no-underline"
         onMouseDown={handleMouseDown}
@@ -208,28 +210,30 @@ export default function ProductCarousel({
         }}
         onClick={() => handleLogClick(item)}
       >
-        {item.image && (
+
+        {item.image && ( // ถ้ามี image เท่านั้นจะแสดง block รูปภาพ
           <div className="product-image-wrapper">
             <Image
               src={item.image}
               alt={getProductName(item)}
-              width={330}
-              height={330}
-              style={{ objectFit: 'cover' }}
+              fill
+              sizes="(max-width: 768px) 100vw, 330px"
               draggable={false}
-              priority
+              priority={idx === 0}  // โหลดเฉพาะภาพแรก
             />
+
             {item.productpro_ispromotion === '1' && item.productpro_percent && (
-              <div className="product-promo-ribbon">- {item.productpro_percent}</div>
+              <div className="product-promo-ribbon">- {item.productpro_percent}</div> // แสดงริบบิ้น Promotion เช่น -20%
             )}
           </div>
-        )}
+        )
+        }
 
         <div
-          className="product-info"
+          className="product-info"     // กล่องข้อมูลสินค้า
           style={{
             display: 'flex',
-            flexDirection: 'column',
+            flexDirection: 'column',   // จัดข้อมูลแนวตั้ง
             justifyContent: 'space-between',
             flexGrow: 1,
             padding: '1rem',
@@ -239,11 +243,11 @@ export default function ProductCarousel({
         >
           <div>
             <h3 style={{ margin: 0, fontSize: '17px', fontWeight: 600, color: '#2a3e5e' }}>
-              {item.productbrandName ? `${item.productbrandName} ` : ''}
-              {getProductName(item)}
+              {item.productbrandName ? `${item.productbrandName} ` : ''}  {/* แสดงชื่อแบรนด์ถ้ามี */}
+              {getProductName(item)}  {/* ชื่อสินค้า (ฟังก์ชันช่วยจัดชื่อให้ถูกต้อง/แปลภาษา) */}
             </h3>
 
-            {item.battery && (
+            {item.battery && ( // ถ้ามีข้อมูล battery จะแสดงรุ่นและขนาดแบต
               <h6 style={{ margin: '0.5rem 0 0 0', fontWeight: 500, color: '#333' }}>
                 รุ่นแบตเตอรี่ {item.battery} kWh
               </h6>
@@ -251,30 +255,28 @@ export default function ProductCarousel({
           </div>
 
           {(item.isprice == 0 || item.isprice === '0') && item.size && (
-            <div className="product-size-display">
+            <div className="product-size-display">    {/* แสดงเฉพาะขนาด kW หากไม่มีราคา */}
               <MdOutlineElectricBolt size={25} color="#ffc300" />
               {item.size}
             </div>
           )}
 
-          {item.isprice === '1' && item.price && (
+          {item.isprice === '1' && item.price && (  // เงื่อนไข: ถ้ามีราคาให้แสดงราคา
             <div className="product-price-display">
-              {/* ใส่ class ให้ตรงกับ CSS mobile (.price-icon, .product-price-new) */}
-              <span className="price-icon">
-                <TbCurrencyBaht size={25} />
-              </span>
-              <span className="product-price-new">
-                {Number(finalPrice ?? item.price).toLocaleString()} บาท
-              </span>
+
+              <span className="price-icon"> <TbCurrencyBaht size={25} /> </span>
+              <span className="product-price-new"> {Number(finalPrice ?? item.price).toLocaleString()} บาท {/* ราคาใหม่ที่มีโปร / ราคาจริงที่ไม่มีโปร */} </span>
+
               {item.productpro_ispromotion === '1' && item.productpro_percent && (
-                <span className="product-price-old">
+                <span className="product-price-old"> {/* ราคาเดิม ขีดฆ่าสำหรับสินค้าโปรโมชั่น */}
                   {Number(item.price).toLocaleString()} บาท
                 </span>
               )}
             </div>
           )}
         </div>
-      </Link>
+      </Link >
+
     );
   };
 
@@ -293,11 +295,13 @@ export default function ProductCarousel({
         {hasItems ? (
           showSlider ? (
             <Slider {...settings}>
-              {items.map((item, idx) => (
-                <div key={idx} className="slide-itemproduct">
-                  {renderCard(item, idx)}
+              {items.map((item) => (
+                <div key={item.product_num ?? item.product_ID} className="slide-itemproduct">
+                  {renderCard(item)}
                 </div>
               ))}
+
+
             </Slider>
           ) : (
             <div className="carouselStaticWrapper">

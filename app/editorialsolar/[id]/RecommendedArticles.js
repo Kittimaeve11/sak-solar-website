@@ -15,7 +15,7 @@ import 'slick-carousel/slick/slick-theme.css';
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 
-/* 👉 Hook ตรวจ screen width */
+/* Hook ตรวจ screen width */
 function useWindowWidth() {
   const [width, setWidth] = useState(1200);
   useEffect(() => {
@@ -28,7 +28,7 @@ function useWindowWidth() {
   return width;
 }
 
-/* 👉 Custom Arrow */
+/* Custom Arrow */
 const PrevArrow = ({ onClick }) => (
   <button className={styles.arrowPrev} onClick={onClick}>
     <IoIosArrowBack />
@@ -41,17 +41,25 @@ const NextArrow = ({ onClick }) => (
   </button>
 );
 
-/* 👉 Cleaning HTML safely */
+/* Clean HTML safely (รวม parseDescription) */
 function cleanHTML(str) {
   if (!str) return "";
-  return str
-    .replace(/\\n/g, " ")
-    .replace(/&nbsp;/g, " ")
-    .replace(/ style="[^"]*"/g, "")
-    .trim();
+  try {
+    return str
+      .replace(/^"+|"+$/g, "")
+      .replace(/\\\//g, "/")
+      .replace(/\\"/g, '"')
+      .replace(/&nbsp;/g, " ")
+      .replace(/\\n/g, " ")
+      .replace(/ style="[^"]*"/g, "")
+      .replace(/<\/?[^>]+(>|$)/g, "")
+      .trim();
+  } catch {
+    return "";
+  }
 }
 
-/* 👉 Get Image URL safely */
+/* Get Image URL safely */
 function getImageUrl(galleryStr) {
   if (!galleryStr) return "/images/no-image.jpg";
   try {
@@ -63,7 +71,7 @@ function getImageUrl(galleryStr) {
   }
 }
 
-/* 👉 Logging click */
+/* Logging click */
 async function handleLogClick(article) {
   try {
     await fetch(`${baseUrl}/api/logWebsitepageapi`, {
@@ -88,18 +96,17 @@ async function handleLogClick(article) {
   }
 }
 
-/* 🌟 MAIN COMPONENT */
+/*  MAIN COMPONENT */
 export default function RecommendedArticles({ typeID, currentId }) {
   const { locale } = useLocale();
   const [articles, setArticles] = useState([]);
   const sliderRef = useRef(null);
   const width = useWindowWidth();
 
-  const slidesToShow = width > 1200 ? 4 : width > 991 ? 3 : width > 638 ? 2 : 1;
+  const slidesToShow = width > 1200 ? 3 : width > 991 ? 2 : width > 638 ? 2 : 1;
 
   useEffect(() => {
-    // ป้องกันไม่ให้ fetch แบบ typeID ว่าง
-    if (!typeID) return;
+    if (!typeID) return; // ไม่ fetch ถ้า typeID ว่าง
 
     async function fetchData() {
       try {
@@ -109,10 +116,9 @@ export default function RecommendedArticles({ typeID, currentId }) {
         );
         const data = await res.json();
 
-        const filtered =
-          data?.result?.filter(
-            (item) => Number(item.editoria_id) !== Number(currentId)
-          ) || [];
+        const filtered = data?.result?.filter(
+          (item) => Number(item.editoria_id) !== Number(currentId)
+        ) || [];
 
         setArticles(filtered);
         sliderRef.current?.slickGoTo(0);
@@ -120,10 +126,11 @@ export default function RecommendedArticles({ typeID, currentId }) {
         console.error("Fetch error:", err);
       }
     }
+
     fetchData();
   }, [typeID, currentId]);
 
-  /* 🚫 Empty data — ไม่ render อะไรเลย */
+  // ถ้าไม่มีบทความ ไม่แสดงอะไรเลย
   if (!articles.length) return null;
 
   const settings = {
@@ -140,64 +147,64 @@ export default function RecommendedArticles({ typeID, currentId }) {
 
   return (
     <section className={styles.wrapper}>
-      <h3 className={styles.title}>
+      <h3 className={styles.titlerecommended}>
         {locale === "en" ? "Recommended Articles" : "บทความแนะนำ"}
       </h3>
 
-      <div className={styles.sliderWrapper}>
+      <div className={styles.sliderWrapperrecommended}>
         <Slider ref={sliderRef} {...settings}>
-          {articles.map((article, idx) => {
+          {articles.map((article) => {
             const imageUrl = getImageUrl(article.editoria_gallary);
-            const title =
-              locale === "en"
-                ? article.editoria_titieEN || article.editoria_titieTH
-                : article.editoria_titieTH || article.editoria_titieEN;
+            const rawTitle = locale === "en"
+              ? article.editoria_titieEN || article.editoria_titieTH
+              : article.editoria_titieTH || article.editoria_titieEN;
+            const title = cleanHTML(rawTitle);
 
-            const previewText =
-              cleanHTML(
-                locale === "en"
-                  ? article.editoria_descriptionEN
-                  : article.editoria_descriptionTH
-              ).slice(0, 120) + "...";
+            const rawPreview =
+              locale === "en"
+                ? article.editoria_descriptionEN
+                : article.editoria_descriptionTH;
+
+            const previewText = cleanHTML(rawPreview).slice(0, 120) + "...";
 
             return (
               <Link
                 key={article.editoria_id}
                 href={`/editorialsolar/${article.editoria_num}`}
                 onClick={() => handleLogClick(article)}
-                className={styles.card}
+                className={styles.cardrecommended}
               >
-                <div className={styles.imageWrapper}>
-                  <Image
-                    src={imageUrl}
-                    alt={title}
-                    fill
-                    loading="lazy"
-                    sizes="(max-width:768px)80vw,(max-width:1200px)40vw,25vw"
-                    style={{ objectFit: "cover" }}
-                  />
-                </div>
+                <article>
+                  <div className={styles.imageWrapperrecommended}>
+                    <Image
+                      src={imageUrl}
+                      alt={title}
+                      fill
+                      loading="lazy"
+                      sizes="(max-width:768px)80vw,(max-width:1200px)40vw,25vw"
+                      style={{ objectFit: "cover" }}
+                    />
+                  </div>
 
-                <div className={styles.cardContent}>
-                  <h4 className={styles.cardTitle}>{title}</h4>
+                  <div className={styles.cardContentrecommended}>
+                    <h4 className={styles.cardTitlerecommended}>{title}</h4>
 
-                  <p className={styles.date}>
-                    {new Date(article.editoria_creacteAt).toLocaleDateString(
-                      locale === "en" ? "en-EN" : "th-TH",
-                      { day: "numeric", month: "long", year: "numeric" }
-                    )}
-                  </p>
+                    <p className={styles.daterecommended}>
+                      {new Date(article.editoria_creacteAt).toLocaleDateString(
+                        locale === "en" ? "en-EN" : "th-TH",
+                        { day: "numeric", month: "long", year: "numeric" }
+                      )}
+                    </p>
 
-                  <p
-                    className={styles.cardDescription}
-                    dangerouslySetInnerHTML={{ __html: previewText }}
-                  />
+                    <p className={styles.cardDescription}>{previewText}</p>
 
-                  <p className={styles.readMore}>
-                    {locale === "en" ? "Read more" : "อ่านเพิ่มเติม"}{" "}
-                    <FaArrowRightLong />
-                  </p>
-                </div>
+                    <p className="read-more">
+                      {locale === "en" ? "Read more" : "อ่านเพิ่มเติม"}{" "}
+                      <FaArrowRightLong />
+                    </p>
+
+                  </div>
+                </article>
               </Link>
             );
           })}

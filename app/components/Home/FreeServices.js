@@ -96,13 +96,13 @@ export default function FreeServices({ contacts = [], locale, loading, baseUrl }
         key={`service-${item.service_ID || index}`}
         className={`${styles.cardfree} ${loaded ? 'fade-in' : 'hiddenBeforeLoad'}`}
       >
-        <div className={styles.iconWrapper}>
+        <div className={styles.iconWrapperfree}>
           <Image
             src={imgSrc}
             alt={title || 'Service'}
             width={90}
             height={90}
-            className={styles.icon}
+            className={styles.iconfree}
             draggable={false}
             unoptimized
             onError={(e) => (e.currentTarget.src = '/images/fallback.png')}
@@ -134,36 +134,36 @@ export default function FreeServices({ contacts = [], locale, loading, baseUrl }
 
       {/*  คง DOM structure เดียวกัน ไม่สลับ return */}
       {showSkeleton ? (
-        <div className={styles.skeletonGrid}>
+        <div className={styles.skeletonGridfree}>
           {Array.from({ length: 8 }).map((_, i) => (
-            <div key={`skeleton-${i}`} className={styles.skeletonCard}>
-              <div className={`skeleton ${styles.skeletonCircle}`} />
-              <div className={`skeleton ${styles.skeletonLine}`} />
-              <div className={`skeleton ${styles.skeletonmessage}`} />
+            <div key={`skeleton-${i}`} className={styles.skeletonCardfree}>
+              <div className={`skeleton ${styles.skeletonCirclefree}`} />
+              <div className={`skeleton ${styles.skeletonLinefree}`} />
+              <div className={`skeleton ${styles.skeletonmessagefree}`} />
               {Array.from({ length: 4 }).map((_, j) => (
-                <div key={`skeleton-${i}-${j}`} className={`skeleton ${styles.skeletonmessagedetails}`} />
+                <div key={`skeleton-${i}-${j}`} className={`skeleton ${styles.skeletonmessagedetailsfree}`} />
               ))}
             </div>
           ))}
         </div>
       ) : isSlider ? (
-        <div className={styles.responsiveSlider}>
+        <div className={styles.responsiveSliderfree}>
           {/*  key เฉพาะตอน slidesToShow เปลี่ยน (กัน re-render ซ้อน) */}
           <Slider key={slidesToShow} {...sliderSettings}>
             {limitedContacts.map((item, index) => renderCard(item, index))}
           </Slider>
         </div>
       ) : (
-        <div className={styles.desktopGrid}>
-          <div className={styles.gridWrapper}>
-            <div className={styles.gridContainer}>
+        <div className={styles.desktopGridfree}>
+          <div className={styles.gridWrapperfree}>
+            <div className={styles.gridContainerfree}>
               {topContacts.map((item, index) => renderCard(item, index))}
             </div>
           </div>
 
           {bottomContacts.length > 0 && (
-            <div className={styles.gridWrapper}>
-              <div className={styles.gridContainer}>
+            <div className={styles.gridWrapperfree}>
+              <div className={styles.gridContainerfree}>
                 {bottomContacts.map((item, index) => renderCard(item, index))}
               </div>
             </div>

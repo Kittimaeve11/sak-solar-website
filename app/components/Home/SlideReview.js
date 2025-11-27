@@ -185,9 +185,9 @@ export default function SlideReview() {
       </div>
 
       {isLoading ? (
-        <div className="skeleton-wrapper-review">
+        <div className="skeleton-wrapper-reviewslide">
           {Array.from({ length: visibleCards }).map((_, index) => (
-            <div key={index} className="skeleton-cardreview">
+            <div key={index} className="skeleton-cardreviewslide">
               <div className="skeleton skeleton-imageslidevideo"></div>
               <div className="skeleton skeleton-titleslidevideo"></div>
               <div className="skeleton skeleton-lineslidevideo"></div>
@@ -235,11 +235,11 @@ export default function SlideReview() {
                   >
                     <div className="thumbnail-wrapperslide">
                       <ThumbnailWithFallback videoId={id} alt={title} />
-                      <IoPlayCircleOutline className="play-icon" />
+                      <IoPlayCircleOutline className="play-iconslide" />
                     </div>
-                    <div className="infoslide">
-                      <h3 className="titleslide">{title}</h3>
-                      <p className="dateslide">{date}</p>
+                    <div className="infoslidereview">
+                      <h3 className="titleslidereview">{title}</h3>
+                      <p className="dateslidereview">{date}</p>
                     </div>
                   </div>
                 </div>

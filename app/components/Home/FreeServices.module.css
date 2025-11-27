@@ -44,7 +44,7 @@
 /* =========================================================
    GRID LAYOUT (โหมด Desktop)
    ========================================================= */
-.gridWrapper {
+.gridWrapperfree {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -54,7 +54,7 @@
   margin: 0 auto;
 }
 
-.gridContainer {
+.gridContainerfree {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -66,7 +66,7 @@
   margin-top: -1.5rem;
 }
 
-.gridContainer > * {
+.gridContainerfree > * {
   height: 100%;
 }
 
@@ -98,7 +98,7 @@
 /* =========================================================
    ICON: ส่วนของไอคอนบริการ
    ========================================================= */
-.iconWrapper {
+.iconWrapperfree {
   height: 80px;
   display: flex;
   align-items: center;
@@ -106,7 +106,7 @@
   margin: 1rem 0 0.5rem;
 }
 
-.icon {
+.iconfree {
   width: 90px;
   height: 90px;
   object-fit: contain;
@@ -166,28 +166,28 @@
 /* =========================================================
    DISPLAY SWITCH: Desktop / Mobile
    ========================================================= */
-.desktopGrid {
+.desktopGridfree {
   display: block;
 }
 
-.responsiveSlider {
+.responsiveSliderfree {
   display: none;
 }
 
 /* =========================================================
    SLIDER: โหมดมือถือ / แท็บเล็ต
    ========================================================= */
-.responsiveSlider {
+.responsiveSliderfree {
   position: relative;
   max-width: 1100px;
   margin: 0 auto;
 }
 
-.responsiveSlider :global(.slick-list) {
+.responsiveSliderfree :global(.slick-list) {
   margin: 0 auto;
 }
 
-.responsiveSlider :global(.slick-track) {
+.responsiveSliderfree :global(.slick-track) {
   display: flex;
   justify-content: center;
   align-items: stretch;
@@ -195,13 +195,13 @@
   margin-bottom: 1rem;
 }
 
-.responsiveSlider :global(.slick-slide) {
+.responsiveSliderfree :global(.slick-slide) {
   display: flex;
   justify-content: center;
 }
 
 /* ปรับขนาดของการ์ดภายในสไลด์ */
-.responsiveSlider .cardfree {
+.responsiveSliderfree .cardfree {
   width: 100%;
   max-width: 340px;
   margin: 0 auto;
@@ -209,26 +209,26 @@
 }
 
 /* ปุ่มลูกศรของสไลด์ */
-.responsiveSlider :global(.slick-prev),
-.responsiveSlider :global(.slick-next) {
+.responsiveSliderfree :global(.slick-prev),
+.responsiveSliderfree :global(.slick-next) {
   width: 40px;
   height: 40px;
   z-index: 10;
 }
 
 /* ขนาดของไอคอนลูกศร */
-.responsiveSlider :global(.slick-prev:before),
-.responsiveSlider :global(.slick-next:before) {
+.responsiveSliderfree :global(.slick-prev:before),
+.responsiveSliderfree :global(.slick-next:before) {
   font-size: 30px;
 }
 
 /* จุดแสดงสถานะสไลด์ (dots) */
-.responsiveSlider :global(.slick-dots) {
+.responsiveSliderfree :global(.slick-dots) {
   bottom: -3rem;
 }
 
 /* จุดปกติ (สีจาง) */
-.responsiveSlider :global(.slick-dots li button:before) {
+.responsiveSliderfree :global(.slick-dots li button:before) {
   content: '';
   width: 10px;
   height: 10px;
@@ -239,7 +239,7 @@
 }
 
 /* จุดที่ active (สว่างกว่า) */
-.responsiveSlider :global(.slick-dots li.slick-active button:before) {
+.responsiveSliderfree :global(.slick-dots li.slick-active button:before) {
   background: #ffffffb7;
 }
 
@@ -247,23 +247,23 @@
    RESPONSIVE: ปรับขนาดตามหน้าจอ
    ========================================================= */
 @media (max-width: 1490px) {
-  .desktopGrid {
+  .desktopGridfree {
     display: none;
   }
 
-  .responsiveSlider {
+  .responsiveSliderfree {
     display: block;
   }
 }
 
 @media (max-width: 1200px) {
-  .responsiveSlider {
+  .responsiveSliderfree {
     max-width: 750px;
   }
 }
 
 @media (max-width: 830px) {
-  .responsiveSlider {
+  .responsiveSliderfree {
     max-width: 400px;
   }
 }
@@ -283,7 +283,7 @@
     width: 295px !important;
   }
 
-  .icon {
+  .iconfree {
     width: 75px;
     height: 75px;
   }
@@ -301,7 +301,7 @@
 /* =========================================================
    SKELETON: โครงร่างโหลดข้อมูล
    ========================================================= */
-.skeletonGrid {
+.skeletonGridfree {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -312,7 +312,7 @@
   padding: 1.5rem 0;
 }
 
-.skeletonCard {
+.skeletonCardfree {
   flex: 0 1 340px;
   height: 390px;
   background: #ffffff;
@@ -326,7 +326,7 @@
 }
 
 /* วงกลมจำลองไอคอน */
-.skeletonCircle {
+.skeletonCirclefree {
   width: 90px;
   height: 90px;
   border-radius: 50%;
@@ -334,7 +334,7 @@
 }
 
 /* เส้นจำลองข้อความ */
-.skeletonLine {
+.skeletonLinefree {
   width: 70%;
   height: 18px;
   border-radius: 4px;
@@ -342,7 +342,7 @@
   margin: 1rem 0;
 }
 
-.skeletonmessage {
+.skeletonmessagefree {
   width: 100%;
   height: 16px;
   border-radius: 4px;
@@ -350,7 +350,7 @@
   margin: 1rem 0 1.5rem 0;
 }
 
-.skeletonmessagedetails {
+.skeletonmessagedetailsfree {
   width: 85%;
   height: 16px;
   border-radius: 4px;
@@ -363,28 +363,28 @@
    ========================================================= */
 /* ≥1490px → 8 การ์ด (4x2 แถว) */
 @media (min-width: 1490px) {
-  .skeletonGrid > :nth-child(n+9) {
+  .skeletonGridfree > :nth-child(n+9) {
     display: none;
   }
 }
 
 /* 1123–1489px → 3 การ์ด */
 @media (max-width: 1489px) and (min-width: 1123px) {
-  .skeletonGrid > :nth-child(n+4) {
+  .skeletonGridfree > :nth-child(n+4) {
     display: none;
   }
 }
 
 /* 781–1122px → 2 การ์ด */
 @media (max-width: 1122px) and (min-width: 831px) {
-  .skeletonGrid > :nth-child(n+3) {
+  .skeletonGridfree > :nth-child(n+3) {
     display: none;
   }
 }
 
 /* ≤830px → 1 การ์ด */
 @media (max-width: 830px) {
-  .skeletonGrid > :nth-child(n+2) {
+  .skeletonGridfree > :nth-child(n+2) {
     display: none;
   }
 }
