@@ -656,18 +656,16 @@ h6 {
 
 /* ====== กรอบวงกลมพร้อมเงา ====== */
 .circle-shadow {
-  width: 55px;
-  height: 55px;
+  width: 45px;
+  height: 45px;
   border-radius: 50%;                /* ทำให้เป็นวงกลม */
   overflow: hidden;                  /* ตัดเนื้อหาที่เกิน */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* เงา */
   display: inline-block;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .circle-shadow:hover {
   transform: scale(1.05);            /* ขยายเล็กน้อย */
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 
 

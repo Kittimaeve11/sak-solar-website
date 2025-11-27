@@ -1,6 +1,6 @@
 'use client';
-import Image from 'next/image';
 import { useState, useEffect } from 'react';
+import { LuArrowUpToLine } from "react-icons/lu";
 
 export default function BackToTopButton() {
   const [visible, setVisible] = useState(false);
@@ -11,13 +11,7 @@ export default function BackToTopButton() {
       const show = window.scrollY > 200;
       if (show !== visible) {
         setVisible(show);
-        if (show) {
-          // เลื่อนขึ้น animation เริ่มตอนแสดง
-          setShowAnimation(true);
-        } else {
-          // ปิด animation ทันทีเมื่อซ่อน
-          setShowAnimation(false);
-        }
+        setShowAnimation(show);
       }
     };
 
@@ -35,35 +29,32 @@ export default function BackToTopButton() {
       aria-label="กลับขึ้นบน"
       style={{
         position: 'fixed',
-        bottom: '96px',
+        bottom: '100px',
         right: '20px',
-        background: 'none',
+        width: '60px',
+        height: '60px',
+        borderRadius: '50%',
+        backgroundColor: '#367AF5',
         border: 'none',
-        padding: 0,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
         zIndex: 1000,
         cursor: 'pointer',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
 
-        // animation style
+        /* Animation */
         opacity: visible ? 1 : 0,
         transform: visible
           ? showAnimation
             ? 'translateY(0)'
             : 'translateY(20px)'
           : 'translateY(20px)',
-
         transition: 'opacity 0.4s ease, transform 0.4s ease',
-        pointerEvents: visible ? 'auto' : 'none', // ปิดการคลิกเวลาซ่อน
+        pointerEvents: visible ? 'auto' : 'none',
       }}
     >
-      <div className="circle-shadow hover-wiggle">
-        <Image
-          src="/topbt/topbt.png"
-          alt="กลับขึ้นบน"
-          width={55}
-          height={55}
-          priority
-        />
-      </div>
+      <LuArrowUpToLine className="circle-shadow hover-wiggle" size={30} color="#FFFFFF" />
     </button>
   );
 }
