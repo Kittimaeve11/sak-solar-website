@@ -42,6 +42,7 @@ export default function EditorialDetailPage() {
                     signal: controller.signal,
                 });
 
+
                 const data = await res.json();
                 const article =
                     data?.result?.[0] ||

@@ -20,34 +20,37 @@ export default function EditorialClient({ articles, types, banners }) {
 
   const titleRef = useRef(null);
 
-  /* 🔹 Detect Mobile */
+  /* รวม useEffect ให้เหลือ 1 ตัว */
   useEffect(() => {
+    // Detect mobile screen
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
     handleResize();
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
-  /* 🔹 Loading Animation */
-  useEffect(() => {
+    // Loading animation
     const timer = setTimeout(() => setLoading(false), 600);
-    return () => clearTimeout(timer);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      clearTimeout(timer);
+    };
   }, []);
 
-  /* 🔹 Filter Articles */
+  /*  Filter Articles */
   const filteredArticles =
     filter === 'ทั้งหมด'
       ? articles
       : articles.filter((a) => a.editoria_typeID === filter);
 
-  /* 🔹 Pagination Logic */
+  /* Pagination Logic */
   const totalPages = Math.ceil(filteredArticles.length / itemsPerPage);
   const paginatedArticles = filteredArticles.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
 
-  /* 🔹 Scroll To Top */
+  /* Scroll to Top Title */
   const scrollToTitle = () => {
     if (titleRef.current) {
       titleRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -70,9 +73,9 @@ export default function EditorialClient({ articles, types, banners }) {
     }, 200);
   };
 
-  /*  Render */
+  /* Render UI */
   return (
-    <div className="no-margin" >
+    <div className="no-margin">
       {/* Banner */}
       {loading ? (
         <div className="skeleton skeleton-banner fade-in"></div>

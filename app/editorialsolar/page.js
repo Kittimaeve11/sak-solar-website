@@ -34,7 +34,7 @@ async function safeJsonFetch(url, options = {}) {
     const data = await res.json();
     return data;
   } catch (err) {
-    console.error('[Editorial] Error fetching:', url, err);
+    // console.error('[Editorial] Error fetching:', url, err);
     return null; // สำคัญ: อย่า throw ต่อ
   }
 }
@@ -43,7 +43,13 @@ async function safeJsonFetch(url, options = {}) {
    Page Component
 ========================================================= */
 export default async function EditorialPage() {
-  //  เคสนี้คือ: Build/Run อยู่บน production + ใช้ localhost เป็น API
+  console.log("🌐 ENV:", {
+    nodeEnv: process.env.NODE_ENV,
+    baseUrl,
+    apiKey,
+    isProdWithLocalApi,
+  });
+    //  เคสนี้คือ: Build/Run อยู่บน production + ใช้ localhost เป็น API
   //  Netlify ต่อไม่ถึงแน่นอน เลยส่งข้อมูลว่าง ๆ ไปก่อน เพื่อให้ build ผ่าน
   if (isProdWithLocalApi) {
     return (
@@ -60,6 +66,7 @@ export default async function EditorialPage() {
     safeJsonFetch(`${baseUrl}/api/edittorTypepageapi`),
     safeJsonFetch(`${baseUrl}/api/edittorpageapi?limit=1000`),
     safeJsonFetch(`${baseUrl}/api/branderIDapi/15`),
+    
   ]);
 
   const types = typesRes?.result || [];
