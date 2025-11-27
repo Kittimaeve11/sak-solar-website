@@ -32,8 +32,9 @@
   border-radius: 6px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   cursor: pointer;
-  transition: transform 0.2s ease;
-  overflow: hidden;
+  position: relative;
+  z-index: 1;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;  overflow: hidden;
   margin-bottom: 10px;
   text-decoration: none;
   color: inherit;
@@ -46,6 +47,7 @@
 .cardrecommended:hover {
   transform: translateY(-4px);
   text-decoration: none;
+  z-index: 10;
 }
 
 /* ===== Image Wrapper ===== */
@@ -135,4 +137,15 @@
 .sliderWrapperrecommended :global(.slick-slide) {
   display: flex; 
   height: auto;
+}
+/* ระยะห่างรอบการ์ด */
+.sliderWrapperrecommended :global(.slick-slide) {
+  padding: 20px;  /* เดิม 12px ให้เยอะขึ้น */
+  box-sizing: border-box;
+}
+
+/* ให้ slide container ไม่ตัดขอบ */
+.sliderWrapperrecommended {
+  overflow: visible;   /* สำคัญ — ป้องกันไม่ให้โดนตัด */
+  padding: 20px 5px;   /* เพิ่มพื้นที่ด้านบนล่าง */
 }

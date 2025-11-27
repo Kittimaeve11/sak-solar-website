@@ -333,7 +333,7 @@ export default function ProductDetailPage() {
      Render UI — โครงสร้างหน้า Product Detail
      ============================================ */
   return (
-    <main className={styles.productslayout}>
+    <main className={`${styles.productslayout} fade-in`}>
 
       {/* =========================================================
         Breadcrumb — เส้นทางนำทางของผู้ใช้
