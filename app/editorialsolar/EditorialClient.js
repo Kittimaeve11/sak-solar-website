@@ -20,37 +20,34 @@ export default function EditorialClient({ articles, types, banners }) {
 
   const titleRef = useRef(null);
 
-  /* รวม useEffect ให้เหลือ 1 ตัว */
+  // รวม useEffect ตัวเดียว
   useEffect(() => {
-    // Detect mobile screen
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
     handleResize();
     window.addEventListener('resize', handleResize);
 
-    // Loading animation
     const timer = setTimeout(() => setLoading(false), 600);
 
-    // Cleanup
     return () => {
       window.removeEventListener('resize', handleResize);
       clearTimeout(timer);
     };
   }, []);
 
-  /*  Filter Articles */
+  // Filter Articles
   const filteredArticles =
     filter === 'ทั้งหมด'
       ? articles
       : articles.filter((a) => a.editoria_typeID === filter);
 
-  /* Pagination Logic */
+  // Pagination Logic
   const totalPages = Math.ceil(filteredArticles.length / itemsPerPage);
   const paginatedArticles = filteredArticles.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
 
-  /* Scroll to Top Title */
+  // Scroll to Title
   const scrollToTitle = () => {
     if (titleRef.current) {
       titleRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -73,15 +70,18 @@ export default function EditorialClient({ articles, types, banners }) {
     }, 200);
   };
 
-  /* Render UI */
+  // Render UI
   return (
-    <div className="no-margin">
+    <div className={`no-margin ${!loading ? 'fade-in' : ''}`}>
       {/* Banner */}
       {loading ? (
         <div className="skeleton skeleton-banner fade-in"></div>
       ) : (
-        <BannerList banners={banners} isMobile={isMobile} />
+        <div className="fade-in">
+          <BannerList banners={banners} isMobile={isMobile} />
+        </div>
       )}
+
 
       <main className="layout-editorial">
         {/* Title */}
