@@ -10,7 +10,7 @@ import ArticleSubSection from "./ArticleSubSection";
 import TableOfContents from "./TableOfContents";
 import RecommendedArticles from "./RecommendedArticles";
 import LoadingSpinner from "./LoadingSpinner";
-import Gallery from "./Gallery";
+import Gallery from "./gallery";
 import { parseHTML, getImageUrls } from "./utils";
 import styles from "./EditorialDetailPage.module.css";
 
