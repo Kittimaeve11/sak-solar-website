@@ -13,6 +13,7 @@ import { FaChevronLeft, FaChevronRight, FaTimes } from 'react-icons/fa';
 import { useLocale } from '@/app/Context/LocaleContext';
 import styles from './Productdetails.module.css';
 import RecommendedProducts from './RecommendedProducts';
+import LoadingSpinner from './LoadingSpinner';
 
 
 function PrevArrow({ onClick }) {
@@ -47,32 +48,32 @@ const slugify = (name) =>
   name?.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') || '';
 
 
-  const normalizeBrandSlug = (name) => {
-    if (!name) return '';
-    const cleaned = name.toLowerCase().trim();
+const normalizeBrandSlug = (name) => {
+  if (!name) return '';
+  const cleaned = name.toLowerCase().trim();
 
-    const mapping = {
-      huawel: 'huawei',
-      huwei: 'huawei',
-      huwail: 'huawei',
-      hweai: 'huawei',
-      huawei: 'huawei',
+  const mapping = {
+    huawel: 'huawei',
+    huwei: 'huawei',
+    huwail: 'huawei',
+    hweai: 'huawei',
+    huawei: 'huawei',
 
-      growat: 'growatt',
-      growwat: 'growatt',
-      growatt: 'growatt',
+    growat: 'growatt',
+    growwat: 'growatt',
+    growatt: 'growatt',
 
-      daye: 'deye',
-      deye: 'deye',
+    daye: 'deye',
+    deye: 'deye',
 
-      sinclare: 'sinclair',
-      sinclair: 'sinclair',
-    };
-
-    return mapping[cleaned] || cleaned.replace(/\s+/g, "-");
+    sinclare: 'sinclair',
+    sinclair: 'sinclair',
   };
 
-  
+  return mapping[cleaned] || cleaned.replace(/\s+/g, "-");
+};
+
+
 /* =========================================================
    ฟังก์ชันรวม URL สำหรับโหลดรูปจาก API หรือ fallback
    ========================================================= */
@@ -286,7 +287,10 @@ export default function ProductDetailPage() {
   /* =========================================================
      Loading และ Error Handling
      ========================================================= */
-  if (loading) return <p>กำลังโหลด...</p>;
+  if (loading) return <>
+    <LoadingSpinner />
+    <div className="loading-placeholder"></div>
+  </>;
   if (!product) return <p>ไม่พบข้อมูลสินค้า</p>;
 
   /* =========================================================

@@ -7,6 +7,7 @@ import { useLocale } from '../Context/LocaleContext';
 import AboutSidebar from './components/AboutSidebar';
 import HistoryVisionMission from './components/HistoryVisionMission';
 import TeamsSection from './components/TeamsSection';
+import LoadingSpinner from './components/LoadingSpinner';
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
@@ -165,7 +166,10 @@ export default function AboutPageClient() {
       {/* Content */}
       <section className="about-content">
         {loading ? (
-          <div className="skeleton-bannerabout"></div>
+          <>
+            <LoadingSpinner />
+            <div className="loading-placeholder"></div>
+          </>
         ) : (
           <>
             <HistoryVisionMission

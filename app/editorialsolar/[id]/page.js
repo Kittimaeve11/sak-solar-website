@@ -10,7 +10,7 @@ import ArticleSubSection from "./ArticleSubSection";
 import TableOfContents from "./TableOfContents";
 import RecommendedArticles from "./RecommendedArticles";
 import LoadingSpinner from "./LoadingSpinner";
-
+import Gallery from "./Gallery";
 import { parseHTML, getImageUrls } from "./utils";
 import styles from "./EditorialDetailPage.module.css";
 
@@ -84,7 +84,7 @@ export default function EditorialDetailPage() {
     }, [id, locale]);
 
     /* ==========================
-       🟡 Loading Stage
+        Loading Stage
     ========================== */
     if (isLoading || editorial === undefined) {
         return (
@@ -95,7 +95,7 @@ export default function EditorialDetailPage() {
         );
     }
 
-    /* ❌ Loaded but no data */
+    /*  Loaded but no data */
     if (editorial === null) {
         return (
             <div className={styles.notFoundBox}>
@@ -104,7 +104,7 @@ export default function EditorialDetailPage() {
         );
     }
 
-    /* 🟢 Valid Data */
+    /*  Valid Data */
     const title =
         locale === "en"
             ? editorial?.titiemainEN || editorial?.editoria_titieEN
@@ -146,6 +146,9 @@ export default function EditorialDetailPage() {
                                     images={getImageUrls(editorial?.gallarymain)}
                                     title={title}
                                 />
+
+
+
                                 <div
                                     className={styles.mainContent}
                                     dangerouslySetInnerHTML={{ __html: parseHTML(description) }}
@@ -173,7 +176,11 @@ export default function EditorialDetailPage() {
                                 locale={locale}
                             />
                         )}
+                        {/*  แสดงเฉพาะภาพที่เหลือเป็นแกลเลอรี่ */}
+                        <Gallery images={getImageUrls(editorial?.gallarymain)?.slice(1)} />
+
                     </div>
+
                 </div>
             </main>
 

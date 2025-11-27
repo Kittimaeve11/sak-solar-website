@@ -244,4 +244,32 @@
     display: none; /* ซ่อนสารบัญ */
   }
 }
+/* wrapper ทั้งชุดรูป */
+.articleImagesWrapper {
+  width: 100%;
+  margin: 1.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* รูปหลัก */
+.mainImageWrapper {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.mainImage {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+/* ส่วน gallery ใต้ภาพหลัก */
+.gallerySection {
+  max-width: 900px;
+  margin: 0 auto;
+}
 
