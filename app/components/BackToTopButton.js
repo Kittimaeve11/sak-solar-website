@@ -57,7 +57,7 @@ export default function BackToTopButton() {
     >
       <div className="circle-shadow hover-wiggle">
         <Image
-          src="/images/icons/top.png"
+          src="/icons/topbt.png"
           alt="กลับขึ้นบน"
           width={55}
           height={55}
