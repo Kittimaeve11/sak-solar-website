@@ -673,6 +673,7 @@ h6 {
 
 /* ====== สปินเนอร์ (วงกลมหมุนโหลดข้อมูล) ====== */
 .spinner-fullscreen {
+  
   position: fixed;
   inset: 0;
   display: flex;
@@ -685,8 +686,6 @@ h6 {
 
   z-index: 99999;
 
-  /* เปลี่ยนจาก all → none */
-  pointer-events: none; /* ให้คลิกผ่าน element นี้ได้ เพื่อไม่ block scroll/focus */
 }
 
 /* Spinner วงกลมหมุน */
