@@ -13,43 +13,48 @@ export default function FreeServices({ contacts = [], locale, loading, baseUrl }
   const [windowWidth, setWindowWidth] = useState(0);
   const [loaded, setLoaded] = useState(false);
 
-  /*  Resize – debounce หนักและกัน re-render ระหว่างลาก simulator */
+  /*  รวมทุก useEffect เป็นอันเดียว */
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
+    /* =====================  Resize + Debounce ===================== */
     let resizeTimer = null;
     let lastWidth = window.innerWidth;
-    setWindowWidth(lastWidth); // เริ่มด้วยค่าปัจจุบัน
+    setWindowWidth(lastWidth);
 
     const handleResize = () => {
       const w = window.innerWidth;
-      if (Math.abs(w - lastWidth) < 50) return; // กันการยิงรัวๆ
+      if (Math.abs(w - lastWidth) < 50) return;
       lastWidth = w;
+
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(() => {
         setWindowWidth(w);
-      }, 400); //  รอให้หยุดลากจริง ๆ ก่อนอัปเดต
+      }, 400);
     };
 
     window.addEventListener('resize', handleResize);
+
+    /* =====================  Fade-in on loading complete ===================== */
+    let fadeTimer = null;
+    if (!loading) {
+      fadeTimer = setTimeout(() => setLoaded(true), 150);
+    } else {
+      setLoaded(false);
+    }
+
+    /* =====================  Cleanup ===================== */
     return () => {
       clearTimeout(resizeTimer);
+      clearTimeout(fadeTimer);
       window.removeEventListener('resize', handleResize);
     };
-  }, []);
-
-  /*  fade-in หลังโหลด */
-  useEffect(() => {
-    if (!loading) {
-      const t = setTimeout(() => setLoaded(true), 150);
-      return () => clearTimeout(t);
-    }
-    setLoaded(false);
   }, [loading]);
 
+  /* =====================  Layout Decision ===================== */
   const isSlider = windowWidth < 1490;
 
-  /*  useMemo */
+  /* =====================  Memoized Data ===================== */
   const limitedContacts = useMemo(() => contacts.slice(0, 8), [contacts]);
 
   const topContacts = useMemo(() => {
@@ -66,7 +71,7 @@ export default function FreeServices({ contacts = [], locale, loading, baseUrl }
     return limitedContacts.slice(4);
   }, [limitedContacts]);
 
-  /*  settings พร้อม key เฉพาะตอน slidesToShow เปลี่ยน */
+  /* ===================== ⚙ Slider Settings ===================== */
   const slidesToShow = windowWidth < 830 ? 1 : windowWidth < 1200 ? 2 : 3;
   const sliderSettings = useMemo(
     () => ({
@@ -84,7 +89,7 @@ export default function FreeServices({ contacts = [], locale, loading, baseUrl }
     [windowWidth, slidesToShow]
   );
 
-  /*  render card */
+  /* =====================  Render Card ===================== */
   const renderCard = (item, index) => {
     const imgSrc = item.picture ? `${baseUrl}/${item.picture}` : '/images/fallback.png';
     const title = locale === 'th' ? item.titleTH : item.titleEN;
@@ -121,7 +126,6 @@ export default function FreeServices({ contacts = [], locale, loading, baseUrl }
     );
   };
 
-  /*  แสดง skeleton ต่อจนข้อมูลมีจริง (ไม่ return null กลางทาง) */
   const showSkeleton = loading || !contacts || contacts.length === 0;
 
   return (
@@ -132,7 +136,6 @@ export default function FreeServices({ contacts = [], locale, loading, baseUrl }
         <span className="keep-together">ติดตั้งฟรี จนถึงการดูแลหลังการขาย</span>
       </h4>
 
-      {/*  คง DOM structure เดียวกัน ไม่สลับ return */}
       {showSkeleton ? (
         <div className={styles.skeletonGridfree}>
           {Array.from({ length: 8 }).map((_, i) => (
@@ -148,7 +151,6 @@ export default function FreeServices({ contacts = [], locale, loading, baseUrl }
         </div>
       ) : isSlider ? (
         <div className={styles.responsiveSliderfree}>
-          {/*  key เฉพาะตอน slidesToShow เปลี่ยน (กัน re-render ซ้อน) */}
           <Slider key={slidesToShow} {...sliderSettings}>
             {limitedContacts.map((item, index) => renderCard(item, index))}
           </Slider>

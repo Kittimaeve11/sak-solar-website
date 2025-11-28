@@ -11,11 +11,11 @@ import '../../styles/tabmenu.css';
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 
-/* 🟢 Category slug */
+/*  Category slug */
 const slugifyCategory = (name) =>
   name?.toLowerCase().trim().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "") || "";
 
-/* 🟠 Normalize Brand → คืน slug ที่ถูกต้อง */
+/*  Normalize Brand → คืน slug ที่ถูกต้อง */
 const normalizeBrandSlug = (name) => {
   if (!name) return '';
   const cleaned = name.toLowerCase().trim();
@@ -48,7 +48,7 @@ export default function TabMenu() {
 
   const timeoutRef = useRef(null);
 
-  /* 🟢 เช็ค Active ของเมนู */
+  /*  เช็ค Active ของเมนู */
   const isActive = (path) =>
     path === '/' ? pathname === '/' : pathname.startsWith(path);
 
@@ -58,7 +58,7 @@ export default function TabMenu() {
      รวม useEffect → เหลือแค่ 1 อันตามที่ขอ
   ========================================================= */
   useEffect(() => {
-    // 🟠 โหลดข้อมูล Product Header
+    //  โหลดข้อมูล Product Header
     const cached = sessionStorage.getItem('menuProducts');
     if (cached) {
       setProducts(JSON.parse(cached));
@@ -102,7 +102,7 @@ export default function TabMenu() {
       fetchProducts();
     }
 
-    // 📱 เช็ค mobile
+    //  เช็ค mobile
     const checkMobile = () => {
       setIsMobile(window.matchMedia('(max-width: 991px)').matches);
     };

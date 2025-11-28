@@ -20,7 +20,6 @@ export default function EditorialClient({ articles, types, banners }) {
 
   const titleRef = useRef(null);
 
-  // รวม useEffect ตัวเดียว
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
     handleResize();

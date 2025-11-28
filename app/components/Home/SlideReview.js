@@ -62,8 +62,11 @@ export default function SlideReview() {
   const [visibleCards, setVisibleCards] = useState(3);
   const sliderRef = useRef(null);
 
-  /* Dynamic Update ของ Slide ตามหน้าจอ */
   useEffect(() => {
+    let isMounted = true;
+    let resizeTimer = null;
+
+    /*  1) Resize Handler — ปรับจำนวน Card ตามหน้าจอ */
     const updateVisibleCards = () => {
       const width = window.innerWidth;
       if (width < 764) setVisibleCards(1);
@@ -72,45 +75,12 @@ export default function SlideReview() {
     };
 
     updateVisibleCards();
-    window.addEventListener('resize', updateVisibleCards);
-    return () => window.removeEventListener('resize', updateVisibleCards);
-  }, []);
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(updateVisibleCards, 200);
+    });
 
-  /* =========================================================
-     ฟังก์ชันบันทึก Log
-  ========================================================= */
-  const handleLogReviewClick = async (item) => {
-    try {
-      const logData = {
-        actionType: "4",
-        actionDetail: `หน้าหลัก รหัสวิดีโอ: ${item.vedio_id ?? "0"} ชื่อวิดีโอ : ${item.nameTH_Vedio ?? "-"}`,
-        typeUser: "ผู้เยี่ยมชมเว็บไซต์",
-        datatype: "รีวิว",
-        dataID: item.vedio_id ?? "0",
-        dataname: item.nameTH_Vedio ?? "-",
-        datatypeID: "0",
-        brandtype: "0"
-      };
-
-      await fetch(`${baseUrl}/api/logWebsitepageapi`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-API-KEY": apiKey,
-        },
-        body: JSON.stringify(logData),
-      });
-    } catch (err) {
-      console.error("เกิดข้อผิดพลาดตอนส่ง Log รีวิว:", err);
-    }
-  };
-
-  /* =========================================================
-     โหลด API รีวิวดิดครั้งเดียว
-  ========================================================= */
-  useEffect(() => {
-    let isMounted = true;
-
+    /*  2) Load API + Cache */
     async function loadReviews() {
       try {
         if (window.__REVIEW_CACHE__) {
@@ -129,18 +99,23 @@ export default function SlideReview() {
           setReviews(data.result.data);
         }
       } catch (err) {
-        console.error('❌ Error fetching reviews:', err);
+        console.error('Error fetching reviews:', err);
       } finally {
         if (isMounted) setIsLoading(false);
       }
     }
     loadReviews();
 
-    return () => { isMounted = false; };
-  }, []);
+    /*  Cleanup */
+    return () => {
+      isMounted = false;
+      clearTimeout(resizeTimer);
+      window.removeEventListener('resize', updateVisibleCards);
+    };
+  }, []); 
 
   /* =========================================================
-     ⚙️ Custom dots
+      Custom dots
   ========================================================= */
   const slidesPerGroup = visibleCards;
   const totalGroups = Math.ceil(reviews.length / slidesPerGroup);
@@ -169,7 +144,7 @@ export default function SlideReview() {
   );
 
   /* =========================================================
-     🖥 Render
+      Render
   ========================================================= */
   return (
     <div className="review-wrapperslide fade-in">

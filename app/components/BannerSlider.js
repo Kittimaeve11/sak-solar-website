@@ -83,7 +83,7 @@ export default function BannerSlider() {
   const [isMobile, setIsMobile] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // 🎯 ใช้ useEffect อันเดียว รวมทุกอย่าง
+  //  ใช้ useEffect อันเดียว รวมทุกอย่าง
   useEffect(() => {
     let isMounted = true;
 

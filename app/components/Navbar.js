@@ -19,10 +19,10 @@ export default function Navbar() {
     <div className={styles.navWrapper}>
       <nav className={styles.navbar}>
 
-        {/* 🔶 โลโก้บริษัท */}
+        {/*  โลโก้บริษัท */}
         <div className={styles.leftSection}>
           <div className={styles.logoContainer}>
-            {/* ✅ ใช้ fill + aspect-ratio แทน width/height เพื่อแก้ warning */}
+            {/*  ใช้ fill + aspect-ratio แทน width/height เพื่อแก้ warning */}
             <Image
               src="/logo/logosolar.png"
               alt="โลโก้บริษัท ศักดิ์สยามโซลาร์"
@@ -35,7 +35,7 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* 🔹 กลุ่มเปลี่ยนภาษา + เมนู */}
+        {/*  กลุ่มเปลี่ยนภาษา + เมนู */}
         <div className={styles.localeContactGroup}>
 
           {/* ปุ่มเปลี่ยนภาษา */}
@@ -55,7 +55,7 @@ export default function Navbar() {
             </span>
           </div>
 
-          {/* 🔸 ปุ่มโทรศัพท์ + ลิงก์เมนู */}
+          {/*  ปุ่มโทรศัพท์ + ลิงก์เมนู */}
           <div className={styles.contactActions}>
             <Link href="tel:1487" className={styles.callLink} title="โทร 1487">
               <FaPhone className={styles.phoneIcon} />

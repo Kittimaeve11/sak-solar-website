@@ -5,8 +5,9 @@ import { useEffect, useState } from "react";
 export default function ThemeModeWrapper({ initialMode }) {
   const [mode, setMode] = useState(initialMode);
 
-  // โหลดจาก API ฝั่ง Client เพื่ออัปเดตสด ๆ
   useEffect(() => {
+    let isMounted = true;
+
     async function loadMode() {
       try {
         const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
@@ -17,19 +18,25 @@ export default function ThemeModeWrapper({ initialMode }) {
         });
 
         const data = await res.json();
-        setMode(data.mode);
+        if (isMounted && data.mode) {
+          setMode(data.mode);
+        }
       } catch (e) {
         console.log("Theme load failed → ใช้ค่าเดิม");
       }
     }
 
+    // โหลดจาก API
     loadMode();
-  }, []);
 
-  // อัปเดต DOM theme ทันทีที่ mode เปลี่ยน
-  useEffect(() => {
+    // อัปเดต DOM theme ทันทีเมื่อ mode เปลี่ยน
     document.documentElement.setAttribute("data-theme-mode", mode);
-  }, [mode]);
+
+    // cleanup
+    return () => {
+      isMounted = false;
+    };
+  }, [mode]); 
 
   return null;
 }

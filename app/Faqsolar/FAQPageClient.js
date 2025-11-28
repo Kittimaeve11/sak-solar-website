@@ -25,49 +25,69 @@ export default function FAQPageClient() {
   const [isMobile, setIsMobile] = useState(false);
   const [openIndex, setOpenIndex] = useState(null);
 
-  /* =====================================================
-      ตรวจมือถือ (เพื่อเลือกไฟล์ภาพ)
-  ===================================================== */
   useEffect(() => {
-    const update = () => setIsMobile(window.innerWidth <= 768);
-    update();
-    window.addEventListener('resize', update);
-    return () => window.removeEventListener('resize', update);
-  }, []);
+    if (typeof window === "undefined") return;
 
-  /* =====================================================
-      ดึงข้อมูล FAQ + Banner
-  ===================================================== */
-  useEffect(() => {
-    const loadData = async () => {
-      // FAQ
-      try {
-        const res = await fetch(`${baseUrl}/api/FQAapi`, {
-          headers: { 'X-API-KEY': apiKey },
-        });
-        const json = await res.json();
-        setFaqs(json.status && json.result ? json.result : []);
-      } finally {
-        setLoadingFaq(false);
-      }
+    let isMounted = true;
+    let resizeTimer = null;
 
-      // Banner
-      try {
-        if (!bannerCache) {
-          const res = await fetch(`${baseUrl}/api/branderIDapi/1`, {
-            headers: { 'X-API-KEY': apiKey },
-          });
-          const json = await res.json();
-          bannerCache = Array.isArray(json.data) ? json.data : [json.data];
-        }
-        setBanners(bannerCache);
-      } finally {
-        setLoadingBanner(false);
-      }
+    //  จัดการ Mobile/Resize
+    const updateMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
     };
+    updateMobile(); // เช็คตอน mount
+
+    window.addEventListener("resize", () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(updateMobile, 200); // debounce
+    });
+
+    //  โหลด FAQ + Banner
+    async function loadData() {
+      try {
+        //  Load FAQ
+        setLoadingFaq(true);
+        const resFaq = await fetch(`${baseUrl}/api/FQAapi`, {
+          headers: { "X-API-KEY": apiKey },
+        });
+        const jsonFaq = await resFaq.json();
+        if (isMounted) {
+          setFaqs(jsonFaq.status && jsonFaq.result ? jsonFaq.result : []);
+        }
+      } catch (e) {
+        console.error("Error loading FAQs:", e);
+      } finally {
+        if (isMounted) setLoadingFaq(false);
+      }
+
+      try {
+        //  Load Banner (with Cache)
+        setLoadingBanner(true);
+        if (!bannerCache) {
+          const resBanner = await fetch(`${baseUrl}/api/branderIDapi/1`, {
+            headers: { "X-API-KEY": apiKey },
+          });
+          const jsonBanner = await resBanner.json();
+          bannerCache = Array.isArray(jsonBanner.data)
+            ? jsonBanner.data
+            : [jsonBanner.data];
+        }
+        if (isMounted) setBanners(bannerCache);
+      } catch (e) {
+        console.error("Error loading Banner:", e);
+      } finally {
+        if (isMounted) setLoadingBanner(false);
+      }
+    }
 
     loadData();
-  }, [locale]);
+
+    return () => {
+      isMounted = false;
+      clearTimeout(resizeTimer);
+      window.removeEventListener("resize", updateMobile);
+    };
+  }, [locale]); 
 
   return (
     <div className="no-margin">

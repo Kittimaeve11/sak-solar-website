@@ -1,4 +1,4 @@
-// 📄 app/about/layout.js
+//  app/about/layout.js
 import '@/styles/about.css';
 
 export const metadata = {
@@ -39,7 +39,7 @@ export const metadata = {
   },
 };
 
-// ⛔⛔⛔ ขาดส่วนนี้ไม่ได้
+// ขาดส่วนนี้ไม่ได้
 export default function AboutLayout({ children }) {
   return <>{children}</>;
 }
