@@ -64,7 +64,7 @@ export const metadata = {
     follow: true, // อนุญาตให้ Google ติดตามลิงก์ในหน้า
   },
   alternates: {
-    canonical: '/', // ป้องกันปัญหา Duplicate URL
+    canonical: 'https://www.saksiamsolar.com', // ป้องกันปัญหา Duplicate URL
   },
 };
 

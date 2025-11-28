@@ -13,7 +13,7 @@ import PaginationControls from './components/PaginationControls';
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 
-// 🚀 Cache in memory
+//  Cache in memory
 let portfolioCache = {
   projects: null,
   types: null,
@@ -25,12 +25,12 @@ export default function PortfolioClient() {
   const { locale } = useLocale();
   const router = useRouter();
 
-  // 📌 State
+  //  State
   const [projects, setProjects] = useState([]);
   const [types, setTypes] = useState([]);
   const [brander, setBrander] = useState([]);
 
-  const [filter, setFilter] = useState('ทั้งหมด');
+  const [filter, setFilter] = useState(locale === 'th' ? 'ทั้งหมด' : 'All');
   const [currentPage, setCurrentPage] = useState(1);
 
   const [isLoading, setIsLoading] = useState(true);
@@ -43,7 +43,15 @@ export default function PortfolioClient() {
   const itemsPerPage = 18;
 
   /* =========================================================
-     โหลดข้อมูลครั้งแรก หรือใช้ Cache
+     Reset filter + page when locale changes
+  ========================================================= */
+  useEffect(() => {
+    setFilter(locale === 'th' ? 'ทั้งหมด' : 'All');
+    setCurrentPage(1);
+  }, [locale]);
+
+  /* =========================================================
+     Load data + cache
   ========================================================= */
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -73,8 +81,10 @@ export default function PortfolioClient() {
           setLoadingBanner(false);
           setProjects([]);
           setTypes([]);
-          setBrander([]); return;
+          setBrander([]);
+          return;
         }
+
         const [typesRes, projectsRes, bannerRes] = await Promise.all([
           fetch(`${baseUrl}/api/portfoliotypepageapi`, { headers: { 'X-API-KEY': apiKey } }),
           fetch(`${baseUrl}/api/portfoliopageapi`, { headers: { 'X-API-KEY': apiKey } }),
@@ -90,33 +100,29 @@ export default function PortfolioClient() {
         const projectList =
           projectsData.status && Array.isArray(projectsData.result?.data)
             ? projectsData.result.data.map((item) => ({
-              portfolio_id: item.portfolio_id,
-              portfolio_num: item.portfolio_num,
-              portfolio_typeID: item.portfolio_typeID,
-
-              id: item.portfolio_num,
-              titleTH: item.adddressTH || '-',
-              titleEN: item.adddressEN || '-',
-
-              size: item.installationsize || '-',
-              productTypeTH: item.TypeProduct_nameTH || '-',
-              productTypeEN: item.TypeProduct_nameEN || '-',
-              panelCount: item.panelsolarcout || '-',
-              postDate: item.portfolio_datainstall || '-',
-
-              coverImage: item.portfolio_gallery
-                ? `${baseUrl}/${JSON.parse(item.portfolio_gallery)[0]}`
-                : '/images/placeholder.png',
-
-              type: item.portfolio_typeID,
-            }))
+                portfolio_id: item.portfolio_id,
+                portfolio_num: item.portfolio_num,
+                portfolio_typeID: item.portfolio_typeID,
+                id: item.portfolio_num,
+                titleTH: item.adddressTH || '-',
+                titleEN: item.adddressEN || '-',
+                size: item.installationsize || '-',
+                productTypeTH: item.TypeProduct_nameTH || '-',
+                productTypeEN: item.TypeProduct_nameEN || '-',
+                panelCount: item.panelsolarcout || '-',
+                postDate: item.portfolio_datainstall || '-',
+                coverImage: item.portfolio_gallery
+                  ? `${baseUrl}/${JSON.parse(item.portfolio_gallery)[0]}`
+                  : '/images/placeholder.png',
+                type: item.portfolio_typeID,
+              }))
             : [];
 
         const bannerList = Array.isArray(bannerData.data)
           ? bannerData.data
           : bannerData.data
-            ? [bannerData.data]
-            : [];
+          ? [bannerData.data]
+          : [];
 
         portfolioCache = {
           projects: projectList,
@@ -131,22 +137,25 @@ export default function PortfolioClient() {
       } finally {
         setIsLoading(false);
         setLoadingBanner(false);
-        setFadeIn(true); // ใส่ก่อน render
+        setFadeIn(true);
       }
     };
 
     load();
 
     return () => window.removeEventListener('resize', checkMobile);
-  }, [locale]);
+  }, []);
 
   /* =========================================================
-     Pagination Logic
+     Filter logic รองรับ TH/EN
   ========================================================= */
-  const filteredProjects =
-    filter === 'ทั้งหมด'
-      ? projects
-      : projects.filter((proj) => proj.type === filter);
+  const isAll =
+    filter === 'ทั้งหมด' ||
+    filter === 'All';
+
+  const filteredProjects = isAll
+    ? projects
+    : projects.filter((proj) => proj.type === filter);
 
   const totalPages = Math.ceil(filteredProjects.length / itemsPerPage);
 
@@ -181,6 +190,7 @@ export default function PortfolioClient() {
         loadingBanner={loadingBanner}
         isMobile={isMobile}
         baseUrl={baseUrl}
+        locale={locale}
       />
 
       <main className={`layout-portfolio ${fadeIn ? 'fade-in' : ''}`} ref={topRef}>
@@ -216,6 +226,7 @@ export default function PortfolioClient() {
               currentPage={currentPage}
               totalPages={totalPages}
               handlePageChange={handlePageChange}
+              locale={locale}
             />
           )}
         </div>

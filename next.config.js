@@ -3,6 +3,12 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
 
+  trailingSlash : true,
+  experimental : {
+     forceSwcTransforms : true
+  },
+
+
   images: {
     domains: ['localhost'],
     remotePatterns: [
