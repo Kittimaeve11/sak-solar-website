@@ -72,7 +72,19 @@ export default function ProductsClient() {
 
     handleResize();
     window.addEventListener("resize", handleResize);
+    const API_ENABLED = false;
 
+    // ถ้า API ปิด → ใช้ Static Fallback
+    if (!API_ENABLED) {
+      setProducts([]);
+      setCategories([]);
+      setBrands([]);
+      setSelectedCategories([]);
+      setSelectedBrands([]);
+      setFilteredBrands([]);
+      setLoading(false);
+      return;
+    }
     const loadData = async () => {
       let categoriesData, productsData, brandsData;
       const cacheAge = Date.now() - productsCache.timestamp;
@@ -98,13 +110,13 @@ export default function ProductsClient() {
 
         categoriesData = headerJSON.result;
 
-        // 🔹 จัดรูปสินค้าจาก API
+        //  จัดรูปสินค้าจาก API
         productsData = productJSON.result.data.map((p) => {
           let mainImage = "";
           try {
             const g = JSON.parse(p.gallery || "[]");
             mainImage = g[0] || "";
-          } catch {}
+          } catch { }
 
           return {
             id: p.product_ID,

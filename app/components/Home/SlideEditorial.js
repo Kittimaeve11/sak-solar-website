@@ -121,6 +121,13 @@ export default function SlideEditorial() {
       }
 
       try {
+        const API_ENABLED = false;
+
+        if (!API_ENABLED) {
+          setLoadingServices(false);
+          setLoadingProducts(false);
+          return;
+        }
         const res = await fetch(`${baseUrl}/api/edittormainpageapi`, {
           headers: { 'X-API-KEY': apiKey || '' },
         });
@@ -140,7 +147,7 @@ export default function SlideEditorial() {
           setEditorials(mapped);
         }
       } catch (error) {
-        console.error('❌ Failed to fetch editorial:', error);
+        // console.error(' Failed to fetch editorial:', error);
       } finally {
         if (isMounted) setIsLoading(false);
       }
@@ -196,21 +203,21 @@ export default function SlideEditorial() {
         </Link>
       </div>
 
-      {/* 🔹 Skeleton Loading แบบ Dynamic ตาม slidesToShow */}
-{isLoading ? (
-  <div className="skeleton-cardsilde-editorial-container">
-    {Array.from({ length: slidesToShow }).map((_, index) => (
-      <div key={index} className="skeleton-cardsilde-editorial">
-        <div className="skeleton skeleton-imagesilde-editorial" />
-          <div className="skeleton skeleton-titlesilde-editorial" />
-          <div className="skeleton skeleton-datesilde-editorial" />
-          <div className="skeleton skeleton-textsilde-editorial" />
-          <div className="skeleton skeleton-textsilde-editorial" />
-       
-      </div>
-    ))}
-  </div>
-) : (
+      {/*  Skeleton Loading แบบ Dynamic ตาม slidesToShow */}
+      {isLoading ? (
+        <div className="skeleton-cardsilde-editorial-container">
+          {Array.from({ length: slidesToShow }).map((_, index) => (
+            <div key={index} className="skeleton-cardsilde-editorial">
+              <div className="skeleton skeleton-imagesilde-editorial" />
+              <div className="skeleton skeleton-titlesilde-editorial" />
+              <div className="skeleton skeleton-datesilde-editorial" />
+              <div className="skeleton skeleton-textsilde-editorial" />
+              <div className="skeleton skeleton-textsilde-editorial" />
+
+            </div>
+          ))}
+        </div>
+      ) : (
         <>
           <Slider
             key={slidesToShow}

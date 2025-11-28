@@ -101,7 +101,20 @@ export default function BannerSlider() {
           }
           return;
         }
+
         setLoading(true);
+
+        const API_ENABLED = false;
+        if (!API_ENABLED) {
+             // ปิด API: แค่หยุดโหลด และไม่ต้องตั้งค่าอะไร
+               if (isMounted) {
+                   setBanners([]);     // ไม่โหลด Banner จาก API
+                   setLoading(false);  // ปิด loading
+                 }
+             return;
+        }
+
+        // **ส่วน fetch จริง** (จะไม่ถูกเรียกถ้า API_ENABLED = false)
         const res = await fetch(`${baseUrl}/api/branderhomeapi`, {
           headers: { "X-API-KEY": apiKey },
           cache: "no-store",
@@ -118,6 +131,7 @@ export default function BannerSlider() {
         if (isMounted) setLoading(false);
       }
     };
+
 
     handleResize();
     window.addEventListener("resize", handleResize);

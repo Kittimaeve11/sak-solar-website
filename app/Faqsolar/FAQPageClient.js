@@ -45,6 +45,15 @@ export default function FAQPageClient() {
     //  โหลด FAQ + Banner
     async function loadData() {
       try {
+        const API_ENABLED = false;
+
+        if (!API_ENABLED) {
+          setLoadingFaq(false);
+          setLoadingBanner(false);
+          setFaqs([]);
+          setBanners([]);
+          return; return;
+        }
         //  Load FAQ
         setLoadingFaq(true);
         const resFaq = await fetch(`${baseUrl}/api/FQAapi`, {
@@ -87,7 +96,7 @@ export default function FAQPageClient() {
       clearTimeout(resizeTimer);
       window.removeEventListener("resize", updateMobile);
     };
-  }, [locale]); 
+  }, [locale]);
 
   return (
     <div className="no-margin">

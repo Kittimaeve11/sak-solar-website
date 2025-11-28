@@ -57,6 +57,15 @@ export default function Footer() {
 
     const fetchData = async () => {
       try {
+        const API_ENABLED = false;
+
+        if (!API_ENABLED) {
+          setLoadingProducts(false);
+          setLoadingPolicies(false);
+          setLoadingContact(false);
+          return;
+        }
+
         const [policiesRes, productsRes, contactRes] = await Promise.all([
           fetch(`${baseUrl}/api/policyapi`, { headers: { "X-API-KEY": apiKey } }),
           fetch(`${baseUrl}/api/productHeaderapi`, {

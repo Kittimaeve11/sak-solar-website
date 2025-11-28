@@ -9,6 +9,12 @@ const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API || '';
 
 async function safeJsonFetch(url, options = {}) {
   try {
+    const API_ENABLED = false;
+
+    if (!API_ENABLED) {
+      setLoading(false);
+      return;
+    }
     const res = await fetch(url, {
       headers: { 'X-API-KEY': apiKey, ...(options.headers || {}) },
       cache: 'no-store',
@@ -46,8 +52,8 @@ export default async function EditorialPage() {
   const banners = Array.isArray(bannersData?.data)
     ? bannersData.data
     : bannersData?.data
-    ? [bannersData.data]
-    : [];
+      ? [bannersData.data]
+      : [];
 
   return (
     <EditorialClient

@@ -60,6 +60,13 @@ export default function TabMenu() {
   useEffect(() => {
     //  โหลดข้อมูล Product Header
     const cached = sessionStorage.getItem('menuProducts');
+    const API_ENABLED = false; //  ปิด API
+
+    if (!API_ENABLED) {
+      setProducts([]);      // เซ็ตเมนูว่าง
+      return;              // ออกจาก useEffect ทันที
+    }
+
     if (cached) {
       setProducts(JSON.parse(cached));
     } else {

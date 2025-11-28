@@ -83,12 +83,22 @@ export default function SlideReview() {
     /*  2) Load API + Cache */
     async function loadReviews() {
       try {
+        const API_ENABLED = false; // เปลี่ยนเป็น true เพื่อเปิด API
+
+        // ถ้ามี cache → ใช้เลย ไม่ต้องโหลด API
         if (window.__REVIEW_CACHE__) {
           setReviews(window.__REVIEW_CACHE__);
           setIsLoading(false);
           return;
         }
 
+        // ปิด API → หยุดโหลด, ป้องกัน error
+        if (!API_ENABLED) {
+          setIsLoading(false);
+          return;
+        }
+
+        // fetch API (จะทำงานเฉพาะตอน API เปิด)
         const res = await fetch(`${baseUrl}/api/Reviewapi?offset=0&limit=10`, {
           headers: { 'X-API-KEY': apiKey },
         });
@@ -104,15 +114,14 @@ export default function SlideReview() {
         if (isMounted) setIsLoading(false);
       }
     }
-    loadReviews();
 
-    /*  Cleanup */
+    loadReviews();    /*  Cleanup */
     return () => {
       isMounted = false;
       clearTimeout(resizeTimer);
       window.removeEventListener('resize', updateVisibleCards);
     };
-  }, []); 
+  }, []);
 
   /* =========================================================
       Custom dots

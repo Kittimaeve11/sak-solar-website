@@ -80,7 +80,7 @@ export default function CookieBanner() {
     const icon = key === 'necessary' ? '✓' : active ? '✓' : '✕';
 
     const handleClick = (e) => {
-      // ❗ กันไม่ให้ไป trigger onClick ของ cookieRow (ไม่ให้เปิด/ปิดดรอปดาวน์)
+      //  กันไม่ให้ไป trigger onClick ของ cookieRow (ไม่ให้เปิด/ปิดดรอปดาวน์)
       e.stopPropagation();
       if (key !== 'necessary') {
         toggleSetting(key);

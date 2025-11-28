@@ -34,14 +34,19 @@ function HomeContent() {
   const [tambons, setTambons] = useState([]);
 
   /* =========================================================
-      📌 Fetch API + Cache (Client-only)
+       Fetch API + Cache (Client-only)
   ========================================================= */
   useEffect(() => {
     if (typeof window === 'undefined') return;
-
+    const API_ENABLED = false;
     const CACHE_KEY = 'HOME_CACHE';
     const cacheText = sessionStorage.getItem(CACHE_KEY);
 
+    if (!API_ENABLED) {
+      setLoadingServices(false);
+      setLoadingProducts(false);
+      return;
+    }
     if (cacheText) {
       try {
         const c = JSON.parse(cacheText);

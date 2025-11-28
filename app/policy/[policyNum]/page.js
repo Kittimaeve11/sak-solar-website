@@ -18,6 +18,12 @@ export default function PolicyPage() {
 
     const fetchPolicy = async () => {
       try {
+        const API_ENABLED = false;
+
+        if (!API_ENABLED) {
+          setLoading(false);
+          return;
+        }
         const res = await fetch(`${baseUrl}/api/policyIDapi/${policyNum}`, {
           headers: { 'X-API-KEY': apiKey || '' },
         });

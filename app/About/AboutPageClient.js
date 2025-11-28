@@ -50,12 +50,23 @@ export default function AboutPageClient() {
   const [selectedMenu, setSelectedMenu] = useState('history');
 
   /* =====================================================
-     🔥 useEffect อันเดียว: รวม Fetch + Cache + Observer
+     useEffect อันเดียว: รวม Fetch + Cache + Observer
      ===================================================== */
   useEffect(() => {
     const cacheKey = `ABOUT_PAGE_CACHE_${locale}`;
     const cachedData = getCache(cacheKey);
+    const API_ENABLED = false;
 
+    if (!API_ENABLED) {
+      setSections({
+        history: null,
+        vision: null,
+        mission: [],
+        teams: [],
+      });
+      setLoading(false);
+      return;
+    }
     // 1) ถ้ามี cache ใช้เลย
     if (cachedData) {
       setSections(cachedData);

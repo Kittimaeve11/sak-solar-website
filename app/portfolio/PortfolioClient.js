@@ -66,6 +66,15 @@ export default function PortfolioClient() {
 
     const load = async () => {
       try {
+        const API_ENABLED = false;
+
+        if (!API_ENABLED) {
+          setIsLoading(false);
+          setLoadingBanner(false);
+          setProjects([]);
+          setTypes([]);
+          setBrander([]); return;
+        }
         const [typesRes, projectsRes, bannerRes] = await Promise.all([
           fetch(`${baseUrl}/api/portfoliotypepageapi`, { headers: { 'X-API-KEY': apiKey } }),
           fetch(`${baseUrl}/api/portfoliopageapi`, { headers: { 'X-API-KEY': apiKey } }),
@@ -81,33 +90,33 @@ export default function PortfolioClient() {
         const projectList =
           projectsData.status && Array.isArray(projectsData.result?.data)
             ? projectsData.result.data.map((item) => ({
-                portfolio_id: item.portfolio_id,
-                portfolio_num: item.portfolio_num,
-                portfolio_typeID: item.portfolio_typeID,
+              portfolio_id: item.portfolio_id,
+              portfolio_num: item.portfolio_num,
+              portfolio_typeID: item.portfolio_typeID,
 
-                id: item.portfolio_num,
-                titleTH: item.adddressTH || '-',
-                titleEN: item.adddressEN || '-',
+              id: item.portfolio_num,
+              titleTH: item.adddressTH || '-',
+              titleEN: item.adddressEN || '-',
 
-                size: item.installationsize || '-',
-                productTypeTH: item.TypeProduct_nameTH || '-',
-                productTypeEN: item.TypeProduct_nameEN || '-',
-                panelCount: item.panelsolarcout || '-',
-                postDate: item.portfolio_datainstall || '-',
+              size: item.installationsize || '-',
+              productTypeTH: item.TypeProduct_nameTH || '-',
+              productTypeEN: item.TypeProduct_nameEN || '-',
+              panelCount: item.panelsolarcout || '-',
+              postDate: item.portfolio_datainstall || '-',
 
-                coverImage: item.portfolio_gallery
-                  ? `${baseUrl}/${JSON.parse(item.portfolio_gallery)[0]}`
-                  : '/images/placeholder.png',
+              coverImage: item.portfolio_gallery
+                ? `${baseUrl}/${JSON.parse(item.portfolio_gallery)[0]}`
+                : '/images/placeholder.png',
 
-                type: item.portfolio_typeID,
-              }))
+              type: item.portfolio_typeID,
+            }))
             : [];
 
         const bannerList = Array.isArray(bannerData.data)
           ? bannerData.data
           : bannerData.data
-          ? [bannerData.data]
-          : [];
+            ? [bannerData.data]
+            : [];
 
         portfolioCache = {
           projects: projectList,
@@ -120,11 +129,9 @@ export default function PortfolioClient() {
         setTypes(typesList);
         setBrander(bannerList);
       } finally {
-        setTimeout(() => {
-          setIsLoading(false);
-          setLoadingBanner(false);
-          setFadeIn(true);
-        }, 200);
+        setIsLoading(false);
+        setLoadingBanner(false);
+        setFadeIn(true); // ใส่ก่อน render
       }
     };
 

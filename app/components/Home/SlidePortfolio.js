@@ -70,6 +70,12 @@ export default function SlidePortfolio() {
       }
 
       try {
+        const API_ENABLED = false;
+        if (!API_ENABLED) {
+          setLoadingServices(false);
+          setLoadingProducts(false);
+          return;
+        }
         const res = await fetch(`${baseUrl}/api/portfoliomainpageapi`, {
           headers: { 'X-API-KEY': apiKey || '' },
         });

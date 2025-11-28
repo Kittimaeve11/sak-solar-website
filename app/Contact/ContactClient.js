@@ -45,6 +45,12 @@ export default function ContactClient() {
 
     const fetchAllData = async () => {
       try {
+        const API_ENABLED = false;
+
+        if (!API_ENABLED) {
+          setLoading(false);
+          return;
+        }
         const cacheAge = Date.now() - contactCache.timestamp;
         if (
           contactCache.contacts &&

@@ -29,6 +29,12 @@ export default function ReviewClient() {
 
         const load = async () => {
             try {
+                const API_ENABLED = false;
+
+                if (!API_ENABLED) {
+                    setLoading(false);
+                    return;
+                }
                 const [reviewRes, bannerRes] = await Promise.all([
                     fetch(`${baseUrl}/api/Reviewapi?offset=1&limit=999`, { headers: { 'X-API-KEY': apiKey } }),
                     fetch(`${baseUrl}/api/branderIDapi/11`, { headers: { 'X-API-KEY': apiKey } }),

@@ -226,9 +226,8 @@ export default function ContactForm({
     try {
       const logData = {
         actionType: '6', // ประเภทการกระทำ = การส่งข้อความสนใจ
-        actionDetail: `ส่งแบบฟอร์มสนใจโซลาร์เซลล์ | สินค้า: ${formData.product || 'N/A'} | ราคา: ${
-          formData.package || 'N/A'
-        } | เวลาใช้ไฟ: ${formData.usageTime || 'N/A'} | จังหวัด: ${formData.province || 'N/A'}`,
+        actionDetail: `ส่งแบบฟอร์มสนใจโซลาร์เซลล์ | สินค้า: ${formData.product || 'N/A'} | ราคา: ${formData.package || 'N/A'
+          } | เวลาใช้ไฟ: ${formData.usageTime || 'N/A'} | จังหวัด: ${formData.province || 'N/A'}`,
         typeUser: 'ผู้เยี่ยมชมเว็บไซต์',
         datatype: 'แบบฟอร์มติดต่อ',
         dataID: '0',
@@ -315,6 +314,13 @@ export default function ContactForm({
     }
 
     try {
+      const API_ENABLED = false;
+
+      if (!API_ENABLED) {
+        setLoadingServices(false);
+        setLoadingProducts(false);
+        return;
+      }
       // เรียก API เพื่อบันทึกข้อมูล
       const res = await fetch(`${baseUrl}/api/Inquiriespageapi`, {
         method: 'POST',

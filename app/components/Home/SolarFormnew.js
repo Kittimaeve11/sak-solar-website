@@ -209,30 +209,28 @@ export default function SolarCalculatorForm() {
      * โหลดข้อมูลสินค้าเมื่อ component mount ครั้งแรก
      */
   useEffect(() => {
+    const API_ENABLED = false; //  เปลี่ยนเป็น true เมื่อจะเปิด API
+
     const fetchProducts = async () => {
+      if (!API_ENABLED) return; //  ปิด API ชั่วคราว
+
       try {
         const res = await fetch(`${baseUrl}/api/productpageapi`, {
           headers: { 'X-API-KEY': apiKey },
         });
 
-        if (!res.ok) {
-          // console.error('การเชื่อมต่อ API ล้มเหลว');
-          return;
-        }
+        if (!res.ok) return;
 
         const data = await res.json();
         if (data.status && data.result?.data) {
           setProductsData(data.result.data);
-        } else {
-          // console.error('ข้อมูลจาก API ไม่ถูกต้อง:', data.message);
         }
-      } catch (err) {
-        // console.error('เกิดข้อผิดพลาดในการดึงข้อมูลสินค้า:', err);
-      }
+      } catch (err) { }
     };
 
     fetchProducts();
   }, []);
+
 
   /**
    * ตรวจสอบค่าที่กรอกในฟอร์ม

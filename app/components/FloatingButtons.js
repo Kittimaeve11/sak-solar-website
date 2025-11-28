@@ -50,6 +50,11 @@ export default function FloatingContactButton() {
     if (!contact) {
       (async () => {
         try {
+          const API_ENABLED = false;
+          if (!API_ENABLED) {
+            return;
+          }
+
           const res = await fetch(`${baseUrl}/api/contactapi`, {
             headers: { 'X-API-KEY': apiKey },
           });
