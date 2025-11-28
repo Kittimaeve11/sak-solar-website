@@ -878,8 +878,8 @@ export default function SolarCalculatorForm() {
                                   <Image
                                     src={mainImage}
                                     alt={name}
-                                    width={330}
-                                    height={330}
+                                    width={300}
+                                    height={300}
                                     style={{
                                       width: '100%',
                                       height: 'auto',     // สำคัญมาก
@@ -1171,7 +1171,7 @@ export default function SolarCalculatorForm() {
                 onClick={handlePrintScreenshot}
                 suppressHydrationWarning
               >
-                ปริ้นผลการคำนวณขนาดติดตั้ง
+                ปริ้นผลการคำนวณ
               </button>
             </div>
           </>

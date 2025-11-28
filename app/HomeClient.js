@@ -163,7 +163,7 @@ function HomeContent() {
   }, [productFromUrl]);
 
   /* =========================================================
-      💚 Render หน้า Home
+       Render หน้า Home
   ========================================================= */
   return (
     <main className="fade-in">
