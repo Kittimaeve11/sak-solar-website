@@ -15,6 +15,7 @@
   "company": "SAKSIAM SOLAR ENERGY CO., LTD.",
   "address": "275, Moo 3, Khung Taphao Sub-district, Mueang District, Uttaradit Province 53000",
   "phone": "phone",
+  "telephone": "telephone",
   "fax": "fax",
   "additional": "Additional inquiry channels",
   "ask": "Ask for more information",
@@ -25,7 +26,8 @@
   "inquiries3": "General inquiries xxxx",
   "namelast": "First name and last name",
   "pnumber": "phone number",
-  "email": "Email (if any)",
+  "email": "Email",
+  "emailany": "Email (if any)",
   "leavemassage": "Leave a message",
   "please_fill": "Please fill in your first and last name.",
   "onlyphone": "Only 10 digits for example",
@@ -57,7 +59,6 @@
       "ig": "Instagram | Saksiame Solar Energy",
       "youtube": "YouTube | Saksiame Solar Energy"
     }
-
   },
   "available": "No products available at the moment"
 }

@@ -104,7 +104,7 @@ export default async function RootLayout({ children }) {
       suppressHydrationWarning             // ป้องกัน Error เวลา hydration
     >
       <body className="font-sukhumvit" suppressHydrationWarning>
-        <ThemeModeWrapper initialMode={themeMode} /> {/* สลับธีมแบบ Client Side */}
+        {/* <ThemeModeWrapper initialMode={themeMode} />  สลับธีมแบบ Client Side */}
 
         {/* ใช้ Suspense ครอบ Component ฝั่ง Client */}
         <Suspense fallback={null}>

@@ -12,11 +12,10 @@ export const menuItems = [
       { label: "ประวัติความเป็นมา", href: "/About#history" },
       { label: "วิสัยทัศน์", href: "/About#vision" },
       { label: "พันธกิจ", href: "/About#mission" },
-      { label: "คณะกรรมการบริษัท", href: "/About#teams" }, 
-      { label: "คำถามที่พบบ่อย", href: "/Faqsolar" },
+      { label: "คณะกรรมการบริษัท", href: "/About#teams" }, { label: "คำถามที่พบบ่อย", href: "/Faq" },
       { label: "ผลงานของเรา", href: "/portfolio" },
       { label: "รีวิวจากลูกค้า", href: "/review" },
-      { label: "บทความ", href: "/editorialsolar" },
+      { label: "บทความ", href: "/editorial" },
     ],
   },
   // {

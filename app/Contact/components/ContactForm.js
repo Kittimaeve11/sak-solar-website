@@ -66,13 +66,10 @@ export default function ContactForm({ messages, locale, topics }) {
     try {
       const logData = {
         actionType: '7',
-        actionDetail: `ส่งแบบฟอร์มสอบถามเพิ่มเติม | หัวข้อ: ${
-          formData.topic || 'N/A'
-        } | ชื่อ: ${formData.name || 'N/A'} | เบอร์โทร: ${
-          formData.phone || 'N/A'
-        } | อีเมล: ${formData.email || 'ไม่มี'} | ข้อความ: ${
-          formData.message || 'ไม่มีข้อความ'
-        }`,
+        actionDetail: `ส่งแบบฟอร์มสอบถามเพิ่มเติม | หัวข้อ: ${formData.topic || 'N/A'
+          } | ชื่อ: ${formData.name || 'N/A'} | เบอร์โทร: ${formData.phone || 'N/A'
+          } | อีเมล: ${formData.email || 'ไม่มี'} | ข้อความ: ${formData.message || 'ไม่มีข้อความ'
+          }`,
         typeUser: 'ผู้เยี่ยมชมเว็บไซต์',
         datatype: 'สอบถามเพิ่มเติม',
         dataID: '0',
@@ -181,9 +178,8 @@ export default function ContactForm({ messages, locale, topics }) {
           </label>
 
           <div
-            className={`custom-select-container ${
-              touched.topic && errors.topic ? 'error-border' : ''
-            }`}
+            className={`custom-select-container ${touched.topic && errors.topic ? 'error-border' : ''
+              }`}
           >
             <select
               id="topic"
@@ -283,7 +279,7 @@ export default function ContactForm({ messages, locale, topics }) {
         {/* Email */}
         <div>
           <label htmlFor="email" className="form-label">
-            อีเมล์ (ถ้ามี)
+            {messages.emailany}
           </label>
           <input
             type="email"
@@ -308,7 +304,8 @@ export default function ContactForm({ messages, locale, topics }) {
         {/* Message */}
         <div>
           <label htmlFor="message" className="form-label">
-            ฝากข้อความ <span className="required-asterisk">*</span>
+            {messages.leavemassage}
+            <span className="required-asterisk">*</span>
           </label>
           <textarea
             id="message"
@@ -322,9 +319,8 @@ export default function ContactForm({ messages, locale, topics }) {
             className={`${getClassName(
               formData.message,
               'form-textarea'
-            )} ${
-              touched.message && errors.message ? 'error-border' : ''
-            }`}
+            )} ${touched.message && errors.message ? 'error-border' : ''
+              }`}
           />
           {touched.message && errors.message && (
             <p className="error-text">*{errors.message}</p>

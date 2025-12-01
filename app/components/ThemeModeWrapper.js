@@ -8,13 +8,18 @@ export default function ThemeModeWrapper({ initialMode }) {
   useEffect(() => {
     let isMounted = true;
 
+    // ควบคุมเปิด/ปิด API ได้จากตรงนี้
+    const API_ENABLED = false;   // ปิด API ชั่วคราว
+
     async function loadMode() {
+      if (!API_ENABLED) return;  // ถ้า API ปิด → ไม่ fetch เลย
+
       try {
         const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
         const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
 
         const res = await fetch(`${baseUrl}/api/website/theme-mode`, {
-          headers: { 'X-API-KEY': apiKey }
+          headers: { "X-API-KEY": apiKey },
         });
 
         const data = await res.json();
@@ -26,17 +31,16 @@ export default function ThemeModeWrapper({ initialMode }) {
       }
     }
 
-    // โหลดจาก API
+    // โหลดจาก API (ถ้าเปิด)
     loadMode();
 
-    // อัปเดต DOM theme ทันทีเมื่อ mode เปลี่ยน
+    // อัปเดต Theme ใน DOM ทุกครั้งที่ mode เปลี่ยน
     document.documentElement.setAttribute("data-theme-mode", mode);
 
-    // cleanup
     return () => {
       isMounted = false;
     };
-  }, [mode]); 
+  }, [mode]);
 
   return null;
 }

@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import styles from "../../styles/Footer.module.css";
 import { menuItems as staticMenu } from "../config/footer";
+import { useLocale } from "../Context/LocaleContext";
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
@@ -36,6 +37,8 @@ const EXTRA_MENUS = [
    Footer Component
 ====================== */
 export default function Footer() {
+  const { messages, locale } = useLocale();
+
   const [socials, setSocials] = useState([]);
   const [policies, setPolicies] = useState([]);
   const [dynamicProducts, setDynamicProducts] = useState([]); // จาก API productHeaderapi เท่านั้น
@@ -44,12 +47,22 @@ export default function Footer() {
   const [loadingProducts, setLoadingProducts] = useState(true);
   const [loadingPolicies, setLoadingPolicies] = useState(true);
   const [loadingContact, setLoadingContact] = useState(true);
-
+  const API_ENABLED = false;
   /* ======================
      Load data from API
   ======================= */
   useEffect(() => {
-    // local /api/data (ถ้ามีใช้ socials)
+        if (!API_ENABLED) {
+      // API ปิด → ใช้ข้อมูล fallback แทน
+      setDynamicProducts([]); // หรือ set fallback product menu static ก็ได้
+      setPolicies([]);
+      setContact(null);
+
+      setLoadingProducts(false);
+      setLoadingPolicies(false);
+      setLoadingContact(false);
+      return;
+    }
     fetch("/api/data")
       .then((res) => res.json())
       .then((data) => setSocials(data.socials || []))
@@ -57,20 +70,9 @@ export default function Footer() {
 
     const fetchData = async () => {
       try {
-        const API_ENABLED = false;
-
-        if (!API_ENABLED) {
-          setLoadingProducts(false);
-          setLoadingPolicies(false);
-          setLoadingContact(false);
-          return;
-        }
-
         const [policiesRes, productsRes, contactRes] = await Promise.all([
           fetch(`${baseUrl}/api/policyapi`, { headers: { "X-API-KEY": apiKey } }),
-          fetch(`${baseUrl}/api/productHeaderapi`, {
-            headers: { "X-API-KEY": apiKey },
-          }),
+          fetch(`${baseUrl}/api/productHeaderapi`, { headers: { "X-API-KEY": apiKey } }),
           fetch(`${baseUrl}/api/contactapi`, { headers: { "X-API-KEY": apiKey } }),
         ]);
 
@@ -88,15 +90,15 @@ export default function Footer() {
         );
         setLoadingPolicies(false);
 
-        // Dynamic Product Menu (เฉพาะ API)
+        // Dynamic Product Menu (จาก API เท่านั้น)
         if (productsData?.status && Array.isArray(productsData.result)) {
           const productMenus = productsData.result.map((item) => ({
             label: item.producttypenameTH.trim(),
-            href: `/products?categories=${slugify(item.producttypenameEN)}`, // SEO friendly
+            href: `/products?categories=${slugify(item.producttypenameEN)}`,
           }));
           setDynamicProducts(productMenus);
         } else {
-          setDynamicProducts([]);
+          setDynamicProducts([]); // ไม่มีข้อมูลจาก API
         }
         setLoadingProducts(false);
 
@@ -138,64 +140,43 @@ export default function Footer() {
   );
 
   /* ======================
-     Merge Static & Dynamic (เฉพาะ API)
-  ======================= */
-  const firstTwoMenus = [
-    {
-      ...staticMenu[0],
-      // ถ้ามีข้อมูลจาก API ใช้อันนั้น, ถ้าไม่มีใช้ค่าจาก config เดิมเป็น fallback
-      items:
-        dynamicProducts.length > 0 ? dynamicProducts : staticMenu[0].items || [],
-    },
-    staticMenu[1],
-  ];
-
-  /* ======================
      Render Footer
   ======================= */
   return (
     <div>
       <footer className={styles.footer}>
         <div className={styles.footerContent}>
+
           {/* Column 1: Products + Policies */}
           <div className={styles.column}>
-            <h4>{firstTwoMenus[0].title}</h4>
+            <h4>{staticMenu[0].title}</h4>
 
             <ul>
-              {/* แสดงกำลังโหลดเฉพาะ API */}
               {loadingProducts ? (
                 <li>กำลังโหลด...</li>
-              ) : firstTwoMenus[0].items.length > 0 ? (
-                firstTwoMenus[0].items.map(({ label, href, external }, i) => (
+              ) : dynamicProducts.length > 0 ? (
+                dynamicProducts.map(({ label, href }, i) => (
                   <li
                     key={href || label + i}
                     className="fade-in"
                     style={{ animationDelay: `${i * 0.1}s` }}
                   >
-                    {href ? (
-                      <Link
-                        href={href}
-                        {...(external
-                          ? { target: "_blank", rel: "noopener noreferrer" }
-                          : {})}
-                      >
-                        {label}
-                      </Link>
-                    ) : (
-                      <span>{label}</span>
-                    )}
+                    <Link href={href}>{label}</Link>
                   </li>
                 ))
               ) : (
-                <li>ไม่มีข้อมูลบริการ</li>
+                <li>ไม่พบข้อมูลสินค้า</li> //  ไม่มี API = แสดงข้อความนี้
               )}
 
-              {/* Extra Static Menus (ไม่ต้องโหลด API) */}
+              {/* Extra static menus */}
               {EXTRA_MENUS.map(({ label, href, external }, i) => (
                 <li
-                  key={href || label + "extra" + i}
+                  key={label + i}
                   className="fade-in"
-                  style={{ animationDelay: `${(firstTwoMenus[0].items.length + i) * 0.1}s` }}
+                  style={{
+                    animationDelay: `${(dynamicProducts.length + i) * 0.1
+                      }s`,
+                  }}
                 >
                   <Link
                     href={href}
@@ -208,6 +189,7 @@ export default function Footer() {
                 </li>
               ))}
             </ul>
+
             <h4>นโยบาย</h4>
             {loadingPolicies ? (
               <p>กำลังโหลด...</p>
@@ -226,15 +208,15 @@ export default function Footer() {
                 ))}
               </ul>
             ) : (
-              <p>ไม่มีนโยบาย</p>
+              <p>ไม่พบข้อมูลนโยบาย</p>
             )}
           </div>
 
           {/* Column 2 */}
           <div className={styles.column}>
-            <h4>{firstTwoMenus[1].title}</h4>
+            <h4>{staticMenu[1].title}</h4>
             <ul>
-              {firstTwoMenus[1].items.map(({ label, href }, i) => (
+              {staticMenu[1].items.map(({ label, href }, i) => (
                 <li key={href || label + i}>
                   {href ? <Link href={href}>{label}</Link> : <span>{label}</span>}
                 </li>
@@ -244,20 +226,19 @@ export default function Footer() {
 
           {/* Column 3 */}
           <div className={styles.column}>
-            <h4>ติดต่อเรา</h4>
+            <h4>{messages.contact}</h4>
             {loadingContact ? (
               <p>กำลังโหลด...</p>
             ) : contact ? (
               <div className="fade-in">
                 <ul>
-                  <li>บริษัท ศักดิ์สยามลิสซิ่ง จำกัด (มหาชน)</li>
+                  <li>{messages.company}</li>
                   <li>{contact.address_th}</li>
-                  <li>โทรศัพท์ : {contact.call_center}</li>
-                  <li>แฟกซ์ : {contact.fax}</li>
-                  <li>อีเมล : {contact.email_main}</li>
+                  <li>{messages.telephone} : {contact.call_center}</li>
+                  <li>{messages.fax} : {contact.fax}</li>
+                  <li>{messages.email} : {contact.email_main}</li>
                 </ul>
 
-                {/* Social Icons */}
                 <div className={styles.socialIcons}>
                   {Object.entries({
                     facebook: contact.facebook,
@@ -288,7 +269,7 @@ export default function Footer() {
                 </div>
               </div>
             ) : (
-              <p>ไม่มีข้อมูลติดต่อ</p>
+              <p>ไม่พบข้อมูลติดต่อ</p>
             )}
           </div>
         </div>
@@ -296,12 +277,10 @@ export default function Footer() {
         <div className={styles.footerBottomImage}></div>
       </footer>
 
-      {/* Bottom Footer */}
       <div className={styles.footerBottomWrapper}>
         <div className={styles.footerBottom}>
           © 2025 Copyright: SAKSIAM SOLAR ENERGY CO., LTD BY
           SAKSIAM LEASING PUBLIC COMPANY LIMITED. All Rights Reserved.
-
           <div className={styles.logoGroup}>
             <Image
               src="/images/logo3.8549861c.png"
