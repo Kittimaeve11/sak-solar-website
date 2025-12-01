@@ -113,22 +113,30 @@ const nextConfig = {
   },
 
   //  เพิ่ม rewrite rule สำหรับสินค้า (เปลี่ยน URL เป็น slug)
-  async rewrites() {
+async rewrites() {
     return [
-      // ===== โซลาร์รูฟท็อป =====
       {
         source: '/products/solar-rooftop/:brandSlug/:productID',
         destination: '/products/1/:brandSlug/:productID',
       },
-      // ===== โซลาร์รูฟท็อปไฮบริด =====
       {
         source: '/products/solar-rooftop-hybrid/:brandSlug/:productID',
         destination: '/products/4/:brandSlug/:productID',
       },
-      // ===== โซลาร์แอร์ =====
       {
         source: '/products/solar-air/:brandSlug/:productID',
         destination: '/products/2/:brandSlug/:productID',
+      },
+    ];
+  },
+
+  //  Redirect API ออกไป Backend จริง (ไม่ให้ Next.js Build /api)
+  async redirects() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: 'https://api.saksiamsolar.com/:path*',
+        permanent: false,
       },
     ];
   },

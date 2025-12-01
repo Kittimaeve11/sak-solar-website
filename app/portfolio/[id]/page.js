@@ -9,7 +9,7 @@ import { BsCalendarCheck } from 'react-icons/bs';
 import { FaSolarPanel } from 'react-icons/fa';
 import Gallery from '../gallery';
 import { useLocale } from '@/app/Context/LocaleContext';
-import LoadingSpinner from './LoadingSpinner'; // 🔥 เพิ่ม import
+import LoadingSpinner from './LoadingSpinner'; //  เพิ่ม import
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 const apiKey = process.env.NEXT_PUBLIC_AUTHORIZATION_KEY_API;
