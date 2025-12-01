@@ -13,37 +13,40 @@ export default function GoogleAnalytics({ GA_MEASUREMENT_ID }) {
 
     useEffect(() => {
         const savedConsent = Cookies.get('cookieConsentSettings');
-        if (savedConsent) setConsent(JSON.parse(savedConsent));
-    }, []);
+        const parsedConsent = savedConsent ? JSON.parse(savedConsent) : null;
 
-    useEffect(() => {
-        if (!consent) return;
-        const url = pathname + (searchParams.toString() ? `?${searchParams}` : '');
-        if (consent.analytics) {
+        setConsent(parsedConsent);
+
+        if (
+            parsedConsent &&
+            parsedConsent.analytics &&
+            pathname
+        ) {
+            const url = pathname + (searchParams.toString() ? `?${searchParams}` : '');
             pageview(url);
         }
-    }, [pathname, searchParams, consent]);
+    }, [pathname, searchParams]);
 
     if (!consent || !consent.analytics) return null;
 
     return (
         <>
             <Script
-                strategy="afterInteractive"
                 src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+                strategy="afterInteractive"
             />
             <Script
                 id="google-analytics"
                 strategy="afterInteractive"
                 dangerouslySetInnerHTML={{
                     __html: `
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', '${GA_MEASUREMENT_ID}', {
-              page_path: window.location.pathname,
-            });
-          `,
+                        window.dataLayer = window.dataLayer || [];
+                        function gtag(){dataLayer.push(arguments);}
+                        gtag('js', new Date());
+                        gtag('config', '${GA_MEASUREMENT_ID}', {
+                            send_page_view: false
+                        });
+                    `,
                 }}
             />
         </>

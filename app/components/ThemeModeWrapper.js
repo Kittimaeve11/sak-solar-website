@@ -27,7 +27,7 @@ export default function ThemeModeWrapper({ initialMode }) {
           setMode(data.mode);
         }
       } catch (e) {
-        console.log("Theme load failed → ใช้ค่าเดิม");
+        // console.log("Theme load failed  ใช้ค่าเดิม");
       }
     }
 

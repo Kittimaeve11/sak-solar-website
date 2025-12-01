@@ -21,17 +21,6 @@ const slugify = (name) =>
     .replace(/\s+/g, "-")
     .replace(/[^a-z0-9-]/g, "") || "";
 
-/* ======================
-   Static extra menu (ไม่ใช่ API)
-====================== */
-const EXTRA_MENUS = [
-  {
-    label: "สินเชื่อโซล่ารูฟ",
-    href: "https://saksiam.com/service/solarrooftop",
-    external: true,
-  },
-  { label: "ใบรับรองการไฟฟ้า", href: "/file/Inverter.pdf" },
-];
 
 /* ======================
    Footer Component
@@ -52,7 +41,7 @@ export default function Footer() {
      Load data from API
   ======================= */
   useEffect(() => {
-        if (!API_ENABLED) {
+    if (!API_ENABLED) {
       // API ปิด → ใช้ข้อมูล fallback แทน
       setDynamicProducts([]); // หรือ set fallback product menu static ก็ได้
       setPolicies([]);
@@ -63,10 +52,6 @@ export default function Footer() {
       setLoadingContact(false);
       return;
     }
-    fetch("/api/data")
-      .then((res) => res.json())
-      .then((data) => setSocials(data.socials || []))
-      .catch(() => setSocials([]));
 
     const fetchData = async () => {
       try {
@@ -155,39 +140,40 @@ export default function Footer() {
               {loadingProducts ? (
                 <li>กำลังโหลด...</li>
               ) : dynamicProducts.length > 0 ? (
-                dynamicProducts.map(({ label, href }, i) => (
-                  <li
-                    key={href || label + i}
-                    className="fade-in"
-                    style={{ animationDelay: `${i * 0.1}s` }}
-                  >
-                    <Link href={href}>{label}</Link>
-                  </li>
-                ))
-              ) : (
-                <li>ไม่พบข้อมูลสินค้า</li> //  ไม่มี API = แสดงข้อความนี้
-              )}
+                <>
+                  {dynamicProducts.map(({ label, href }, i) => (
+                    <li
+                      key={href || label + i}
+                      className="fade-in"
+                      style={{ animationDelay: `${i * 0.1}s` }}
+                    >
+                      <Link href={href}>{label}</Link>
+                    </li>
+                  ))}
 
-              {/* Extra static menus */}
-              {EXTRA_MENUS.map(({ label, href, external }, i) => (
-                <li
-                  key={label + i}
-                  className="fade-in"
-                  style={{
-                    animationDelay: `${(dynamicProducts.length + i) * 0.1
-                      }s`,
-                  }}
-                >
-                  <Link
-                    href={href}
-                    {...(external
-                      ? { target: "_blank", rel: "noopener noreferrer" }
-                      : {})}
-                  >
-                    {label}
-                  </Link>
-                </li>
-              ))}
+                  {/*  StaticMenu ต่อท้าย dynamicProducts */}
+                  {staticMenu[0].items.map(({ label, href }, i) => (
+                    <li
+                      key={href || label + i}
+                      className="fade-in"
+                      style={{ animationDelay: `${(dynamicProducts.length + i) * 0.1}s` }}
+                    >
+                      <Link href={href}>{label}</Link>
+                    </li>
+                  ))}
+                </>
+              ) : (
+                <>
+                  <li>ไม่พบข้อมูลสินค้า</li>
+
+                  {/*  StaticMenu ยังแสดงเวลา API ว่างด้วย */}
+                  {staticMenu[0].items.map(({ label, href }, i) => (
+                    <li key={href || label + i}>
+                      <Link href={href}>{label}</Link>
+                    </li>
+                  ))}
+                </>
+              )}
             </ul>
 
             <h4>นโยบาย</h4>
