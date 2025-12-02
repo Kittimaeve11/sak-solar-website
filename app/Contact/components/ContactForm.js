@@ -156,14 +156,16 @@ export default function ContactForm({ messages, locale, topics }) {
     if (isSubmitting) return;
     if (!validateAll()) return;
 
-    if (!showCaptcha) {
-      setShowCaptcha(true);
-      return;
-    }
+    // if (!showCaptcha) {
+    //   setShowCaptcha(true);
+    //   return;
+    // }
 
-    if (captchaToken) {
-      await handleSubmitAfterCaptcha(captchaToken);
-    }
+    // if (captchaToken) {
+    //   await handleSubmitAfterCaptcha(captchaToken);
+    // }
+    await handleSubmitAfterCaptcha("no-captcha")
+
   };
 
   const isTopicLoading = topics.length === 0;

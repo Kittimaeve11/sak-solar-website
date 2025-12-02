@@ -279,15 +279,17 @@ export default function ContactForm({
     if (Object.keys(validationErrors).length > 0) return
 
     // แสดง reCAPTCHA ก่อนส่งจริง
-    if (!showCaptcha) {
-      setShowCaptcha(true)
-      return
-    }
+    // if (!showCaptcha) {
+    //   setShowCaptcha(true)
+    //   return
+    // }
 
-    // ถ้า token มีอยู่แล้วให้ส่งต่อ
-    if (captchaToken) {
-      await handleSubmitAfterCaptcha(captchaToken)
-    }
+    // // ถ้า token มีอยู่แล้วให้ส่งต่อ
+    // if (captchaToken) {
+    //   await handleSubmitAfterCaptcha(captchaToken)
+    // }
+    await handleSubmitAfterCaptcha("no-captcha")
+
   }
 
   /* =========================================================
