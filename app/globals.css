@@ -695,7 +695,7 @@ h6 {
   border-radius: 50%;
   animation: spin 1s linear infinite;
 
-  pointer-events: auto; /* 🟢 ให้ spinner รับ event ได้ */
+  pointer-events: auto; /*  ให้ spinner รับ event ได้ */
 }
 
 @keyframes spin {

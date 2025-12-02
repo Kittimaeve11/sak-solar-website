@@ -4,7 +4,7 @@ import Script from 'next/script';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
-import { pageview } from '../lib/firebase';
+import { initFirebase, pageview } from '../lib/firebase';
 
 export default function GoogleAnalytics({ GA_MEASUREMENT_ID }) {
     const pathname = usePathname();
@@ -12,17 +12,15 @@ export default function GoogleAnalytics({ GA_MEASUREMENT_ID }) {
     const [consent, setConsent] = useState(null);
 
     useEffect(() => {
+        initFirebase();
+
         const savedConsent = Cookies.get('cookieConsentSettings');
-        const parsedConsent = savedConsent ? JSON.parse(savedConsent) : null;
+        const parsed = savedConsent ? JSON.parse(savedConsent) : null;
+        setConsent(parsed);
 
-        setConsent(parsedConsent);
-
-        if (
-            parsedConsent &&
-            parsedConsent.analytics &&
-            pathname
-        ) {
-            const url = pathname + (searchParams.toString() ? `?${searchParams}` : '');
+        if (parsed?.analytics) {
+            const url =
+                pathname + (searchParams.toString() ? `?${searchParams}` : '');
             pageview(url);
         }
     }, [pathname, searchParams]);

@@ -109,7 +109,7 @@ export default async function RootLayout({ children }) {
         {/* ใช้ Suspense ครอบ Component ฝั่ง Client */}
         <Suspense fallback={null}>
           <LocaleProvider> {/* ใช้ Context ภาษาและข้อความให้ทั้งเว็บ */}
-            <GoogleAnalytics GA_MEASUREMENT_ID="G-GRQS76P3XV" />
+            {/* <GoogleAnalytics GA_MEASUREMENT_ID="G-GRQS76P3XV" /> */}
             <Navbar />
             <TabMenu />
 
@@ -120,7 +120,7 @@ export default async function RootLayout({ children }) {
             <ToastProvider />
             <FloatingButtons />
             <BackToTopButton />
-            <CookieBanner />
+            {/* <CookieBanner /> */}
             <Footer />
           </LocaleProvider>
         </Suspense>

@@ -329,7 +329,7 @@ export default function ContactForm({ messages, locale, topics }) {
       </div>
 
       {/* reCAPTCHA */}
-      {showCaptcha && process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY && (
+      {/* {showCaptcha && process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY && (
         <div
           style={{
             display: 'flex',
@@ -338,11 +338,11 @@ export default function ContactForm({ messages, locale, topics }) {
           }}
         >
           <ReCAPTCHA
-            sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+            sitekey="6LcIkRosAAAAAND5QNfsXclXOIMMr6CT4zoK124Q"
             onChange={handleCaptchaChange}
           />
         </div>
-      )}
+      )} */}
 
       {/* Submit Buttons */}
       <div className="form-submit">

@@ -594,7 +594,7 @@ export default function ContactForm({
           </div>
 
           {/* กล่อง reCAPTCHA (แสดง/ซ่อนด้วย CSS ไม่ลบออกจาก DOM) */}
-          <div
+          {/* <div
             style={{
               display: 'flex',
               justifyContent: 'center',
@@ -605,10 +605,10 @@ export default function ContactForm({
             }}
           >
             <ReCAPTCHA
-              sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+              sitekey="6LcIkRosAAAAAND5QNfsXclXOIMMr6CT4zoK124Q"
               onChange={handleCaptchaChange}
             />
-          </div>
+          </div> */}
 
           {/* ปุ่มส่งฟอร์ม */}
           <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1.5rem' }}>
