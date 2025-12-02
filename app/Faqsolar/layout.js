@@ -24,10 +24,10 @@ export const metadata = {
         'SAKSIAM SOLAR ENERGY CO., LTD.',
     ],
     openGraph: {
-        title: 'คำถามที่พบบ่อยเกี่ยวกับโซลาร์เซลล์ | Saksiam Solar',
+        title: 'คำถามที่พบบ่อยเกี่ยวกับโซลาร์เซลล์ |บริษัท ศักดิ์สยาม โซลาร์ เอ็นเนอร์ยี่ จำกัด | SAKSIAM SOLAR ENERGY CO., LTD.',
         description:
             'ตอบคำถามเกี่ยวกับโซลาร์เซลล์ ตั้งแต่เริ่มต้น จนถึงการติดตั้งจริง ครอบคลุมทั้งบ้านพักอาศัยและธุรกิจ พร้อมคำแนะนำจากผู้เชี่ยวชาญ.',
-        url: 'https://www.saksiamsolar.com/faq',
+        url: 'https://solar.saksiam.com/faqsolar',
     images: ['/images/locationPhoto685cbc7c35ef8.jpg'], // รูปตัวอย่างตอนแชร์ลิงก์ (ควรเป็นขนาด 1200x630px)
         type: 'website',
         siteName: 'Saksiam Solar',

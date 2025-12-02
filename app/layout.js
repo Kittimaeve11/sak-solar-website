@@ -48,11 +48,11 @@ export const metadata = {
     'ติดตั้งโซลาร์',
   ],
   creator: 'Saksiam Solar',
-  metadataBase: new URL('https://www.saksiamsolar.com'), // กำหนด Base URL ของเว็บ
+  metadataBase: new URL('https://solar.saksiam.com/contact'), // กำหนด Base URL ของเว็บ
   openGraph: {
     type: 'website',                     // ประเภทเนื้อหา ใช้ website (ไม่ใช่ blog หรือ product)
     locale: 'th_TH',                     // ภาษาของเว็บ (ไทยประเทศไทย)
-    url: 'https://www.saksiamsolar.com', // ลิงก์จริงของหน้า ใช้สำหรับแชร์และ canonical
+    url: 'https://solar.saksiam.com/contact', // ลิงก์จริงของหน้า ใช้สำหรับแชร์และ canonical
     siteName: 'Saksiam Solar',           // ชื่อเว็บไซต์ที่จะแสดงเวลาแชร์บนโซเชียล
     title: 'บริการติดตั้งโซลาร์เซลล์ครบวงจร – พร้อมรับประกันและดูแลหลังการขาย', // หัวข้อหลักตอนแชร์ลิงก์
     description:

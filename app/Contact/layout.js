@@ -26,7 +26,7 @@ export const metadata = {
       "ติดต่อบริษัท ศักดิ์สยาม โซลาร์ เอ็นเนอร์ยี่ จำกัด | Saksiam Solar",
     description:
       "สอบถามบริการติดตั้งระบบโซลาร์เซลล์ ออกแบบ ขออนุญาต พร้อมให้คำปรึกษาโดยทีมงานผู้เชี่ยวชาญ",
-    url: "https://www.saksiamsolar.com/contact",
+    url: "https://solar.saksiam.com/contact",
     type: "website",
     siteName: "Saksiam Solar",
     images: ['/images/locationPhoto685cbc7c35ef8.jpg'], // รูปตัวอย่างตอนแชร์ลิงก์ (ควรเป็นขนาด 1200x630px)
@@ -35,14 +35,14 @@ export const metadata = {
 
   twitter: {
     card: "summary_large_image",
-    title: "ติดต่อ Saksiam Solar | ขอใบเสนอราคา ติดตั้งโซลาร์เซลล์",
+    title: "ติดต่อเรา | บริษัท ศักดิ์สยาม โซลาร์ เอ็นเนอร์ยี่ จำกัด | SAKSIAM SOLAR ENERGY CO., LTD.",
     description:
       "ติดต่อสอบถามข้อมูลโซลาร์ ขอใบเสนอราคา ติดตั้ง Solar Rooftop สำหรับบ้านและธุรกิจ",
     images: ["/images/seo/contact-cover.jpg"],
   },
 
   alternates: {
-    canonical: "https://www.saksiamsolar.com/contact",
+    canonical: "https://solar.saksiam.com/contact",
   },
 };
 

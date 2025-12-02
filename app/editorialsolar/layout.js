@@ -23,10 +23,10 @@ export const metadata = {
   ],
 
   openGraph: {
-    title: "บทความและสาระความรู้เกี่ยวกับโซลาร์เซลล์",
+    title: "บทความและสาระความรู้เกี่ยวกับโซลาร์เซลล์ บริษัท ศักดิ์สยาม โซลาร์ เอ็นเนอร์ยี่ จำกัด | SAKSIAM SOLAR ENERGY CO., LTD.",
     description:
       "แหล่งความรู้เกี่ยวกับระบบโซลาร์เซลล์สำหรับบ้านและธุรกิจ พร้อมเทคนิค การติดตั้ง การเลือกอุปกรณ์ และคำแนะนำจากผู้เชี่ยวชาญ.",
-    url: "https://www.saksiamsolar.com/editorial",
+    url: "https://solar.saksiam.com/editorialsolar",
     type: "website",
     siteName: "Saksiam Solar",
     images: ['/images/locationPhoto685cbc7c35ef8.jpg'], // รูปตัวอย่างตอนแชร์ลิงก์ (ควรเป็นขนาด 1200x630px)
@@ -41,7 +41,7 @@ export const metadata = {
   },
 
   alternates: {
-    canonical: "https://www.saksiamsolar.com/editorial",
+    canonical: "https://solar.saksiam.com/editorialsolar",
   },
 };
 

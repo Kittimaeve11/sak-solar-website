@@ -19,10 +19,10 @@ export const metadata = {
   ],
   openGraph: {
     title:
-      'เกี่ยวกับเรา | Saksiam Solar Energy Co., Ltd. | ศักดิ์สยาม โซลาร์',
+      'เกี่ยวกับเรา |บริษัท ศักดิ์สยาม โซลาร์ เอ็นเนอร์ยี่ จำกัด | SAKSIAM SOLAR ENERGY CO., LTD.',
     description:
       'ผู้นำด้านเทคโนโลยีพลังงานแสงอาทิตย์ครบวงจร พร้อมทีมวิศวกรและบริการหลังการขายที่มั่นใจได้',
-    url: 'https://www.saksiamsolar.com/about',
+    url: 'https://solar.saksiam.com/about',
     type: 'website',
     siteName: 'Saksiam Solar',
     images: ['/images/locationPhoto685cbc7c35ef8.jpg'], // รูปตัวอย่างตอนแชร์ลิงก์ (ควรเป็นขนาด 1200x630px)
@@ -35,7 +35,7 @@ export const metadata = {
     images: ['/images/seo/about-cover.jpg'],
   },
   alternates: {
-    canonical: 'https://www.saksiamsolar.com/about',
+    canonical: 'https://solar.saksiam.com/about',
   },
 };
 

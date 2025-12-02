@@ -1,6 +1,6 @@
 
 export const metadata = {
-  title: 'รีวิวติดตั้งโซลาร์เซลล์',
+  title: 'รีวิวติดตั้งโซลาร์เซลล์ | บริษัท ศักดิ์สยาม โซลาร์ เอ็นเนอร์ยี่ จำกัด | SAKSIAM SOLAR ENERGY CO., LTD.',
   description:
     'ชมรีวิวการติดตั้งโซลาร์เซลล์จริงจากลูกค้าบ้านพักอาศัย โรงงาน และธุรกิจทั่วประเทศ พร้อมวิดีโอรีวิว ผลลัพธ์หลังติดตั้ง และประสบการณ์ใช้งานจริง.',
   keywords: [
@@ -17,10 +17,10 @@ export const metadata = {
     'ศักดิ์สยาม โซลาร์ รีวิว',
   ],
   openGraph: {
-    title: 'รีวิวติดตั้งโซลาร์เซลล์',
+    title: 'รีวิวติดตั้งโซลาร์เซลล์ | บริษัท ศักดิ์สยาม โซลาร์ เอ็นเนอร์ยี่ จำกัด | SAKSIAM SOLAR ENERGY CO., LTD.',
     description:
       'ดูวิดีโอรีวิวและประสบการณ์การใช้งานโซลาร์เซลล์จากลูกค้าจริง ทั้งบ้านพักอาศัย โรงงาน และภาคธุรกิจ',
-    url: 'https://www.saksiamsolar.com/review',
+    url: 'https://solar.saksiam.com/review',
     type: 'website',
     siteName: 'Saksiam Solar',
     images: ['/images/locationPhoto685cbc7c35ef8.jpg'], // รูปตัวอย่างตอนแชร์ลิงก์ (ควรเป็นขนาด 1200x630px)
